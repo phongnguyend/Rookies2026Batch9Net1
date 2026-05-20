@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/NashAssetManagement.Application/NashAssetManagement.Application.csproj" />
+    <Project Path="src/NashAssetManagement.Domain/NashAssetManagement.Domain.csproj" />
+    <Project Path="src/NashAssetManagement.Infrastructure/NashAssetManagement.Infrastructure.csproj" />
+    <Project Path="src/NashAssetManagement.Persistence/NashAssetManagement.Persistence.csproj" />
+    <Project Path="src/NashAssetManagement.WebAPI/NashAssetManagement.WebAPI.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
