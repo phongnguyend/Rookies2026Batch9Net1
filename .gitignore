@@ -1,0 +1,28 @@
+# Secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/*.env.development
+**/*.env.production
+**/.git
+**/secrets/*.env
+!**/secrets/example.env
+
+# User-specific files
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+**/*.http
+**/*.postman*
+
+# Temp files
+**/*.tmp
+**/*.temp
+
+# React
+**/node_modules/
+**/.next/
+**/dist/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
