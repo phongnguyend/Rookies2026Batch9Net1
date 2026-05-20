@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace NashAssetManagement.Application
 {
@@ -9,6 +10,11 @@ namespace NashAssetManagement.Application
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            });
+
             return services;
         }
     }
