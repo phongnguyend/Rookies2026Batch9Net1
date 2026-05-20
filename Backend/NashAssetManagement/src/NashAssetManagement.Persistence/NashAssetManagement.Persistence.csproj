@@ -2,4 +2,7 @@
     <ItemGroup>
         <ProjectReference Include="..\NashAssetManagement.Application\NashAssetManagement.Application.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
+    </ItemGroup>
 </Project>
