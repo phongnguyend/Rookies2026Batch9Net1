@@ -1,0 +1,28 @@
+services:
+  # Nash Asset Management Database
+  nam-db:
+    container_name: nam-db
+    image: postgres:18.4
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - nam-db-data:/var/lib/postgresql/data
+    env_file:
+      - path: secrets/nam-db.env
+        required: true
+    networks:
+      - nam-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sa -d nam-db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nam-db-data:
+
+
+networks:
+  nam-network:
+    driver: bridge
