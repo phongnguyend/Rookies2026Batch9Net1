@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Persistence.DataAccess;
@@ -7,10 +8,20 @@ namespace NashAssetManagement.Persistence
 {
     public static class ServiceCollectionExtensions
     {
+        const string ConnectionStringName = "Database";
+
         public static IServiceCollection AddPersistenceServices(
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            // DbContext
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                // For development
+                options.EnableSensitiveDataLogging(true);
+                options.UseNpgsql(configuration.GetConnectionString(ConnectionStringName))
+                        .UseSnakeCaseNamingConvention();
+            });
             services.AddRepositories();
             services.AddUnitOfWork();
 

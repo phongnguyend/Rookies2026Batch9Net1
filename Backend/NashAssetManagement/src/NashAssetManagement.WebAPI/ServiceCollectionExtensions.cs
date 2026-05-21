@@ -1,4 +1,6 @@
-﻿namespace NashAssetManagement.WebAPI
+﻿using NashAssetManagement.WebAPI.Middlewares;
+
+namespace NashAssetManagement.WebAPI
 {
     public static class ServiceCollectionExtensions
     {
@@ -8,6 +10,9 @@
         {
             services.AddControllers();
             services.AddOpenApi();
+            services.AddProblemDetails();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
             return services;
         }
     }

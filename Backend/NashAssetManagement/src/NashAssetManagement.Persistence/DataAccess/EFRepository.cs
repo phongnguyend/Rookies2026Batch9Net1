@@ -10,11 +10,11 @@ namespace NashAssetManagement.Persistence.DataAccess
         : IRepository<TEntity, TKey>
         where TEntity : BaseEntity<TKey>
     {
-        protected readonly DbContext _dbContext;
+        protected readonly AppDbContext _dbContext;
         protected readonly DbSet<TEntity> _dbSet;
         protected readonly SpecificationEvaluator _specificationEvaluator;
 
-        public EFRepository(DbContext dbContext)
+        public EFRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<TEntity>();
