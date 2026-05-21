@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.WebAPI.Middlewares;
+using NashAssetManagement.WebAPI.Utilities.Converters;
+using System.Text.Json.Serialization;
 
 namespace NashAssetManagement.WebAPI
 {
@@ -10,7 +12,13 @@ namespace NashAssetManagement.WebAPI
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NullableUtcDateTimeJsonConverter());
+                });
             services.AddOpenApi();
             services.AddProblemDetails();
             services.AddExceptionHandler<GlobalExceptionHandler>();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NashAssetManagement.Infrastructure.DateTimes;
 
 namespace NashAssetManagement.Infrastructure
 {
@@ -9,6 +10,8 @@ namespace NashAssetManagement.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddDateTimeProvider();
+
             return services;
         }
     }
