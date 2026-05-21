@@ -40,7 +40,7 @@ export default function NavBar() {
   const breadcrumbs = getBreadcrumbs(pathname || "");
 
   return (
-    <div className="navbar bg-primary h-17.5 w-full px-6 flex items-center justify-between text-white shadow-sm">
+    <div className="navbar bg-primary h-17.5 w-full px-8 flex items-center justify-between text-white shadow-sm">
       {/* Left - Breadcrumbs */}
       <div className="breadcrumbs text-lg font-bold [&_li::before]:opacity-100 [&_li::before]:text-white">
         <ul>
