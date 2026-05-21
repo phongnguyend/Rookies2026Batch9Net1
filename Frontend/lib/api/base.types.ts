@@ -18,7 +18,7 @@ export interface ValidationErrorField {
 export interface ApiErrorResponse {
     title: string;
     type: string;
-    statusCode: number;
+    status: number;
     detail: string;
     errors?: ValidationErrorField[];
 }

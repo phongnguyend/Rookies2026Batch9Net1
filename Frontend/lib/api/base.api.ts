@@ -19,7 +19,7 @@ const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
         const customErrorResponse: ApiErrorResponse = {
             title: rawErrordata?.title as string || 'An error occurred',
             type: rawErrordata?.type as string || 'Unknown',
-            statusCode: Number(result.error.status) || 500,
+            status: Number(result.error.status) || 500,
             detail: rawErrordata?.detail as string || 'Something went wrong. Please try again later.',
             errors: rawErrordata?.errors as ApiErrorResponse['errors'] || undefined
         }
