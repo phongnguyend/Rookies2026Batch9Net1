@@ -1,3 +1,5 @@
+import { PaginationResponse } from "@/lib/api/base.types";
+
 export interface User {
   id: string;
   createdAt: string;
@@ -19,23 +21,18 @@ export interface GetUsersRequest {
   page?: number;
   limit?: number;
   search?: string;
-}
-// assume has paging 
-export interface PagingMeta {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+  skins?: string[];
+  createdDate?: Date | null;
 }
 
-export interface PagingResponse<T> {
-  data: T[];
-  paging: PagingMeta;
-}
+export const fakeUserSkins: UserSkin[] = [
+  { id: '1', skin: 'black' },
+  { id: '2', skin: 'white' },
+  { id: '3', skin: 'yellow' },
+  { id: '4', skin: 'indian' },
+];
 
-export type GetUsersResponse = PagingResponse<User>;
+export interface GetUsersResponse extends PaginationResponse<User>{};
 
 export type GetUserByIdResponse = User;
 
@@ -379,9 +376,3 @@ export interface UserSkin {
   skin: string;
 }
 
-export const fakeUserSkins: UserSkin[] = [
-  { id: '1', skin: 'black' },
-  { id: '2', skin: 'white' },
-  { id: '3', skin: 'yellow' },
-  { id: '4', skin: 'indian' },
-];

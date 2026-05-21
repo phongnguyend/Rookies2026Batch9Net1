@@ -5,7 +5,7 @@ import { BaseQueryFn } from '@reduxjs/toolkit/query';
 
 const rawBaseQuery = fetchBaseQuery({
     baseUrl: ENV_CONFIGS.apiUrl,
-    credentials: 'include', // send cookie automatically
+    // credentials: 'include', // send cookie automatically
 });
 
 const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
@@ -33,7 +33,7 @@ const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
 export const baseApiSlice = createApi({
     reducerPath: 'api',
     baseQuery: customBaseQuery,
-    tagTypes: ['Account', 'Asset', 'Assignment', 'Report', 'Return'],
+    tagTypes: ['Account', 'Asset', 'Assignment', 'Report', 'Return', "Users"],
     endpoints: () => ({
     }),
 });

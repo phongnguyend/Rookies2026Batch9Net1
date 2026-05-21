@@ -23,7 +23,7 @@ export default function DataTable<T>({
   emptyMessage = 'No records found.',
 }: DataTableProps<T>) {
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto" >
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-400">

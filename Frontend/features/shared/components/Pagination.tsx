@@ -1,49 +1,66 @@
 'use client';
 
 interface PaginationProps {
-  currentPage: number;
+  pageNumber: number;
   totalPages: number;
+  pageSize?: number;
+  totalCount?: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
   onPageChange: (page: number) => void;
 }
 
 export default function Pagination({
-  currentPage,
+  pageNumber,
   totalPages,
+  pageSize,
+  totalCount,
+  hasPreviousPage,
+  hasNextPage,
   onPageChange,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="mt-6 flex justify-end">
+    <div className="mt-6 flex items-center justify-between">
+      {typeof totalCount === 'number' && typeof pageSize === 'number' && (
+        <p className="text-sm text-gray-500">
+          Page {pageNumber} of {totalPages} — Total {totalCount} items
+        </p>
+      )}
+
       <div className="join">
         <button
+          type="button"
           className="join-item btn btn-sm"
-          disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
+          disabled={!hasPreviousPage}
+          onClick={() => onPageChange(pageNumber - 1)}
         >
           Previous
         </button>
 
         {Array.from({ length: totalPages }).map((_, index) => {
-          const pageNumber = index + 1;
+          const current = index + 1;
 
           return (
             <button
-              key={pageNumber}
-              onClick={() => onPageChange(pageNumber)}
+              key={current}
+              type="button"
+              onClick={() => onPageChange(current)}
               className={`join-item btn btn-sm ${
-                currentPage === pageNumber ? 'btn-primary' : ''
+                pageNumber === current ? 'btn-primary' : ''
               }`}
             >
-              {pageNumber}
+              {current}
             </button>
           );
         })}
 
         <button
+          type="button"
           className="join-item btn btn-sm"
-          disabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
+          disabled={!hasNextPage}
+          onClick={() => onPageChange(pageNumber + 1)}
         >
           Next
         </button>

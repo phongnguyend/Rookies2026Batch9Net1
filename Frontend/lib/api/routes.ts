@@ -8,6 +8,9 @@ export const APP_ROUTES = {
   ADMIN_REPORT: "/admin/report",
   ADMIN_RETURNS: "/admin/returns",
 
+  // TEST
+  ADMIN_TEST: "/admin/test",
+  
   STAFF_HOME: "/staff",
 };
 

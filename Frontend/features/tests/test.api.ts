@@ -1,75 +1,81 @@
-import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
 import type {
   GetUserByIdResponse,
   GetUsersRequest,
   GetUsersResponse,
   User,
 } from './test.types';
-import { fakeUsers } from './test.types';
+import { baseApiSlice } from '@/lib/api/base.api';
 
-export const testApi = createApi({
-  reducerPath: 'testApi',
-  baseQuery: fakeBaseQuery(),
-  tagTypes: ['Users'],
+export const testApi = baseApiSlice.injectEndpoints({
+  overrideExisting: true,
+
   endpoints: (builder) => ({
     getUsers: builder.query<GetUsersResponse, GetUsersRequest | void>({
-      queryFn: async (arg) => {
-        const page = arg?.page ?? 1;
-        const limit = arg?.limit ?? 10;
+      query: () => ({
+        url: '/users',
+        method: 'GET',
+      }),
+
+      transformResponse: (response: User[], _meta, arg) => {
+        const pageNumber = arg?.page ?? 1;
+        const pageSize = arg?.limit ?? 10;
         const search = arg?.search?.trim().toLowerCase() ?? '';
+        const skins = arg?.skins ?? [];
+        const createdDate = arg?.createdDate ?? null;
 
-        const filteredUsers = search
-          ? fakeUsers.filter((user) =>
-              [
-                user.name,
-                user.city,
-                user.cityName,
-                user.country,
-                user.address,
-                user.skin,
-              ].some((value) => value.toLowerCase().includes(search)),
-            )
-          : fakeUsers;
+        let filteredUsers = response;
 
-        const totalItems = filteredUsers.length;
-        const totalPages = Math.ceil(totalItems / limit);
-        const startIndex = (page - 1) * limit;
-        const data = filteredUsers.slice(startIndex, startIndex + limit);
+        if (search) {
+          filteredUsers = filteredUsers.filter((user) =>
+            [
+              user.name,
+              user.city,
+              user.cityName,
+              user.country,
+              user.address,
+              user.skin,
+            ].some((value) => value.toLowerCase().includes(search)),
+          );
+        }
+
+        if (skins.length > 0) {
+          filteredUsers = filteredUsers.filter((user) =>
+            skins.includes(user.skin),
+          );
+        }
+
+        if (createdDate) {
+          filteredUsers = filteredUsers.filter((user) => {
+            const userDate = new Date(user.createdAt);
+
+            return userDate.toDateString() === createdDate.toDateString();
+          });
+        }
+
+        const totalCount = filteredUsers.length;
+        const totalPages = Math.ceil(totalCount / pageSize) || 1;
+        const startIndex = (pageNumber - 1) * pageSize;
+        const items = filteredUsers.slice(startIndex, startIndex + pageSize);
 
         return {
-          data: {
-            data,
-            paging: {
-              page,
-              limit,
-              totalItems,
-              totalPages,
-              hasNextPage: page < totalPages,
-              hasPreviousPage: page > 1,
-            },
-          },
+          items,
+          pageNumber,
+          totalPages,
+          totalCount,
+          pageSize,
+          hasPreviousPage: pageNumber > 1,
+          hasNextPage: pageNumber < totalPages,
         };
       },
+
       providesTags: ['Users'],
     }),
 
     getUserById: builder.query<GetUserByIdResponse, string>({
-      queryFn: async (id) => {
-        const user = fakeUsers.find((user) => user.id === id);
-
-        if (!user) {
-          return {
-            error: {
-              status: 404,
-              data: 'User not found',
-            },
-          };
-        }
-
-        return {
-          data: user,
-        };
-      },
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: 'GET',
+      }),
       providesTags: (_result, _error, id) => [{ type: 'Users', id }],
     }),
   }),
