@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
 import ToastContainer from "@/features/shared/components/Toast/ToastContainer";
+import { Fragment } from "react/jsx-runtime";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,13 +29,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // will implement auth later
+  const isAuthenticated = true;
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <StoreProvider>
-          <NavBar />
-          {children}
-          <ToastContainer />
+          {isAuthenticated ? (
+            <>
+              <NavBar />
+              {children}
+              <ToastContainer />
+            </>
+          ) : (
+            children
+          )}
         </StoreProvider>
       </body>
     </html>
