@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NashAssetManagement.Domain.Entities.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Persistence.Configurations
 {
@@ -15,11 +12,8 @@ namespace NashAssetManagement.Persistence.Configurations
         {
             builder.ToTable(TableName, DbSchema.Core);
 
-            builder.Property(x => x.AssignedDateAtUtc)
-            .HasColumnType("date");
-
             builder.Property(x => x.Note)
-                .HasMaxLength(500);
+                .HasMaxLength(1000);
 
             builder.HasOne(x => x.Asset)
                 .WithMany(x => x.Assignments)
@@ -35,6 +29,9 @@ namespace NashAssetManagement.Persistence.Configurations
                 .WithMany(x => x.ReceivedAssignments)
                 .HasForeignKey(x => x.AssignedToUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.State)
+                .HasConversion<string>();
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Extensions.Logging.Abstractions;
 using NashAssetManagement.Domain.Entities.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Persistence.Configurations
 {
@@ -15,9 +11,6 @@ namespace NashAssetManagement.Persistence.Configurations
         public void Configure(EntityTypeBuilder<ReturnRequest> builder)
         {
             builder.ToTable(TableName, DbSchema.Core);
-
-            builder.Property(x => x.ReturnedDate)
-            .HasColumnType("date");
 
             builder.HasOne(x => x.Assignment)
                 .WithMany(x => x.ReturnRequests)
@@ -33,6 +26,9 @@ namespace NashAssetManagement.Persistence.Configurations
                 .WithMany(x => x.AcceptedReturnRequests)
                 .HasForeignKey(x => x.AcceptedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.State)
+                .HasConversion<string>();
         }
     }
 }

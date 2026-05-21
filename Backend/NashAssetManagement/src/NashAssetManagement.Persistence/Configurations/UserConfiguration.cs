@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NashAssetManagement.Domain.Entities.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Persistence.Configurations
 {
@@ -16,7 +13,7 @@ namespace NashAssetManagement.Persistence.Configurations
             builder.ToTable(TableName, DbSchema.Auth);
 
             builder.Property(x => x.PasswordHash)
-            .HasMaxLength(255);
+                .HasMaxLength(255);
 
             builder.Property(x => x.UserName)
                 .HasMaxLength(100);
@@ -36,11 +33,14 @@ namespace NashAssetManagement.Persistence.Configurations
             builder.Property(x => x.LastName)
                 .HasMaxLength(100);
 
-            builder.Property(x => x.DateOfBirth)
+            builder.Property(x => x.JoinedAtUtc)
                 .HasColumnType("date");
 
-            builder.Property(x => x.JoinedDateAtUtc)
-                .HasColumnType("date");
+            builder.Property(x => x.Gender)
+                .HasConversion<string>();
+
+            builder.Property(x => x.UserType)
+                .HasConversion<string>();
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NashAssetManagement.Persistence.Configurations
+﻿namespace NashAssetManagement.Persistence.Configurations
 {
     internal static class DbSchema
     {

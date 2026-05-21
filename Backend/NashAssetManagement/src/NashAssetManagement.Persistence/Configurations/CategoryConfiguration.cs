@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NashAssetManagement.Domain.Entities.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Persistence.Configurations
 {

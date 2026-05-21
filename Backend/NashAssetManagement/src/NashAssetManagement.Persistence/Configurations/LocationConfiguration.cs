@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NashAssetManagement.Domain.Entities.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Persistence.Configurations
 {
@@ -15,7 +12,7 @@ namespace NashAssetManagement.Persistence.Configurations
             builder.ToTable(TableName, DbSchema.Core);
 
             builder.Property(x => x.Name)
-            .HasMaxLength(100);
+                .HasMaxLength(100);
 
             builder.HasIndex(x => x.Name)
                 .IsUnique();
