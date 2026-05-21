@@ -1,12 +1,9 @@
 ﻿using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {
-    public sealed class Asset : SoftDeletableEntity<Guid>
+    public sealed class Asset : BaseEntity<Guid>, ISoftDeletable
     {
         public string AssetCode { get; set; } = default!;
 
@@ -14,18 +11,20 @@ namespace NashAssetManagement.Domain.Entities.Core
 
         public string Specification { get; set; } = default!;
 
-        public DateTime InstalledDateAtUtc { get; set; }
+        public DateTime InstalledAtUtc { get; set; }
 
         public AssetState State { get; set; }
 
-        public int LocationId { get; set; }
+        public Guid LocationId { get; set; }
 
-        public Location Location { get; set; } = default!;
+        public Location? Location { get; set; }
 
-        public int CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
 
-        public Category Category { get; set; } = default!;
+        public Category? Category { get; set; }
 
         public ICollection<Assignment> Assignments { get; set; } = [];
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAtUtc { get; set; }
     }
 }

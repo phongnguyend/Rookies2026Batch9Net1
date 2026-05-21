@@ -1,15 +1,12 @@
 ﻿using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {
-    public sealed class Assignment : TrackableEntity<Guid>
+    public sealed class Assignment : BaseEntity<Guid>, ITrackable
     {
-        public DateTime AssignedDateAtUtc { get; set; }
+        public DateTime AssignedAtUtc { get; set; }
 
         public string? Note { get; set; }
 
@@ -17,18 +14,20 @@ namespace NashAssetManagement.Domain.Entities.Core
 
         public bool IsReturning { get; set; } = false;
 
-        public int AssetId { get; set; }
+        public Guid AssetId { get; set; }
 
-        public Asset Asset { get; set; } = default!;
+        public Asset? Asset { get; set; }
 
-        public int AssignedByUserId { get; set; }
+        public Guid AssignedByUserId { get; set; }
 
-        public User AssignedByUser { get; set; } = default!;
+        public User? AssignedByUser { get; set; }
 
-        public int AssignedToUserId { get; set; }
+        public Guid AssignedToUserId { get; set; }
 
-        public User AssignedToUser { get; set; } = default!;
+        public User? AssignedToUser { get; set; }
 
         public ICollection<ReturnRequest> ReturnRequests { get; set; } = [];
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? UpdatedAtUtc { get; set; }
     }
 }

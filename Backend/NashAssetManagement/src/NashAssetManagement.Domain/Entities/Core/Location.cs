@@ -1,8 +1,5 @@
 ﻿using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {

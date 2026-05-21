@@ -1,28 +1,27 @@
 ﻿using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {
-    public sealed class ReturnRequest : TrackableEntity<Guid>
+    public sealed class ReturnRequest : BaseEntity<Guid>, ITrackable
     {
-        public DateTime? ReturnedDate {  get; set; }
+        public DateTime? ReturnedAtUtc { get; set; }
 
         public ReturnRequestState State { get; set; }
 
-        public int AssignmentId { get; set; }
+        public Guid AssignmentId { get; set; }
 
-        public Assignment Assignment { get; set; } = default!;
+        public Assignment? Assignment { get; set; }
 
-        public int RequestedByUserId { get; set; }
+        public Guid RequestedByUserId { get; set; }
 
-        public User RequestedByUser { get; set; } = default!;
+        public User? RequestedByUser { get; set; }
 
-        public int? AcceptedByUserId { get; set; }
+        public Guid? AcceptedByUserId { get; set; }
 
         public User? AcceptedByUser { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? UpdatedAtUtc { get; set; }
     }
 }

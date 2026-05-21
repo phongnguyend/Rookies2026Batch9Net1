@@ -2,11 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NashAssetManagement.Domain.Entities.Identity
 {
@@ -16,7 +11,7 @@ namespace NashAssetManagement.Domain.Entities.Identity
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public DateTime? DateOfBirth { get; set; }
-        public DateTime JoinedDateAtUtc {  get; set; }
+        public DateTime JoinedAtUtc { get; set; }
 
         public Gender Gender { get; set; }
 
@@ -24,7 +19,7 @@ namespace NashAssetManagement.Domain.Entities.Identity
 
         public bool IsFirstLogin { get; set; } = true;
 
-        public bool IsDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; }
 
         public DateTime? DeletedAtUtc { get; set; }
 
@@ -32,16 +27,13 @@ namespace NashAssetManagement.Domain.Entities.Identity
 
         public DateTime? UpdatedAtUtc { get; set; }
 
-        public int LocationId { get; set; }
+        public Guid LocationId { get; set; }
 
-        public Location Location { get; set; } = default!;
+        public Location? Location { get; set; }
 
         public ICollection<UserRole> UserRoles { get; set; } = [];
-
         public ICollection<Assignment> AssignedAssignments { get; set; } = [];
-
         public ICollection<Assignment> ReceivedAssignments { get; set; } = [];
-
         public ICollection<ReturnRequest> RequestedReturnRequests { get; set; } = [];
         public ICollection<ReturnRequest> AcceptedReturnRequests { get; set; } = [];
     }

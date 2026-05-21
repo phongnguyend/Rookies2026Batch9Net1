@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NashAssetManagement.Domain.Enums
+﻿namespace NashAssetManagement.Domain.Enums
 {
     public enum ReturnRequestState
     {
