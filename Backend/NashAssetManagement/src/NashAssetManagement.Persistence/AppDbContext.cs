@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace NashAssetManagement.Persistence
 {

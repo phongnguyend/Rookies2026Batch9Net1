@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 
 namespace NashAssetManagement.Persistence.DataAccess
@@ -7,9 +6,9 @@ namespace NashAssetManagement.Persistence.DataAccess
     public class EFUnitOfWork
         : IUnitOfWork, IAsyncDisposable
     {
-        readonly DbContext _dbContext;
+        readonly AppDbContext _dbContext;
         IDbContextTransaction? _transaction;
-        public EFUnitOfWork(DbContext dbContext)
+        public EFUnitOfWork(AppDbContext dbContext)
         {
             _dbContext = dbContext;
             _transaction = null;
