@@ -25,13 +25,21 @@ export default function Drawer({ role }: DrawerProps) {
   const dispatch = useAppDispatch();
 
   return (
-    <div className="min-h-full w-64 flex flex-col shadow-sm bg-white">
+    <div className="min-h-full w-64 flex flex-col bg-white">
       {/* Brand Header */}
       <div className="md:pb-8 md:pl-0 flex flex-col gap-1 p-6">
         <div className="flex items-center">
-          <Image quality={100} src={"/assets/images/nashtech_logo.png"} alt="NashTech Logo" className="w-20 h-auto" width={100} height={20} />
+          <Image
+            quality={100}
+            src="/assets/images/nashtech_logo.png"
+            alt="NashTech Logo"
+            width={80}
+            height={0}
+            style={{ width: 'auto', height: 'auto' }}
+            loading="eager"
+          />
         </div>
-        <div className="text-primary font-bold text-lg leading-snug">Online Asset Management</div>
+        <div className="text-primary font-bold text-lg leading-snug">Nash Asset Management</div>
       </div>
 
       {/* Navigation */}
