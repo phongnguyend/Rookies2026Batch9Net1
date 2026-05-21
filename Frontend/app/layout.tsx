@@ -5,6 +5,10 @@ import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
 import ToastContainer from "@/features/shared/components/Toast/ToastContainer";
 import { Fragment } from "react/jsx-runtime";
+import Drawer from "@/features/shared/components/Drawer/Drawer";
+import { AccountRole } from "@/features/accounts/accounts.types";
+import DrawerCheckbox from "@/features/shared/components/Drawer/DrawerCheckbox";
+import FloatingDrawerButton from "@/features/shared/components/Drawer/FloatingDrawerButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,16 +34,34 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   // will implement auth later
-  const isAuthenticated = true;
+  const authenticatedUser = {
+    isAuthenticated: true,
+    role: AccountRole.Admin,
+  };
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <StoreProvider>
-          {isAuthenticated ? (
+          {authenticatedUser.isAuthenticated ? (
             <>
               <NavBar />
-              {children}
+              <div className="drawer md:drawer-open relative px-8 pt-12">
+                <DrawerCheckbox />
+                <FloatingDrawerButton />
+
+                {/* Left Content */}
+                <div className="drawer-content md:pl-15 md:pt-15">
+                  <main>{children}</main>
+                </div>
+
+                {/* Drawer Sidebar */}
+                <div className="drawer-side">
+                  <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+
+                  <Drawer role={authenticatedUser.role} />
+                </div>
+              </div>
               <ToastContainer />
             </>
           ) : (
