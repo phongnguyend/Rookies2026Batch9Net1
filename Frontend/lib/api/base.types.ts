@@ -1,13 +1,16 @@
 export interface PaginationRequest {
-    pageIndex?: number;
+    pageNumber?: number;
     pageSize?: number;
 }
 
 export interface PaginationResponse<T> {
     items: T[];
-    totalItems: number;
+    pageNumber: number;
     totalPages: number;
-    pageIndex: number;
+    totalCount: number;
+    pageSize: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
 }
 
 export interface ValidationErrorField {
