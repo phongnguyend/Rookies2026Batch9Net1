@@ -4,7 +4,9 @@ import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
 import ToastContainer from "@/features/shared/components/Toast/ToastContainer";
+import GlobalModalContainer from "@/features/shared/components/Modal/GlobalModalContainer";
 import { Fragment } from "react/jsx-runtime";
+
 import Drawer from "@/features/shared/components/Drawer/Drawer";
 import { AccountRole } from "@/features/accounts/accounts.types";
 import DrawerCheckbox from "@/features/shared/components/Drawer/DrawerCheckbox";
@@ -45,7 +47,10 @@ export default function RootLayout({
         <StoreProvider>
           {authenticatedUser.isAuthenticated ? (
             <>
+              {/* Navbar */}
               <NavBar />
+
+              {/* Main */}
               <div className="drawer md:drawer-open relative px-8 pt-12">
                 <DrawerCheckbox />
                 <FloatingDrawerButton />
@@ -62,7 +67,10 @@ export default function RootLayout({
                   <Drawer role={authenticatedUser.role} />
                 </div>
               </div>
+
+              {/* Utilities Components */}
               <ToastContainer />
+              <GlobalModalContainer />
             </>
           ) : (
             children
