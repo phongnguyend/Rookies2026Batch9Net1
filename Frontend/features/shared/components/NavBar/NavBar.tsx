@@ -3,88 +3,58 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import NavbarProfile from "./NavBarProfile";
+import { APP_ROUTES, APP_LABELS } from "@/lib/api/routes";
 
-interface RouteConfig {
-  segment: string;
-  parentLabel: string;
-  itemLabel: string;
+interface BreadcrumbItem {
+  label: string;
+  href: string;
 }
 
-const ROUTE_CONFIGS: RouteConfig[] = [
-  { segment: "accounts", parentLabel: "Manage User", itemLabel: "User" },
-  { segment: "assets", parentLabel: "Manage Asset", itemLabel: "Asset" },
-  { segment: "assignments", parentLabel: "Manage Assignment", itemLabel: "Assignment" },
-];
+const getBreadcrumbs = (path: string): BreadcrumbItem[] => {
+  if (!path) return [{ label: "Home", href: APP_ROUTES.HOME }];
 
-const getHeaderBreadcrumbs = (path: string): string[] => {
-  if (!path) return ["Home"];
+  const homeHref = path.startsWith(APP_ROUTES.STAFF_HOME) ? APP_ROUTES.STAFF_HOME : APP_ROUTES.ADMIN_HOME;
+  const parentRoute = Object.values(APP_ROUTES).find((route) => route !== APP_ROUTES.HOME && route !== APP_ROUTES.ADMIN_HOME && path.startsWith(route));
 
-  const segments = path.split("/").filter(Boolean);
-
-  // Default to ["Home"] for root, admin, or staff homepages
-  if (
-    segments.length === 0 ||
-    (segments.length === 1 && (segments[0] === "admin" || segments[0] === "staff"))
-  ) {
-    return ["Home"];
+  // by default, return Home, even Admin Home and Staff Home
+  if (!parentRoute || path === APP_ROUTES.ADMIN_HOME || path === APP_ROUTES.STAFF_HOME) {
+    return [{ label: "Home", href: homeHref }];
   }
 
-  for (const config of ROUTE_CONFIGS) {
-    if (path.includes(`/${config.segment}`)) {
-      if (path.includes("/create")) {
-        return [config.parentLabel, `Create New ${config.itemLabel}`];
-      }
-      if (path.includes("/edit")) {
-        return [config.parentLabel, `Edit ${config.itemLabel}`];
-      }
-      return [config.parentLabel];
-    }
+  const routeConfig = APP_LABELS[parentRoute] || { parentLabel: "Section", itemLabel: "Item" };
+  const breadcrumbs: BreadcrumbItem[] = [{ label: routeConfig.parentLabel, href: parentRoute }];
+
+  // check the path, if containing create or edit, add Create, Edit
+  const lowerPath = path.toLowerCase();
+  if (lowerPath.includes("/create")) {
+    breadcrumbs.push({ label: `Create New ${routeConfig.itemLabel}`, href: path });
+  } else if (lowerPath.includes("/edit")) {
+    breadcrumbs.push({ label: `Edit ${routeConfig.itemLabel}`, href: path });
   }
 
-  // Basic single-level routes
-  if (path.includes("/returns")) return ["Request for Returning"];
-  if (path.includes("/report")) return ["Report"];
-
-  return ["Home"];
+  return breadcrumbs;
 };
 
 export default function NavBar() {
   const pathname = usePathname();
-  const breadcrumbs = getHeaderBreadcrumbs(pathname || "");
-
-  // Map breadcrumb labels back to their respective routes via a clean lookup
-  const getBreadcrumbLink = (label: string): string => {
-    const isStaff = pathname?.startsWith("/staff");
-    const homeHref = isStaff ? "/staff" : "/admin";
-
-    const pathMap: Record<string, string> = {
-      Home: homeHref,
-      "Manage User": "/admin/accounts",
-      "Manage Asset": "/admin/assets",
-      "Manage Assignment": "/admin/assignments",
-      "Request for Returning": "/admin/returns",
-      Report: "/admin/report",
-    };
-
-    return pathMap[label] || pathname || "/";
-  };
+  const breadcrumbs = getBreadcrumbs(pathname || "");
 
   return (
-    <div className="navbar bg-primary h-[70px] w-full px-6 flex items-center justify-between text-white shadow-sm">
-      {/* Left - Clickable Breadcrumbs */}
+    <div className="navbar bg-primary h-17.5 w-full px-6 flex items-center justify-between text-white shadow-sm">
+      {/* Left - Breadcrumbs */}
       <div className="breadcrumbs text-lg font-bold [&_li::before]:opacity-100 [&_li::before]:text-white">
         <ul>
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
-            const href = getBreadcrumbLink(crumb);
+            const href = crumb.href;
 
             return (
               <li key={idx}>
                 {isLast ? (
-                  <span className="text-white">{crumb}</span>
+                  <span className="text-white">{crumb.label}</span>
                 ) : (
                   <Link href={href} className="text-white/80 hover:text-white transition-colors">
-                    {crumb}
+                    {crumb.label}
                   </Link>
                 )}
               </li>
