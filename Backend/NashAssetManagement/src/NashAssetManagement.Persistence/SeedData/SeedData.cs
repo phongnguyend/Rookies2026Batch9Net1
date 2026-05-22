@@ -173,6 +173,21 @@ namespace NashAssetManagement.Persistence.SeedData
                 users.Add(user);
             }
             #endregion
+            if (!await dbContext.Locations.AnyAsync())
+            {
+                dbContext.Locations.AddRange(LocationsData);
+                await dbContext.SaveChangesAsync();
+            }
+            if (!await dbContext.Users.AnyAsync())
+            {
+                dbContext.Users.AddRange(users);
+                await dbContext.SaveChangesAsync();
+            }
+            if (!await dbContext.Categories.AnyAsync())
+            {
+                dbContext.Categories.AddRange(CategoriesData);
+                await dbContext.SaveChangesAsync();
+            }
             #region RoleIdentity
             var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
 
@@ -201,25 +216,62 @@ namespace NashAssetManagement.Persistence.SeedData
             }
             #endregion
             #region UserRoleIdentity
+            if (!await dbContext.UserRoles.AnyAsync())
+            {
+                var adminRoleId = Guid.Parse("20000000-0000-0000-0000-000000000001");
+                var staffRoleId = Guid.Parse("20000000-0000-0000-0000-000000000002");
 
+                var userRoleMappings = new (Guid UserId, UserType Type)[]
+                {
+                    // ===== HA NOI ADMINS =====
+                    (Guid.Parse("10000000-0000-0000-0000-000000000001"), UserType.Admin),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000002"), UserType.Admin),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000003"), UserType.Admin),
+
+                    // ===== HA NOI STAFF =====
+                    (Guid.Parse("10000000-0000-0000-0000-000000000004"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000005"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000006"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000007"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000008"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000009"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000010"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000011"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000012"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000013"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000014"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000015"), UserType.Staff),
+
+                    // ===== HCM ADMINS =====
+                    (Guid.Parse("10000000-0000-0000-0000-000000000016"), UserType.Admin),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000017"), UserType.Admin),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000018"), UserType.Admin),
+
+                    // ===== HCM STAFF =====
+                    (Guid.Parse("10000000-0000-0000-0000-000000000019"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000020"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000021"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000022"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000023"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000024"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000025"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000026"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000027"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000028"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000029"), UserType.Staff),
+                    (Guid.Parse("10000000-0000-0000-0000-000000000030"), UserType.Staff),
+                };
+
+                var userRoles = userRoleMappings.Select(u => new UserRole
+                {
+                    UserId = u.UserId,
+                    RoleId = u.Type == UserType.Admin ? adminRoleId : staffRoleId
+                });
+
+                await dbContext.UserRoles.AddRangeAsync(userRoles);
+                await dbContext.SaveChangesAsync();
+            }
             #endregion
-
-
-            if (!await dbContext.Locations.AnyAsync())
-            {
-                dbContext.Locations.AddRange(LocationsData);
-                await dbContext.SaveChangesAsync();
-            }
-            if (!await dbContext.Users.AnyAsync())
-            {
-                dbContext.Users.AddRange(users);
-                await dbContext.SaveChangesAsync();
-            }
-            if (!await dbContext.Categories.AnyAsync())
-            {
-                dbContext.Categories.AddRange(CategoriesData);
-                await dbContext.SaveChangesAsync();
-            }
             return;
         }
     }

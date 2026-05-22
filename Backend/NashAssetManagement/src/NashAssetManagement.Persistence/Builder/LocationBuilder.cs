@@ -1,6 +1,4 @@
-using NashAssetManagement.Domain.Entities;
 using NashAssetManagement.Domain.Entities.Core;
-using NashAssetManagement.Domain.Entities.Identity;
 
 namespace NashAssetManagement.Persistence.Builder;
 
