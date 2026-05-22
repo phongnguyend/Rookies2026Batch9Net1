@@ -4,7 +4,7 @@ using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {
-    public sealed class Assignment : BaseEntity<Guid>, ITrackable
+    public sealed class Assignment : BaseEntity<Guid>, ITrackable, ISoftDeletable
     {
         public DateTime AssignedAtUtc { get; set; }
 
@@ -29,5 +29,7 @@ namespace NashAssetManagement.Domain.Entities.Core
         public ICollection<ReturnRequest> ReturnRequests { get; set; } = [];
         public DateTime CreatedAtUtc { get; set; }
         public DateTime? UpdatedAtUtc { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAtUtc { get; set; }
     }
 }

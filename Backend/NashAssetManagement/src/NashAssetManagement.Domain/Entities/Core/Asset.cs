@@ -3,7 +3,7 @@ using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Domain.Entities.Core
 {
-    public sealed class Asset : BaseEntity<Guid>, ISoftDeletable
+    public sealed class Asset : BaseEntity<Guid>, ISoftDeletable, ITrackable
     {
         public string AssetCode { get; set; } = default!;
 
@@ -26,5 +26,7 @@ namespace NashAssetManagement.Domain.Entities.Core
         public ICollection<Assignment> Assignments { get; set; } = [];
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAtUtc { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+        public DateTime? UpdatedAtUtc { get; set; }
     }
 }
