@@ -1,3 +1,4 @@
+using Microsoft.OpenApi;
 using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
@@ -32,7 +33,12 @@ try
     {
         app.MapOpenApi();
     }
-
+    if (app.Environment.IsDevelopment())
+    {
+        using var scope = app.Services.CreateScope();
+        var seeder = scope.ServiceProvider.GetRequiredService<NAMDbContextSeedData>();
+        await seeder.SeedDataAsync(scope.ServiceProvider);
+    }
     app.UseAuthorization();
 
     app.MapControllers();

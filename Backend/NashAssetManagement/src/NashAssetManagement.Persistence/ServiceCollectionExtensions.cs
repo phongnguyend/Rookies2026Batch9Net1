@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Persistence.DataAccess;
 using NashAssetManagement.Persistence.SeedData;
-
 namespace NashAssetManagement.Persistence
 {
     public static class ServiceCollectionExtensions
