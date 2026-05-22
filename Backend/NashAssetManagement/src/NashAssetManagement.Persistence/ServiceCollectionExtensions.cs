@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NashAssetManagement.Application.Abstractions.DataAccess;
-using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Persistence.DataAccess;
 using NashAssetManagement.Persistence.SeedData;
+
 namespace NashAssetManagement.Persistence
 {
     public static class ServiceCollectionExtensions
@@ -26,7 +25,7 @@ namespace NashAssetManagement.Persistence
             });
             services.AddRepositories();
             services.AddUnitOfWork();
-            services.AddSeedData();
+            services.AddSeedDevelopmentData();
             return services;
         }
 
@@ -46,9 +45,9 @@ namespace NashAssetManagement.Persistence
             return services;
         }
         
-        private static IServiceCollection AddSeedData(this IServiceCollection services)
+        private static IServiceCollection AddSeedDevelopmentData(this IServiceCollection services)
         {
-            services.AddScoped<NAMDbContextSeedData>();
+            services.AddScoped<NamDevelopmentSeedData>();
             return services;
         }
     }

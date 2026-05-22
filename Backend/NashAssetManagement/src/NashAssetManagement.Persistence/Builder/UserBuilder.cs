@@ -1,4 +1,3 @@
-
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 namespace NashAssetManagement.Persistence.Builder;
@@ -19,66 +18,79 @@ public sealed class UserBuilder
     private bool _isDeleted = false;
     private DateTime _isCreatedAtUtc = DateTime.UtcNow;
     private DateTime? _isDeletedAtUtc;
+
     public UserBuilder WithLocation(Guid locationId)
     {
         _locationId = locationId;
         return this;
     }
+
     public UserBuilder WithGender(Gender gender)
     {
         _gender = gender;
         return this;
     }
+
     public UserBuilder WithId(Guid id)
     {
         _id = id;
         return this;
     }
+
     public UserBuilder WithName(string userName)
     {
         _userName = userName;
         return this;
     }
+
     public UserBuilder WithStaffCode(string staffCode)
     {
         _staffCode = staffCode;
         return this;
     }
+
     public UserBuilder WithFirsName(string firstName)
     {
         _firstName = firstName;
         return this;
     }
+
     public UserBuilder WithLastName(string lastName)
     {
         _lastName = lastName;
         return this;
     }
+
     public UserBuilder WithDOB(DateTime dob)
     {
         _dateOfBirth = DateTime.SpecifyKind(dob, DateTimeKind.Utc);
         return this;
     }
+
     public UserBuilder WithJoinDate(DateTime joinDate)
     {
         _joinDate = DateTime.SpecifyKind(joinDate,DateTimeKind.Utc);
         return this;
     }
+
     public UserBuilder WithUserType(UserType userType)
     {
         _userType = userType;
         return this;
     }
+
     public UserBuilder WithFirstLogin(bool check)
     {
         _isFirstLogin = check;
         return this;
     }
+
     public UserBuilder WithIsDeleted(bool check)
     {
         _isDeleted = check;
         return this;
     }
+
     public UserBuilder WithIsDeletedDate(DateTime deleteDate)
     {
         _isDeletedAtUtc = DateTime.SpecifyKind(deleteDate, DateTimeKind.Utc);

@@ -13,7 +13,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
-
 try
 {
     Log.Information("Starting application");
@@ -22,7 +21,6 @@ try
         .AddPersistenceServices(builder.Configuration)
         .AddInfrastructureServices(builder.Configuration)
         .AddApiServices(builder.Configuration);
-
 
     var app = builder.Build();
 
@@ -34,12 +32,15 @@ try
     {
         app.MapOpenApi();
     }
-    if (app.Environment.IsDevelopment())
-    {
-        using var scope = app.Services.CreateScope();
-        var seeder = scope.ServiceProvider.GetRequiredService<NAMDbContextSeedData>();
-        await seeder.SeedDataAsync(scope.ServiceProvider);
-    }
+    // Only uncomment if you need SeedData
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     Log.Information("Begin seed development data.");
+    //     using var scope = app.Services.CreateScope();
+    //     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
+    //     await seeder.SeedDataAsync(scope.ServiceProvider);
+    //     Log.Information("Seed development data finished successfully.");
+    // }
     app.UseAuthorization();
 
     app.MapControllers();

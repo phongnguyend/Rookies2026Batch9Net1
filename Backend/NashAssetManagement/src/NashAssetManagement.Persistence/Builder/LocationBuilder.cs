@@ -1,8 +1,4 @@
-
-using NashAssetManagement.Domain.Entities;
 using NashAssetManagement.Domain.Entities.Core;
-
-
 
 namespace NashAssetManagement.Persistence.Builder;
 
@@ -13,6 +9,7 @@ public sealed class LocationBuilder
     private string _prefix = "TL";
     private bool _isDeleted = false;
     private DateTime? _deletedTime;
+    
     public LocationBuilder WithId(Guid id)
     {
         _id = id;

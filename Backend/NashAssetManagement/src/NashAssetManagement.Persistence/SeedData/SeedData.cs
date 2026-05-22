@@ -9,7 +9,7 @@ using NashAssetManagement.Persistence.Builder;
 
 namespace NashAssetManagement.Persistence.SeedData
 {
-    public class NAMDbContextSeedData(AppDbContext dbContext)
+    public class NamDevelopmentSeedData(AppDbContext dbContext)
     {
         public async Task SeedDataAsync(IServiceProvider serviceProvider)
         {
@@ -21,6 +21,7 @@ namespace NashAssetManagement.Persistence.SeedData
                 new LocationBuilder().WithId(Guid.Parse("22222222-2222-2222-2222-222222222222")).WithName("Ho Chi Minh").WithPrefix("HCM").Build()
             };
             #endregion
+
             #region Category
             var CategoriesData = new List<Category>
             {
@@ -97,6 +98,7 @@ namespace NashAssetManagement.Persistence.SeedData
                     .Build(),
                 };
             #endregion
+
             #region  User
             var users = new List<User>();
 
@@ -174,7 +176,6 @@ namespace NashAssetManagement.Persistence.SeedData
             }
             #endregion
 
-            
             if (!await dbContext.Locations.AnyAsync())
             {
                 dbContext.Locations.AddRange(LocationsData);
@@ -218,6 +219,7 @@ namespace NashAssetManagement.Persistence.SeedData
                 }
             }
             #endregion
+
             #region UserRoleIdentity
             if (!await dbContext.UserRoles.AnyAsync())
             {
@@ -275,6 +277,7 @@ namespace NashAssetManagement.Persistence.SeedData
                 await dbContext.SaveChangesAsync();
             }
             #endregion
+            
             return;
         }
     }
