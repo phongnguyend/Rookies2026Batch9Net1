@@ -10,6 +10,11 @@ export interface ColumnDef<T> {
 
 type SortDirection = "asc" | "desc";
 
+export interface SortItem {
+  key: string;
+  direction: SortDirection;
+}
+
 interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
@@ -18,9 +23,8 @@ interface DataTableProps<T> {
   emptyMessage?: string;
 
   // sort 
-  sortKey?: string;
-  sortDirection?: SortDirection;
-  onSortChange?: (key: string, direction: SortDirection) => void;
+  sorts?: SortItem[];
+  onSortChange?: (sorts: SortItem[]) => void;
 }
 
 export default function DataTable<T>({
@@ -29,15 +33,25 @@ export default function DataTable<T>({
   isLoading = false,
   onRowClick,
   emptyMessage = "No records found.",
-  sortKey,
-  sortDirection = "asc",
+  sorts = [],
   onSortChange,
 }: DataTableProps<T>) {
   const handleSort = (key: string) => {
-    const nextDirection: SortDirection =
-      sortKey === key && sortDirection === "asc" ? "desc" : "asc";
+    const currentSort = sorts.find((s) => s.key === key);
 
-    onSortChange?.(key, nextDirection);
+    let nextSorts: SortItem[];
+
+    if (!currentSort) {
+      nextSorts = [...sorts, { key, direction: "asc" }];
+    } else if (currentSort.direction === "asc") {
+      nextSorts = sorts.map((s) =>
+        s.key === key ? { ...s, direction: "desc" } : s
+      );
+    } else {
+      nextSorts = sorts.filter((s) => s.key !== key);
+    }
+
+    onSortChange?.(nextSorts);
   };
   return (
     <div className="w-full overflow-x-auto">
@@ -45,7 +59,8 @@ export default function DataTable<T>({
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
-              const isSorted = sortKey === column.key;
+              const currentSort = sorts.find((s) => s.key === column.key);
+              const sortIndex = sorts.findIndex((s) => s.key === column.key);
 
               return (
                 <th
@@ -61,11 +76,17 @@ export default function DataTable<T>({
 
                   {column.sortable && (
                     <span className="ml-1">
-                      {isSorted
-                        ? sortDirection === "asc"
+                      {currentSort
+                        ? currentSort.direction === "asc"
                           ? "↑"
                           : "↓"
                         : "↕"}
+                    </span>
+                  )}
+
+                  {currentSort && (
+                    <span className="ml-1 text-xs text-gray-400">
+                      {sortIndex + 1}
                     </span>
                   )}
                 </th>

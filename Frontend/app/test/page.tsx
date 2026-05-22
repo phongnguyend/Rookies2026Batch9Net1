@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DataTable, {
+  SortItem,
   type ColumnDef,
 } from "@/features/shared/components/DataTable";
 import Pagination from "@/features/shared/components/Pagination";
@@ -30,7 +31,7 @@ export default function TestPage() {
   // date picker
   const [createdDate, setCreatedDate] = useState<Date | null>(null);
   // sort in datatable
-  const [sortKey, setSortKey] = useState("firstName");
+  const [sorts, setSorts] = useState<SortItem[]>([]);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Testing purpose on the yes or no question, or only yes for modal
@@ -241,12 +242,19 @@ export default function TestPage() {
             columns={columns}
             isLoading={isLoading}
             emptyMessage="No users found."
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-            onSortChange={(key, direction) => {
-              setSortKey(key);
-              setSortDirection(direction);
-              console.log("Key: ", key, "| Direction: ", direction);
+            sorts={sorts}
+            onSortChange={(newSorts) => {
+              setSorts(newSorts);
+              // this string will send to sortBy in backend Endpoint: noAsc,countryDesc
+              const sortQuery = newSorts
+                .map(
+                  (sort) =>
+                    `${sort.key}${sort.direction === "asc" ? "Asc" : "Desc"}`
+                )
+                .join(",");
+
+              console.log(sortQuery);
+              
             }}
           />
 
