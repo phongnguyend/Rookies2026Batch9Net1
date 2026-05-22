@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Persistence.DataAccess;
+using NashAssetManagement.Persistence.SeedData;
 
 namespace NashAssetManagement.Persistence
 {
@@ -24,7 +25,7 @@ namespace NashAssetManagement.Persistence
             });
             services.AddRepositories();
             services.AddUnitOfWork();
-
+            services.AddSeedData();
             return services;
         }
 
@@ -41,6 +42,12 @@ namespace NashAssetManagement.Persistence
         {
             services.AddScoped<IUnitOfWork, EFUnitOfWork>();
 
+            return services;
+        }
+        
+        private static IServiceCollection AddSeedData(this IServiceCollection services)
+        {
+            services.AddScoped<NAMDbContextSeedData>();
             return services;
         }
     }

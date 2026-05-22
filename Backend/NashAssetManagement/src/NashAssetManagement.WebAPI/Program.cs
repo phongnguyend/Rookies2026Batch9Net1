@@ -1,6 +1,7 @@
 using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
+using NashAssetManagement.Persistence.SeedData;
 using NashAssetManagement.WebAPI;
 using Serilog;
 
