@@ -14,6 +14,8 @@ export interface SortItem {
   direction: SortDirection;
 }
 
+type SortDirection = "asc" | "desc";
+
 interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
