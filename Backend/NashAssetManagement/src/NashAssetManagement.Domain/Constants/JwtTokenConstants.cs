@@ -11,6 +11,7 @@
         public const string JwtUsernameClaimType = "username";
         public const string JwtRolesClaimType = "roles";
         public const string JwtUserTypeClaimType = "userType";
+        public const string JwtJtiClaimType = "jti";
 
         #endregion
 

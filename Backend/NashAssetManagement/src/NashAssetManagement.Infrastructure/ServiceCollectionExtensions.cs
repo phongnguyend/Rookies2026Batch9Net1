@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NashAssetManagement.Infrastructure.AppIdentity;
 using NashAssetManagement.Infrastructure.DateTimes;
+using NashAssetManagement.Infrastructure.Jwt;
 
 namespace NashAssetManagement.Infrastructure
 {
@@ -13,6 +14,7 @@ namespace NashAssetManagement.Infrastructure
         {
             services.AddDateTimeProvider();
             services.AddAppIdentityServices();
+            services.AddJwtTokenProvider();
 
             return services;
         }
