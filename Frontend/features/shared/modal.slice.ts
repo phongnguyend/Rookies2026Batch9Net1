@@ -4,20 +4,24 @@ export interface ModalState {
   isOpen: boolean;
   title: string;
   body: string;
-  confirmLabel: string;
-  cancelLabel: string;
-  confirmActionType: string | null;
-  confirmPayload: any;
+  yesButtonLabel: string;
+  noButtonLabel: string;
+  yesActionType: string | null;
+  yesPayload: unknown;
+  noActionType: string | null;
+  noPayload: unknown;
 }
 
 const initialState: ModalState = {
   isOpen: false,
   title: "",
   body: "",
-  confirmLabel: "Confirm",
-  cancelLabel: "Cancel",
-  confirmActionType: null,
-  confirmPayload: null,
+  yesButtonLabel: "Yes",
+  noButtonLabel: "No",
+  yesActionType: null,
+  yesPayload: null,
+  noActionType: null,
+  noPayload: null,
 };
 
 export const modalSlice = createSlice({
@@ -29,28 +33,34 @@ export const modalSlice = createSlice({
       action: PayloadAction<{
         title: string;
         body: string;
-        confirmLabel?: string;
-        cancelLabel?: string;
-        confirmActionType?: string;
-        confirmPayload?: any;
+        yesButtonLabel?: string;
+        noButtonLabel?: string;
+        yesActionType?: string;
+        yesPayload?: unknown;
+        noActionType?: string;
+        noPayload?: unknown;
       }>
     ) => {
       state.isOpen = true;
       state.title = action.payload.title;
       state.body = action.payload.body;
-      state.confirmLabel = action.payload.confirmLabel ?? "Confirm";
-      state.cancelLabel = action.payload.cancelLabel ?? "Cancel";
-      state.confirmActionType = action.payload.confirmActionType ?? null;
-      state.confirmPayload = action.payload.confirmPayload ?? null;
+      state.yesButtonLabel = action.payload.yesButtonLabel ?? "Yes";
+      state.noButtonLabel = action.payload.noButtonLabel ?? "No";
+      state.yesActionType = action.payload.yesActionType ?? null;
+      state.yesPayload = action.payload.yesPayload ?? null;
+      state.noActionType = action.payload.noActionType ?? null;
+      state.noPayload = action.payload.noPayload ?? null;
     },
     hideModal: (state) => {
       state.isOpen = false;
       state.title = "";
       state.body = "";
-      state.confirmLabel = "Confirm";
-      state.cancelLabel = "Cancel";
-      state.confirmActionType = null;
-      state.confirmPayload = null;
+      state.yesButtonLabel = "Yes";
+      state.noButtonLabel = "No";
+      state.yesActionType = null;
+      state.yesPayload = null;
+      state.noActionType = null;
+      state.noPayload = null;
     },
   },
 });

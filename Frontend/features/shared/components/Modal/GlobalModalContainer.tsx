@@ -6,13 +6,28 @@ import ConfirmModal from "./ConfirmModal";
 
 export default function GlobalModalContainer() {
   const dispatch = useAppDispatch();
-  const { isOpen, title, body, confirmLabel, cancelLabel, confirmActionType, confirmPayload } = useAppSelector(
-    (state) => state.modalSlice
-  );
+  const {
+    isOpen,
+    title,
+    body,
+    yesButtonLabel,
+    noButtonLabel,
+    yesActionType,
+    yesPayload,
+    noActionType,
+    noPayload,
+  } = useAppSelector((state) => state.modalSlice);
 
-  const handleConfirm = () => {
-    if (confirmActionType) {
-      dispatch({ type: confirmActionType, payload: confirmPayload });
+  const handleYes = () => {
+    if (yesActionType) {
+      dispatch({ type: yesActionType, payload: yesPayload });
+    }
+    dispatch(hideModal());
+  };
+
+  const handleNo = () => {
+    if (noActionType) {
+      dispatch({ type: noActionType, payload: noPayload });
     }
     dispatch(hideModal());
   };
@@ -20,12 +35,13 @@ export default function GlobalModalContainer() {
   return (
     <ConfirmModal
       isOpen={isOpen}
-      onYes={handleConfirm}
+      onYes={handleYes}
+      onNo={handleNo}
       onClose={() => dispatch(hideModal())}
       title={title}
       body={body}
-      yesButtonLabel={confirmLabel}
-      noButtonLabel={cancelLabel}
+      yesButtonLabel={yesButtonLabel}
+      noButtonLabel={noButtonLabel}
     />
   );
 }
