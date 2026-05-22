@@ -1,6 +1,8 @@
+using Microsoft.OpenApi;
 using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
+using NashAssetManagement.Persistence.SeedData;
 using NashAssetManagement.WebAPI;
 using Serilog;
 
@@ -20,7 +22,6 @@ try
         .AddInfrastructureServices(builder.Configuration)
         .AddApiServices(builder.Configuration);
 
-
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
@@ -31,7 +32,15 @@ try
     {
         app.MapOpenApi();
     }
-
+    // Only uncomment if you need SeedData
+    // if (app.Environment.IsDevelopment())
+    // {
+    //     Log.Information("Begin seed development data.");
+    //     using var scope = app.Services.CreateScope();
+    //     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
+    //     await seeder.SeedDataAsync(scope.ServiceProvider);
+    //     Log.Information("Seed development data finished successfully.");
+    // }
     app.UseAuthorization();
 
     app.MapControllers();
