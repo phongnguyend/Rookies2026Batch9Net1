@@ -13,21 +13,40 @@ interface BreadcrumbItem {
 const getBreadcrumbs = (path: string): BreadcrumbItem[] => {
   if (!path) return [{ label: "Home", href: APP_ROUTES.HOME }];
 
-  const homeHref = path.startsWith(APP_ROUTES.STAFF_HOME) ? APP_ROUTES.STAFF_HOME : APP_ROUTES.ADMIN_HOME;
-  const parentRoute = Object.values(APP_ROUTES).find((route) => route !== APP_ROUTES.HOME && route !== APP_ROUTES.ADMIN_HOME && path.startsWith(route));
+  const homeHref = path.startsWith(APP_ROUTES.STAFF_HOME)
+    ? APP_ROUTES.STAFF_HOME
+    : APP_ROUTES.ADMIN_HOME;
+  const parentRoute = Object.values(APP_ROUTES).find(
+    (route) =>
+      route !== APP_ROUTES.HOME &&
+      route !== APP_ROUTES.ADMIN_HOME &&
+      path.startsWith(route),
+  );
 
   // by default, return Home, even Admin Home and Staff Home
-  if (!parentRoute || path === APP_ROUTES.ADMIN_HOME || path === APP_ROUTES.STAFF_HOME) {
+  if (
+    !parentRoute ||
+    path === APP_ROUTES.ADMIN_HOME ||
+    path === APP_ROUTES.STAFF_HOME
+  ) {
     return [{ label: "Home", href: homeHref }];
   }
 
-  const routeConfig = APP_LABELS[parentRoute] || { parentLabel: "Section", itemLabel: "Item" };
-  const breadcrumbs: BreadcrumbItem[] = [{ label: routeConfig.parentLabel, href: parentRoute }];
+  const routeConfig = APP_LABELS[parentRoute] || {
+    parentLabel: "Section",
+    itemLabel: "Item",
+  };
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: routeConfig.parentLabel, href: parentRoute },
+  ];
 
   // check the path, if containing create or edit, add Create, Edit
   const lowerPath = path.toLowerCase();
   if (lowerPath.includes("/create")) {
-    breadcrumbs.push({ label: `Create New ${routeConfig.itemLabel}`, href: path });
+    breadcrumbs.push({
+      label: `Create New ${routeConfig.itemLabel}`,
+      href: path,
+    });
   } else if (lowerPath.includes("/edit")) {
     breadcrumbs.push({ label: `Edit ${routeConfig.itemLabel}`, href: path });
   }
@@ -53,7 +72,10 @@ export default function NavBar() {
                 {isLast ? (
                   <span className="text-white">{crumb.label}</span>
                 ) : (
-                  <Link href={href} className="text-white/80 hover:text-white transition-colors">
+                  <Link
+                    href={href}
+                    className="text-white/80 hover:text-white transition-colors"
+                  >
                     {crumb.label}
                   </Link>
                 )}

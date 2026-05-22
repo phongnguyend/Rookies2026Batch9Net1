@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import DatePicker from 'react-datepicker';
+import DatePicker from "react-datepicker";
 
 interface DatePickerInputProps {
   value: Date | null;
@@ -12,8 +12,8 @@ interface DatePickerInputProps {
 export default function DatePickerInput({
   value,
   onChange,
-  placeholder = 'Select Date',
-  width = 'w-56',
+  placeholder = "Select Date",
+  width = "w-56",
 }: DatePickerInputProps) {
   return (
     <div className={width}>

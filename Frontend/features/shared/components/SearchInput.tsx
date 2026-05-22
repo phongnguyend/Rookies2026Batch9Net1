@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface SearchInputProps {
   value: string;
@@ -12,8 +12,8 @@ export default function SearchInput({
   value,
   onChange,
   onSearch,
-  placeholder = 'Search...',
-  width = 'w-60',
+  placeholder = "Search...",
+  width = "w-60",
 }: SearchInputProps) {
   return (
     <div
@@ -25,7 +25,7 @@ export default function SearchInput({
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             onSearch?.(value);
           }
         }}

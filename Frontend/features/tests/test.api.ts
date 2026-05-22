@@ -3,8 +3,8 @@ import type {
   GetUsersRequest,
   GetUsersResponse,
   User,
-} from './test.types';
-import { baseApiSlice } from '@/lib/api/base.api';
+} from "./test.types";
+import { baseApiSlice } from "@/lib/api/base.api";
 
 export const testApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -12,14 +12,14 @@ export const testApi = baseApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query<GetUsersResponse, GetUsersRequest | void>({
       query: () => ({
-        url: '/users',
-        method: 'GET',
+        url: "/users",
+        method: "GET",
       }),
 
       transformResponse: (response: User[], _meta, arg) => {
         const pageNumber = arg?.page ?? 1;
         const pageSize = arg?.limit ?? 10;
-        const search = arg?.search?.trim().toLowerCase() ?? '';
+        const search = arg?.search?.trim().toLowerCase() ?? "";
         const skins = arg?.skins ?? [];
         const createdDate = arg?.createdDate ?? null;
 
@@ -68,15 +68,15 @@ export const testApi = baseApiSlice.injectEndpoints({
         };
       },
 
-      providesTags: ['Users'],
+      providesTags: ["Users"],
     }),
 
     getUserById: builder.query<GetUserByIdResponse, string>({
       query: (id) => ({
         url: `/users/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: (_result, _error, id) => [{ type: 'Users', id }],
+      providesTags: (_result, _error, id) => [{ type: "Users", id }],
     }),
   }),
 });

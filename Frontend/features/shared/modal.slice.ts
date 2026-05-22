@@ -39,7 +39,7 @@ export const modalSlice = createSlice({
         yesPayload?: unknown;
         noActionType?: string;
         noPayload?: unknown;
-      }>
+      }>,
     ) => {
       state.isOpen = true;
       state.title = action.payload.title;

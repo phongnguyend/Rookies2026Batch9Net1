@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface PaginationProps {
   pageNumber: number;
@@ -23,7 +23,7 @@ export default function Pagination({
 
   return (
     <div className="mt-6 flex items-center justify-between">
-      {typeof totalCount === 'number' && typeof pageSize === 'number' && (
+      {typeof totalCount === "number" && typeof pageSize === "number" && (
         <p className="text-sm text-gray-500">
           Page {pageNumber} of {totalPages} — Total {totalCount} items
         </p>
@@ -48,7 +48,7 @@ export default function Pagination({
               type="button"
               onClick={() => onPageChange(current)}
               className={`join-item btn btn-sm ${
-                pageNumber === current ? 'btn-primary' : ''
+                pageNumber === current ? "btn-primary" : ""
               }`}
             >
               {current}

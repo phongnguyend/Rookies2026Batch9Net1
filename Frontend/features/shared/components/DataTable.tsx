@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 export interface ColumnDef<T> {
   key: string;
@@ -20,15 +20,18 @@ export default function DataTable<T>({
   columns,
   isLoading = false,
   onRowClick,
-  emptyMessage = 'No records found.',
+  emptyMessage = "No records found.",
 }: DataTableProps<T>) {
   return (
-    <div className="w-full overflow-x-auto" >
+    <div className="w-full overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => (
-              <th key={column.key} className={`py-2 font-semibold ${column.className ?? ''}`}>
+              <th
+                key={column.key}
+                className={`py-2 font-semibold ${column.className ?? ""}`}
+              >
                 {column.header}
               </th>
             ))}
@@ -44,7 +47,10 @@ export default function DataTable<T>({
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="py-8 text-center text-gray-500">
+              <td
+                colSpan={columns.length}
+                className="py-8 text-center text-gray-500"
+              >
                 {emptyMessage}
               </td>
             </tr>
@@ -54,11 +60,14 @@ export default function DataTable<T>({
                 key={rowIndex}
                 onClick={() => onRowClick?.(row)}
                 className={`border-b border-gray-300 ${
-                  onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''
+                  onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
                 }`}
               >
                 {columns.map((column) => (
-                  <td key={column.key} className={`py-2 ${column.className ?? ''}`}>
+                  <td
+                    key={column.key}
+                    className={`py-2 ${column.className ?? ""}`}
+                  >
                     {column.render
                       ? column.render(row, rowIndex)
                       : (row as Record<string, ReactNode>)[column.key]}

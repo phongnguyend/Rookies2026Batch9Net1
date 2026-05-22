@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface DropdownFilterProps<T> {
   items: T[];
@@ -16,12 +16,12 @@ interface DropdownFilterProps<T> {
 export default function DropdownFilter<T>({
   items,
   values,
-  placeholder = 'Select',
-  width = 'w-52',
+  placeholder = "Select",
+  width = "w-52",
   getKey,
   getLabel,
   onChange,
-  allLabel = 'All',
+  allLabel = "All",
 }: DropdownFilterProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 

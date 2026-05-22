@@ -42,7 +42,10 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           {authenticatedUser.isAuthenticated ? (
@@ -62,7 +65,10 @@ export default function RootLayout({
 
                 {/* Drawer Sidebar */}
                 <div className="drawer-side">
-                  <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+                  <label
+                    htmlFor="admin-drawer"
+                    className="drawer-overlay"
+                  ></label>
 
                   <Drawer role={authenticatedUser.role} />
                 </div>

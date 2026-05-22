@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setDrawerOpen } from "@/features/shared/drawer.slice";
-import { APP_SIDEBAR_ADMIN_ITEMS, APP_SIDEBAR_STAFF_ITEMS } from "@/lib/api/routes";
+import {
+  APP_SIDEBAR_ADMIN_ITEMS,
+  APP_SIDEBAR_STAFF_ITEMS,
+} from "@/lib/api/routes";
 import { AccountRole } from "@/features/accounts/accounts.types";
 import Image from "next/image";
 
@@ -12,7 +15,9 @@ export interface DrawerProps {
   role: AccountRole;
 }
 
-const sideBarItems = (role = AccountRole.Admin): { label: string; href: string }[] => {
+const sideBarItems = (
+  role = AccountRole.Admin,
+): { label: string; href: string }[] => {
   if (role === AccountRole.Admin) {
     return APP_SIDEBAR_ADMIN_ITEMS;
   }
@@ -35,17 +40,21 @@ export default function Drawer({ role }: DrawerProps) {
             alt="NashTech Logo"
             width={80}
             height={0}
-            style={{ width: 'auto', height: 'auto' }}
+            style={{ width: "auto", height: "auto" }}
             loading="eager"
           />
         </div>
-        <div className="text-primary font-bold text-lg leading-snug">Nash Asset Management</div>
+        <div className="text-primary font-bold text-lg leading-snug">
+          Nash Asset Management
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex flex-col">
         {sideBarItems(role).map((item, index) => {
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
 
           return (
             <Link
@@ -57,7 +66,8 @@ export default function Drawer({ role }: DrawerProps) {
                 ${index === 0 ? "border-t border-white" : ""}
                 border-b border-white
                 ${isActive ? "bg-primary text-white" : "bg-[#eff1f5] hover:bg-base-300/80 text-neutral-800 hover:text-black"}
-              `}>
+              `}
+            >
               {item.label}
             </Link>
           );
