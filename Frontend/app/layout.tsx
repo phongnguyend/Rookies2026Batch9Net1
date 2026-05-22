@@ -8,7 +8,7 @@ import GlobalModalContainer from "@/features/shared/components/Modal/GlobalModal
 import { Fragment } from "react/jsx-runtime";
 
 import Drawer from "@/features/shared/components/Drawer/Drawer";
-import { AccountRole } from "@/features/accounts/accounts.types";
+import { AccountRole } from "@/features/users/accounts.types";
 import DrawerCheckbox from "@/features/shared/components/Drawer/DrawerCheckbox";
 import FloatingDrawerButton from "@/features/shared/components/Drawer/FloatingDrawerButton";
 

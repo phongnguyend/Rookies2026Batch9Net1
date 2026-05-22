@@ -2,7 +2,7 @@ export const APP_ROUTES = {
   HOME: "/",
 
   ADMIN_HOME: "/admin",
-  ADMIN_ACCOUNTS: "/admin/accounts",
+  ADMIN_USERS: "/admin/users",
   ADMIN_ASSETS: "/admin/assets",
   ADMIN_ASSIGNMENTS: "/admin/assignments",
   ADMIN_REPORT: "/admin/report",
@@ -21,7 +21,7 @@ export const APP_LABELS: Record<
   [APP_ROUTES.HOME]: { parentLabel: "Home", itemLabel: "Home" },
   [APP_ROUTES.STAFF_HOME]: { parentLabel: "Home", itemLabel: "Home" },
   [APP_ROUTES.ADMIN_HOME]: { parentLabel: "Home", itemLabel: "Home" },
-  [APP_ROUTES.ADMIN_ACCOUNTS]: {
+  [APP_ROUTES.ADMIN_USERS]: {
     parentLabel: "Manage User",
     itemLabel: "User",
   },
@@ -42,7 +42,7 @@ export const APP_LABELS: Record<
 
 export const APP_SIDEBAR_ADMIN_ITEMS = [
   { label: "Home", href: APP_ROUTES.ADMIN_HOME },
-  { label: "Manage User", href: APP_ROUTES.ADMIN_ACCOUNTS },
+  { label: "Manage User", href: APP_ROUTES.ADMIN_USERS },
   { label: "Manage Asset", href: APP_ROUTES.ADMIN_ASSETS },
   { label: "Manage Assignment", href: APP_ROUTES.ADMIN_ASSIGNMENTS },
   { label: "Request for Returning", href: APP_ROUTES.ADMIN_RETURNS },

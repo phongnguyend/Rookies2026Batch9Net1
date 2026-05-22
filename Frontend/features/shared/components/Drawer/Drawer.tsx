@@ -8,7 +8,7 @@ import {
   APP_SIDEBAR_ADMIN_ITEMS,
   APP_SIDEBAR_STAFF_ITEMS,
 } from "@/lib/api/routes";
-import { AccountRole } from "@/features/accounts/accounts.types";
+import { AccountRole } from "@/features/users/accounts.types";
 import Image from "next/image";
 
 export interface DrawerProps {
