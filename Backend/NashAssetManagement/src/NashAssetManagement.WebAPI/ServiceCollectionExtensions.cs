@@ -26,6 +26,8 @@ namespace NashAssetManagement.WebAPI
             services.AddAuthenticationServices();
             services.AddHttpContextAccessor();
             services.AddAspIdentityServices();
+            services.ConfigureApiVersioning();
+            services.AddSwaggerDocumentation();
 
             return services;
         }
