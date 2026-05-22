@@ -19,11 +19,19 @@ import Image from "next/image";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
+  // page
   const [page, setPage] = useState(1);
+  // search
   const [search, setSearch] = useState("");
+  // selected items
   const [selectedSkins, setSelectedSkins] = useState<string[]>([]);
+  // selected 1 item
   const [selectedSkin, setSelectedSkin] = useState("black");
+  // date picker
   const [createdDate, setCreatedDate] = useState<Date | null>(null);
+  // sort in datatable
+  const [sortKey, setSortKey] = useState("firstName");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Testing purpose on the yes or no question, or only yes for modal
   const [isAcceptOrDeclineLoading, setAcceptOrDeclineMutation] =
@@ -52,25 +60,28 @@ export default function TestPage() {
   const columns: ColumnDef<User>[] = [
     {
       key: "no",
-      header: "No. ▼",
+      header: "No.",
+      sortable: true,
       render: (_user, index) => (page - 1) * limit + index + 1,
     },
-    {
-      key: "avatar",
-      header: "Avatar",
-      render: (user) => (
-        <Image
-          src={user.avatar}
-          alt={user.name}
-          className="h-9 w-9 rounded-full object-cover"
-        />
-      ),
-    },
-    { key: "name", header: "Name ▼" },
-    { key: "city", header: "City ▼" },
-    { key: "country", header: "Country ▼" },
-    { key: "address", header: "Address ▼" },
-    { key: "skin", header: "Skin ▼" },
+    // {
+    //   key: "avatar",
+    //   header: "Avatar",
+    //   render: (user) => (
+    //     <Image
+    //       src={user.avatar}
+    //       alt={user.name}
+    //       width={40}
+    //       height={40}
+    //       className="rounded-full object-cover"
+    //     />
+    //   ),
+    // },
+    { key: "name", header: "Name", sortable: true, },
+    { key: "city", header: "City", sortable: true, },
+    { key: "country", header: "Country", sortable: true, },
+    { key: "address", header: "Address", sortable: true, },
+    { key: "skin", header: "Skin", sortable: true, },
     {
       key: "actions",
       header: "",
@@ -125,7 +136,7 @@ export default function TestPage() {
               <DatePickerInput
                 value={createdDate}
                 onChange={(date) => {
-                  setCreatedDate(date);
+                  console.log(date);
                   setPage(1);
                 }}
                 placeholder="Created Date"
@@ -230,6 +241,13 @@ export default function TestPage() {
             columns={columns}
             isLoading={isLoading}
             emptyMessage="No users found."
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSortChange={(key, direction) => {
+              setSortKey(key);
+              setSortDirection(direction);
+              console.log("Key: ", key, "| Direction: ", direction);
+            }}
           />
 
           {/* Pagination */}

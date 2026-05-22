@@ -5,7 +5,10 @@ export interface ColumnDef<T> {
   header: ReactNode;
   render?: (row: T, index: number) => ReactNode;
   className?: string;
+  sortable?: boolean;
 }
+
+type SortDirection = "asc" | "desc";
 
 interface DataTableProps<T> {
   data: T[];
@@ -13,6 +16,11 @@ interface DataTableProps<T> {
   isLoading?: boolean;
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
+
+  // sort 
+  sortKey?: string;
+  sortDirection?: SortDirection;
+  onSortChange?: (key: string, direction: SortDirection) => void;
 }
 
 export default function DataTable<T>({
@@ -21,20 +29,48 @@ export default function DataTable<T>({
   isLoading = false,
   onRowClick,
   emptyMessage = "No records found.",
+  sortKey,
+  sortDirection = "asc",
+  onSortChange,
 }: DataTableProps<T>) {
+  const handleSort = (key: string) => {
+    const nextDirection: SortDirection =
+      sortKey === key && sortDirection === "asc" ? "desc" : "asc";
+
+    onSortChange?.(key, nextDirection);
+  };
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-400">
-            {columns.map((column) => (
-              <th
-                key={column.key}
-                className={`py-2 font-semibold ${column.className ?? ""}`}
-              >
-                {column.header}
-              </th>
-            ))}
+            {columns.map((column) => {
+              const isSorted = sortKey === column.key;
+
+              return (
+                <th
+                  key={column.key}
+                  onClick={() => column.sortable && handleSort(column.key)}
+                  className={`py-2 font-semibold ${column.className ?? ""} ${
+                    column.sortable
+                      ? "cursor-pointer select-none hover:text-primary"
+                      : ""
+                  }`}
+                >
+                  {column.header}
+
+                  {column.sortable && (
+                    <span className="ml-1">
+                      {isSorted
+                        ? sortDirection === "asc"
+                          ? "↑"
+                          : "↓"
+                        : "↕"}
+                    </span>
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
 
