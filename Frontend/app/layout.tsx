@@ -5,10 +5,8 @@ import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
 import ToastContainer from "@/features/shared/components/Toast/ToastContainer";
 import GlobalModalContainer from "@/features/shared/components/Modal/GlobalModalContainer";
-import { Fragment } from "react/jsx-runtime";
-
 import Drawer from "@/features/shared/components/Drawer/Drawer";
-import { AccountRole } from "@/features/users/accounts.types";
+import { UserRoles } from "@/features/users/users.types";
 import DrawerCheckbox from "@/features/shared/components/Drawer/DrawerCheckbox";
 import FloatingDrawerButton from "@/features/shared/components/Drawer/FloatingDrawerButton";
 
@@ -38,7 +36,7 @@ export default function RootLayout({
   // will implement auth later
   const authenticatedUser = {
     isAuthenticated: true,
-    role: AccountRole.Admin,
+    role: UserRoles.Admin,
   };
 
   return (
