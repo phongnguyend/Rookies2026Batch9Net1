@@ -23,6 +23,7 @@ namespace NashAssetManagement.WebAPI
             services.AddProblemDetails();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddAuthenticationServices();
+            services.AddHttpContextAccessor();
 
             return services;
         }
