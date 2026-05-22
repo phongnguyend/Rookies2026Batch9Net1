@@ -1,3 +1,4 @@
+import { SortDirection } from "@/lib/api/base.types";
 import type { ReactNode } from "react";
 
 export interface ColumnDef<T> {
@@ -7,8 +8,6 @@ export interface ColumnDef<T> {
   className?: string;
   sortable?: boolean;
 }
-
-type SortDirection = "asc" | "desc";
 
 export interface SortItem {
   key: string;
@@ -42,10 +41,10 @@ export default function DataTable<T>({
     let nextSorts: SortItem[];
 
     if (!currentSort) {
-      nextSorts = [...sorts, { key, direction: "asc" }];
-    } else if (currentSort.direction === "asc") {
+      nextSorts = [...sorts, { key, direction: SortDirection.Asc }];
+    } else if (currentSort.direction === SortDirection.Asc) {
       nextSorts = sorts.map((s) =>
-        s.key === key ? { ...s, direction: "desc" } : s
+        s.key === key ? { ...s, direction: SortDirection.Desc } : s
       );
     } else {
       nextSorts = sorts.filter((s) => s.key !== key);
@@ -53,6 +52,13 @@ export default function DataTable<T>({
 
     onSortChange?.(nextSorts);
   };
+
+  const getSortIcon = (direction?: SortDirection) => {
+    if (direction === SortDirection.Asc) return "↑";
+    if (direction === SortDirection.Desc) return "↓";
+    return "↕";
+  };
+  
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -76,11 +82,7 @@ export default function DataTable<T>({
 
                   {column.sortable && (
                     <span className="ml-1">
-                      {currentSort
-                        ? currentSort.direction === "asc"
-                          ? "↑"
-                          : "↓"
-                        : "↕"}
+                      {getSortIcon(currentSort?.direction)}
                     </span>
                   )}
 

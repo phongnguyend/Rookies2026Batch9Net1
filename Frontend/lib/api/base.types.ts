@@ -25,3 +25,8 @@ export interface ApiErrorResponse {
   detail: string;
   errors?: ValidationErrorField[];
 }
+
+export enum SortDirection {
+  Asc = "Asc",
+  Desc = "Desc",
+}
