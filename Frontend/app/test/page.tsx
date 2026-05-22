@@ -247,14 +247,10 @@ export default function TestPage() {
               setSorts(newSorts);
               // this string will send to sortBy in backend Endpoint: noAsc,countryDesc
               const sortQuery = newSorts
-                .map(
-                  (sort) =>
-                    `${sort.key}${sort.direction === "asc" ? "Asc" : "Desc"}`
-                )
+                .map((sort) => `${sort.key}${sort.direction}`)
                 .join(",");
 
               console.log(sortQuery);
-              
             }}
           />
 
