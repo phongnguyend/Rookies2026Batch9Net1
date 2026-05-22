@@ -13,6 +13,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Host.UseSerilog();
 
+
 try
 {
     Log.Information("Starting application");

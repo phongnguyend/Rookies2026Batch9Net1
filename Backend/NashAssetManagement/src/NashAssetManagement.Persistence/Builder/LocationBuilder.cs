@@ -1,4 +1,8 @@
+
+using NashAssetManagement.Domain.Entities;
 using NashAssetManagement.Domain.Entities.Core;
+
+
 
 namespace NashAssetManagement.Persistence.Builder;
 

@@ -173,6 +173,8 @@ namespace NashAssetManagement.Persistence.SeedData
                 users.Add(user);
             }
             #endregion
+
+            
             if (!await dbContext.Locations.AnyAsync())
             {
                 dbContext.Locations.AddRange(LocationsData);
@@ -188,6 +190,7 @@ namespace NashAssetManagement.Persistence.SeedData
                 dbContext.Categories.AddRange(CategoriesData);
                 await dbContext.SaveChangesAsync();
             }
+
             #region RoleIdentity
             var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
 
