@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserRoles } from "@/features/users/users.types";
@@ -26,7 +27,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     console.error(error);
   }, [error]);
 
-  //TODO: will implement auth later
+
   const user: UserRoles = UserRoles.Admin;
 
   let homePath = APP_ROUTES.HOME;
@@ -111,6 +112,14 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               </svg>
               Try Again
             </button>
+
+            {/* return to home path */}
+            <Link
+              href={homePath}
+              className="w-full py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold rounded-lg shadow-sm transition-all duration-150 flex items-center justify-center gap-2 text-sm"
+            >
+              Go Back Home
+            </Link>
           </div>
         </div>
       </body>
