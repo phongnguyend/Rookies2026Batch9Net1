@@ -4,21 +4,26 @@
     {
         #region ClaimTypes
 
-        public const string JwtUserIdClaimType = "userId";
-        public const string JwtFirstNameClaimType = "firstName";
-        public const string JwtLastNameClaimType = "lastName";
-        public const string JwtEmailClaimType = "email";
-        public const string JwtUsernameClaimType = "username";
-        public const string JwtRolesClaimType = "roles";
-        public const string JwtUserTypeClaimType = "userType";
-        public const string JwtJtiClaimType = "jti";
+        public const string UserId = "userId";
+        public const string Username = "username";
+        public const string LocationId = "locationId";
+        public const string IsFirstLogin = "isFirstLogin";
+        public const string Roles = "roles";
+        public const string Jti = "jti";
 
         #endregion
 
         #region TokenName
 
-        public const string RefreshTokenName = "refreshToken";
-        public const string AccessTokenName = "accessToken";
+        public const string RefreshToken = "refreshToken";
+        public const string AccessToken = "accessToken";
+
+        #endregion
+
+        #region CookieName
+
+        public const string CookieAccessToken = "NashAssetManagement.Cookie.AccessToken";
+        public const string CookieRefreshToken = "NashAssetManagement.Cookie.RefreshToken";
 
         #endregion
     }

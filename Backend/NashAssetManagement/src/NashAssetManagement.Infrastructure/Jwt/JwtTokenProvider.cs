@@ -16,33 +16,37 @@ namespace NashAssetManagement.Infrastructure.Jwt
         : IJwtTokenProvider
     {
         readonly JwtOptions _jwtOptions = options.Value ?? throw new ArgumentNullException(nameof(options));
+
         public string GenerateAccessToken(User user, IList<string> roles)
         {
             ArgumentNullException.ThrowIfNull(user);
             ArgumentNullException.ThrowIfNull(roles);
+
             var claims = new List<Claim>
             {
-                new Claim(JwtTokenConstants.JwtUserIdClaimType, user.Id.ToString()),
-                new Claim(JwtTokenConstants.JwtUsernameClaimType, user.UserName!),
-                new Claim(JwtTokenConstants.JwtEmailClaimType, user.Email!),
-                new Claim(JwtTokenConstants.JwtFirstNameClaimType, user.FirstName!),
-                new Claim(JwtTokenConstants.JwtLastNameClaimType, user.LastName!),
-                new Claim(JwtTokenConstants.JwtUserTypeClaimType, user.UserType.ToString()),
-                new Claim(JwtTokenConstants.JwtJtiClaimType, Guid.NewGuid().ToString())
+                new Claim(JwtTokenConstants.UserId, user.Id.ToString()),
+                new Claim(JwtTokenConstants.Username, user.UserName!),
+                new Claim(JwtTokenConstants.LocationId, user.LocationId.ToString()),
+                new Claim(JwtTokenConstants.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtTokenConstants.IsFirstLogin, user.IsFirstLogin.ToString()),
             };
+
             foreach (var role in roles)
             {
-                claims.Add(new Claim(JwtTokenConstants.JwtRolesClaimType, role));
+                claims.Add(new Claim(JwtTokenConstants.Roles, role));
             }
+
             var creds = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
                 SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: claims,
                 expires: dateTimeProvider.UtcNow.AddMilliseconds(_jwtOptions.AccessTokenExpiryInMilliseconds),
                 signingCredentials: creds);
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -53,6 +57,7 @@ namespace NashAssetManagement.Infrastructure.Jwt
                 new Claim(JwtTokenConstants.JwtUserIdClaimType, user.Id.ToString()),
                 new Claim(JwtTokenConstants.JwtJtiClaimType, Guid.NewGuid().ToString())
             };
+
             var creds = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
                 SecurityAlgorithms.HmacSha256);

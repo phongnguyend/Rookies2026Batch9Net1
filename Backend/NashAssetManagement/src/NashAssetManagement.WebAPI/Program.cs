@@ -1,9 +1,7 @@
 using Asp.Versioning.ApiExplorer;
-using Microsoft.OpenApi;
 using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
-using NashAssetManagement.Persistence.SeedData;
 using NashAssetManagement.WebAPI;
 using Serilog;
 
@@ -53,6 +51,8 @@ try
     //     await seeder.SeedDataAsync(scope.ServiceProvider);
     //     Log.Information("Seed development data finished successfully.");
     // }
+
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
