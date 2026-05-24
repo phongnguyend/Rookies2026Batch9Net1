@@ -19,7 +19,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
             var totalItems = await repo.CountAsync(filterSpec, cancellationToken);
             var items = await repo.ListAsync(pagingSpec, cancellationToken);
 
-            return PagedList.Create(items, totalItems, query.PageIndex ?? 1, query.PageSize ?? 10);
+            return PagedList.Create(items, totalItems, query.PageNumber ?? 1, query.PageSize ?? 10);
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public record PagedQuery
     {
-        public int? PageIndex { get; init; } = 1;
+        public int? PageNumber { get; init; } = 1;
         public int? PageSize { get; init; } = 10;
     }
 }
