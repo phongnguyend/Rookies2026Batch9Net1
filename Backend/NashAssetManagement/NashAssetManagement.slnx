@@ -11,5 +11,7 @@
     <Project Path="src/NashAssetManagement.Persistence/NashAssetManagement.Persistence.csproj" />
     <Project Path="src/NashAssetManagement.WebAPI/NashAssetManagement.WebAPI.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/NashAssetManagement.UnitTests/NashAssetManagement.UnitTests.csproj" />
+  </Folder>
 </Solution>

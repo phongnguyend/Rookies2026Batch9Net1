@@ -100,12 +100,8 @@ namespace NashAssetManagement.Persistence.SeedData
             #endregion
 
             #region  User
-            var users = new List<User>();
-
             var haNoiId = Guid.Parse("11111111-1111-1111-1111-111111111111");
             var hcmId = Guid.Parse("22222222-2222-2222-2222-222222222222");
-
-            var passwordHasher = new PasswordHasher<User>();
 
             var seedUsers = new List<(Guid Id, string UserName, string StaffCode, string FirstName, string LastName, Gender Gender, DateTime Dob, DateTime JoinedDate, Guid LocationId, UserType UserType)>
             {
@@ -148,32 +144,6 @@ namespace NashAssetManagement.Persistence.SeedData
                 (Guid.Parse("10000000-0000-0000-0000-000000000030"), "longcv", "SD0030", "Long", "Cao Van", Gender.Male, new DateTime(1993, 12, 05), new DateTime(2018, 12, 01), hcmId, UserType.Staff),
             };
 
-            foreach (var item in seedUsers)
-            {
-                var password = $"{item.UserName}@{item.Dob:ddMMyyyy}";
-
-                var user = new UserBuilder()
-                    .WithId(item.Id)
-                    .WithName(item.UserName)
-                    .WithStaffCode(item.StaffCode)
-                    .WithFirsName(item.FirstName)
-                    .WithLastName(item.LastName)
-                    .WithDOB(item.Dob)
-                    .WithJoinDate(item.JoinedDate)
-                    .WithGender(item.Gender)
-                    .WithUserType(item.UserType)
-                    .WithLocation(item.LocationId)
-                    .WithFirstLogin(true)
-                    .Build();
-
-                user.Email = $"{item.UserName}@nam.local";
-                user.NormalizedEmail = user.Email.ToUpper();
-                user.NormalizedUserName = item.UserName.ToUpper();
-
-                user.PasswordHash = passwordHasher.HashPassword(user, password);
-
-                users.Add(user);
-            }
             #endregion
 
             if (!await dbContext.Locations.AnyAsync())
@@ -183,8 +153,47 @@ namespace NashAssetManagement.Persistence.SeedData
             }
             if (!await dbContext.Users.AnyAsync())
             {
-                dbContext.Users.AddRange(users);
-                await dbContext.SaveChangesAsync();
+                var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+
+                foreach (var item in seedUsers)
+                {
+                    var password = $"{item.UserName}@{item.Dob:ddMMyyyy}";
+
+                    var user = new UserBuilder()
+                        .WithId(item.Id)
+                        .WithName(item.UserName)
+                        .WithStaffCode(item.StaffCode)
+                        .WithFirsName(item.FirstName)
+                        .WithLastName(item.LastName)
+                        .WithDOB(item.Dob)
+                        .WithJoinDate(item.JoinedDate)
+                        .WithGender(item.Gender)
+                        .WithUserType(item.UserType)
+                        .WithLocation(item.LocationId)
+                        .WithFirstLogin(true)
+                        .Build();
+
+                    user.Email = $"{item.UserName}@nam.local";
+
+                    var result = await userManager.CreateAsync(user, password);
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                        throw new InvalidOperationException($"Failed to seed user '{item.UserName}': {errors}");
+                    }
+                }
+            }
+            else
+            {
+                var usersWithNullStamp = await dbContext.Users.Where(u => u.SecurityStamp == null).ToListAsync();
+                if (usersWithNullStamp.Count > 0)
+                {
+                    foreach (var u in usersWithNullStamp)
+                    {
+                        u.SecurityStamp = Guid.NewGuid().ToString();
+                    }
+                    await dbContext.SaveChangesAsync();
+                }
             }
             if (!await dbContext.Categories.AnyAsync())
             {
