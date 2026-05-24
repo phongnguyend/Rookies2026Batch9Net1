@@ -44,6 +44,12 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
                 return Errors.InvalidCredentials;
             }
 
+            // Check if user is disabled
+            if (user.IsDeleted)
+            {
+                return Errors.UserIsDisabled;
+            }
+
             // Check locked out
             var signInResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, true);
             if (signInResult.IsLockedOut)

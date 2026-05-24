@@ -4,10 +4,14 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
 {
     public static class Errors
     {
-        public static Error InvalidCredentials = Error.Unauthorized(
+        public static readonly Error InvalidCredentials = Error.Unauthorized(
             code: "Login.InvalidCredentials",
             description: "Username or password is incorrect. Please try again."
         );
+
+        public static readonly Error UserIsDisabled = Error.Unauthorized(
+            code: "Login.UserIsDisabled",
+            description: "User has been disabled.");
 
         public static Error InvalidCredentialsWithRemainingAttempts(int remainingAttempts)
         {
