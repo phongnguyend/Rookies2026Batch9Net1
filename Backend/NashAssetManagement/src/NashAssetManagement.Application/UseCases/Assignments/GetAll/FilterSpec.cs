@@ -17,11 +17,11 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var search = $"%{searchTerm}%";
+                var search = $"%{searchTerm.ToLower()}%";
                 Query
-                    .Search(x => x.Asset!.AssetCode, search)
-                    .Search(x => x.Asset!.Name, search)
-                    .Search(x => x.AssignedToUser!.UserName, search);
+                    .Search(x => x.Asset!.AssetCode.ToLower(), search)
+                    .Search(x => x.Asset!.Name.ToLower(), search)
+                    .Search(x => x.AssignedToUser!.UserName!.ToLower(), search);
             }
 
             if (!query.IncludeDeleted ?? false)
