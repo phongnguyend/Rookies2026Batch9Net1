@@ -1,10 +1,11 @@
-﻿using NashAssetManagement.Domain.Entities.Identity;
+﻿using NashAssetManagement.Domain.Entities.Auth;
+using NashAssetManagement.Domain.Entities.Identity;
 
 namespace NashAssetManagement.Application.Abstractions.Jwt
 {
     public interface IJwtTokenProvider
     {
         string GenerateAccessToken(User user, IList<string> roles);
-        string GenerateRefreshToken(User user);
+        RefreshToken GenerateRefreshToken(User user);
     }
 }

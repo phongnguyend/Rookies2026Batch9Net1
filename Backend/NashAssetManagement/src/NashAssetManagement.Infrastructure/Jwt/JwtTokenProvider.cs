@@ -3,9 +3,11 @@ using Microsoft.IdentityModel.Tokens;
 using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Abstractions.Jwt;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace NashAssetManagement.Infrastructure.Jwt
@@ -28,7 +30,7 @@ namespace NashAssetManagement.Infrastructure.Jwt
                 new Claim(JwtTokenConstants.Username, user.UserName!),
                 new Claim(JwtTokenConstants.LocationId, user.LocationId.ToString()),
                 new Claim(JwtTokenConstants.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtTokenConstants.IsFirstLogin, user.IsFirstLogin.ToString()),
+                new Claim(JwtTokenConstants.IsFirstLogin, user.IsFirstLogin ? "true" : "false"),
             };
 
             foreach (var role in roles)
@@ -50,24 +52,15 @@ namespace NashAssetManagement.Infrastructure.Jwt
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateRefreshToken(User user)
+        public RefreshToken GenerateRefreshToken(User user)
         {
-            var claims = new List<Claim>()
+            return new RefreshToken
             {
-                new Claim(JwtTokenConstants.JwtUserIdClaimType, user.Id.ToString()),
-                new Claim(JwtTokenConstants.JwtJtiClaimType, Guid.NewGuid().ToString())
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                CreatedAtUtc = dateTimeProvider.UtcNow,
+                ExpiresAtUtc = dateTimeProvider.UtcNow.AddMilliseconds(_jwtOptions.RefreshTokenExpiryInMilliseconds)
             };
-
-            var creds = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)),
-                SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: _jwtOptions.Issuer,
-                audience: _jwtOptions.Audience,
-                claims: claims,
-                expires: dateTimeProvider.UtcNow.AddMilliseconds(_jwtOptions.RefreshTokenExpiryInMilliseconds),
-                signingCredentials: creds);
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

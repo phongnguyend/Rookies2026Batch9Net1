@@ -53,6 +53,7 @@ namespace NashAssetManagement.WebAPI.Configuration
                             };
                             await context.Response.WriteAsJsonAsync(problem);
                         },
+
                         OnForbidden = async context =>
                         {
                             context.Response.Clear();
