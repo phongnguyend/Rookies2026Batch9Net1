@@ -11,6 +11,8 @@ namespace NashAssetManagement.WebAPI.Configuration
     {
         public void Configure(SwaggerGenOptions options)
         {
+            options.CustomSchemaIds(type => type.FullName);
+
             foreach (var description in provider.ApiVersionDescriptions)
             {
                 options.EnableAnnotations();
