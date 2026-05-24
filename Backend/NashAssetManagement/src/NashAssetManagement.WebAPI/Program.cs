@@ -3,6 +3,7 @@ using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
 using NashAssetManagement.WebAPI;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,15 +43,18 @@ try
             }
         });
     }
-    // Only uncomment if you need SeedData
+    // // Only uncomment if you need SeedData
     // if (app.Environment.IsDevelopment())
     // {
-    //     Log.Information("Begin seed development data.");
     //     using var scope = app.Services.CreateScope();
+    //     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    //     Log.Information("Begin seed development data.");
+    //     await dbContext.Database.MigrateAsync();
     //     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
     //     await seeder.SeedDataAsync(scope.ServiceProvider);
-    //     Log.Information("Seed development data finished successfully.");
+    //     Log.Information("Seed development data finished successfully.");    
     // }
+
     app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
