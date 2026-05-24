@@ -31,14 +31,15 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             // var usersQuery = userManager.Users;
 
             // Search
-            if (!string.IsNullOrEmpty(query.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
             {
-                var pattern = $"%{query.SearchTerm}%";
+                var searchTerm = query.SearchTerm.Trim().ToLowerInvariant();
+                var pattern = $"%{searchTerm}%";
 
                 usersQuery = usersQuery.Where(u =>
-                    (u.StaffCode != null && EF.Functions.Like(u.StaffCode, pattern)) ||
-                    (u.FirstName != null && EF.Functions.Like(u.FirstName, pattern)) ||
-                    (u.LastName != null && EF.Functions.Like(u.LastName, pattern)));
+                    (u.StaffCode != null && EF.Functions.Like(u.StaffCode.ToLower(), pattern)) ||
+                    (u.FirstName != null && EF.Functions.Like(u.FirstName.ToLower(), pattern)) ||
+                    (u.LastName != null && EF.Functions.Like(u.LastName.ToLower(), pattern)));
             }
 
             // Filter by user type
