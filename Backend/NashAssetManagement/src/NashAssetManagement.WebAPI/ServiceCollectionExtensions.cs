@@ -1,4 +1,5 @@
-﻿using NashAssetManagement.WebAPI.Configuration;
+using NashAssetManagement.WebAPI.Configuration;
+using NashAssetManagement.WebAPI.Configuration.Cors;
 using NashAssetManagement.WebAPI.Middlewares;
 using NashAssetManagement.WebAPI.Utilities.Converters;
 using System.Text.Json.Serialization;
@@ -26,6 +27,7 @@ namespace NashAssetManagement.WebAPI
             services.AddAspIdentityServices();
             services.ConfigureApiVersioning();
             services.AddSwaggerDocumentation();
+            services.AddCorsServices();
 
             return services;
         }
