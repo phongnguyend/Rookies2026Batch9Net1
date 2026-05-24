@@ -26,9 +26,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
 
             // Get users have same location with current admin user
             var usersQuery = userManager.Users
-                .Where(u => u.LocationId.Equals(currentAdmin.LocationId));
-
-            // var usersQuery = userManager.Users;
+                .Where(u => u.LocationId.Equals(currentAdmin.LocationId))
+                ;
 
             // Search
             if (!string.IsNullOrWhiteSpace(query.SearchTerm))
