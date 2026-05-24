@@ -1,4 +1,5 @@
 ﻿using NashAssetManagement.Infrastructure.Jwt;
+using NashAssetManagement.WebAPI.Configuration.Cors;
 
 namespace NashAssetManagement.WebAPI.Configuration
 {
@@ -12,6 +13,12 @@ namespace NashAssetManagement.WebAPI.Configuration
                 .BindConfiguration(JwtOptions.SectionName)
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
+
+            services.AddOptions<CorsOptions>()
+                .BindConfiguration(CorsOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             return services;
         }
     }

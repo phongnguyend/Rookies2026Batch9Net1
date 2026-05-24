@@ -53,6 +53,8 @@ try
     //     await seeder.SeedDataAsync(scope.ServiceProvider);
     //     Log.Information("Seed development data finished successfully.");
     // }
+    app.UseCors();
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
