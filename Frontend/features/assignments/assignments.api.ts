@@ -83,7 +83,7 @@ export const assignmentApi =
         query: (id) => ({
           url: `api/v1/assignments/${id}`,
           method: "GET",
-        }),
+    }),
 
         providesTags: (_result, _error, id) => [
           { type: "Assignment", id },
