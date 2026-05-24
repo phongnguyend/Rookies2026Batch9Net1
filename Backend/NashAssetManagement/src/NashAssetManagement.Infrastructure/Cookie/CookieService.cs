@@ -21,7 +21,7 @@ namespace NashAssetManagement.Infrastructure.Cookie
         public AuthCookie CreateRefreshTokenCookie(string refreshToken, DateTime expiresAtUtc)
         {
             return new AuthCookie(
-                TokenName: JwtTokenConstants.CookieAccessToken,
+                TokenName: JwtTokenConstants.CookieRefreshToken,
                 Value: refreshToken,
                 ExpiresAtUtc: expiresAtUtc,
                 HttpOnly: true,
