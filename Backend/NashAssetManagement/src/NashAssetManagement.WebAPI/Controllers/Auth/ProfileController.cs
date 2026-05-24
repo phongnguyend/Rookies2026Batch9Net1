@@ -14,7 +14,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
     {
         [HttpGet]
         [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
             var request = new Request();
