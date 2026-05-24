@@ -40,6 +40,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                     Query.Where(x => states.Contains(x.State));
             }
 
+
             if (query.AssignedDate.HasValue)
             {
                 var date = query.AssignedDate.Value.Date;
