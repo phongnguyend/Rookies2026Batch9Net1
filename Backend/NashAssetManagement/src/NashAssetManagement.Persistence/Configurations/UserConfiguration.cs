@@ -41,6 +41,11 @@ namespace NashAssetManagement.Persistence.Configurations
 
             builder.Property(x => x.UserType)
                 .HasConversion<string>();
+
+            builder.HasMany(x => x.RefreshTokens)
+                .WithOne()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
