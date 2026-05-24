@@ -9,7 +9,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
        IRequest<ErrorOr<PagedList<Response>>>
     {
         public string? SearchTerm { get; init; }
-        public string? State { get; init; }
+        public string[]? State { get; init; }
         public string? SortBy { get; init; }
         public bool? SortDesc { get; init; }
         public DateTime? AssignedDate { get; init; }

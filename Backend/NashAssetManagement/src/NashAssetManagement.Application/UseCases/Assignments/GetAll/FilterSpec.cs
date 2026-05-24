@@ -29,11 +29,17 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                 Query.Where(x => x.IsDeleted == false);
             }
 
-            if (!string.IsNullOrWhiteSpace(query.State)
-            && Enum.TryParse<AssignmentState>(query.State, ignoreCase: true, out var state))
+            if (query.State?.Length > 0)
             {
-                Query.Where(x => x.State == state);
+                var states = query.State
+                    .Where(s => Enum.TryParse<AssignmentState>(s, ignoreCase: true, out _))
+                    .Select(s => Enum.Parse<AssignmentState>(s, ignoreCase: true))
+                    .ToArray();
+
+                if (states.Length > 0)
+                    Query.Where(x => states.Contains(x.State));
             }
+
 
             if (query.AssignedDate.HasValue)
             {

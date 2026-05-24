@@ -8,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
         public PagingSpec(Query request) : base(request)
         {
             ApplySorting(request.SortBy, request.SortDesc);
-            Query.ApplyPaging(request.PageIndex ?? 1, request.PageSize ?? 10);
+            Query.ApplyPaging(request.PageNumber ?? 1, request.PageSize ?? 10);
         }
 
         #region ApplySorting
