@@ -28,6 +28,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             var usersQuery = userManager.Users
                 .Where(u => u.LocationId.Equals(currentAdmin.LocationId));
 
+            // var usersQuery = userManager.Users;
+
             // Search
             if (!string.IsNullOrEmpty(query.SearchTerm))
             {
@@ -92,7 +94,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
                 u.Id,
                 u.StaffCode,
                 u.FirstName + " " + u.LastName,
-                u.UserName,
+                u.UserName ?? "",
                 u.JoinedAtUtc.ToString("yyyy-MM-dd"),
                 u.UserType.ToString()
             )
