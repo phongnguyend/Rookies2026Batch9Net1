@@ -4,8 +4,8 @@ import { ENV_CONFIGS } from "./lib/config/env";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const sessionCookieName = ENV_CONFIGS.sessionCookieName || "AspNet.Cookie.Api";
-  const hasSession = request.cookies.has(sessionCookieName);
+  const accessTokenCookieName = ENV_CONFIGS.accessTokenCookieName || "NashAssetManagement.Cookie.AccessToken";
+  const hasSession = request.cookies.has(accessTokenCookieName);
 
   // route guard
   if (!hasSession) {

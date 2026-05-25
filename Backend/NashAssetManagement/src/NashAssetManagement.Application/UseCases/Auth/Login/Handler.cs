@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Abstractions.Jwt;
 using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Identity;
@@ -16,6 +17,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
         IJwtTokenProvider jwtTokenProvider,
         IUnitOfWork uow,
         ILogger<Handler> logger,
+        IDateTimeProvider dateTimeProvider,
         IRepository<RefreshToken, Guid> rfTokenRepository,
         IValidator<Request> validator) : IRequestHandler<Request, ErrorOr<Response>>
     {
@@ -42,6 +44,12 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
                 return Errors.InvalidCredentials;
             }
 
+            // Check if user is disabled
+            if (user.IsDeleted)
+            {
+                return Errors.UserIsDisabled;
+            }
+
             // Check locked out
             var signInResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, true);
             if (signInResult.IsLockedOut)
@@ -56,6 +64,16 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
                 var maxAttempts = Domain.Constants.IdentityConstants.MaxFailedAttempts;
                 var remainingAttempts = Math.Max(0, maxAttempts - failedCount);
                 return Errors.InvalidCredentialsWithRemainingAttempts(remainingAttempts);
+            }
+
+            // Compile with Single Session Refresh Token
+            var activeRefreshTokens = rfTokenRepository.GetQueryableSet()
+                                        .Where(x => x.UserId == user.Id && !x.IsRevoked && x.ExpiresAtUtc > dateTimeProvider.UtcNow);
+
+            foreach (var token in activeRefreshTokens)
+            {
+                token.IsRevoked = true;
+                token.RevokedAtUtc = dateTimeProvider.UtcNow;
             }
 
             // Generate tokens

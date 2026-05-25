@@ -1,18 +1,20 @@
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NashAssetManagement.Application.Abstractions.Cookie;
 using NashAssetManagement.Application.Abstractions.DateTimes;
-using NashAssetManagement.Application.UseCases.Auth.Login;
+using NashAssetManagement.Application.UseCases.Auth.FirstChangePassword;
 using NashAssetManagement.Infrastructure.Jwt;
 using NashAssetManagement.WebAPI.Utilities;
 
 namespace NashAssetManagement.WebAPI.Controllers.Auth
 {
+    [Authorize]
     [ApiVersion(1)]
-    [Route("api/v{version:apiVersion}/auth/login")]
-    public sealed class AuthController(
+    [Route("api/v{version:apiVersion}/auth/first-change-password")]
+    public sealed class FirstChangePasswordController(
         ISender sender,
         ICookieService cookieService,
         IDateTimeProvider dateTimeProvider,
@@ -22,9 +24,11 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Login(
+        public async Task<IActionResult> FirstChangePassword(
             [FromBody] Request request,
             CancellationToken cancellationToken)
         {
@@ -34,13 +38,13 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
                 return result.Errors.ToProblem();
             }
 
-            // Set access token to cookie
+            // Set new access token to cookie
             var accessTokenCookie = cookieService.CreateAccessTokenCookie(
                 result.Value.AccessToken,
                 dateTimeProvider.UtcNow.AddMilliseconds(jwtOptions.Value.AccessTokenExpiryInMilliseconds));
             Response.AppendAuthCookie(accessTokenCookie);
 
-            // Set refresh token to cookie
+            // Set new refresh token to cookie
             var refreshTokenCookie = cookieService.CreateRefreshTokenCookie(
                 result.Value.RefreshToken,
                 dateTimeProvider.UtcNow.AddMilliseconds(jwtOptions.Value.RefreshTokenExpiryInMilliseconds));

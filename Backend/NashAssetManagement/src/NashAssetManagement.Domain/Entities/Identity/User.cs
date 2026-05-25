@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
@@ -36,5 +37,6 @@ namespace NashAssetManagement.Domain.Entities.Identity
         public ICollection<Assignment> ReceivedAssignments { get; set; } = [];
         public ICollection<ReturnRequest> RequestedReturnRequests { get; set; } = [];
         public ICollection<ReturnRequest> AcceptedReturnRequests { get; set; } = [];
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     }
 }

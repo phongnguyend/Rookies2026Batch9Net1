@@ -11,11 +11,11 @@ const loginFormSchema = z.object({
   username: z
     .string()
     .min(1, "Username is required")
-    .transform(val => val.trim()),
+    .transform((val) => val.trim()),
   password: z
     .string()
     .min(1, "Password is required")
-    .transform(val => val.trim())
+    .transform((val) => val.trim()),
 });
 
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
@@ -23,11 +23,14 @@ type LoginFormSchema = z.infer<typeof loginFormSchema>;
 interface LoginFormProps {
   onLogin: (data: LoginFormSchema) => void;
   isLoading?: boolean;
-  errorMesage?: string | null;
+  errorMessage?: string | null;
 }
 
-export default function LoginForm({ onLogin, isLoading = false, errorMesage = null }: LoginFormProps) {
-
+export default function LoginForm({
+  onLogin,
+  isLoading = false,
+  errorMessage = null,
+}: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -71,8 +74,9 @@ export default function LoginForm({ onLogin, isLoading = false, errorMesage = nu
           <input
             type="text"
             placeholder="Enter your username"
-            className={`input input-bordered w-full focus:input-primary transition-colors ${errors.username ? "input-error focus:input-error" : ""
-              }`}
+            className={`input input-bordered w-full focus:input-primary transition-colors ${
+              errors.username ? "input-error focus:input-error" : ""
+            }`}
             disabled={isLoading}
             {...register("username")}
             data-testid="txtUsername"
@@ -95,8 +99,9 @@ export default function LoginForm({ onLogin, isLoading = false, errorMesage = nu
             <input
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
-              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${errors.password ? "input-error focus:input-error" : ""
-                }`}
+              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${
+                errors.password ? "input-error focus:input-error" : ""
+              }`}
               disabled={isLoading}
               {...register("password")}
               data-testid="txtPassword"
@@ -171,14 +176,12 @@ export default function LoginForm({ onLogin, isLoading = false, errorMesage = nu
         </button>
 
         {/* Error message from server */}
-        {
-          errorMesage && (
-            <div className="p-3 text-sm text-error bg-error/10 border border-error/20 rounded-lg">
-              {errorMesage}
-            </div>
-          )
-        }
-      </form >
-    </div >
+        {errorMessage && (
+          <div className="p-3 text-sm text-error bg-error/10 border border-error/20 rounded-lg">
+            {errorMessage}
+          </div>
+        )}
+      </form>
+    </div>
   );
 }
