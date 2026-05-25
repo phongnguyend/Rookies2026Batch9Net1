@@ -7,9 +7,14 @@ import { useUserAssignmentTableState } from "./useUserAssignmentsTableState";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import SingleSortDataTable from "@/features/shared/components/SingleSortDataTable";
+import { ViewUserAssignments } from "../user-assignment.types";
+import { useState } from "react";
+import UserAssignmentDetailDialog from "./UserAssignmentDetailDialog";
 
 export const UserAssignmentsDataTable = () => {
   const { params, dispatch } = useUserAssignmentTableState();
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
   // Derive sorts for DataTable directly from params — single source of truth
   const sorts: SortItem[] = params.sortBy
     ? [
@@ -42,6 +47,7 @@ export const UserAssignmentsDataTable = () => {
         isLoading={isLoading}
         sorts={sorts}
         onSortChange={handleSortChange}
+        onRowClick={setSelectedAssignment}
         emptyMessage="No assignments found."
       />
 
@@ -62,6 +68,11 @@ export const UserAssignmentsDataTable = () => {
             },
           });
         }}
+      />
+
+      <UserAssignmentDetailDialog
+        assignment={selectedAssignment}
+        onClose={() => setSelectedAssignment(null)}
       />
     </div>
   );
