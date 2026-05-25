@@ -27,5 +27,19 @@ namespace NashAssetManagement.Application.Common.Validators
         }
 
         #endregion
+
+        #region Path Parameters
+
+        internal static IRuleBuilderOptions<T, string?> MustBeValidGuid<T>(
+            this IRuleBuilder<T, string?> ruleBuilder)
+        {
+            return ruleBuilder
+                .NotEmpty()
+                .WithMessage("{PropertyName} is required.")
+                .Must(value => value is not null && Guid.TryParse(value, out _))
+                .WithMessage("{PropertyName} must be a valid Guid/uuid.");
+        }
+
+        #endregion
     }
 }
