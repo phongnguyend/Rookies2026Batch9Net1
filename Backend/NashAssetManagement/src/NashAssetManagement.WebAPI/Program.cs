@@ -53,7 +53,7 @@ try
     //     await dbContext.Database.MigrateAsync();
     //     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
     //     await seeder.SeedDataAsync(scope.ServiceProvider);
-    //     Log.Information("Seed development data finished successfully.");    
+    //     Log.Information("Seed development data finished successfully.");
     // }
 
     app.UseCors();
