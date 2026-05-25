@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import DataTable, {
+import {
   SortItem,
   type ColumnDef,
 } from "@/features/shared/components/DataTable";
@@ -142,7 +142,7 @@ export default function AssignmentsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333]">
+    <div className="min-h-screen bg-white text-[#333]" data-testid="mnuManageAssignment">
       <div className="flex">
         <main className="flex-1 px-32 pt-24">
           <h2 className="mb-6 text-xl font-bold text-primary">
@@ -152,34 +152,40 @@ export default function AssignmentsPage() {
           <div className="mb-6 flex items-center justify-between">
             {/* Left side */}
             <div className="flex items-center gap-4">
-              <DropdownFilter
-                items={Object.values(AssignmentState).map((s) => ({
-                  key: s,
-                  label: s,
-                }))}
-                values={states}
-                placeholder="State"
-                getKey={(item) => item.key}
-                getLabel={(item) => item.label}
-                onChange={(values) =>
-                  updateParams({
-                    state: values,
-                    page: "1",
-                  })
-                }
-              />
+              <div data-testid="ddlState">
+                <DropdownFilter
+                  items={Object.values(AssignmentState).map((s) => ({
+                    key: s,
+                    label: s,
+                  }))}
+                  values={states}
+                  placeholder="State"
+                  getKey={(item) => item.key}
+                  getLabel={(item) => item.label}
+                  onChange={(values) =>
+                    updateParams({
+                      state: values,
+                      page: "1",
+                    })
+                  }
+                  getTestIdAll={() => "chkStateAll"}
+                  getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
+                />
+              </div>
 
-              <DatePickerInput
-                value={assignedDate}
-                onChange={(date) =>
-                  updateParams({
-                    assignedDate:
-                      date?.toLocaleDateString("en-CA"),
-                    page: "1",
-                  })
-                }
-                placeholder="Assigned Date"
-              />
+              <div data-testid="dtpAssignedDate">
+                <DatePickerInput
+                  value={assignedDate}
+                  onChange={(date) =>
+                    updateParams({
+                      assignedDate:
+                        date?.toLocaleDateString("en-CA"),
+                      page: "1",
+                    })
+                  }
+                  placeholder="Assigned Date"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -198,7 +204,8 @@ export default function AssignmentsPage() {
                 }}
               />
 
-              <button className="rounded bg-primary px-5 py-2 font-semibold text-white">
+              <button className="rounded bg-primary px-5 py-2 font-semibold text-white"
+                data-testid="btnCreateNewAssignment">
                 Create new assignment
               </button>
             </div>
@@ -212,7 +219,6 @@ export default function AssignmentsPage() {
             sorts={sorts}
             onSortChange={(newSorts) => {
               const sort = newSorts[0];
-
               updateParams({
                 sortBy: sort?.key,
                 sortDesc:
@@ -234,15 +240,17 @@ export default function AssignmentsPage() {
             />
           )}
 
-          <Pagination
-            pageNumber={data?.pageNumber ?? page}
-            totalPages={data?.totalPages ?? 1}
-            pageSize={data?.pageSize ?? limit}
-            totalCount={data?.totalCount ?? 0}
-            hasPreviousPage={data?.hasPreviousPage ?? false}
-            hasNextPage={data?.hasNextPage ?? false}
-            onPageChange={(p) => updateParams({ page: String(p) })}
-          />
+          <div data-testid="pagination">
+            <Pagination
+              pageNumber={data?.pageNumber ?? page}
+              totalPages={data?.totalPages ?? 1}
+              pageSize={data?.pageSize ?? limit}
+              totalCount={data?.totalCount ?? 0}
+              hasPreviousPage={data?.hasPreviousPage ?? false}
+              hasNextPage={data?.hasNextPage ?? false}
+              onPageChange={(p) => updateParams({ page: String(p) })}
+            />
+          </div>
         </main>
       </div>
     </div>
