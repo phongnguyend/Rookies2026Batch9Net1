@@ -82,6 +82,7 @@ namespace NashAssetManagement.WebAPI.Configuration
                 .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
                 .Configure<IOptions<JwtOptions>>((libOptions, jwtOptions) =>
                 {
+                    libOptions.MapInboundClaims = false;
                     libOptions.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
