@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DataTable, { type ColumnDef, type SortItem } from "@/features/shared/components/DataTable";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import { SortDirection } from "@/lib/api/base.types";
+import UserDetailModal from "@/features/users/components/UserDetailModal";
 import { useGetUsersQuery } from "@/features/users/users.api";
 import { UserRoles, type GetUsersRequest, type UserRow } from "@/features/users/users.types";
 
@@ -24,36 +25,30 @@ export default function UsersPage() {
   const pageParam = Number(searchParams.get("page") ?? "1");
   const queryPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
   const querySearch = searchParams.get("search") ?? "";
+  const sortByParam = searchParams.get("sortBy") ?? "";
+  const sortDescParam = searchParams.get("sortDesc");
   const typeParam = searchParams.get("type");
   const selectedType =
     typeParam === UserRoles.Admin || typeParam === UserRoles.Staff
       ? typeParam
       : "All";
+  const sorts: SortItem[] = sortByParam
+    ? [
+        {
+          key: sortByParam,
+          direction:
+            sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
+        },
+      ]
+    : [];
 
-  const [searchInput, setSearchInput] = useState(querySearch);
-  const [sorts, setSorts] = useState<SortItem[]>([]);
-
-  useEffect(() => {
-    setSearchInput(querySearch);
-  }, [querySearch]);
-
-  useEffect(() => {
-    const sortByParam = searchParams.get("sortBy") ?? "";
-    const sortDescParam = searchParams.get("sortDesc");
-
-    if (!sortByParam) {
-      setSorts([]);
-      return;
-    }
-
-    setSorts([
-      {
-        key: sortByParam,
-        direction:
-          sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
-      },
-    ]);
-  }, [searchParams]);
+  const [searchState, setSearchState] = useState({
+    inputValue: querySearch,
+    urlValue: querySearch,
+  });
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const searchInput =
+    searchState.urlValue === querySearch ? searchState.inputValue : querySearch;
 
   const updateQueryParams = useCallback(
     (
@@ -127,15 +122,14 @@ export default function UsersPage() {
   const users = data?.items ?? [];
 
   const handleSortChange = (newSorts: SortItem[]) => {
-    setSorts(newSorts);
-
     if (newSorts.length === 0) {
-      updateQueryParams({ sortBy: null, sortDesc: null });
+      updateQueryParams({ page: 1, sortBy: null, sortDesc: null });
       return;
     }
 
     const firstSort = newSorts[0];
     updateQueryParams({
+      page: 1,
       sortBy: firstSort.key,
       sortDesc: firstSort.direction === SortDirection.Desc,
     });
@@ -151,7 +145,7 @@ export default function UsersPage() {
       key: "actions",
       header: "",
       className: "w-[140px] text-right",
-      render: (user) => (
+      render: () => (
         <div className="flex justify-end gap-2">
           <button
             type="button"
@@ -208,9 +202,13 @@ export default function UsersPage() {
               value={searchInput}
               placeholder="Search users..."
               width="w-72"
-              onChange={(value) => setSearchInput(value)}
+              onChange={(value) =>
+                setSearchState({ inputValue: value, urlValue: querySearch })
+              }
               onSearch={(value) => {
-                updateQueryParams({ page: 1, search: value });
+                const nextSearch = value.trim();
+                setSearchState({ inputValue: nextSearch, urlValue: nextSearch });
+                updateQueryParams({ page: 1, search: nextSearch });
               }}
             />
             <button
@@ -225,14 +223,23 @@ export default function UsersPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto bg-white">
-          <DataTable
-            data={users}
-            columns={columns}
-            sorts={sorts}
-            onSortChange={handleSortChange}
-            isLoading={isLoading}
-            emptyMessage="No users found."
+        <div className="relative bg-white">
+          <div className="overflow-x-auto">
+            <DataTable
+              data={users}
+              columns={columns}
+              sorts={sorts}
+              onSortChange={handleSortChange}
+              onRowClick={(user) => setSelectedUserId(user.id)}
+              isLoading={isLoading}
+              emptyMessage="No users found."
+            />
+          </div>
+
+          <UserDetailModal
+            userId={selectedUserId}
+            isOpen={selectedUserId !== null}
+            onClose={() => setSelectedUserId(null)}
           />
         </div>
 

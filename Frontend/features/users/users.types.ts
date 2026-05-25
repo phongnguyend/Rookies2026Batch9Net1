@@ -17,6 +17,18 @@ export interface UserRow {
   canBeDisabled: boolean;
 }
 
+export interface UserDetail {
+  id: string;
+  staffCode: string;
+  fullName: string;
+  userName: string;
+  joinedDate: string;
+  userType: UserRoles;
+  dateOfBirth: string;
+  gender: string;
+  location: string;
+}
+
 export interface GetUsersRequest {
   pageNumber?: number;
   pageSize?: number;
@@ -27,3 +39,5 @@ export interface GetUsersRequest {
 }
 
 export interface GetUsersResponse extends PaginationResponse<UserRow> {}
+
+export type GetUserByIdResponse = UserDetail;

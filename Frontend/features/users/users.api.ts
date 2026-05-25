@@ -1,5 +1,9 @@
 import { baseApiSlice } from "@/lib/api/base.api";
-import { GetUsersRequest, GetUsersResponse } from "./users.types";
+import {
+  GetUserByIdResponse,
+  GetUsersRequest,
+  GetUsersResponse,
+} from "./users.types";
 
 export const usersApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -19,7 +23,14 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+    getUserById: builder.query<GetUserByIdResponse, string>({
+      query: (id) => ({
+        url: `https://localhost:8081/api/v1/users/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [{ type: "Users", id }],
+    }),
   }),
 });
 
-export const { useGetUsersQuery } = usersApi;
+export const { useGetUsersQuery, useGetUserByIdQuery } = usersApi;
