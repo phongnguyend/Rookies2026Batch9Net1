@@ -11,7 +11,7 @@ using Xunit;
 
 namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments
 {
-    public class GetAllHanderTest
+    public class GetAllHandlerTest
     {
         private static Mock<UserManager<User>> CreateUserManagerMock()
         {
