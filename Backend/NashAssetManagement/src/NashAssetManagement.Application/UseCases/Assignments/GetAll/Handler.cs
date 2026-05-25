@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using FluentValidation;
 using MediatR;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.Utilities;
@@ -13,6 +14,10 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
             Query query,
             CancellationToken cancellationToken)
         {
+            //var validationResult = await validator.ValidateAsync(query, cancellationToken);
+            //if (!validationResult.IsValid)
+            //    throw new ValidationException(validationResult.Errors);
+
             var filterSpec = new FilterSpec(query);
             var pagingSpec = new PagingSpec(query);
 

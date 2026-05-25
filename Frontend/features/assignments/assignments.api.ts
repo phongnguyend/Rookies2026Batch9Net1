@@ -1,5 +1,6 @@
 import { SortDirection } from "@/lib/api/base.types";
 import {
+  AssignmentDetails,
   GetAssignmentsRequest,
   GetAssignmentsResponse,
 } from "./assignments.types";
@@ -74,9 +75,25 @@ export const assignmentApi =
 
         providesTags: ["Assignment"],
       }),
+
+      getAssignmentById: builder.query<
+        AssignmentDetails,
+        string
+      >({
+        query: (id) => ({
+          url: `api/v1/assignments/${id}`,
+          method: "GET",
+        }),
+
+        providesTags: (_result, _error, id) => [
+          { type: "Assignment", id },
+        ],
+      }),
+
     }),
   });
 
 export const {
   useGetAllAssignmentsQuery,
+  useGetAssignmentByIdQuery
 } = assignmentApi;

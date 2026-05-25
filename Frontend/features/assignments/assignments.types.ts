@@ -6,21 +6,6 @@ import {
 
 export interface Assignment {
   id: string;
-  assignedAtUtc: string;
-  note?: string;
-  state: AssignmentState;
-  isReturning: boolean;
-  assetId: string;
-  assignedByUserId: string;
-  assignedToUserId: string;
-  createdAtUtc: string;
-  updatedAtUtc?: string | null;
-  isDeleted: boolean;
-  deletedAtUtc?: string | null;
-}
-
-export interface AssignmentDto {
-  id: string;
   assetCode: string;
   assetName: string;
   assignedTo: string;
@@ -28,6 +13,17 @@ export interface AssignmentDto {
   assignedDate: string;
   state: string;
 }
+
+export type AssignmentDetails = {
+  assetCode: string;
+  assetName: string;
+  specification: string;
+  assignedTo: string;
+  assignedBy: string;
+  assignedDate: string;
+  state: string;
+  note: string;
+};
 
 export enum AssignmentState {
   WaitingForAcceptance = "WaitingForAcceptance",
@@ -46,4 +42,4 @@ export interface GetAssignmentsRequest
   includeDeleted?: boolean;
 }
 
-export interface GetAssignmentsResponse extends PaginationResponse<AssignmentDto> { }
+export interface GetAssignmentsResponse extends PaginationResponse<Assignment> { }
