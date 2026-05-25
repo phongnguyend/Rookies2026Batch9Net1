@@ -10,10 +10,26 @@ export namespace Login {
     export interface Response { };
 }
 
+export namespace Refresh {
+    export interface Request { }
+    export interface Response { }
+}
+
 export namespace GetMe {
+    export interface Refresh { };
     export interface Response {
-        username: string;
-        role: UserRoles;
+        id: string;
+        userName: string;
+        locationId: string;
         isFirstLogin: boolean;
+        roles: string[];
     }
+}
+
+export namespace FirstChangePassword {
+    export interface Request {
+        currentPassword: string;
+        newPassword: string;
+    }
+    export interface Response { }
 }
