@@ -5,7 +5,7 @@ import { BaseQueryFn } from "@reduxjs/toolkit/query";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: ENV_CONFIGS.apiUrl,
-  // credentials: 'include', // send cookie automatically
+  credentials: 'include', // send cookie automatic
 });
 
 const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {

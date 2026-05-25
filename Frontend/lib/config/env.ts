@@ -10,8 +10,12 @@ const getEnv = (key: string, value: string | undefined): string => {
 // Export environment variables
 export const ENV_CONFIGS = {
   apiUrl: getEnv("NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL),
-  sessionCookieName: getEnv(
-    "NEXT_PUBLIC_SESSION_COOKIE_NAME",
-    process.env.NEXT_PUBLIC_SESSION_COOKIE_NAME,
+  accessTokenCookieName: getEnv(
+    "NEXT_PUBLIC_ACCESS_SESSION_COOKIE_NAME",
+    process.env.NEXT_PUBLIC_ACCESS_SESSION_COOKIE_NAME,
+  ),
+  refreshTokenCookieName: getEnv(
+    "NEXT_PUBLIC_REFRESH_SESSION_COOKIE_NAME",
+    process.env.NEXT_PUBLIC_REFRESH_SESSION_COOKIE_NAME,
   ),
 };
