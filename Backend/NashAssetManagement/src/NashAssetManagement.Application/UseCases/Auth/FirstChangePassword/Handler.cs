@@ -69,18 +69,13 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                 if (!removeResult.Succeeded)
                 {
                     var errorDescription = string.Join(" ", removeResult.Errors.Select(e => e.Description));
-                    return Error.Validation(
-                        code: "FirstChangePassword.RemoveFailed",
-                        description: errorDescription);
+                    return Errors.ChangePasswordFailed;
                 }
 
                 var addResult = await userManager.AddPasswordAsync(user, request.NewPassword);
                 if (!addResult.Succeeded)
                 {
-                    var errorDescription = string.Join(" ", addResult.Errors.Select(e => e.Description));
-                    return Error.Validation(
-                        code: "FirstChangePassword.AddFailed",
-                        description: errorDescription);
+                    return Errors.ChangePasswordFailed;
                 }
 
                 // Mark as no longer first login
@@ -92,7 +87,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                     return Errors.ChangePasswordFailed;
                 }
 
-                // Compile with Single Session Refresh Token - revoke active refresh tokens
+                // When change the password, then revoke other refresh token
                 var activeRefreshTokens = rfTokenRepository.GetQueryableSet()
                                             .Where(x => x.UserId == user.Id && !x.IsRevoked && x.ExpiresAtUtc > dateTimeProvider.UtcNow);
 
