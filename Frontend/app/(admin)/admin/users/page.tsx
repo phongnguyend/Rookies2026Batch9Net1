@@ -2,14 +2,21 @@
 
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import DataTable, { type ColumnDef, type SortItem } from "@/features/shared/components/DataTable";
+import DataTable, {
+  type ColumnDef,
+  type SortItem,
+} from "@/features/shared/components/DataTable";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import { SortDirection } from "@/lib/api/base.types";
 import UserDetailModal from "@/features/users/components/UserDetailModal";
 import { useGetUsersQuery } from "@/features/users/users.api";
-import { UserRoles, type GetUsersRequest, type UserRow } from "@/features/users/users.types";
+import {
+  UserRoles,
+  type GetUsersRequest,
+  type UserRow,
+} from "@/features/users/users.types";
 
 const typeFilters = [
   { id: UserRoles.Admin, label: "Admin" },
@@ -176,55 +183,62 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-10">
-      <div className="mx-auto w-full max-w-6xl rounded-3xl bg-white p-6 shadow-sm">
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-red-600">User List</h1>
-        </div>
+    <div className="min-h-screen bg-white text-[#333]">
+      <div className="flex">
+        <main className="flex-1 px-32 pt-24">
+          <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
-        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <DropdownFilter
-            items={typeFilters}
-            values={selectedType === "All" ? [] : [selectedType]}
-            placeholder="All"
-            width="w-40"
-            getKey={(item) => item.id}
-            getLabel={(item) => item.label}
-            onChange={(values) => {
-              const nextType = values.length === 1 ? (values[0] as UserRoles) : "All";
-              updateQueryParams({ page: 1, type: nextType !== "All" ? nextType : null });
-            }}
-            allLabel="All"
-          />
+          <div className="mb-6 mt-4 flex items-center justify-between">
+            <div className="flex gap-5">
+              <DropdownFilter
+                items={typeFilters}
+                values={selectedType === "All" ? [] : [selectedType]}
+                placeholder="Type"
+                width="w-40"
+                getKey={(item) => item.id}
+                getLabel={(item) => item.label}
+                onChange={(values) => {
+                  const nextType =
+                    values.length === 1 ? (values[0] as UserRoles) : "All";
+                  updateQueryParams({
+                    page: 1,
+                    type: nextType !== "All" ? nextType : null,
+                  });
+                }}
+                allLabel="All"
+              />
+            </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <SearchInput
-              value={searchInput}
-              placeholder="Search users..."
-              width="w-72"
-              onChange={(value) =>
-                setSearchState({ inputValue: value, urlValue: querySearch })
-              }
-              onSearch={(value) => {
-                const nextSearch = value.trim();
-                setSearchState({ inputValue: nextSearch, urlValue: nextSearch });
-                updateQueryParams({ page: 1, search: nextSearch });
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: navigate to create user page, e.g. router.push('/admin/users/create')
-              }}
-              className="inline-flex items-center justify-center border rounded-md border-red-200 bg-red-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
-            >
-              Create new user
-            </button>
+            <div className="flex gap-8">
+              <SearchInput
+                value={searchInput}
+                placeholder="Search..."
+                onChange={(value) =>
+                  setSearchState({ inputValue: value, urlValue: querySearch })
+                }
+                onSearch={(value) => {
+                  const nextSearch = value.trim();
+                  setSearchState({
+                    inputValue: nextSearch,
+                    urlValue: nextSearch,
+                  });
+                  updateQueryParams({ page: 1, search: nextSearch });
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  // TODO: navigate to create user page, e.g. router.push('/admin/users/create')
+                }}
+                className="rounded bg-primary px-5 py-2 font-semibold text-white"
+              >
+                Create new user
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="relative bg-white">
-          <div className="overflow-x-auto">
+          <div className="relative">
             <DataTable
               data={users}
               columns={columns}
@@ -234,16 +248,14 @@ export default function UsersPage() {
               isLoading={isLoading}
               emptyMessage="No users found."
             />
+
+            <UserDetailModal
+              userId={selectedUserId}
+              isOpen={selectedUserId !== null}
+              onClose={() => setSelectedUserId(null)}
+            />
           </div>
 
-          <UserDetailModal
-            userId={selectedUserId}
-            isOpen={selectedUserId !== null}
-            onClose={() => setSelectedUserId(null)}
-          />
-        </div>
-
-        <div className="mt-6">
           <Pagination
             pageNumber={data?.pageNumber ?? queryPage}
             totalPages={data?.totalPages ?? 1}
@@ -253,7 +265,7 @@ export default function UsersPage() {
             hasNextPage={Boolean(data?.hasNextPage)}
             onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
           />
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using GetUserDetail = NashAssetManagement.Application.UseCases.Users.ViewDetail;
 using NashAssetManagement.WebAPI.Utilities;
+using NashAssetManagement.Domain.Constants;
 
 
 namespace NashAssetManagement.WebAPI.Controllers.Users
@@ -16,7 +17,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         : BaseApiController(sender)
     {
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = ApplicationRole.Admin)]
         [ProducesResponseType(typeof(GetUserDetail.Response), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

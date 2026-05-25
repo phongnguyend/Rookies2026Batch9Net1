@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.WebAPI.Utilities;
 using GetUsers = NashAssetManagement.Application.UseCases.Users.ViewList;
+using NashAssetManagement.Domain.Constants;
 
 namespace NashAssetManagement.WebAPI.Controllers.Users
 {
@@ -16,7 +17,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
     : BaseApiController(sender)
     {
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = ApplicationRole.Admin)]
         [ProducesResponseType(typeof(PagedList<GetUsers.Response>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
