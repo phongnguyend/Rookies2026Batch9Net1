@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NashAssetManagement.Application.UseCases.Auth.ChangePassword;
@@ -16,7 +17,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
     )
         : BaseApiController(sender)
     {
-        // [Authorize] wait for feature/5199_login_into_the_system
+        [Authorize]
         [HttpPost]
         [SwaggerOperation(
             Summary = "Change password for the currently authenticated user.",

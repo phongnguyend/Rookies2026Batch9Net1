@@ -40,6 +40,26 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
             var result = await _validator.ValidateAsync(request);
 
             Assert.True(result.IsValid);
+            Assert.Empty(result.Errors);
+        }
+
+        [Fact]
+        public async Task Validate_Should_Return_Errors_When_OldPassword_And_NewPassword_Are_Empty()
+        {
+            var request = new Request("", "");
+
+            var result = await _validator.ValidateAsync(request);
+
+            Assert.False(result.IsValid);
+            Assert.Equal(2, result.Errors.Count);
+
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.OldPassword)
+                     && x.ErrorMessage == "Old password is required");
+
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.NewPassword)
+                     && x.ErrorMessage == "New password is required");
         }
     }
 }
