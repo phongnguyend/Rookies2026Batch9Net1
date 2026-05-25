@@ -27,7 +27,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onAccept(row);
           }}
-          className="text-green-600 disabled:cursor-not-allowed disabled:opacity-30"
+          className="text-green-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Accept"
         >
           ✓
@@ -42,7 +42,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onDecline(row);
           }}
-          className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+          className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Decline"
         >
           ⊗
@@ -57,7 +57,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onReturn(row);
           }}
-          className="text-blue-600 disabled:cursor-not-allowed disabled:opacity-30"
+          className="text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Return"
         >
           ↻

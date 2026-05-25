@@ -6,12 +6,16 @@ import DataTable, {
   type ColumnDef,
 } from "@/features/shared/components/DataTable";
 import { useGetAllAssignmentsQuery } from "@/features/assignments/assignments.api";
-import { AssignmentDto, AssignmentState } from "@/features/assignments/assignments.types";
+import { Assignment, AssignmentState } from "@/features/assignments/assignments.types";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
+import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
+import AssignmentTable from "./components/AssignmentTable";
+import { useState } from "react";
+import AssignmentDetailPopup from "./components/AssignmentDetailPopup";
 
 const limit = 10;
 
@@ -23,11 +27,13 @@ export default function AssignmentsPage() {
   // Read from Url
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
+  const [searchInput, setSearchInput] = useState(search);
   const states = searchParams.getAll("state");
   const assignedDateParam = searchParams.get("assignedDate");
   const assignedDate = assignedDateParam ? new Date(assignedDateParam) : null;
   const sortBy = searchParams.get("sortBy") || undefined;
   const sortDesc = searchParams.get("sortDesc") === "true";
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
 
   const sorts: SortItem[] = sortBy
     ? [{ key: sortBy, direction: sortDesc ? SortDirection.Desc : SortDirection.Asc }]
@@ -69,18 +75,70 @@ export default function AssignmentsPage() {
 
   const assignments = data?.items ?? [];
 
-  const columns: ColumnDef<AssignmentDto>[] = [
+  const columns: ColumnDef<Assignment>[] = [
     {
       key: "no",
       header: "No.",
+      className: "w-[40px]",
       render: (_assignment, index) => (page - 1) * limit + index + 1,
     },
-    { key: "assetCode", header: "Asset Code", sortable: true },
-    { key: "assetName", header: "Asset Name", sortable: true },
-    { key: "assignedTo", header: "Assigned To", sortable: true },
-    { key: "assignedBy", header: "Assigned By", sortable: true },
-    { key: "assignedDate", header: "Assigned Date", sortable: true },
-    { key: "state", header: "State", sortable: true },
+    {
+      key: "assetCode",
+      header: "Asset Code",
+      sortable: true
+    },
+    {
+      key: "assetName",
+      header: "Asset Name",
+      sortable: true
+    },
+    {
+      key: "assignedTo",
+      header: "Assigned to",
+      sortable: true
+    },
+    {
+      key: "assignedBy",
+      header: "Assigned by",
+      sortable: true
+    },
+    {
+      key: "assignedDate",
+      header: "Assigned Date",
+      sortable: true
+    },
+    {
+      key: "state",
+      header: "State",
+      sortable: true,
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (assignment) => {
+        const isWaiting =
+          assignment.state === "WaitingForAcceptance";
+
+        const isAccepted =
+          assignment.state === "Accepted";
+
+        const isFinal =
+          assignment.state === "Returned" ||
+          assignment.state === "Declined";
+
+        return (
+          <DataTableButtonActions
+            row={assignment}
+            disabledAccept={isAccepted || isFinal}
+            disabledDecline={isAccepted || isFinal}
+            disabledReturn={isWaiting || isFinal}
+            onAccept={(row) => console.log("accept", row)}
+            onDecline={(row) => console.log("decline", row)}
+            onReturn={(row) => console.log("return", row)}
+          />
+        );
+      },
+    }
   ];
 
   return (
@@ -124,38 +182,57 @@ export default function AssignmentsPage() {
               />
             </div>
 
-            {/* Right side */}
-            <SearchInput
-              value={search}
-              placeholder="Search..."
-              onChange={(value) =>
-                updateParams({ search: value })
-              }
-              onSearch={(value) =>
-                updateParams({
-                  search: value,
-                  page: "1",
-                })
-              }
-            />
+            <div className="flex items-center gap-4">
+              {/* Right side */}
+              <SearchInput
+                value={searchInput}
+                placeholder="Search..."
+                onChange={(value) => {
+                  setSearchInput(value);
+                }}
+                onSearch={(value) => {
+                  updateParams({
+                    search: value || undefined,
+                    page: "1",
+                  });
+                }}
+              />
+
+              <button className="rounded bg-primary px-5 py-2 font-semibold text-white">
+                Create new assignment
+              </button>
+            </div>
           </div>
 
-          <DataTable<AssignmentDto>
+          <AssignmentTable<Assignment>
             data={assignments}
             columns={columns}
             isLoading={isLoading}
             emptyMessage="No assignments found."
             sorts={sorts}
-            onSortChange={(newSorts) =>
+            onSortChange={(newSorts) => {
+              const sort = newSorts[0];
+
               updateParams({
-                sortBy: newSorts[0]?.key,
-                sortDesc: newSorts[0]?.direction === SortDirection.Desc
-                  ? "true"
-                  : undefined,
+                sortBy: sort?.key,
+                sortDesc:
+                  sort?.direction === SortDirection.Desc
+                    ? "true"
+                    : undefined,
                 page: "1",
-              })
-            }
+              });
+            }}
+            onRowClick={(row) => {
+              setSelectedAssignmentId(row.id);
+            }}
           />
+
+          {selectedAssignmentId && (
+            <AssignmentDetailPopup
+              id={selectedAssignmentId}
+              onClose={() => setSelectedAssignmentId(null)}
+            />
+          )}
 
           <Pagination
             pageNumber={data?.pageNumber ?? page}
