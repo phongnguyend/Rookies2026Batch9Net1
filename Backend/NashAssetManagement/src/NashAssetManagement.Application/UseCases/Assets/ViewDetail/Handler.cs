@@ -5,7 +5,7 @@ using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 
 public class GetAssetDetailHandler : IRequestHandler<GetAssetDetailRequest, ErrorOr<GetAssetDetailResponse>>
 {

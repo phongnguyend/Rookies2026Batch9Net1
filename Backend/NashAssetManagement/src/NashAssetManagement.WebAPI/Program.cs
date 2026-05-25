@@ -44,7 +44,7 @@ try
             }
         });
     }
-    // // Only uncomment if you need SeedData
+    // Only uncomment if you need SeedData
     // if (app.Environment.IsDevelopment())
     // {
     //     using var scope = app.Services.CreateScope();

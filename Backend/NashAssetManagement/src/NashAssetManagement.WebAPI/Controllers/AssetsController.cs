@@ -1,7 +1,8 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NashAssetManagement.Application.UseCases.Assets;
+using NashAssetManagement.Application.UseCases.Assets.ViewDetail;
+using NashAssetManagement.Application.UseCases.Assets.ViewList;
 using NashAssetManagement.Domain.Enums;
 using NashAssetManagement.WebAPI.Utilities;
 
@@ -15,12 +16,17 @@ public class AssetsController : BaseApiController
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] string? category,
-        [FromQuery] AssetState? state,
-        CancellationToken cancellationToken)
+        [FromQuery] string? categories,
+        [FromQuery] string? states,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
+        var categoryList = categories?.Split(",", StringSplitOptions.RemoveEmptyEntries);
+        var stateList = states?.Split(",", StringSplitOptions.RemoveEmptyEntries); // ← no Enum.Parse
+
         var result = await _sender.Send(
-            new GetAssetsRequest(category, state),
+            new GetAssetsRequest(categoryList, stateList, pageNumber, pageSize),
             cancellationToken);
 
         return result.Match(

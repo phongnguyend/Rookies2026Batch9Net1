@@ -4,7 +4,7 @@ using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
 {
@@ -14,15 +14,13 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
     {
         _categoryRepository = categoryRepository;
 
-        RuleFor(x => x.State)
-            .IsInEnum()
-            .When(x => x.State is not null)
-            .WithMessage($"State must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
+        RuleForEach(x => x.States)
+            .Must(s => Enum.TryParse<AssetState>(s, out _))
+            .WithMessage(s => $"State '{s}' is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
 
-        RuleFor(x => x.Category)
+        RuleForEach(x => x.Categories)
             .MustAsync(CategoryExistsAsync)
-            .When(x => x.Category is not null)
-            .WithMessage(x => $"Category '{x.Category}' does not exist.");
+            .WithMessage((request, categoryName) => $"Category '{categoryName}' does not exist.");
 
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
@@ -34,11 +32,10 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
     }
 
     private async Task<bool> CategoryExistsAsync(
-        string? categoryName,
+        string categoryName,
         CancellationToken cancellationToken)
     {
-        var spec = new CategoryByNameSpec(categoryName!);
+        var spec = new CategoryByNameSpec(categoryName);
         return await _categoryRepository.AnyAsync(spec, cancellationToken);
     }
 }
-

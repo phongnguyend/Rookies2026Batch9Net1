@@ -1,4 +1,6 @@
 using Ardalis.Specification;
+using NashAssetManagement.Application.UseCases.Assets.ViewDetail;
+using NashAssetManagement.Application.UseCases.Assets.ViewList;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 
@@ -6,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assets.Specification;
 
 public sealed class AssetSpec : Specification<Asset, GetAssetsResponse>
 {
-    public AssetSpec(string? category, AssetState? state, int pageNumber, int pageSize)
+    public AssetSpec(string[]? categories, AssetState[]? states, int pageNumber, int pageSize)
     {
         Query
             .Where(a => !a.IsDeleted)
@@ -17,11 +19,11 @@ public sealed class AssetSpec : Specification<Asset, GetAssetsResponse>
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
 
-        if (category is not null)
-            Query.Where(a => a.Category!.CategoryName == category);
+        if (categories is not null && categories.Length > 0)
+            Query.Where(a => categories.Contains(a.Category!.CategoryName));
 
-        if (state is not null)
-            Query.Where(a => a.State == state);
+        if (states is not null && states.Length > 0)
+            Query.Where(a => states.Contains(a.State));  
 
         Query.Select(a => new GetAssetsResponse(
             a.Id,
@@ -58,15 +60,16 @@ public sealed class AssetDetailSpec : Specification<Asset, GetAssetDetailRespons
 
 public sealed class AssetCountSpec : Specification<Asset>
 {
-    public AssetCountSpec(string? category, AssetState? state)
+    public AssetCountSpec(string[]? categories, AssetState[]? states)
     {
         Query.Where(a => !a.IsDeleted);
 
-        if (category is not null)
-            Query.Where(a => a.Category!.CategoryName == category);
+        if (categories is not null && categories.Length > 0)
+            Query.Where(a => categories.Contains(a.Category!.CategoryName));
 
-        if (state is not null)
-            Query.Where(a => a.State == state);
+        if (states is not null && states.Length > 0)
+            Query.Where(a => states.Contains(a.State));
+
     }
 }
 

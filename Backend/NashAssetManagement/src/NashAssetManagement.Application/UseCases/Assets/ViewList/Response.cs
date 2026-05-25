@@ -1,6 +1,6 @@
 using NashAssetManagement.Domain.Enums;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public record GetAssetsResponse(
     Guid Id,

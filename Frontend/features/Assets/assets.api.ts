@@ -3,6 +3,7 @@ import type {
   GetAssetsRequest,
   GetAssetsResponse,
   GetAssetDetailResponse,
+  GetCategoriesResponse,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
@@ -15,11 +16,19 @@ export const assetsApi = baseApiSlice.injectEndpoints({
         url: "/assets",
         method: "GET",
         params: {
-          category: params?.category,
-          state: params?.state,
+          categories: params?.categories?.join(","),  // ← join array to string
+          states: params?.states?.join(","),           // ← join array to string
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },
+      }),
+      providesTags: ["Asset"],
+    }),
+
+    getCategories: builder.query<GetCategoriesResponse, void>({
+      query: () => ({
+        url: "/categories",
+        method: "GET",
       }),
       providesTags: ["Asset"],
     }),
@@ -39,4 +48,5 @@ export const assetsApi = baseApiSlice.injectEndpoints({
 export const {
   useGetAssetsQuery,
   useGetAssetByIdQuery,
+  useGetCategoriesQuery
 } = assetsApi;

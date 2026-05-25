@@ -1,6 +1,6 @@
 using ErrorOr;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 
 public static class GetAssetDetailErrors
 {

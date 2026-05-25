@@ -5,8 +5,9 @@ using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Enums;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedList<GetAssetsResponse>>>
 {
@@ -25,21 +26,23 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         // _currentUser = currentUser;
     }
 
-public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
-        GetAssetsRequest request,
-        CancellationToken cancellationToken)
+    public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
+    GetAssetsRequest request,
+    CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken);
+        await _validator.ValidateAndThrowAsync(request, cancellationToken); // ← validate first
 
-        // Count total matching records first
-        var countSpec = new AssetCountSpec(request.Category, request.State);
+        var stateList = request.States?   // ← parse after validation passes
+            .Select(s => Enum.Parse<AssetState>(s))
+            .ToArray();
+
+        var countSpec = new AssetCountSpec(request.Categories, stateList);
         var totalCount = await _assetRepository.CountAsync(countSpec, cancellationToken);
 
         if (totalCount == 0)
             return GetAssetsErrors.NotFound;
 
-        // Fetch the current page
-        var spec = new AssetSpec(request.Category, request.State, request.PageNumber, request.PageSize);
+        var spec = new AssetSpec(request.Categories, stateList, request.PageNumber, request.PageSize);
         var assets = await _assetRepository.ListAsync(spec, cancellationToken);
 
         return PagedList.Create(assets, totalCount, request.PageNumber, request.PageSize);

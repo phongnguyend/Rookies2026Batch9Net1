@@ -10,8 +10,8 @@ export enum AssetState {
 
 // ─── List ─────────────────────────────────────────────
 export interface GetAssetsRequest extends PaginationRequest {
-  category?: string;
-  state?: AssetState;
+  categories?: string[];    
+  states?: AssetState[];
 }
 
 export interface AssetListItem {
@@ -36,3 +36,10 @@ export interface GetAssetDetailResponse {
   category: string;
   location: string;
 }
+// ─── Categories ───────────────────────────────────────────
+export interface CategoryItem {
+  id: string;
+  name: string;
+}
+
+export type GetCategoriesResponse = CategoryItem[];

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace NashAssetManagement.Application.UseCases.Assets;
+namespace NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 
 public class GetAssetDetailValidator : AbstractValidator<GetAssetDetailRequest>
 {
