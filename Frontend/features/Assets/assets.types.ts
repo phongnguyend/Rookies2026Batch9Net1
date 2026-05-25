@@ -13,6 +13,8 @@ export interface GetAssetsRequest extends PaginationRequest {
   categories?: string[];
   states?: AssetState[];
   search?: string;
+  sortBy?: string;
+  sortDirection?: string;
 }
 
 export interface AssetListItem {

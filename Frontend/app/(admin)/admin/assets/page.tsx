@@ -9,13 +9,14 @@ import {
   useGetCategoriesQuery,
 } from "@/features/assets/assets.api";
 import { AssetState, type AssetListItem } from "@/features/assets/assets.types";
-import DataTable, {
-  type ColumnDef,
-} from "@/features/shared/components/DataTable";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import AssetDetailModal from "@/features/assets/components/assetDetailModal";
+import DataTable, {
+  ColumnDef,
+  SortItem,
+} from "@/features/assets/components/assetDataTable";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,
@@ -27,7 +28,7 @@ function AssetsContent() {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") ?? undefined;
-
+  const [sort, setSort] = useState<SortItem | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(search ?? "");
 
@@ -35,7 +36,6 @@ function AssetsContent() {
   const pageNumber = Number(searchParams.get("pageNumber") ?? "1");
   const selectedCategories = searchParams.getAll("categories");
   const selectedStates = searchParams.getAll("states") as AssetState[];
-
 
   // ─── Write to URL ──────────────────────────────
   const updateMultipleUrl = (key: string, values: string[]) => {
@@ -47,14 +47,19 @@ function AssetsContent() {
   };
 
   // ─── API ───────────────────────────────────────
-  const { data: categoriesData, isLoading: categoriesLoading, isError } =
-    useGetCategoriesQuery();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    isError,
+  } = useGetCategoriesQuery();
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
     pageSize: 10,
     categories: selectedCategories.length > 0 ? selectedCategories : undefined,
     states: selectedStates.length > 0 ? selectedStates : undefined,
     search,
+    sortBy: sort?.key,
+    sortDirection: sort?.direction,
   });
 
   const categoryOptions =
@@ -205,8 +210,12 @@ function AssetsContent() {
         data={data?.items ?? []}
         columns={columns}
         isLoading={isLoading}
-        emptyMessage={isError ? "No assets found." : "No assets found after filtering."}
-        onRowClick={(row) => setSelectedAssetId(row.id)} // ← opens detail modal
+        emptyMessage={
+          isError ? "No assets found." : "No assets found after filtering."
+        }
+        onRowClick={(row) => setSelectedAssetId(row.id)}
+        sort={sort}
+        onSortChange={setSort}
       />
 
       {/* Pagination */}
@@ -232,7 +241,7 @@ function AssetsContent() {
 export default function AssetsPage() {
   return (
     <div className="p-6">
-    <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
+      <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <AssetsContent />
       </Suspense>
