@@ -8,6 +8,8 @@ namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 public record GetAssetsRequest(
     string[]? Categories,       // filter by category name e.g. "Laptop"
     string[]? States,           // filter by state e.g. Available
+    string? SortBy,
+    string? SortDirection,
     string? Search,      
     int PageNumber = 1,
     int PageSize = 10      

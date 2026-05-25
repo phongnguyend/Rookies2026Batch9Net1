@@ -14,7 +14,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
 {
     private readonly IRepository<Asset, Guid> _assetRepository;
     private readonly GetAssetsValidator _validator;
-    private readonly ICurrentUser _currentUser;         
+    private readonly ICurrentUser _currentUser;
 
     public GetAssetsHandler(
         IRepository<Asset, Guid> assetRepository,
@@ -38,14 +38,14 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         var stateList = request.States?   // ← parse after validation passes
             .Select(s => Enum.Parse<AssetState>(s))
             .ToArray();
-        
+
         var countSpec = new AssetCountSpec(request.Categories, stateList, request.Search, location);
         var totalCount = await _assetRepository.CountAsync(countSpec, cancellationToken);
 
         if (totalCount == 0)
-            return GetAssetsErrors.NotFound;
+            return PagedList.Create(new List<GetAssetsResponse>(), 0, request.PageNumber, request.PageSize);
 
-        var spec = new AssetSpec(request.Categories, stateList, request.Search, request.PageNumber, request.PageSize, location);
+        var spec = new AssetSpec(request.Categories, stateList, request.Search, request.SortBy, request.SortDirection, request.PageNumber, request.PageSize, location);
         var assets = await _assetRepository.ListAsync(spec, cancellationToken);
 
         return PagedList.Create(assets, totalCount, request.PageNumber, request.PageSize);

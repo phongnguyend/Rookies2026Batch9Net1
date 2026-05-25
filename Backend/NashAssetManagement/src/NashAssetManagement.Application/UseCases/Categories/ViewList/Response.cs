@@ -1,4 +1,4 @@
-namespace NashAssetManagement.Application.UseCases.Categories;
+namespace NashAssetManagement.Application.UseCases.Categories.ViewList;
 
 public record GetCategoriesResponse(
     Guid Id,

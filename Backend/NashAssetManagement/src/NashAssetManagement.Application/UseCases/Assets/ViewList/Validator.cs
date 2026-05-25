@@ -4,17 +4,27 @@ using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
+using static NashAssetManagement.Application.UseCases.Assets.Specification.AssetDetailSpec;
 
 namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
 {
     private readonly IRepository<Category, Guid> _categoryRepository;
-
+    private static readonly string[] AllowedSortBy = ["assetcode", "name", "category", "state"];
+    private static readonly string[] AllowedSortDirection = ["asc", "desc"];
     public GetAssetsValidator(IRepository<Category, Guid> categoryRepository)
     {
         _categoryRepository = categoryRepository;
+        
+        RuleFor(x => x.SortBy)
+            .Must(s => s is null || AllowedSortBy.Contains(s.ToLower()))
+            .WithMessage($"SortBy must be one of: {string.Join(", ", AllowedSortBy)}.");
 
+        RuleFor(x => x.SortDirection)
+            .Must(s => s is null || AllowedSortDirection.Contains(s.ToLower()))
+            .WithMessage($"SortDirection must be one of: {string.Join(", ", AllowedSortDirection)}.");
+            
         RuleForEach(x => x.States)
             .Must(s => Enum.TryParse<AssetState>(s, out _))
             .WithMessage(s => $"State is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
@@ -22,7 +32,7 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
         RuleForEach(x => x.Categories)
             .MustAsync(CategoryExistsAsync)
             .WithMessage((request, categoryName) => $"Category '{categoryName}' does not exist.");
-            
+
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
             .WithMessage("PageNumber must be at least 1.");

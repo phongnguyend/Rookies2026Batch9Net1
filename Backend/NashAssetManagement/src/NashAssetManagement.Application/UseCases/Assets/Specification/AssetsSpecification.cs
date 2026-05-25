@@ -8,27 +8,50 @@ namespace NashAssetManagement.Application.UseCases.Assets.Specification;
 
 public sealed class AssetSpec : Specification<Asset, GetAssetsResponse>
 {
-    public AssetSpec(string[]? categories, AssetState[]? states, string? search , int pageNumber, int pageSize, Guid location)
+    public AssetSpec(string[]? categories, AssetState[]? states, string? search, string? sortBy, string? sortDirection, int pageNumber, int pageSize, Guid location)
     {
+        var isDesc = sortDirection?.ToLower() == "desc";
+
         Query
             .Where(a => !a.IsDeleted)
-            .Where(a => a.LocationId == location)  
+            .Where(a => a.LocationId == location)
             .Include(a => a.Category)
             .Include(a => a.Location)
-            .OrderByDescending(a => a.CreatedAtUtc)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
+
+        switch (sortBy?.ToLower())
+        {
+            case "assetcode":
+                if (isDesc) Query.OrderByDescending(a => a.AssetCode);
+                else Query.OrderBy(a => a.AssetCode);
+                break;
+            case "name":
+                if (isDesc) Query.OrderByDescending(a => a.Name);
+                else Query.OrderBy(a => a.Name);
+                break;
+            case "category":
+                if (isDesc) Query.OrderByDescending(a => a.Category!.CategoryName);
+                else Query.OrderBy(a => a.Category!.CategoryName);
+                break;
+            case "state":
+                if (isDesc) Query.OrderByDescending(a => a.State);
+                else Query.OrderBy(a => a.State);
+                break;
+            default:
+                break;
+        }
 
         if (categories is not null && categories.Length > 0)
             Query.Where(a => categories.Contains(a.Category!.CategoryName));
 
         if (states is not null && states.Length > 0)
-            Query.Where(a => states.Contains(a.State));  
+            Query.Where(a => states.Contains(a.State));
 
         if (search is not null)
-        Query.Where(a =>
-            a.AssetCode.Contains(search) ||  // ← search in AssetCode
-            a.Name.Contains(search));         // ← search in Name
+            Query.Where(a =>
+                a.AssetCode.Contains(search) ||  // ← search in AssetCode
+                a.Name.Contains(search));         // ← search in Name
 
         Query.Select(a => new GetAssetsResponse(
             a.Id,
@@ -56,38 +79,66 @@ public sealed class AssetCountSpec : Specification<Asset>
             Query.Where(a => states.Contains(a.State));
 
         if (search is not null)
-        Query.Where(a =>
-            a.AssetCode.Contains(search) ||  
-            a.Name.Contains(search));         
+            Query.Where(a =>
+                a.AssetCode.Contains(search) ||
+                a.Name.Contains(search));
     }
 }
 
-public sealed class AssetDetailSpec : Specification<Asset, GetAssetDetailResponse>
+public sealed class AssetDetailSpec
+    : Specification<Asset, GetAssetDetailResponse>
 {
-    public AssetDetailSpec(Guid id)
+    public AssetDetailSpec(
+        Guid assetId,
+        Guid locationId)
     {
         Query
-            .Where(a => a.Id == id && !a.IsDeleted)
-            .Include(a => a.Category)
-            .Include(a => a.Location);
-
-        Query.Select(a => new GetAssetDetailResponse(
-            a.Id,
-            a.AssetCode,
-            a.Name,
-            a.Specification,
-            a.InstalledAtUtc,
-            a.State,
-            a.Category!.CategoryName,
-            a.Location!.Name
-        ));
+            .Where(x =>
+                x.Id == assetId &&
+                x.LocationId == locationId &&
+                !x.IsDeleted)
+            .Include(x => x.Category)
+            .Include(x => x.Location)
+            .Include(x => x.Assignments)
+                .ThenInclude(x => x.AssignedToUser)
+            .Include(x => x.Assignments)
+                .ThenInclude(x => x.AssignedByUser)
+            .Include(x => x.Assignments)
+                .ThenInclude(x => x.ReturnRequests)
+            .Select(asset => new GetAssetDetailResponse(
+                asset.Id,
+                asset.AssetCode,
+                asset.Name,
+                asset.Specification,
+                asset.InstalledAtUtc,
+                asset.State,
+                asset.Category!.CategoryName,
+                asset.Location!.Name,
+                asset.Assignments
+                    .Where(a =>
+                        a.State == AssignmentState.Accepted ||
+                        a.State == AssignmentState.Returned)
+                    .OrderByDescending(a => a.AssignedAtUtc)
+                    .Select(a => new GetAssetAssignmentHistoryResponse(
+                        a.AssignedAtUtc,
+                        $"{a.AssignedToUser!.FirstName} {a.AssignedToUser.LastName}",
+                        $"{a.AssignedByUser!.FirstName} {a.AssignedByUser.LastName}",
+                        a.State == AssignmentState.Returned
+                            ? a.ReturnRequests
+                                .OrderByDescending(r => r.ReturnedAtUtc)
+                                .Select(r => r.ReturnedAtUtc)
+                                .FirstOrDefault()
+                            : null
+                    ))
+                    .ToList()
+            ));
     }
-}
 
-public sealed class CategoryByNameSpec : Specification<Category>
-{
-    public CategoryByNameSpec(string name)
+    public sealed class CategoryByNameSpec : Specification<Category>
     {
-        Query.Where(c => c.CategoryName == name);
+        public CategoryByNameSpec(string name)
+        {
+            Query.Where(c => c.CategoryName == name);
+        }
     }
 }

@@ -7,15 +7,15 @@ import { showModal } from "@/features/shared/modal.slice";
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from "@/features/Assets/assets.api";
-import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
+} from "@/features/assets/assets.api";
+import { AssetState, type AssetListItem } from "@/features/assets/assets.types";
 import DataTable, {
   type ColumnDef,
 } from "@/features/shared/components/DataTable";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
-import AssetDetailModal from "./AssetDetailModal";
+import AssetDetailModal from "@/features/assets/components/assetDetailModal";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,
@@ -47,7 +47,7 @@ function AssetsContent() {
   };
 
   // ─── API ───────────────────────────────────────
-  const { data: categoriesData, isLoading: categoriesLoading } =
+  const { data: categoriesData, isLoading: categoriesLoading, isError } =
     useGetCategoriesQuery();
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
@@ -205,7 +205,7 @@ function AssetsContent() {
         data={data?.items ?? []}
         columns={columns}
         isLoading={isLoading}
-        emptyMessage="No assets found."
+        emptyMessage={isError ? "No assets found." : "No assets found after filtering."}
         onRowClick={(row) => setSelectedAssetId(row.id)} // ← opens detail modal
       />
 
@@ -232,7 +232,7 @@ function AssetsContent() {
 export default function AssetsPage() {
   return (
     <div className="p-6">
-    <h1>List Asset</h1>
+    <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <AssetsContent />
       </Suspense>

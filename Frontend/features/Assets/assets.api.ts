@@ -36,7 +36,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
 
     getAssetById: builder.query<GetAssetDetailResponse, string>({
       query: (id) => ({
-        url: `/assets/${id}`,
+        url: `v1/assets/${id}`,
         method: "GET",
       }),
       providesTags: (_result, _error, id) => [{ type: "Asset", id }],

@@ -27,6 +27,13 @@ export interface AssetListItem {
 export type GetAssetsResponse = PaginationResponse<AssetListItem>;
 
 // ─── Detail ───────────────────────────────────────────
+export interface AssetHistoryItem {
+  assignedAtUtc: string;
+  assignedTo: string;
+  assignedBy: string;
+  returnedAtUtc?: string | null;
+}
+
 export interface GetAssetDetailResponse {
   id: string;
   assetCode: string;
@@ -36,7 +43,10 @@ export interface GetAssetDetailResponse {
   state: AssetState;
   category: string;
   location: string;
+  history: AssetHistoryItem[];
 }
+
+
 // ─── Categories ───────────────────────────────────────────
 export interface CategoryItem {
   id: string;

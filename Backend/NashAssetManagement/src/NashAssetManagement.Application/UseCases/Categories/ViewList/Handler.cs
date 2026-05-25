@@ -1,10 +1,10 @@
-using Ardalis.Specification;
 using ErrorOr;
 using MediatR;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 
-namespace NashAssetManagement.Application.UseCases.Categories.GetCategories;
+namespace NashAssetManagement.Application.UseCases.Categories.ViewList;
 
 public class GetCategoriesHandler
     : IRequestHandler<GetCategoriesRequest, ErrorOr<List<GetCategoriesResponse>>>
@@ -24,20 +24,5 @@ public class GetCategoriesHandler
         var categories = await _categoryRepository.ListAsync(spec, cancellationToken);
 
         return categories;
-    }
-}
-
-// Spec is so simple, just put it in the same file
-file sealed class GetCategoriesSpec : Specification<Category, GetCategoriesResponse>
-{
-    public GetCategoriesSpec()
-    {
-        Query
-            .OrderBy(c => c.CategoryName);
-
-        Query.Select(c => new GetCategoriesResponse(
-            c.Id,
-            c.CategoryName
-        ));
     }
 }

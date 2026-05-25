@@ -2,7 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NashAssetManagement.Application.UseCases.Categories;
+using NashAssetManagement.Application.UseCases.Categories.ViewList;
 using NashAssetManagement.WebAPI.Utilities;
 
 namespace NashAssetManagement.WebAPI.Controllers;
