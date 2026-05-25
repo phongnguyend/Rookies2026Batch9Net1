@@ -12,5 +12,10 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
             Error.NotFound(
                 code: "Auth.UserNotFound",
                 description: "User not found");
+
+        public static readonly Error UserIdNotFound =
+            Error.NotFound(
+                code: "Auth.UserIdNotFound",
+                description: "User id not found");
     }
 }

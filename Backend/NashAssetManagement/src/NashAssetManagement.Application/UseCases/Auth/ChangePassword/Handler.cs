@@ -4,7 +4,9 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.Domain.Entities.Identity;
 
 namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
@@ -12,6 +14,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
     public class Handler(
         ILogger<Handler> logger,
         UserManager<User> userManager,
+        ICurrentUser currentUser,
         IValidator<Request> validator) : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(Request orgReq, CancellationToken cancellationToken)
@@ -35,32 +38,36 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
                             error.ErrorMessage));
             }
 
-            // Replace hardcode with current user id from JWT (feature/5199_login_into_the_system)
             // Find user by id
-            var userId = Guid.Parse("10000000-0000-0000-0000-000000000001");
+            if (currentUser.UserId is null)
+            {
+                return Errors.UserIdNotFound;
+            }
 
-            var currentUser = await userManager.FindByIdAsync(userId.ToString());
+            var userId = currentUser.UserId.ToString();
 
-            if (currentUser is null)
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user is null)
             {
                 return Errors.UserNotFound;
             }
+
             // Change Password
-            var changePasswordResult = await userManager.ChangePasswordAsync(
-                currentUser,
-                request.OldPassword,
-                request.NewPassword);
+            var changePasswordResult = await userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
 
             // If incorrect, return Errors.IncorrectOldPassword
             if (!changePasswordResult.Succeeded)
             {
                 var isIncorrectPassword = changePasswordResult.Errors.Any(error =>
-                    error.Code == "PasswordMismatch");
+                    error.Code == PasswordConstants.PasswordMismatchCode);
 
                 if (isIncorrectPassword)
                 {
                     return Errors.IncorrectOldPassword;
                 }
+
+                logger.LogWarning("Password change failed for user {UserId}", userId);
 
                 return changePasswordResult.Errors
                     .Select(error =>
@@ -72,7 +79,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
 
             logger.LogInformation(
                 "User {UserId} changed password successfully",
-                currentUser.Id);
+                userId);
 
             return new Response("Your password has been changed successfully!");
         }
