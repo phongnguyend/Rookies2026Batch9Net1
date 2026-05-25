@@ -93,7 +93,8 @@ namespace NashAssetManagement.WebAPI.Configuration
                         ValidAudience = jwtOptions.Value.Audience,
                         ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey)),
-                        ClockSkew = TimeSpan.Zero // expired access token + refreshtoken will be invalidated immediately
+                        ClockSkew = TimeSpan.Zero, // expired access token + refreshtoken will be invalidated immediately
+                        NameClaimType = JwtTokenConstants.Roles
                     };
                 });
 
