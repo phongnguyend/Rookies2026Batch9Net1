@@ -1,3 +1,4 @@
+using System.Data;
 using FluentValidation;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
@@ -16,12 +17,12 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
 
         RuleForEach(x => x.States)
             .Must(s => Enum.TryParse<AssetState>(s, out _))
-            .WithMessage(s => $"State '{s}' is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
+            .WithMessage(s => $"State is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
 
         RuleForEach(x => x.Categories)
             .MustAsync(CategoryExistsAsync)
             .WithMessage((request, categoryName) => $"Category '{categoryName}' does not exist.");
-
+            
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)
             .WithMessage("PageNumber must be at least 1.");

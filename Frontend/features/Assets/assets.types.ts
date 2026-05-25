@@ -10,8 +10,9 @@ export enum AssetState {
 
 // ─── List ─────────────────────────────────────────────
 export interface GetAssetsRequest extends PaginationRequest {
-  categories?: string[];    
+  categories?: string[];
   states?: AssetState[];
+  search?: string;
 }
 
 export interface AssetListItem {

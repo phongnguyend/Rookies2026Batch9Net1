@@ -7,8 +7,8 @@ import { showModal } from "@/features/shared/modal.slice";
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from "@/features/assets/assets.api";
-import { AssetState, type AssetListItem } from "@/features/assets/assets.types";
+} from "@/features/Assets/assets.api";
+import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
 import DataTable, {
   type ColumnDef,
 } from "@/features/shared/components/DataTable";
@@ -26,13 +26,16 @@ function AssetsContent() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
+  const search = searchParams.get("search") ?? undefined;
 
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState(search ?? "");
 
   // ─── Read from URL ─────────────────────────────
   const pageNumber = Number(searchParams.get("pageNumber") ?? "1");
   const selectedCategories = searchParams.getAll("categories");
   const selectedStates = searchParams.getAll("states") as AssetState[];
+
 
   // ─── Write to URL ──────────────────────────────
   const updateMultipleUrl = (key: string, values: string[]) => {
@@ -51,6 +54,7 @@ function AssetsContent() {
     pageSize: 10,
     categories: selectedCategories.length > 0 ? selectedCategories : undefined,
     states: selectedStates.length > 0 ? selectedStates : undefined,
+    search,
   });
 
   const categoryOptions =
@@ -174,16 +178,17 @@ function AssetsContent() {
 
         <div className="ml-auto">
           <SearchInput
-            value={searchParams.get("search") ?? ""}
-            onChange={() => {}}
+            value={searchInput}
+            onChange={setSearchInput} // ← updates local state while typing
             onSearch={(value) => {
+              // ← only hits API when Enter or button clicked
               const current = new URLSearchParams(searchParams.toString());
               if (value) current.set("search", value);
               else current.delete("search");
               current.set("pageNumber", "1");
               router.push(`?${current.toString()}`);
             }}
-            placeholder="Search assets..."
+            placeholder="Search by asset code or name..."
           />
         </div>
 
@@ -227,6 +232,7 @@ function AssetsContent() {
 export default function AssetsPage() {
   return (
     <div className="p-6">
+    <h1>List Asset</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <AssetsContent />
       </Suspense>

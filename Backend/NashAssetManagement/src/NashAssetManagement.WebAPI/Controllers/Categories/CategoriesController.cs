@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Categories;
 using NashAssetManagement.WebAPI.Utilities;
@@ -7,6 +8,7 @@ using NashAssetManagement.WebAPI.Utilities;
 namespace NashAssetManagement.WebAPI.Controllers;
 
 [ApiVersion(1)]
+[Authorize]
 [Route("api/v{version:apiVersion}/categories")]
 public class CategoriesController : BaseApiController
 {

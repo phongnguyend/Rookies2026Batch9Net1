@@ -13,11 +13,12 @@ export const assetsApi = baseApiSlice.injectEndpoints({
 
     getAssets: builder.query<GetAssetsResponse, GetAssetsRequest | void>({
       query: (params) => ({
-        url: "/assets",
+        url: "v1/assets",
         method: "GET",
         params: {
           categories: params?.categories?.join(","),  // ← join array to string
-          states: params?.states?.join(","),           // ← join array to string
+          states: params?.states?.join(","),
+          search: params?.search,        // ← join array to string
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },
@@ -27,7 +28,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
 
     getCategories: builder.query<GetCategoriesResponse, void>({
       query: () => ({
-        url: "/categories",
+        url: "v1/categories",
         method: "GET",
       }),
       providesTags: ["Asset"],
