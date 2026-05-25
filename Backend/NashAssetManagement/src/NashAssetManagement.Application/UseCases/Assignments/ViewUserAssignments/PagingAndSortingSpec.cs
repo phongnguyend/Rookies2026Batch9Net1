@@ -34,68 +34,6 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
             {
                 Query.OrderBy(keySelector!);
             }
-
-            //sortBy = sortBy?.Trim().ToLowerInvariant();
-
-            //switch (sortBy)
-            //{
-            //    case "assetcode":
-            //        if (descending)
-            //        {
-            //            Query.OrderByDescending(x => x.Asset!.AssetCode);
-            //        }
-            //        else
-            //        {
-            //            Query.OrderBy(x => x.Asset!.AssetCode);
-            //        }
-            //        break;
-
-            //    case "assetname":
-            //        if (descending)
-            //        {
-            //            Query.OrderByDescending(x => x.Asset!.Name);
-            //        }
-            //        else
-            //        {
-            //            Query.OrderBy(x => x.Asset!.Name);
-            //        }
-            //        break;
-
-            //    case "category":
-            //        if (descending)
-            //        {
-            //            Query.OrderByDescending(
-            //                x => x.Asset!.Category!.CategoryName);
-            //        }
-            //        else
-            //        {
-            //            Query.OrderBy(
-            //                x => x.Asset!.Category!.CategoryName);
-            //        }
-            //        break;
-
-            //    case "state":
-            //        if (descending)
-            //        {
-            //            Query.OrderByDescending(x => x.State);
-            //        }
-            //        else
-            //        {
-            //            Query.OrderBy(x => x.State);
-            //        }
-            //        break;
-
-            //    default:
-            //        if (descending)
-            //        {
-            //            Query.OrderByDescending(x => x.CreatedAtUtc);
-            //        }
-            //        else
-            //        {
-            //            Query.OrderBy(x => x.CreatedAtUtc);
-            //        }
-            //        break;
-            //}
         }
     }
 }
