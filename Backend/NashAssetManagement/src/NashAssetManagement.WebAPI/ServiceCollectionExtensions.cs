@@ -21,10 +21,10 @@ namespace NashAssetManagement.WebAPI
             services.AddOpenApi();
             services.AddProblemDetails();
             services.AddExceptionHandler<GlobalExceptionHandler>();
-            services.AddAuthenticationServices();
+            services.AddAspIdentityServices(); // cookie authentication set by default
+            services.AddAuthenticationServices(); // jwt bearer will overwrite the previous, make sure add below the identity server
             services.AddAuthorizationServices();
             services.AddHttpContextAccessor();
-            services.AddAspIdentityServices();
             services.ConfigureApiVersioning();
             services.AddSwaggerDocumentation();
             services.AddCorsServices();

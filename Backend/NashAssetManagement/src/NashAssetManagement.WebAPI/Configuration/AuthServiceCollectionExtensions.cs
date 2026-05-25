@@ -37,6 +37,12 @@ namespace NashAssetManagement.WebAPI.Configuration
                             return Task.CompletedTask;
                         },
 
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine($"[JWT Diagnostics] Token validation failed: {context.Exception.Message}");
+                            return Task.CompletedTask;
+                        },
+
                         OnChallenge = async context =>
                         {
                             context.HandleResponse();
@@ -73,7 +79,7 @@ namespace NashAssetManagement.WebAPI.Configuration
 
             // Configure Jwt Validation Handler
             services
-                .AddOptions<JwtBearerOptions>()
+                .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
                 .Configure<IOptions<JwtOptions>>((libOptions, jwtOptions) =>
                 {
                     libOptions.TokenValidationParameters = new TokenValidationParameters
