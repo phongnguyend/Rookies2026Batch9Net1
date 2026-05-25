@@ -2,6 +2,7 @@ using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
@@ -16,6 +17,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
         UserManager<User> userManager,
         ICurrentUser currentUser,
         IValidator<Request> validator,
+        IPasswordHasher<User> passwordHasher,
         IUnitOfWork uow,
         IJwtTokenProvider jwtTokenProvider,
         IRepository<RefreshToken, Guid> rfTokenRepository,
@@ -59,6 +61,13 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                 return Errors.NotFirstLogin;
             }
 
+            // Only change password differently than the previous one
+            var hash = passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, request.NewPassword);
+            if (hash == PasswordVerificationResult.Success || hash == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                return Errors.DuplicatePassword;
+            }
+
             string accessToken;
             string refreshTokenId;
 
@@ -69,12 +78,15 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                 if (!removeResult.Succeeded)
                 {
                     var errorDescription = string.Join(" ", removeResult.Errors.Select(e => e.Description));
+                    logger.LogError(errorDescription);
                     return Errors.ChangePasswordFailed;
                 }
 
                 var addResult = await userManager.AddPasswordAsync(user, request.NewPassword);
                 if (!addResult.Succeeded)
                 {
+                    var errorDescription = string.Join(" ", addResult.Errors.Select(e => e.Description));
+                    logger.LogError(errorDescription);
                     return Errors.ChangePasswordFailed;
                 }
 
@@ -84,12 +96,18 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                 var updateResult = await userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
                 {
+                    var errorDescription = string.Join(" ", updateResult.Errors.Select(e => e.Description));
+                    logger.LogError(errorDescription);
                     return Errors.ChangePasswordFailed;
                 }
 
                 // When change the password, then revoke other refresh token
-                var activeRefreshTokens = rfTokenRepository.GetQueryableSet()
-                                            .Where(x => x.UserId == user.Id && !x.IsRevoked && x.ExpiresAtUtc > dateTimeProvider.UtcNow);
+                var activeRefreshTokens = await rfTokenRepository
+                                            .GetQueryableSet()
+                                            .Where(x => x.UserId == user.Id
+                                                    && !x.IsRevoked
+                                                    && x.ExpiresAtUtc > dateTimeProvider.UtcNow)
+                                            .ToListAsync(cancellationToken: cancellationToken);
 
                 foreach (var token in activeRefreshTokens)
                 {
