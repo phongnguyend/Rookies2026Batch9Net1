@@ -5,7 +5,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
 {
     internal class PagingSpec : FilterSpec
     {
-        public PagingSpec(Query request) : base(request)
+        public PagingSpec(Query request, Guid locationId) : base(request, locationId)
         {
             ApplySorting(request.SortBy, request.SortDesc);
             Query.ApplyPaging(request.PageNumber ?? 1, request.PageSize ?? 10);
