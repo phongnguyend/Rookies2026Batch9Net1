@@ -12,6 +12,11 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
         public static Error UserNotFound() =>
             Error.NotFound(
                 "Users.NotFound",
-                "User not found.");        
+                "User not found.");  
+
+        public static Error UserHasNoLocation() =>
+            Error.NotFound(
+                "Users.NotFound",
+                "User has no location assigned.");   
     }
 }

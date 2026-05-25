@@ -16,14 +16,17 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             Query query,
             CancellationToken cancellationToken)
         {
-            // Get current admin's location
-            if (currentUser.LocationId == null)            {
-                return Error.Unauthorized();
-            }
+            // Check current user id
+            if (currentUser.UserId == null)
+                return Errors.Unauthorized();
 
+            // Check current admin's location
+            if (currentUser.LocationId == null)            
+                return Errors.UserHasNoLocation();
+        
             // Get users have same location with current admin user
             var usersQuery = userManager.Users
-                // .Where(u => u.LocationId.Equals(currentUser.LocationId))
+                .Where(u => u.LocationId.ToString().Equals(currentUser.LocationId))
                 ;
 
             // Search

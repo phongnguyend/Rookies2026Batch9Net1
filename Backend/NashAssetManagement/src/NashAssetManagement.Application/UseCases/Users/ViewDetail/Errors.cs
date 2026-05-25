@@ -23,5 +23,10 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
             Error.Conflict(
                 "Users.Conflict",
                 $"User with ID {userId} has a different location.");
+
+        public static Error UserHasNoLocation() =>
+            Error.NotFound(
+                "Users.NotFound",
+                "User has no location assigned.");
     }
 }

@@ -12,10 +12,13 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
     {
         public async Task<ErrorOr<Response>> Handle(Query query, CancellationToken cancellationToken)
         {
-            // Get current admin's location
-            if (currentUser.LocationId == null)            {
-                return Error.Unauthorized();
-            }
+            // Check current user id
+            if (currentUser.UserId == null)
+                return Errors.Unauthorized();
+
+            // Check current admin's location
+            if (currentUser.LocationId == null)            
+                return Errors.UserHasNoLocation();
 
             // Get user by id
             var user = await userManager.Users
