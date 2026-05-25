@@ -3,8 +3,8 @@ using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
 using NashAssetManagement.WebAPI;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
+using NashAssetManagement.WebAPI.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,7 @@ try
 {
     Log.Information("Starting application");
     builder.Services
+        .ConfigureApplicationOptions(builder.Configuration)
         .AddApplicationServices(builder.Configuration)
         .AddPersistenceServices(builder.Configuration)
         .AddInfrastructureServices(builder.Configuration)
