@@ -2,8 +2,12 @@ using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.DateTimes;
+using NashAssetManagement.Application.Abstractions.Jwt;
+using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Identity;
 
 namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
@@ -12,7 +16,11 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
         UserManager<User> userManager,
         ICurrentUser currentUser,
         IValidator<Request> validator,
-        IUnitOfWork uow)
+        IUnitOfWork uow,
+        IJwtTokenProvider jwtTokenProvider,
+        IRepository<RefreshToken, Guid> rfTokenRepository,
+        IDateTimeProvider dateTimeProvider,
+        ILogger<Handler> logger)
         : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(
@@ -22,7 +30,6 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
             // Pre-cleaning
             var request = orgReq with
             {
-                CurrentPassword = orgReq.CurrentPassword.Trim(),
                 NewPassword = orgReq.NewPassword.Trim()
             };
 
@@ -52,15 +59,27 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                 return Errors.NotFirstLogin;
             }
 
+            string accessToken;
+            string refreshTokenId;
+
             try
             {
-                // Change password 
-                var result = await userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
-                if (!result.Succeeded)
+                // Change password without needing current password
+                var removeResult = await userManager.RemovePasswordAsync(user);
+                if (!removeResult.Succeeded)
                 {
-                    var errorDescription = string.Join(" ", result.Errors.Select(e => e.Description));
+                    var errorDescription = string.Join(" ", removeResult.Errors.Select(e => e.Description));
                     return Error.Validation(
-                        code: "FirstChangePassword.Failed",
+                        code: "FirstChangePassword.RemoveFailed",
+                        description: errorDescription);
+                }
+
+                var addResult = await userManager.AddPasswordAsync(user, request.NewPassword);
+                if (!addResult.Succeeded)
+                {
+                    var errorDescription = string.Join(" ", addResult.Errors.Select(e => e.Description));
+                    return Error.Validation(
+                        code: "FirstChangePassword.AddFailed",
                         description: errorDescription);
                 }
 
@@ -73,14 +92,32 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
                     return Errors.ChangePasswordFailed;
                 }
 
+                // Compile with Single Session Refresh Token - revoke active refresh tokens
+                var activeRefreshTokens = rfTokenRepository.GetQueryableSet()
+                                            .Where(x => x.UserId == user.Id && !x.IsRevoked && x.ExpiresAtUtc > dateTimeProvider.UtcNow);
+
+                foreach (var token in activeRefreshTokens)
+                {
+                    token.IsRevoked = true;
+                    token.RevokedAtUtc = dateTimeProvider.UtcNow;
+                }
+
+                // Generate new tokens (now with IsFirstLogin = false claim!)
+                var roles = await userManager.GetRolesAsync(user);
+                accessToken = jwtTokenProvider.GenerateAccessToken(user, roles);
+                var refreshToken = jwtTokenProvider.GenerateRefreshToken(user);
+                refreshTokenId = refreshToken.Id.ToString();
+
+                await rfTokenRepository.AddAsync(refreshToken, cancellationToken);
                 await uow.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.LogError(ex, "Failed to change password and refresh token for user {UserId}", user.Id);
                 return Errors.PersistenceFailed;
             }
 
-            return new Response();
+            return new Response(accessToken, refreshTokenId);
         }
     }
 }

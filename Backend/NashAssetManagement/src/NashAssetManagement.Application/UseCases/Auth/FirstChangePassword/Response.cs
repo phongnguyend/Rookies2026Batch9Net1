@@ -1,4 +1,4 @@
 namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
 {
-    public record Response();
+    public record Response(string AccessToken, string RefreshToken);
 }

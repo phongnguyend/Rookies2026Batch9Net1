@@ -1,10 +1,12 @@
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
+using NashAssetManagement.Domain.Entities.Identity;
 
 namespace NashAssetManagement.Application.UseCases.Auth.Profile
 {
-    public class Handler(ICurrentUser currentUser)
+    public class Handler(ICurrentUser currentUser, UserManager<User> userManager)
         : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(
@@ -16,13 +18,19 @@ namespace NashAssetManagement.Application.UseCases.Auth.Profile
                 return Errors.UserNotFound;
             }
 
+            var user = await userManager.FindByIdAsync(currentUser.UserId.Value.ToString());
+            if (user is null || user.IsDeleted)
+            {
+                return Errors.UserNotFound;
+            }
+
             var locationId = Guid.TryParse(currentUser.LocationId, out var locId) ? locId : Guid.Empty;
 
             var response = new Response(
-                currentUser.UserId.Value,
-                currentUser.Username ?? string.Empty,
+                user.Id,
+                user.UserName ?? string.Empty,
                 locationId,
-                currentUser.IsFirstTimeLogin,
+                user.IsFirstLogin,
                 currentUser.Roles);
 
             return response;

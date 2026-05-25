@@ -28,7 +28,6 @@ export namespace GetMe {
 
 export namespace FirstChangePassword {
     export interface Request {
-        currentPassword: string;
         newPassword: string;
     }
     export interface Response { }

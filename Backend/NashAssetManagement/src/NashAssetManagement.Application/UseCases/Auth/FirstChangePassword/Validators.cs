@@ -4,16 +4,12 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
 {
     public class Validator : AbstractValidator<Request>
     {
-        private const string CurrentPasswordRequired = "Current password is required.";
         private const string NewPasswordRequired = "New password is required.";
         private const string NewPasswordLength = "New password must be at least 6 characters long.";
         private const string NewPasswordFormat = "New password must contain alphanumeric characters and have exactly one special character (@).";
 
         public Validator()
         {
-            RuleFor(x => x.CurrentPassword)
-                .NotEmpty().WithMessage(CurrentPasswordRequired);
-
             RuleFor(x => x.NewPassword)
                 .NotEmpty().WithMessage(NewPasswordRequired)
                 .MinimumLength(6).WithMessage(NewPasswordLength)

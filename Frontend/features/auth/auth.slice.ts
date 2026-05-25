@@ -44,9 +44,15 @@ export const authSlice = createSlice({
       state.error = action.payload;
     },
 
+    completeFirstLogin: (state) => {
+      if (state.user) {
+        state.user.isFirstLogin = false;
+      }
+    },
+
     // logout here
   }
 })
 
-export const { loginStart, loginSuccess, loginFailure } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, completeFirstLogin } = authSlice.actions;
 export default authSlice.reducer;

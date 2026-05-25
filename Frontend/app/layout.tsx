@@ -16,6 +16,7 @@ import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess } from "@/features/auth/auth.slice";
+import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -145,6 +146,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           {/* Utility Components */}
           <ToastContainer />
           <GlobalModalContainer />
+          <FirstChangePasswordModal isOpen={user?.isFirstLogin === true} />
         </>
       ) : (
         children

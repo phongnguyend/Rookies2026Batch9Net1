@@ -3,5 +3,5 @@ using MediatR;
 
 namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
 {
-    public record Request(string CurrentPassword, string NewPassword) : IRequest<ErrorOr<Response>>;
+    public record Request(string NewPassword) : IRequest<ErrorOr<Response>>;
 }
