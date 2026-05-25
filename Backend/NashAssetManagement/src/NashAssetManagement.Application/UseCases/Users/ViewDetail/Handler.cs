@@ -25,7 +25,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
                 return Errors.UserWithIdNotFound(query.Id);
 
             // Check if user and current admin have same location
-            if (user.LocationId.ToString().Equals(currentUser.LocationId))
+            if (!user.LocationId.ToString().Equals(currentUser.LocationId))
                 return Errors.UserHasDifferentLocation(query.Id);
 
             return new Response(
