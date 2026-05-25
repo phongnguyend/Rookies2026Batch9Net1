@@ -22,6 +22,42 @@ namespace NashAssetManagement.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("NashAssetManagement.Domain.Entities.Auth.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at_utc");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at_utc");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_revoked");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at_utc");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_refresh_tokens");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_refresh_tokens_user_id");
+
+                    b.ToTable("refresh_tokens", "auth");
+                });
+
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Asset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -612,6 +648,16 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.ToTable("user_tokens", "auth");
                 });
 
+            modelBuilder.Entity("NashAssetManagement.Domain.Entities.Auth.RefreshToken", b =>
+                {
+                    b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", null)
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_users_user_id");
+                });
+
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Asset", b =>
                 {
                     b.HasOne("NashAssetManagement.Domain.Entities.Core.Category", "Category")
@@ -799,6 +845,8 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.Navigation("AssignedAssignments");
 
                     b.Navigation("ReceivedAssignments");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("RequestedReturnRequests");
 

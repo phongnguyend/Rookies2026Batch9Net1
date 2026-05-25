@@ -8,17 +8,17 @@ import {
   APP_SIDEBAR_ADMIN_ITEMS,
   APP_SIDEBAR_STAFF_ITEMS,
 } from "@/lib/api/routes";
-import { AccountRole } from "@/features/accounts/accounts.types";
+import { UserRoles } from "@/features/users/users.types";
 import Image from "next/image";
 
 export interface DrawerProps {
-  role: AccountRole;
+  role: UserRoles;
 }
 
 const sideBarItems = (
-  role = AccountRole.Admin,
+  role = UserRoles.Admin,
 ): { label: string; href: string }[] => {
-  if (role === AccountRole.Admin) {
+  if (role === UserRoles.Admin) {
     return APP_SIDEBAR_ADMIN_ITEMS;
   }
 

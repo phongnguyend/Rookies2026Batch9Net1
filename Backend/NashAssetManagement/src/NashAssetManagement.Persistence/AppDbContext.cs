@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace NashAssetManagement.Persistence
         public DbSet<Category> Categories { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<ReturnRequest> ReturnRequests { get; set; }
+        public DbSet<RefreshToken> refreshTokens { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options)
         {

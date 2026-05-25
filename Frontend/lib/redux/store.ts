@@ -3,6 +3,7 @@ import { baseApiSlice } from "../api/base.api";
 import { drawerSlice } from "@/features/shared/drawer.slice";
 import { toastSlice } from "@/features/shared/toast.slice";
 import { modalSlice } from "@/features/shared/modal.slice";
+import { authSlice } from "@/features/auth/auth.slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -11,6 +12,7 @@ export const makeStore = () => {
       drawerSlice: drawerSlice.reducer,
       toastSlice: toastSlice.reducer,
       modalSlice: modalSlice.reducer,
+      authSlice: authSlice.reducer,
     },
 
     middleware: (getDefaultMiddleware) =>

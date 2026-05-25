@@ -17,6 +17,7 @@ import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import Image from "next/image";
+import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
 
 export default function TestPage() {
   const dispatch = useAppDispatch();
@@ -266,6 +267,9 @@ export default function TestPage() {
           />
         </main>
       </div>
+
+      {/* Test Spinner */}
+      {/* <LoadingSpinner></LoadingSpinner> */}
 
       {/* Example of Do you want to returning request*/}
       <ConfirmModal

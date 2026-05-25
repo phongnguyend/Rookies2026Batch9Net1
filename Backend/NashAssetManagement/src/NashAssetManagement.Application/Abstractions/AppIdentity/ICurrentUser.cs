@@ -7,7 +7,8 @@ namespace NashAssetManagement.Application.Abstractions.AppIdentity
         bool IsAuthenticated { get; }
         Guid? UserId { get; }
         string? Username { get; }
-        string? Email { get; }
+        string? LocationId { get; }
+        bool IsFirstTimeLogin { get; }
         IReadOnlyList<string> Roles { get; }
         ClaimsPrincipal Principal { get; }
     }
