@@ -23,7 +23,7 @@ namespace NashAssetManagement.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(PagedList<GetUsers.Response>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromQuery] GetUsers.Query query)
         {
@@ -45,7 +45,7 @@ namespace NashAssetManagement.WebAPI.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(GetUserDetail.Response), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDetail(Guid id)

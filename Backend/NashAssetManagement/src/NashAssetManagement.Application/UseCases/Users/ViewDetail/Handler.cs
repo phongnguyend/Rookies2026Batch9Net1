@@ -13,12 +13,12 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
         public async Task<ErrorOr<Response>> Handle(Query query, CancellationToken cancellationToken)
         {
             // Get current admin's location
-            var currentAdminUserId = currentUser.UserId;
-            if (currentAdminUserId == null)
-                return Errors.Unauthorized();
-            var currentAdmin = await userManager.FindByIdAsync(currentAdminUserId.ToString());
-            if (currentAdmin == null)
-                return Errors.UserNotFound();
+            // var currentAdminUserId = currentUser.UserId;
+            // if (currentAdminUserId == null)
+            //     return Errors.Unauthorized();
+            // var currentAdmin = await userManager.FindByIdAsync(currentAdminUserId.ToString());
+            // if (currentAdmin == null)
+            //     return Errors.UserNotFound();
 
             // Get user by id
             var user = await userManager.Users
@@ -28,8 +28,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
                 return Errors.UserWithIdNotFound(query.Id);
 
             // Check if user and current admin have same location
-            if (user.LocationId != currentAdmin.LocationId)
-                return Errors.Unauthorized();
+            // if (user.LocationId != currentAdmin.LocationId)
+            //     return Errors.Unauthorized();
 
             return new Response(
                 user.Id,
