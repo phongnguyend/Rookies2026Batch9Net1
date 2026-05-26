@@ -161,32 +161,33 @@ function AssetsContent() {
 
       {/* Filters */}
       <div className="mb-4 flex items-center gap-3">
-        <DropdownFilter
-          items={categoryOptions}
-          values={selectedCategories}
-          placeholder={categoriesLoading ? "Loading..." : "Category"}
-          getKey={(item) => item.key}
-          getLabel={(item) => item.label}
-          onChange={(values) => updateMultipleUrl("categories", values)}
-          allLabel="All Categories"
-        />
-
-        <DropdownFilter
-          items={STATE_OPTIONS}
-          values={selectedStates}
-          placeholder="State"
-          getKey={(item) => item.key}
-          getLabel={(item) => item.label}
-          onChange={(values) => updateMultipleUrl("states", values)}
-          allLabel="All States"
-        />
-
-        <div className="ml-auto">
+        <div data-test-id="ddlState">
+          <DropdownFilter
+            items={STATE_OPTIONS}
+            values={selectedStates}
+            placeholder="State"
+            getKey={(item) => item.key}
+            getLabel={(item) => item.label}
+            onChange={(values) => updateMultipleUrl("states", values)}
+            allLabel="All States"
+          />
+        </div>
+        <div data-test-id="ddlCategory">
+          <DropdownFilter
+            items={categoryOptions}
+            values={selectedCategories}
+            placeholder={categoriesLoading ? "Loading..." : "Category"}
+            getKey={(item) => item.key}
+            getLabel={(item) => item.label}
+            onChange={(values) => updateMultipleUrl("categories", values)}
+            allLabel="All Categories"
+          />
+        </div>
+        <div className="ml-auto" data-test-id="txtSearch">
           <SearchInput
             value={searchInput}
-            onChange={setSearchInput} // ← updates local state while typing
+            onChange={setSearchInput}
             onSearch={(value) => {
-              // ← only hits API when Enter or button clicked
               const current = new URLSearchParams(searchParams.toString());
               if (value) current.set("search", value);
               else current.delete("search");
