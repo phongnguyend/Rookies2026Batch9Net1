@@ -22,7 +22,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [SwaggerOperation(
             Summary = "Change password for the currently authenticated user.",
             Description = "Allows an authenticated user to change their password by providing the current password and a new password.")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -33,7 +33,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
             var result = await _sender.Send(command, cancellationToken);
             
             return result.Match(
-                success => Ok(success),
+                _ => NoContent(),
                 errors => errors.ToProblem());
         }
     }

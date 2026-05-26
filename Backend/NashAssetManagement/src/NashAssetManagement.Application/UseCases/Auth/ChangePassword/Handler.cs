@@ -13,9 +13,9 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
         ILogger<Handler> logger,
         UserManager<User> userManager,
         ICurrentUser currentUser,
-        IValidator<Request> validator) : IRequestHandler<Request, ErrorOr<Response>>
+        IValidator<Request> validator) : IRequestHandler<Request, ErrorOr<Updated>>
     {
-        public async Task<ErrorOr<Response>> Handle(Request orgReq, CancellationToken cancellationToken)
+        public async Task<ErrorOr<Updated>> Handle(Request orgReq, CancellationToken cancellationToken)
         {
             // cleaning request
             var request = orgReq with
@@ -29,17 +29,13 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
 
             if (!validationResult.IsValid)
             {
-                return validationResult.Errors
-                    .ConvertAll(error =>
-                        Error.Validation(
-                            error.PropertyName,
-                            error.ErrorMessage));
+                throw new ValidationException(validationResult.Errors);
             }
 
             // Find user by id
-            if (currentUser.UserId is null)
+            if (currentUser is null || currentUser.UserId is null)
             {
-                return Errors.UserIdNotFound;
+                return Errors.UserNotFound;
             }
 
             var userId = currentUser.UserId.ToString();
@@ -51,35 +47,42 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
                 return Errors.UserNotFound;
             }
 
-            // Change Password
-            var changePasswordResult = await userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+            // Check old password
+            var isOldPasswordValid = await userManager.CheckPasswordAsync(user, request.OldPassword);
 
-            // If incorrect, return Errors.IncorrectOldPassword
-            if (!changePasswordResult.Succeeded)
+            if (!isOldPasswordValid)
             {
-                var isIncorrectPassword = changePasswordResult.Errors.Any(error =>
-                    error.Code == PasswordConstants.PasswordMismatchCode);
-
-                if (isIncorrectPassword)
-                {
-                    return Errors.IncorrectOldPassword;
-                }
-
-                logger.LogWarning("Password change failed for user {UserId}", userId);
-
-                return changePasswordResult.Errors
-                    .Select(error =>
-                        Error.Validation(
-                            error.Code,
-                            error.Description))
-                    .ToList();
+                return Errors.IncorrectOldPassword;
             }
 
-            logger.LogInformation(
-                "User {UserId} changed password successfully",
-                userId);
+            // Change Password
+            try
+            {
+                var changePasswordResult = await userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
 
-            return new Response("Your password has been changed successfully!");
+                if (!changePasswordResult.Succeeded)
+                {
+                    var errorCodes = string.Join(", ", changePasswordResult.Errors.Select(e => e.Code));
+
+                    logger.LogError(
+                        "Password change failed for user {UserId}. Errors: {Errors}", 
+                        userId, 
+                        errorCodes);
+
+                    return Errors.ChangePasswordFailed;
+                }
+
+                logger.LogInformation(
+                    "User {UserId} changed password successfully",
+                    userId);
+
+                return Result.Updated;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error occurred while changing password");
+                return Errors.UnexpectedError;
+            }
         }
     }
 }
