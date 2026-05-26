@@ -1,9 +1,16 @@
 "use client";
-
+import { useState } from "react";
+import ChangePasswordModal from "@/features/auth/components/ChangePasswordModal";
 import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function NavbarProfile() {
   const { username } = useAppSelector((state) => state.authSlice.user);
+
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+
+  const handleChangePassword = () => {
+    setIsChangePasswordOpen(true);
+  };
 
   const handleSignOut = () => {
     // will add sign out later
@@ -39,6 +46,15 @@ export default function NavbarProfile() {
       >
         <li>
           <button
+            onClick={handleChangePassword}
+            className="font-semibold hover:bg-primary hover:text-white active:bg-primary/80 active:text-white w-full text-left"
+          >
+            Change Password
+          </button>
+        </li>
+
+        <li>
+          <button
             onClick={handleSignOut}
             className="text-error font-semibold hover:bg-error hover:text-white active:bg-error/80 active:text-white w-full text-left"
           >
@@ -46,6 +62,10 @@ export default function NavbarProfile() {
           </button>
         </li>
       </ul>
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </div>
   );
 }
