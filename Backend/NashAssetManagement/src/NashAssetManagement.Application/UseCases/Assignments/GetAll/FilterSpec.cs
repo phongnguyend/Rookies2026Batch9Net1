@@ -6,10 +6,11 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
 {
     internal class FilterSpec : Specification<Assignment, Response>
     {
-        public FilterSpec(Query query) {
+        public FilterSpec(Query query, Guid locationId) {
             var searchTerm = query.SearchTerm?.Trim();
 
-            Query.Include(x => x.Asset)
+            Query.Where(x => x.Asset!.LocationId == locationId)
+                 .Include(x => x.Asset)
                  .Include(x => x.AssignedToUser)
                  .Include(x => x.AssignedByUser)
                  .AsNoTracking()

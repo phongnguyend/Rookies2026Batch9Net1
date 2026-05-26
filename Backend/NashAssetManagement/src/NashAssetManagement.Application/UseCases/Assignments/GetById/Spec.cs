@@ -5,8 +5,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetById
 {
     internal class Spec : Specification<Assignment, Response>
     {
-        public Spec(Query query) {
-            Query.Where(x => x.Id == query.Id)
+        public Spec(Query query, Guid locationId) {
+            Query.Where(x => x.Id == query.Id && x.Asset!.LocationId == locationId)
                 .Include(x => x.Asset)
                 .Include(x => x.AssignedToUser)
                 .Include(x => x.AssignedByUser)
