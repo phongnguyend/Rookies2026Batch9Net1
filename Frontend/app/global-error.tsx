@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserRoles } from "@/features/users/users.types";
 import { APP_ROUTES } from "@/lib/api/routes";
+import { useAppSelector } from "@/lib/redux/hooks";
+import Link from "next/link";
+import StoreProvider from "./StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,15 +25,22 @@ type GlobalErrorProps = {
 };
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  return (
+    <StoreProvider>
+      <GlobalErrorContent error={error} reset={reset} />
+    </StoreProvider>
+  );
+}
+
+function GlobalErrorContent({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     console.error(error);
   }, [error]);
 
-
-  const user: UserRoles = UserRoles.Admin;
+  const user = useAppSelector((state) => state.authSlice.user);
 
   let homePath = APP_ROUTES.HOME;
-  switch (user as UserRoles) {
+  switch (user?.role as UserRoles) {
     case UserRoles.Admin: {
       homePath = APP_ROUTES.ADMIN_HOME;
       break;
@@ -52,10 +61,10 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     >
       <body className="min-h-full flex flex-col items-center justify-center bg-[#f8f9fa] px-6 py-12 select-none">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-lg p-8 text-center relative overflow-hidden">
-          {/* Top Error Accent Line */}
+          {/* top error accent line */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-primary" />
 
-          {/* 500 Error Graphic */}
+          {/* 500 error graphic */}
           <div className="flex justify-center mb-6">
             <div className="bg-[#fff1f2] text-primary p-4 rounded-full">
               <svg
@@ -74,23 +83,23 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             </div>
           </div>
 
-          {/* Big Code */}
+          {/* big code */}
           <h1 className="text-6xl font-black text-primary tracking-tight">
             500
           </h1>
 
-          {/* Title */}
+          {/* title */}
           <h2 className="text-xl font-bold text-neutral-800 mt-4">
             Unexpected Error Occurred
           </h2>
 
-          {/* Description */}
+          {/* description */}
           <p className="text-gray-500 mt-2 text-sm leading-relaxed">
             Something went wrong in the system. Our team of highly trained
             administrators has been notified.
           </p>
 
-          {/* Buttons */}
+          {/* buttons */}
           <div className="flex flex-col gap-3 mt-8">
             <button
               onClick={() => reset()}
