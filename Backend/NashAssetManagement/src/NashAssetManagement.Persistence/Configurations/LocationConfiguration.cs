@@ -6,7 +6,8 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class LocationConfiguration : IEntityTypeConfiguration<Location>
     {
-        const string TableName = "locations";
+        const string TableName = "Locations";
+
         public void Configure(EntityTypeBuilder<Location> builder)
         {
             builder.ToTable(TableName, DbSchema.Core);
