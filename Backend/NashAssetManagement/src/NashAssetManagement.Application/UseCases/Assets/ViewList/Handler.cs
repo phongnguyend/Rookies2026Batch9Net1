@@ -36,6 +36,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         var location = Guid.Parse(_currentUser.LocationId);
         var sortBy = request.SortBy ?? "assetcode";
         var sortDirection = request.SortDirection ?? "asc";
+        var normalizedSearch = request.Search?.Trim();
 
         var stateList = request.States?
             .Select(s => Enum.Parse<AssetState>(s))
@@ -44,7 +45,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         var countSpec = new AssetCountSpec(
             request.Categories,
             stateList,
-            request.Search,
+            normalizedSearch,
             location);
 
         var totalCount = await _assetRepository.CountAsync(countSpec, cancellationToken);
@@ -59,7 +60,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         var spec = new AssetListSpec(
             request.Categories,
             stateList,
-            request.Search,
+            normalizedSearch,
             sortBy,
             sortDirection,
             request.PageNumber,
