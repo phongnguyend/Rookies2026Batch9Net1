@@ -1,21 +1,30 @@
 "use client";
 
 import { SortItem } from "@/features/shared/components/DataTable";
-import { columns } from "./columns";
+import { createColumns } from "./columns";
 import { userAssignmentApi } from "../user-assignment.api";
 import { useUserAssignmentTableState } from "./useUserAssignmentsTableState";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import SingleSortDataTable from "@/features/shared/components/SingleSortDataTable";
 import { ViewUserAssignments } from "../user-assignment.types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import UserAssignmentDetailDialog from "./UserAssignmentDetailDialog";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { useDispatch } from "react-redux";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 
 export const UserAssignmentsDataTable = () => {
   const { params, dispatch } = useUserAssignmentTableState();
+
+  const dispatchAction = useDispatch();
+
   const [selectedAssignment, setSelectedAssignment] =
     useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
-  // Derive sorts for DataTable directly from params — single source of truth
+
+  const [returningAssignment, setReturningAssignment] =
+    useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
+
   const sorts: SortItem[] = params.sortBy
     ? [
         {
@@ -26,6 +35,14 @@ export const UserAssignmentsDataTable = () => {
     : [];
   const { data, isLoading } =
     userAssignmentApi.useViewUserAssignmentsQuery(params);
+
+  const [createReturnRequest, { isLoading: isReturning }] =
+    userAssignmentApi.useUserCreateReturnRequestMutation();
+
+  const columns = useMemo(
+    () => createColumns({ onReturnClick: setReturningAssignment }),
+    [],
+  );
 
   const handleSortChange = (nextSorts: SortItem[]) => {
     if (nextSorts.length === 0) {
@@ -39,9 +56,36 @@ export const UserAssignmentsDataTable = () => {
     }
   };
 
+  const handleConfirmReturn = async () => {
+    if (!returningAssignment) return;
+
+    try {
+      await createReturnRequest({
+        assignmentId: returningAssignment.id,
+      }).unwrap();
+
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Return request created successfully.",
+          type: ToastType.Success,
+        }),
+      );
+    } catch {
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to create return request. Please try again.",
+          type: ToastType.Error,
+        }),
+      );
+    }
+  };
+
   return (
     <div className="space-y-4">
       <SingleSortDataTable
+        data-testid={"test"}
         data={data?.items ?? []}
         columns={columns}
         isLoading={isLoading}
@@ -51,7 +95,6 @@ export const UserAssignmentsDataTable = () => {
         emptyMessage="No assignments found."
       />
 
-      {/* Pagination */}
       <Pagination
         pageNumber={data?.pageNumber ?? 1}
         totalPages={data?.totalPages ?? 1}
@@ -73,6 +116,17 @@ export const UserAssignmentsDataTable = () => {
       <UserAssignmentDetailDialog
         assignment={selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
+      />
+
+      <ConfirmModal
+        isOpen={!!returningAssignment}
+        onClose={() => setReturningAssignment(null)}
+        onYes={handleConfirmReturn}
+        isLoading={isReturning}
+        title="Are you sure?"
+        body={<p>Do you want to create a returning request for asset?</p>}
+        yesButtonLabel="Yes"
+        noButtonLabel="No"
       />
     </div>
   );

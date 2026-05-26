@@ -55,9 +55,9 @@ export default function SingleSortDataTable<T>({
   };
 
   const getSortIcon = (direction?: SortDirection) => {
-    if (direction === SortDirection.Asc) return "▴";
-    if (direction === SortDirection.Desc) return "▾";
-    return "▴▾";
+    if (direction === SortDirection.Asc) return "↑";
+    if (direction === SortDirection.Desc) return "↓";
+    return "↕";
   };
 
   return (

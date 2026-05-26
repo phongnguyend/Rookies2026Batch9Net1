@@ -5,56 +5,62 @@ import DataTableButtonActions from "@/features/shared/components/DataTableButton
 import { formatDate } from "@/utils/datetime.utils";
 import { AssignmentState } from "@/lib/api/base.types";
 
-export const columns: ColumnDef<ViewUserAssignments.UserAssignmentSummary>[] = [
-  {
-    key: "assetCode",
-    header: "Asset Code",
-    sortable: true,
-  },
-  {
-    key: "assetName",
-    header: "Asset Name",
-    sortable: true,
-  },
-  {
-    key: "category",
-    header: "Category",
-    sortable: true,
-  },
-  {
-    key: "assignedDate",
-    header: "Assigned Date",
-    sortable: true,
-    render: (assignment) => formatDate(assignment.assignedDate),
-  },
-  {
-    key: "state",
-    header: "State",
-    sortable: true,
-    render: (assignment) => displayAssignmentState(assignment.state),
-  },
-  {
-    key: "actions",
-    header: "",
-    render: (assignment) => {
-      return (
-        <DataTableButtonActions
-          row={assignment}
-          disabledAccept={
-            assignment.state !== AssignmentState.WaitingForAcceptance
-          }
-          disabledDecline={
-            assignment.state !== AssignmentState.WaitingForAcceptance
-          }
-          disabledReturn={
-            assignment.state !== AssignmentState.Accepted ||
-            assignment.isReturning
-          }
-          onAccept={(row) => console.log("accept", row)}
-          onDecline={(row) => console.log("decline", row)}
-          onReturn={(row) => console.log("return", row)}
-        />
-      );
+export function createColumns(handlers: {
+  onReturnClick: (
+    assignment: ViewUserAssignments.UserAssignmentSummary,
+  ) => void;
+}): ColumnDef<ViewUserAssignments.UserAssignmentSummary>[] {
+  return [
+    {
+      key: "assetCode",
+      header: "Asset Code",
+      sortable: true,
     },
-  },
-];
+    {
+      key: "assetName",
+      header: "Asset Name",
+      sortable: true,
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+    },
+    {
+      key: "assignedDate",
+      header: "Assigned Date",
+      sortable: true,
+      render: (assignment) => formatDate(assignment.assignedDate),
+    },
+    {
+      key: "state",
+      header: "State",
+      sortable: true,
+      render: (assignment) => displayAssignmentState(assignment.state),
+    },
+    {
+      key: "actions",
+      header: "",
+      render: (assignment) => {
+        return (
+          <DataTableButtonActions
+            row={assignment}
+            disabledAccept={
+              assignment.state !== AssignmentState.WaitingForAcceptance
+            }
+            disabledDecline={
+              assignment.state !== AssignmentState.WaitingForAcceptance
+            }
+            disabledReturn={
+              assignment.state !== AssignmentState.Accepted ||
+              assignment.isReturning
+            }
+            onAccept={(row) => console.log("accept", row)}
+            onDecline={(row) => console.log("decline", row)}
+            onReturn={handlers.onReturnClick}
+          />
+        );
+      },
+    },
+  ];
+}
