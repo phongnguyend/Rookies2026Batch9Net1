@@ -33,3 +33,15 @@ export namespace FirstChangePassword {
   }
   export interface Response { }
 }
+
+
+export namespace ChangePassword {
+  export interface Request {
+    oldPassword: string;
+    newPassword: string;
+  }
+
+  export interface Response {
+    message: string;
+  }
+}
