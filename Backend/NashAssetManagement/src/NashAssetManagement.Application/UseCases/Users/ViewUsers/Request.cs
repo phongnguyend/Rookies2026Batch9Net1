@@ -2,7 +2,7 @@ using ErrorOr;
 using MediatR;
 using NashAssetManagement.Application.Utilities;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewList
+namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
     public record Request (
         int? PageNumber, 

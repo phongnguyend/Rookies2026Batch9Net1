@@ -6,7 +6,7 @@ using NashAssetManagement.Application.Abstractions.AppIdentity;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
+namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
 {
     internal class Handler(
         UserManager<User> userManager, 

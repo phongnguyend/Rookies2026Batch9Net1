@@ -8,7 +8,7 @@ using NashAssetManagement.Application.Abstractions.AppIdentity;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewList
+namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
     internal class Handler(
         UserManager<User> userManager, 
@@ -43,7 +43,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             {
                 SortBy = request.SortBy?.Trim(),
                 PageNumber = request.PageNumber ?? 1,
-                PageSize = request.PageSize ?? 20,
+                PageSize = request.PageSize ?? 10,
             };
 
             // Search

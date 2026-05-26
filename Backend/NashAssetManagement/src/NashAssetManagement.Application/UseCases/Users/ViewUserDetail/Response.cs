@@ -1,6 +1,6 @@
 
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
+namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
 {
     public record Response(
         Guid Id,

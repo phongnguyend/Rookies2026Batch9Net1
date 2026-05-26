@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewList
+namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
     public record Response(
         Guid Id,

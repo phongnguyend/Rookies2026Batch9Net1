@@ -1,8 +1,7 @@
-using System.Threading.Tasks;
-using NashAssetManagement.Application.UseCases.Users.ViewList;
+using NashAssetManagement.Application.UseCases.Users.ViewUsers;
 using Xunit;
 
-namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewList
+namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers
 {
     public class ValidatorTests
     {

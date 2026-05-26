@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using NashAssetManagement.Application.UseCases.Users.ViewDetail;
+using NashAssetManagement.Application.UseCases.Users.ViewUserDetail;
 using NashAssetManagement.WebAPI.Utilities;
 using NashAssetManagement.Domain.Constants;
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.WebAPI.Utilities;
-using NashAssetManagement.Application.UseCases.Users.ViewList;
+using NashAssetManagement.Application.UseCases.Users.ViewUsers;
 using NashAssetManagement.Domain.Constants;
 
 namespace NashAssetManagement.WebAPI.Controllers.Users

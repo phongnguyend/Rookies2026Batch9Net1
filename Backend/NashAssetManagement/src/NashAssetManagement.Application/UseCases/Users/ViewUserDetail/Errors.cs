@@ -1,6 +1,6 @@
 using ErrorOr;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
+namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
 {
     internal static class Errors
     {

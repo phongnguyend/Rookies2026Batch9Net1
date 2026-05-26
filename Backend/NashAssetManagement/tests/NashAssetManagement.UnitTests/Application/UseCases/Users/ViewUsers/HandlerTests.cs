@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 using ErrorOr;
@@ -7,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
-using NashAssetManagement.Application.UseCases.Users.ViewList;
+using NashAssetManagement.Application.UseCases.Users.ViewUsers;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 using Xunit;
 
-namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewList;
+namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers;
 
 public class HandlerTests
 {
@@ -213,7 +212,7 @@ public class HandlerTests
         Request request)
     {
         var handlerType = typeof(Request).Assembly.GetType(
-            "NashAssetManagement.Application.UseCases.Users.ViewList.Handler",
+            "NashAssetManagement.Application.UseCases.Users.ViewUsers.Handler",
             throwOnError: true)!;
         var handler = Activator.CreateInstance(
             handlerType,

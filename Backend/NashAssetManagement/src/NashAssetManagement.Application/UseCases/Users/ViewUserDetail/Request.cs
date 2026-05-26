@@ -1,7 +1,7 @@
 using ErrorOr;
 using MediatR;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
+namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
 {
     public record Request(
         string? UserId

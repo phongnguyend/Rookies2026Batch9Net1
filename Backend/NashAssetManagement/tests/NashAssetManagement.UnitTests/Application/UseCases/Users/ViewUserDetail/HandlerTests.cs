@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Query;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
-using NashAssetManagement.Application.UseCases.Users.ViewDetail;
+using NashAssetManagement.Application.UseCases.Users.ViewUserDetail;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 using Xunit;
 
-namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewDetail;
+namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetail;
 
 public class HandlerTests
 {
@@ -121,7 +121,7 @@ public class HandlerTests
         Request request)
     {
         var handlerType = typeof(Request).Assembly.GetType(
-            "NashAssetManagement.Application.UseCases.Users.ViewDetail.Handler",
+            "NashAssetManagement.Application.UseCases.Users.ViewUserDetail.Handler",
             throwOnError: true)!;
         var handler = Activator.CreateInstance(
             handlerType,

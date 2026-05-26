@@ -3,7 +3,7 @@
 using FluentValidation;
 using NashAssetManagement.Application.Common.Validators;
 
-namespace NashAssetManagement.Application.UseCases.Users.ViewList
+namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
     public class Validators : AbstractValidator<Request>
     {

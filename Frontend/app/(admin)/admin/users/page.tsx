@@ -1,6 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import {
+  type MouseEvent,
+  type ReactNode,
+  useCallback,
+  useState,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DataTable, {
   type ColumnDef,
@@ -23,7 +28,73 @@ const typeFilters = [
   { id: UserRoles.Staff, label: "Staff" },
 ];
 
-const pageSize = 20;
+const pageSize = 10;
+
+function ActionIconButton({
+  label,
+  children,
+  className = "text-slate-700 hover:text-primary",
+  onClick,
+}: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <span className="group relative inline-flex h-8 w-8 items-center justify-center">
+      <button
+        type="button"
+        aria-label={label}
+        onClick={onClick}
+        className={`inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 shadow-none outline-none transition ${className}`}
+      >
+        {children}
+      </button>
+      <span className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-neutral px-2 py-1 text-xs font-medium text-neutral-content opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+        {label}
+      </span>
+    </span>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14.75 4.25 19.75 9.25" />
+      <path d="M18.25 2.75a2.12 2.12 0 0 1 3 3L8.5 18.5 3.75 20.25 5.5 15.5 18.25 2.75Z" />
+      <path d="M5.5 15.5 8.5 18.5" />
+    </svg>
+  );
+}
+
+function DisableIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <path d="M9 9 15 15" />
+      <path d="M15 9 9 15" />
+    </svg>
+  );
+}
 
 export default function UsersPage() {
   const router = useRouter();
@@ -35,10 +106,13 @@ export default function UsersPage() {
   const sortByParam = searchParams.get("sortBy") ?? "";
   const sortDescParam = searchParams.get("sortDesc");
   const typeParam = searchParams.get("type");
-  const selectedType =
-    typeParam === UserRoles.Admin || typeParam === UserRoles.Staff
-      ? typeParam
-      : "All";
+
+  // The type filter is stored in the URL as comma-separated values.
+  // Invalid values are dropped so only supported user roles reach the UI/API.
+  const selectedTypes = (typeParam?.split(",") ?? []).filter(
+    (type): type is UserRoles =>
+      type === UserRoles.Admin || type === UserRoles.Staff,
+  );
   const sorts: SortItem[] = sortByParam
     ? [
         {
@@ -120,7 +194,10 @@ export default function UsersPage() {
     pageNumber: queryPage,
     pageSize,
     ...(querySearch ? { searchTerm: querySearch } : {}),
-    ...(selectedType !== "All" ? { type: selectedType } : {}),
+
+    // Backend currently accepts a single type value. When both roles are
+    // selected, the dropdown normalizes to "All", so no type filter is sent.
+    ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
     ...(sorts[0]?.key ? { sortBy: sorts[0]!.key } : {}),
     ...(sorts[0]?.direction === SortDirection.Desc ? { sortDesc: true } : {}),
   };
@@ -151,32 +228,29 @@ export default function UsersPage() {
     {
       key: "actions",
       header: "",
-      className: "w-[140px] text-right",
+      className: "w-[72px] text-left",
       render: () => (
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
+        <div className="flex justify-start gap-2">
+          <ActionIconButton
+            label="Edit"
             onClick={(event) => {
               event.stopPropagation();
               // Navigate to edit user page for user.id
             }}
-            title="Edit"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-slate-700 transition hover:bg-slate-100"
           >
-            ✎
-          </button>
+            <EditIcon />
+          </ActionIconButton>
 
-          <button
-            type="button"
+          <ActionIconButton
+            label="Disable"
+            className="text-red-700 hover:text-red-800"
             onClick={(event) => {
               event.stopPropagation();
               // Disable user logic goes here
             }}
-            title="Disable"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-red-50 text-red-700 transition hover:bg-red-100"
           >
-            ⊗
-          </button>
+            <DisableIcon />
+          </ActionIconButton>
         </div>
       ),
     },
@@ -192,17 +266,17 @@ export default function UsersPage() {
             <div className="flex gap-5">
               <DropdownFilter
                 items={typeFilters}
-                values={selectedType === "All" ? [] : [selectedType]}
+                values={selectedTypes}
                 placeholder="Type"
                 width="w-40"
                 getKey={(item) => item.id}
                 getLabel={(item) => item.label}
                 onChange={(values) => {
-                  const nextType =
-                    values.length === 1 ? (values[0] as UserRoles) : "All";
+                  // Empty values mean "All"; otherwise keep selected roles in
+                  // the URL so refresh/back navigation preserves the filter.
                   updateQueryParams({
                     page: 1,
-                    type: nextType !== "All" ? nextType : null,
+                    type: values.length > 0 ? values.join(",") : null,
                   });
                 }}
                 allLabel="All"
