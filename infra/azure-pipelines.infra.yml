@@ -1,0 +1,59 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  - group: bicep-deploy-vars
+  - name: azureSubscription
+    value: 'Visual Studio Enterprise – MPN (2f740cf0-f72d-49a7-b69b-893aafa173f2)'
+
+stages:
+- stage: Deploy
+  jobs:
+  - job: DeployAndConfigure
+    displayName: Deploy Bicep & Set Connection Strings
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: $(azureSubscription)
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo "Deploying Bicep template..."
+
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file infra/main.bicep \
+            --parameters @infra/main.parameters.json \
+            --parameters adminPassword=$(adminPassword)
+    - task: AzureAppServiceSettings@1
+      displayName: 'Set DEV API App Settings'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: 'Rookies2026Batch9Net1-DEV-API'
+        resourceGroupName: $(resourceGroupName)
+        appSettings: |
+          [
+            {
+              "name": "ConnectionStrings__DefaultConnection",
+              "value": "Server=tcp:$(sqlServerName).database.windows.net,1433;Initial Catalog=Rookies2026Batch9Net1-DEV;Persist Security Info=False;User ID=$(adminUsername);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            }
+          ]
+
+    - task: AzureAppServiceSettings@1
+      displayName: 'Set QC API App Settings'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: 'Rookies2026Batch9Net1-QC-API'
+        resourceGroupName: $(resourceGroupName)
+        appSettings: |
+          [
+            {
+              "name": "ConnectionStrings__DefaultConnection",
+              "value": "Server=tcp:$(sqlServerName).database.windows.net,1433;Initial Catalog=Rookies2026Batch9Net1-QC;Persist Security Info=False;User ID=$(adminUsername);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+            }
+          ]
