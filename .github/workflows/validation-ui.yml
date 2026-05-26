@@ -11,6 +11,11 @@ jobs:
     name: Build ReactJs
     runs-on: ubuntu-latest
 
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_ACCESS_SESSION_COOKIE_NAME: ${{ secrets.NEXT_PUBLIC_ACCESS_SESSION_COOKIE_NAME }}
+      NEXT_PUBLIC_REFRESH_SESSION_COOKIE_NAME: ${{ secrets.NEXT_PUBLIC_REFRESH_SESSION_COOKIE_NAME }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
