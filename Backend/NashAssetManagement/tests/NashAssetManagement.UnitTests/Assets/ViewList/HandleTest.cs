@@ -82,7 +82,12 @@ public class HandlerTests
     [Fact]
     public async Task Handle_Should_Return_Empty_PagedList_When_No_Assets_Found()
     {
-        var request = new GetAssetsRequest(null, null, "nonexistent", null, null);
+        var request = new GetAssetsRequest(
+            Categories: null,
+            States: null,
+            Search: "nonexistent",   // ← named so position doesn't matter
+            SortBy: null,
+            SortDirection: null);
 
         _assetRepositoryMock
             .Setup(r => r.CountAsync(
@@ -96,7 +101,6 @@ public class HandlerTests
         Assert.Equal(0, result.Value.TotalCount);
         Assert.Empty(result.Value.Items);
 
-        // repository ListAsync never called if count is 0
         _assetRepositoryMock.Verify(
             r => r.ListAsync(
                 It.IsAny<AssetSpec>(),

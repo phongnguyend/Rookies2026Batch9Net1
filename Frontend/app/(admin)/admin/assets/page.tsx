@@ -7,16 +7,16 @@ import { showModal } from "@/features/shared/modal.slice";
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from "@/features/assets/assets.api";
+} from "@/features/Assets/assets.api";
 import { AssetState, type AssetListItem } from "@/features/assets/assets.types";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
-import AssetDetailModal from "@/features/assets/components/assetDetailModal";
+import AssetDetailModal from "@/features/Assets/components/assetDetailModal";
 import DataTable, {
   ColumnDef,
   SortItem,
-} from "@/features/assets/components/assetDataTable";
+} from "@/features/Assets/components/assetDataTable";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,

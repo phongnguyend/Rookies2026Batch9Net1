@@ -37,7 +37,7 @@ public class ValidatorTests
     [InlineData("state")]
     public async Task Validate_Should_Pass_When_SortBy_Is_Valid(string sortBy)
     {
-        var request = new GetAssetsRequest(null, null, null, sortBy, null);
+        var request = new GetAssetsRequest(null, null, sortBy, null, null);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -47,7 +47,7 @@ public class ValidatorTests
     [Fact]
     public async Task Validate_Should_Return_Error_When_SortBy_Is_Invalid()
     {
-        var request = new GetAssetsRequest(null, null, null, "invalidField", null);
+        var request = new GetAssetsRequest(null, null,"invalidField", null, null);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -82,7 +82,7 @@ public class ValidatorTests
     [Fact]
     public async Task Validate_Should_Return_Error_When_SortDirection_Is_Invalid()
     {
-        var request = new GetAssetsRequest(null, null, null, null, "invalidDirection");
+        var request = new GetAssetsRequest(null, null, null, "invalidDirection", null);
 
         var result = await _validator.ValidateAsync(request);
 
