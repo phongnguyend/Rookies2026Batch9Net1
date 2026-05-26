@@ -133,5 +133,5 @@ stages:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish UI'
       inputs:
-        PathtoPublish: 'Frontend/.next'
+        PathtoPublish: 'Frontend/out'
         ArtifactName: 'UI'        
