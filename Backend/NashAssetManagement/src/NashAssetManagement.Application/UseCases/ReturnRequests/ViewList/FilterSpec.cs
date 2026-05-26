@@ -60,9 +60,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
                     x.Assignment.Asset.AssetCode,
                     x.Assignment.Asset.Name,
                     x.RequestedByUser.UserName,
-                    x.Assignment.AssignedAtUtc.ToString(),
+                    x.Assignment.AssignedAtUtc,
                     x.AcceptedByUser != null ? x.AcceptedByUser.UserName : null,
-                    x.ReturnedAtUtc.HasValue ? x.ReturnedAtUtc.Value.ToString() : null,
+                    x.ReturnedAtUtc,
                     x.State.ToString()
                 ));
         }

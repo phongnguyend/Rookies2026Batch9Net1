@@ -5,9 +5,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         string AssetCode,
         string AssetName,
         string RequestedBy,
-        string AssignedDate,
+        DateTime AssignedDate,
         string? AcceptedBy,
-        string? ReturnedDate,
+        DateTime? ReturnedDate,
         string State
     );
 }
