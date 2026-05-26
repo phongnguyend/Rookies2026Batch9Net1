@@ -1,5 +1,5 @@
 import { baseApiSlice } from "@/lib/api/base.api";
-import { Login, Refresh, GetMe, FirstChangePassword } from "./auth.types";
+import { Login, Refresh, GetMe, FirstChangePassword, ChangePassword } from "./auth.types";
 
 export const authApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -34,6 +34,15 @@ export const authApi = baseApiSlice.injectEndpoints({
         body: data,
       }),
     }),
+
+    changePassword: builder.mutation<ChangePassword.Response, ChangePassword.Request>({
+      query: (data) => ({
+        url: "/v1/auth/change-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
   }),
 });
 
@@ -43,4 +52,5 @@ export const {
   useLazyGetMeQuery,
   useGetMeQuery,
   useFirstChangePasswordMutation,
+  useChangePasswordMutation
 } = authApi;
