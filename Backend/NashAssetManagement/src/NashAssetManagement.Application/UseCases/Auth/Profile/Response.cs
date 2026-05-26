@@ -4,6 +4,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.Profile
         Guid Id,
         string UserName,
         Guid LocationId,
+        string LocationName,
         bool IsFirstLogin,
         IReadOnlyList<string> Roles);
 }

@@ -8,10 +8,8 @@ export function proxy(request: NextRequest) {
   const hasSession = request.cookies.has(accessTokenCookieName);
 
   // route guard if dont have cookie
-  if (!hasSession) {
-    if (pathname !== "/") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  if (!hasSession && pathname !== "/") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // if authenticated, let the request go through
