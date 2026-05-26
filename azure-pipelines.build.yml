@@ -1,0 +1,139 @@
+trigger:
+- main
+
+variables: 
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+
+- stage: BuildDotNet
+  displayName: Build .Net 
+  jobs:
+  - job: Build
+    displayName: Build
+    dependsOn: []
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+      - task: UseDotNet@2
+        displayName: Use .Net 10.0.x
+        inputs:
+          packageType: 'sdk'
+          version: '10.0.x'
+      - task: DotNetCoreCLI@2
+        displayName: dotnet restore
+        inputs:
+          command: 'restore'
+          projects: 'Backend/NashAssetManagement/NashAssetManagement.slnx'
+          feedsToUse: 'select'
+      - task: DotNetCoreCLI@2
+        displayName: dotnet list package --vulnerable
+        inputs:
+          command: 'custom'
+          custom: 'list'
+          arguments: 'package --vulnerable'
+          workingDirectory: 'Backend/NashAssetManagement'
+      - task: CmdLine@2
+        displayName: dotnet tool install CheckNugetPackages.DotNetCliTool --global
+        inputs:
+          script: 'dotnet tool install CheckNugetPackages.DotNetCliTool --global'
+      - task: PowerShell@2
+        displayName: CheckNugetPackages
+        inputs:
+          targetType: 'inline'
+          script: |
+            cd Backend/NashAssetManagement
+            CheckNugetPackages ./
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish nuget_packages.csv'
+        inputs:
+          PathtoPublish: 'Backend/NashAssetManagement/packages.csv'
+          ArtifactName: 'nuget_packages.csv'
+      - task: DotNetCoreCLI@2
+        displayName: Build
+        inputs:
+          command: 'build'
+          arguments: '--configuration Release'
+          workingDirectory: 'Backend/NashAssetManagement'
+      - task: DotNetCoreCLI@2
+        displayName: Test
+        inputs:
+          command: 'test'
+          projects: |
+            Backend/NashAssetManagement/tests/NashAssetManagement.UnitTests/NashAssetManagement.UnitTests.csproj
+          arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura "/p:Include=\"[NashAssetManagement.Application]*,[NashAssetManagement.Domain]*\""'
+      - task: PublishCodeCoverageResults@2
+        displayName: 'Publish Code Coverage'
+        inputs:
+          summaryFileLocation: '$(Build.SourcesDirectory)/**/*.cobertura.xml'
+      - task: DotNetCoreCLI@2
+        displayName: Publish
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: |
+            Backend/NashAssetManagement/src/NashAssetManagement.WebAPI/NashAssetManagement.WebAPI.csproj
+          arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+          zipAfterPublish: false
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish AssetManagement.Api'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/NashAssetManagement.WebAPI'
+          ArtifactName: 'API'
+
+- stage: BuildReactJs
+  displayName: Build ReactJs
+  dependsOn: []
+  variables:
+    - group: fe-variables
+  jobs:
+  - job: Build
+    displayName: Build ReactJs
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
+    - task: NodeTool@0
+      displayName: Use Node 24.x
+      inputs:
+        versionSpec: 24.x
+        checkLatest: true
+    - task: Npm@1
+      displayName: npm install
+      inputs:
+        workingDir: Frontend
+    - task: Npm@1
+      displayName: npm audit --audit-level=critical
+      inputs:
+        command: 'custom'
+        workingDir: 'Frontend'
+        customCommand: 'audit --audit-level=critical'
+    - task: CmdLine@2
+      displayName: dotnet tool install CheckNpmPackages.DotNetCliTool --global
+      inputs:
+        script: 'dotnet tool install CheckNpmPackages.DotNetCliTool --global'
+    - task: PowerShell@2
+      displayName: CheckNpmPackages
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd Frontend
+          CheckNpmPackages ./
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish npm_packages.csv'
+      inputs:
+        PathtoPublish: 'Frontend/packages.csv'
+        ArtifactName: 'npm_packages.csv'
+    - task: Npm@1
+      displayName: run build
+      inputs:
+        command: custom
+        workingDir: Frontend
+        customCommand: run build
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish UI'
+      inputs:
+        PathtoPublish: 'Frontend/out'
+        ArtifactName: 'UI'        
