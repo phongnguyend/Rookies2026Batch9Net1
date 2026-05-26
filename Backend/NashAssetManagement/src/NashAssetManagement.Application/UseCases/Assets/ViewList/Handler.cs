@@ -34,24 +34,12 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
         var location = Guid.Parse(_currentUser.LocationId);
+        var sortBy = request.SortBy ?? "assetcode";
+        var sortDirection = request.SortDirection ?? "asc";
 
-        AssetState[] stateList;
-
-        if (request.States is null || request.States.Length == 0)
-        {
-            stateList =
-            [
-                AssetState.Available,
-            AssetState.NotAvailable,
-            AssetState.Assigned
-            ];
-        }
-        else
-        {
-            stateList = request.States
-                .Select(s => Enum.Parse<AssetState>(s))
-                .ToArray();
-        }
+        var stateList = request.States?
+            .Select(s => Enum.Parse<AssetState>(s))
+            .ToArray();
 
         var countSpec = new AssetCountSpec(
             request.Categories,
@@ -72,8 +60,8 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
             request.Categories,
             stateList,
             request.Search,
-            request.SortBy,
-            request.SortDirection,
+            sortBy,
+            sortDirection,
             request.PageNumber,
             request.PageSize,
             location);
