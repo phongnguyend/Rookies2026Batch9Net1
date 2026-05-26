@@ -19,9 +19,9 @@ export default function DataTableButtonActions<T>({
   disabledAccept = false,
   disabledDecline = false,
   disabledReturn = false,
-  acceptBtnTestId,
-  declineBtnTestId,
-  returnBtnTestId,
+  acceptBtnTestId = "btnAcceptAssignment",
+  declineBtnTestId = "btnDeclineAssignment",
+  returnBtnTestId = "btnReturnAssignment",
 }: DataTableButtonActionsProps<T>) {
   return (
     <div className="flex items-center gap-3">
