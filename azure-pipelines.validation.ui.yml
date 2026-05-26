@@ -2,9 +2,10 @@
 trigger: none
 
 variables:
-  
+  - group: fe-variables
+
   # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+vmImageName: 'ubuntu-latest'
 
 stages:
 - stage: Build
