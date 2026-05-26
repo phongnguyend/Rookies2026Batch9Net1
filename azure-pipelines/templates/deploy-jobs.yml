@@ -1,0 +1,84 @@
+parameters:
+- name: buildRunId
+  type: string
+- name: serviceConnection
+  type: string
+- name: project
+  type: string
+- name: buildPipelineId
+  type: number
+- name: environment
+  type: string
+
+jobs:
+- job: DeployBackend
+  displayName: 'Deploy API (Evironment: ${{ parameters.environment }}) (RunId: ${{ parameters.buildRunId }})'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      buildType: 'specific'
+      project: ${{ parameters.project }}
+      pipeline: ${{ parameters.buildPipelineId }}
+      runVersion: 'specific'
+      runId: ${{ parameters.buildRunId }}
+      artifactName: 'api'
+      targetPath: '$(Pipeline.Workspace)/api'
+  - task: replacetokens@5
+    inputs:
+      rootDirectory: '$(Pipeline.Workspace)/api'
+      targetFiles: '**/*.config'
+      encoding: 'auto'
+      tokenPattern: 'octopus'
+      writeBOM: true
+      actionOnMissing: 'warn'
+      keepToken: false
+      actionOnNoFiles: 'continue'
+      enableTransforms: false
+      enableRecursion: false
+      useLegacyPattern: false
+      enableTelemetry: true
+  - task: AzureWebApp@1
+    displayName: $(Api.AppName)
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      appType: webApp
+      appName: $(Api.AppName)
+      package: '$(Pipeline.Workspace)/api'
+
+- job: DeployFrontend
+  displayName: 'Deploy UI (Evironment: ${{ parameters.environment }}) (RunId: ${{ parameters.buildRunId }})'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      buildType: 'specific'
+      project: ${{ parameters.project }}
+      pipeline: ${{ parameters.buildPipelineId }}
+      runVersion: 'specific'
+      runId: ${{ parameters.buildRunId }}
+      artifactName: 'ui'
+      targetPath: '$(Pipeline.Workspace)/ui'
+  - task: replacetokens@5
+    inputs:
+      rootDirectory: '$(Pipeline.Workspace)/ui'
+      targetFiles: '**/*.js'
+      encoding: 'auto'
+      tokenPattern: 'octopus'
+      writeBOM: true
+      actionOnMissing: 'warn'
+      keepToken: false
+      actionOnNoFiles: 'continue'
+      enableTransforms: false
+      enableRecursion: false
+      useLegacyPattern: false
+      enableTelemetry: true
+  - task: AzureWebApp@1
+    displayName: $(Ui.AppName)
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      appType: webApp
+      appName: $(Ui.AppName)
+      package: '$(Pipeline.Workspace)/ui'

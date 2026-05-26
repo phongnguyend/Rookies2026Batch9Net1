@@ -1,0 +1,40 @@
+trigger: none
+
+parameters:
+- name: buildRunId
+  displayName: 'Build Pipeline Run ID'
+  type: string
+
+variables:
+  project: '2026Batch9Net1'
+  serviceConnection: 'Visual Studio Enterprise – MPN (2f740cf0-f72d-49a7-b69b-893aafa173f2)'
+  buildPipelineId: 33  # <-- Replace with your actual build pipeline ID (not name)
+
+stages:
+- stage: 'DeployDEV'
+  displayName: Deploy DEV
+  variables:
+    - group: DEV
+  jobs:
+  - template: azure-pipelines/templates/deploy-jobs.yml
+    parameters:
+      buildRunId: ${{ parameters.buildRunId }}
+      serviceConnection: $(serviceConnection)
+      project: $(project)
+      buildPipelineId: $(buildPipelineId)
+      environment: 'DEV'
+
+- stage: 'DeployQC'
+  displayName: Deploy QC
+  dependsOn: [DeployDEV]
+  condition: succeeded()
+  variables:
+    - group: QC
+  jobs:
+  - template: azure-pipelines/templates/deploy-jobs.yml
+    parameters:
+      buildRunId: ${{ parameters.buildRunId }}
+      serviceConnection: $(serviceConnection)
+      project: $(project)
+      buildPipelineId: $(buildPipelineId)
+      environment: 'QC'
