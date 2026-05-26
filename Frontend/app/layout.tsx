@@ -52,9 +52,7 @@ export default function RootLayout({
 
 // wrap layout content under store provider
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user } = useAppSelector(
-    (state) => state.authSlice,
-  );
+  const { isAuthenticated, user } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
   // restore session on page mount/refresh if cookie exists
@@ -64,7 +62,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (profile && !isAuthenticated) {
-      const userRole = profile.roles.includes("Admin")
+      const userRole = profile.roles.includes(UserRoles.Admin)
         ? UserRoles.Admin
         : UserRoles.Staff;
       dispatch(
@@ -72,6 +70,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           username: profile.userName,
           role: userRole,
           isFirstLogin: profile.isFirstLogin,
+          locationName: profile.locationName,
         }),
       );
     }
