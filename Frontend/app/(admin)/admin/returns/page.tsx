@@ -315,7 +315,11 @@ export default function ReturnsPage() {
                 getLabel={(state) => state.label}
                 onChange={(values) => {
                   // Filter changes always restart the list from page 1.
-                  updateQueryParams({ page: 1, states: values });
+                  updateQueryParams({
+                    page: 1,
+                    states:
+                      values.length === stateFilters.length ? [] : values,
+                  });
                 }}
                 allLabel="All"
               />
