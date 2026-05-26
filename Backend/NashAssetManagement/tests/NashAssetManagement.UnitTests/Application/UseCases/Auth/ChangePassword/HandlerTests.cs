@@ -43,6 +43,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_CurrentUserIdIsNull_ShouldReturnUserNotFound()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -56,8 +57,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("OldPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.UserNotFound.Code, result.FirstError.Code);
 
@@ -69,6 +72,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_UserDoesNotExist_ShouldReturnUserNotFound()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -88,8 +92,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("OldPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.UserNotFound.Code, result.FirstError.Code);
 
@@ -112,6 +118,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_IncorrectOldPassword_ShouldReturnIncorrectOldPassword()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -136,8 +143,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("WrongPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.IncorrectOldPassword.Code, result.FirstError.Code);
 
@@ -156,6 +165,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_ChangePasswordFails_ShouldReturnChangePasswordFailed()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -193,8 +203,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("OldPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.ChangePasswordFailed.Code, result.FirstError.Code);
 
@@ -209,6 +221,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_ValidRequest_ShouldReturnSuccess()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -240,8 +253,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("OldPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.False(result.IsError);
             Assert.Equal(Result.Updated, result.Value);
 
@@ -264,6 +279,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
         [Fact]
         public async Task ChangePasswordHandler_ChangePasswordThrowsException_ShouldReturnUnexpectedError()
         {
+            // Arrange
             var userManagerMock = CreateUserManagerMock();
             var loggerMock = new Mock<ILogger<Handler>>();
             var validator = new Validator();
@@ -295,8 +311,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
 
             var request = new Request("OldPassword123!", "NewPassword123!");
 
+            // Act
             var result = await handler.Handle(request, CancellationToken.None);
 
+            // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.UnexpectedError.Code, result.FirstError.Code);
         }
