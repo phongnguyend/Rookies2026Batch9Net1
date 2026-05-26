@@ -21,7 +21,20 @@ namespace NashAssetManagement.Domain.Entities.Core
         public Guid? AcceptedByUserId { get; set; }
 
         public User? AcceptedByUser { get; set; }
+
         public DateTime CreatedAtUtc { get; set; }
+
         public DateTime? UpdatedAtUtc { get; set; }
+
+        public static ReturnRequest Create(Guid assignmentId, Guid assigneeId, DateTime? createAtUtc = null)
+        {
+            return new ReturnRequest
+            {
+                AssignmentId = assignmentId,
+                RequestedByUserId = assigneeId,
+                State = ReturnRequestState.WaitingForReturning,
+                CreatedAtUtc = createAtUtc ?? DateTime.UtcNow
+            };
+        }
     }
 }
