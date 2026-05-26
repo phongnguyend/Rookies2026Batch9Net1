@@ -6,10 +6,15 @@ using NashAssetManagement.Application.Utilities;
 using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewList
 {
-    internal class Handler(UserManager<User> userManager, ICurrentUser currentUser)
+    internal class Handler(
+        UserManager<User> userManager, 
+        ICurrentUser currentUser,
+        IValidator<Request> validator
+    )
     : IRequestHandler<Request, ErrorOr<PagedList<Response>>>
     {
         public async Task<ErrorOr<PagedList<Response>>> Handle(
@@ -23,16 +28,28 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             // Check current admin's location
             if (currentUser.LocationId == null)            
                 return Errors.UserHasNoLocation();
+
+            var validationResults = await validator.ValidateAsync(request, cancellationToken);
+            if (!validationResults.IsValid)
+                throw new ValidationException(validationResults.Errors);
         
             // Get users have same location with current admin user
             var usersQuery = userManager.Users
                 .Where(u => u.LocationId.ToString().Equals(currentUser.LocationId))
                 ;
 
-            // Search
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            // Cleaned request
+            var cleanedRequest = request with
             {
-                var searchTerm = request.SearchTerm.Trim().ToLowerInvariant();
+                SortBy = request.SortBy?.Trim(),
+                PageNumber = request.PageNumber ?? 1,
+                PageSize = request.PageSize ?? 20,
+            };
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(cleanedRequest.SearchTerm))
+            {
+                var searchTerm = cleanedRequest.SearchTerm.Trim().ToLowerInvariant();
                 var pattern = $"%{searchTerm}%";
 
                 usersQuery = usersQuery.Where(u =>
@@ -42,15 +59,15 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             }
 
             // Filter by user type
-            if (!string.IsNullOrEmpty(request.Type) &&
-                Enum.TryParse<UserType>(request.Type, ignoreCase: true, out var userType))
+            if (!string.IsNullOrEmpty(cleanedRequest.Type) &&
+                Enum.TryParse<UserType>(cleanedRequest.Type, ignoreCase: true, out var userType))
             {
                 usersQuery = usersQuery.Where(u => u.UserType == userType);
             }
 
             // Apply sorting
-            var sortBy = request.SortBy?.Trim().ToLowerInvariant();
-            var sortDesc = request.SortDesc.GetValueOrDefault();
+            var sortBy = cleanedRequest.SortBy?.Trim().ToLowerInvariant();
+            var sortDesc = cleanedRequest.SortDesc.GetValueOrDefault();
 
             if (string.IsNullOrEmpty(sortBy))
             {
@@ -88,14 +105,14 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             // Apply paging
             var totalItems = await usersQuery.CountAsync(cancellationToken);
             var users = await usersQuery
-            .Skip((request.PageNumber!.Value -1) * request.PageSize!.Value)
-            .Take(request.PageSize.Value)
+            .Skip((cleanedRequest.PageNumber!.Value -1) * cleanedRequest.PageSize!.Value)
+            .Take(cleanedRequest.PageSize.Value)
             .Select(u => new Response(
                 u.Id,
                 u.StaffCode,
                 u.FirstName + " " + u.LastName,
                 u.UserName ?? "",
-                u.JoinedAtUtc.ToString("yyyy-MM-dd"),
+                u.JoinedAtUtc.ToString(),
                 u.UserType.ToString()
             )
             {
@@ -104,7 +121,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
                     a.State == AssignmentState.Accepted)
             })
             .ToListAsync(cancellationToken);
-            return new PagedList<Response>(users, totalItems, request.PageNumber!.Value, request.PageSize!.Value);
+            return new PagedList<Response>(users, totalItems, cleanedRequest.PageNumber!.Value, cleanedRequest.PageSize!.Value);
         }
     }
 }

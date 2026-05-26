@@ -14,12 +14,12 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
                 "Users.NotFound",
                 "User not found.");
 
-        public static Error UserWithIdNotFound(Guid userId) =>
+        public static Error UserWithIdNotFound(string userId) =>
             Error.NotFound(
                 "Users.NotFound",
                 $"User with ID {userId} not found.");
 
-        public static Error UserHasDifferentLocation(Guid userId) =>
+        public static Error UserHasDifferentLocation(string userId) =>
             Error.Conflict(
                 "Users.Conflict",
                 $"User with ID {userId} has a different location.");

@@ -4,10 +4,15 @@ using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
 {
-    internal class Handler(UserManager<User> userManager, ICurrentUser currentUser)
+    internal class Handler(
+        UserManager<User> userManager, 
+        ICurrentUser currentUser,
+        IValidator<Request> validator
+    )
     : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(Request request, CancellationToken cancellationToken)
@@ -20,23 +25,27 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
             if (currentUser.LocationId == null)            
                 return Errors.UserHasNoLocation();
 
+            var validationResults = await validator.ValidateAsync(request, cancellationToken);
+            if (!validationResults.IsValid)
+                throw new ValidationException(validationResults.Errors);
+
             // Get user by id
             var user = await userManager.Users
                 .Include(u => u.Location)
-                .FirstOrDefaultAsync(u => u.Id.Equals(request.Id), cancellationToken);
+                .FirstOrDefaultAsync(u => u.Id.ToString().Equals(request.UserId), cancellationToken);
             if (user == null)
-                return Errors.UserWithIdNotFound(request.Id);
+                return Errors.UserWithIdNotFound(request.UserId);
 
             // Check if user and current admin have same location
             if (!user.LocationId.ToString().Equals(currentUser.LocationId))
-                return Errors.UserHasDifferentLocation(request.Id);
+                return Errors.UserHasDifferentLocation(request.UserId);
 
             return new Response(
                 user.Id,
                 user.StaffCode,
                 user.FirstName + " " + user.LastName,
                 user.UserName ?? "",
-                user.JoinedAtUtc.ToString("yyyy-MM-dd"),
+                user.JoinedAtUtc.ToString(),
                 user.UserType.ToString(),
                 user.DateOfBirth == null ? "" : user.DateOfBirth.Value.ToString("yyyy-MM-dd"),
                 user.Gender.ToString(),

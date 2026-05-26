@@ -3,8 +3,7 @@ using MediatR;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewDetail
 {
-    public record Request : IRequest<ErrorOr<Response>>
-    {
-        public Guid Id { get; init; }
-    }
+    public record Request(
+        string? UserId
+    ) : IRequest<ErrorOr<Response>>;
 }

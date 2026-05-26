@@ -25,20 +25,11 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get([FromQuery] Request request)
         {
-            logger.LogInformation("Getting users with query: {@Query}", request);
             var result = await _sender.Send(request);
 
             return result.Match(
-                onValue: data =>
-                {
-                    logger.LogInformation("Successfully retrieved {TotalItems} users", data.TotalCount);
-                    return Ok(data);    
-                },
-                onError: errors =>
-                {
-                    logger.LogWarning("Failed to get users: {@Errors}", errors);
-                    return errors.ToProblem();
-                }
+                Ok,
+                errors => ErrorOrExtensions.ToProblem(errors)
             );
         }
     }

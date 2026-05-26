@@ -10,7 +10,7 @@ using NashAssetManagement.Domain.Constants;
 namespace NashAssetManagement.WebAPI.Controllers.Users
 {
     [ApiVersion(1)]
-    [Route("api/v{version:apiVersion}/users/{id:guid}")]
+    [Route("api/v{version:apiVersion}/users/{id}")]
     public class ViewUserDetailController(
         ISender sender,
         ILogger<ViewUserDetailController> logger) 
@@ -24,22 +24,13 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetDetail(Guid id)
+        public async Task<IActionResult> GetDetail(string id)
         {
-            logger.LogInformation("Getting user detail with id: {id}", id);
-            var result = await _sender.Send(new Request { Id = id });
+            var result = await _sender.Send(new Request(id));
 
             return result.Match(
-                onValue: data =>
-                {
-                    logger.LogInformation("Successfully retrieved user detail for ID: {id}", id);
-                    return Ok(data);
-                },
-                onError: errors =>
-                {
-                    logger.LogWarning("Failed to get user detail for ID: {id}, Errors: {@Errors}", id, errors);
-                    return errors.ToProblem();
-                }
+                Ok,
+                errors => ErrorOrExtensions.ToProblem(errors)
             );
         }
     }

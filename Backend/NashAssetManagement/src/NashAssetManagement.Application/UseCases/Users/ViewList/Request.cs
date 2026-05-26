@@ -4,13 +4,12 @@ using NashAssetManagement.Application.Utilities;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewList
 {
-    public record Request : IRequest<ErrorOr<PagedList<Response>>>
-    {
-        public int? PageNumber { get; init; } = 1;
-        public int? PageSize { get; init;} = 10;
-        public string? SearchTerm { get; init; }
-        public string? Type { get; init; }
-        public string? SortBy { get; init; }
-        public bool? SortDesc { get; init; } = false;
-    }
+    public record Request (
+        int? PageNumber, 
+        int? PageSize, 
+        string? SearchTerm, 
+        string? Type, 
+        string? SortBy, 
+        bool? SortDesc
+    ) : IRequest<ErrorOr<PagedList<Response>>>;
 }
