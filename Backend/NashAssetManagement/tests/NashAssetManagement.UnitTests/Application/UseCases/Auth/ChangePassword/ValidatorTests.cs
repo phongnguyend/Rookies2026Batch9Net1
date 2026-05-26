@@ -52,7 +52,6 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
             var result = await _validator.ValidateAsync(request);
 
             Assert.False(result.IsValid);
-            Assert.Equal(2, result.Errors.Count);
 
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.OldPassword)

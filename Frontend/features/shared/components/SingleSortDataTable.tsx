@@ -7,11 +7,8 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
-}
-
-export interface SortItem {
-  key: string;
-  direction: SortDirection;
+  headerTestId?: string;
+  cellTestId?: string | ((row: T, index: number) => string);
 }
 
 export interface SortItem {
@@ -26,12 +23,12 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
 
-  // sort 
+  // sort
   sorts?: SortItem[];
   onSortChange?: (sorts: SortItem[]) => void;
 }
 
-export default function DataTable<T>({
+export default function SingleSortDataTable<T>({
   data,
   columns,
   isLoading = false,
@@ -46,13 +43,14 @@ export default function DataTable<T>({
     let nextSorts: SortItem[];
 
     if (!currentSort) {
-      nextSorts = [...sorts, { key, direction: SortDirection.Asc }];
+      // New column selected — reset all others, sort this one Asc
+      nextSorts = [{ key, direction: SortDirection.Asc }];
     } else if (currentSort.direction === SortDirection.Asc) {
-      nextSorts = sorts.map((s) =>
-        s.key === key ? { ...s, direction: SortDirection.Desc } : s
-      );
+      // Same column, cycle to Desc
+      nextSorts = [{ key, direction: SortDirection.Desc }];
     } else {
-      nextSorts = sorts.filter((s) => s.key !== key);
+      // Same column on Desc — clear sort
+      nextSorts = [];
     }
 
     onSortChange?.(nextSorts);
@@ -63,7 +61,7 @@ export default function DataTable<T>({
     if (direction === SortDirection.Desc) return "↓";
     return "↕";
   };
-  
+
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left text-sm">
@@ -71,11 +69,11 @@ export default function DataTable<T>({
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
               const currentSort = sorts.find((s) => s.key === column.key);
-              const sortIndex = sorts.findIndex((s) => s.key === column.key);
 
               return (
                 <th
                   key={column.key}
+                  data-testid={column.headerTestId}
                   onClick={() => column.sortable && handleSort(column.key)}
                   className={`py-2 font-semibold ${column.className ?? ""} ${
                     column.sortable
@@ -88,18 +86,6 @@ export default function DataTable<T>({
                   {column.sortable && (
                     <span className="ml-1">
                       {getSortIcon(currentSort?.direction)}
-                    </span>
-                  )}
-
-                  {currentSort && (
-                    <span className="ml-1 text-xs text-gray-400">
-                      {sortIndex + 1}
-                    </span>
-                  )}
-
-                  {currentSort && (
-                    <span className="ml-1 text-xs text-gray-400">
-                      {sortIndex + 1}
                     </span>
                   )}
                 </th>
@@ -137,6 +123,11 @@ export default function DataTable<T>({
                   <td
                     key={column.key}
                     className={`py-2 ${column.className ?? ""}`}
+                    data-testid={
+                      typeof column.cellTestId === "function"
+                        ? column.cellTestId(row, rowIndex)
+                        : column.cellTestId
+                    }
                   >
                     {column.render
                       ? column.render(row, rowIndex)
