@@ -12,7 +12,6 @@ export interface Toast {
   message: string | null;
   type: ToastType;
   duration: number;
-  testId?: string; // add data-testid
 }
 
 export interface ToastState {
@@ -33,7 +32,6 @@ export const toastSlice = createSlice({
         message: string;
         type: ToastType;
         duration?: number;
-        testId?: string;
       }>,
     ) => {
       state.toasts.push({
@@ -41,7 +39,6 @@ export const toastSlice = createSlice({
         message: action.payload.message,
         type: action.payload.type,
         duration: action.payload.duration ?? 3000,
-        testId: action.payload.testId,
       });
     },
 
