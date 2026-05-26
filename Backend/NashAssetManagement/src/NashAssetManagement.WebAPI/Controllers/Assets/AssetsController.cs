@@ -50,7 +50,6 @@ public class AssetsController : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = ApplicationRole.Admin)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
