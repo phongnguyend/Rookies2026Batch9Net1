@@ -31,23 +31,59 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
     GetAssetsRequest request,
     CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken); 
+        await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
         var location = Guid.Parse(_currentUser.LocationId);
 
-        var stateList = request.States?   
-            .Select(s => Enum.Parse<AssetState>(s))
-            .ToArray();
+        AssetState[] stateList;
 
-        var countSpec = new AssetCountSpec(request.Categories, stateList, request.Search, location);
+        if (request.States is null || request.States.Length == 0)
+        {
+            stateList =
+            [
+                AssetState.Available,
+            AssetState.NotAvailable,
+            AssetState.Assigned
+            ];
+        }
+        else
+        {
+            stateList = request.States
+                .Select(s => Enum.Parse<AssetState>(s))
+                .ToArray();
+        }
+
+        var countSpec = new AssetCountSpec(
+            request.Categories,
+            stateList,
+            request.Search,
+            location);
+
         var totalCount = await _assetRepository.CountAsync(countSpec, cancellationToken);
 
         if (totalCount == 0)
-            return PagedList.Create(new List<GetAssetsResponse>(), 0, request.PageNumber, request.PageSize);
+            return PagedList.Create(
+                new List<GetAssetsResponse>(),
+                0,
+                request.PageNumber,
+                request.PageSize);
 
-        var spec = new AssetSpec(request.Categories, stateList, request.Search, request.SortBy, request.SortDirection, request.PageNumber, request.PageSize, location);
+        var spec = new AssetSpec(
+            request.Categories,
+            stateList,
+            request.Search,
+            request.SortBy,
+            request.SortDirection,
+            request.PageNumber,
+            request.PageSize,
+            location);
+
         var assets = await _assetRepository.ListAsync(spec, cancellationToken);
 
-        return PagedList.Create(assets, totalCount, request.PageNumber, request.PageSize);
+        return PagedList.Create(
+            assets,
+            totalCount,
+            request.PageNumber,
+            request.PageSize);
     }
 }

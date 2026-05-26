@@ -1,7 +1,6 @@
 using ErrorOr;
 using MediatR;
 using NashAssetManagement.Application.Utilities;
-using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
