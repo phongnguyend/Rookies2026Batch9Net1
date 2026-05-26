@@ -1,5 +1,4 @@
-trigger:
-- main
+trigger: none
 
 variables: 
   # Agent VM image name
@@ -85,6 +84,8 @@ stages:
 - stage: BuildReactJs
   displayName: Build ReactJs
   dependsOn: []
+  variables:
+    - group: fe-variables
   jobs:
   - job: Build
     displayName: Build ReactJs

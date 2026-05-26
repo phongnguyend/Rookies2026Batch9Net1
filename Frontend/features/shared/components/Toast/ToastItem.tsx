@@ -28,6 +28,7 @@ export default function ToastItem({ toast }: { toast: Toast }) {
 
   return (
     <div
+      data-testid={toast.testId}
       className={`alert ${typeClass} shadow-xl border-none text-white min-w-[320px] flex items-center gap-3 cursor-pointer hover:scale-[1.02] transition-transform duration-200 ease-out`}
       onClick={() => dispatch(removeToast({ id: toast.id }))}
     >
