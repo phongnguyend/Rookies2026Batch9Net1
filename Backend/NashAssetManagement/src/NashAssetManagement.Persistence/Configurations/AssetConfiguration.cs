@@ -6,7 +6,7 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class AssetConfiguration : IEntityTypeConfiguration<Asset>
     {
-        const string TableName = "assets";
+        const string TableName = "Assets";
 
         public void Configure(EntityTypeBuilder<Asset> builder)
         {

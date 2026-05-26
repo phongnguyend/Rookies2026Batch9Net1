@@ -7,10 +7,12 @@ namespace NashAssetManagement.Persistence.Configurations
     internal sealed class RefreshTokenConfiguration
         : IEntityTypeConfiguration<RefreshToken>
     {
+        const string TableName = "RefreshTokens";
+
         public void Configure(
             EntityTypeBuilder<RefreshToken> builder)
         {
-            builder.ToTable("refresh_tokens", DbSchema.Auth);
+            builder.ToTable(TableName, DbSchema.Auth);
 
             builder.HasKey(x => x.Id);
 
