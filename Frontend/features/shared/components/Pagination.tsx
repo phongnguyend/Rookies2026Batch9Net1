@@ -35,6 +35,7 @@ export default function Pagination({
           className="join-item btn btn-sm"
           disabled={!hasPreviousPage}
           onClick={() => onPageChange(pageNumber - 1)}
+          data-testid="btnPreviousPage"
         >
           Previous
         </button>
@@ -47,9 +48,8 @@ export default function Pagination({
               key={current}
               type="button"
               onClick={() => onPageChange(current)}
-              className={`join-item btn btn-sm ${
-                pageNumber === current ? "btn-primary" : ""
-              }`}
+              className={`join-item btn btn-sm ${pageNumber === current ? "btn-primary" : ""}`}
+              data-testid={pageNumber === current ? "btnCurrentPage" : undefined}
             >
               {current}
             </button>
@@ -61,6 +61,7 @@ export default function Pagination({
           className="join-item btn btn-sm"
           disabled={!hasNextPage}
           onClick={() => onPageChange(pageNumber + 1)}
+          data-testid="btnNextPage"
         >
           Next
         </button>

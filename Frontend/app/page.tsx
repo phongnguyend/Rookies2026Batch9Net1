@@ -17,10 +17,10 @@ export default function HomePage() {
   const dispatch = useAppDispatch();
 
   // States
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
 
   const handleLoginSubmit = async (data: Login.Request) => {
-    setErrorMessage(null);
+    setServerErrors([]);
     try {
       await login({
         username: data.username,
@@ -37,15 +37,29 @@ export default function HomePage() {
           isFirstLogin: profile.isFirstLogin,
         }),
       );
-    } catch (err: ApiErrorResponse | any) {
+    } catch (err: any) {
       console.error("Login failed error object:", err);
-      const errorMsg =
-        err?.detail ||
-        err?.data?.detail ||
-        err?.message ||
-        "Username or password is incorrect. Please try again.";
-      setErrorMessage(errorMsg);
-      dispatch(loginFailure(errorMsg));
+      const parsedErrors: string[] = [];
+
+      // parse validation error list if present
+      if (err?.errors) {
+        Object.values(err.errors).forEach((messages: any) => {
+          if (Array.isArray(messages)) {
+            parsedErrors.push(...messages);
+          } else if (typeof messages === "string") {
+            parsedErrors.push(messages);
+          }
+        });
+      }
+
+      // fallback to single error description
+      if (parsedErrors.length === 0) {
+        const fallbackMsg = err?.detail || "Username or password is incorrect. Please try again.";
+        parsedErrors.push(fallbackMsg);
+      }
+
+      setServerErrors(parsedErrors);
+      dispatch(loginFailure(parsedErrors[0]));
     }
   };
 
@@ -60,7 +74,7 @@ export default function HomePage() {
         <LoginForm
           onLogin={handleLoginSubmit}
           isLoading={isLoggingIn}
-          errorMessage={errorMessage}
+          serverErrors={serverErrors}
         />
       </div>
     </main>

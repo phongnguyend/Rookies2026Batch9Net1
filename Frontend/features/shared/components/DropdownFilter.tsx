@@ -11,6 +11,8 @@ interface DropdownFilterProps<T> {
   getLabel: (item: T) => string;
   onChange: (values: string[]) => void;
   allLabel?: string;
+  getTestId?: (item: T) => string;
+  getTestIdAll?: () => string;
 }
 
 export default function DropdownFilter<T>({
@@ -22,6 +24,8 @@ export default function DropdownFilter<T>({
   getLabel,
   onChange,
   allLabel = "All",
+  getTestId,
+  getTestIdAll,
 }: DropdownFilterProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -71,6 +75,7 @@ export default function DropdownFilter<T>({
               checked={isAllSelected}
               onChange={handleToggleAll}
               className="checkbox checkbox-xs"
+              {...(getTestIdAll ? { "data-testid": getTestIdAll() } : {})}
             />
             <span>{allLabel}</span>
           </label>
@@ -89,6 +94,7 @@ export default function DropdownFilter<T>({
                   checked={values.includes(itemKey)}
                   onChange={() => handleToggleItem(itemKey)}
                   className="checkbox checkbox-xs"
+                  {...(getTestId ? { "data-testid": getTestId(item) } : {})}
                 />
                 <span>{itemLabel}</span>
               </label>

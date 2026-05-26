@@ -30,12 +30,14 @@ export default function SearchInput({
           }
         }}
         className="h-full flex-1 px-3 text-sm outline-none"
+        data-testid="txtSearch"
       />
 
       <button
         type="button"
         onClick={() => onSearch?.(value)}
         className="flex h-full w-10 items-center justify-center border-l border-gray-400 text-gray-600 hover:bg-gray-50"
+        data-testid="btnSearch"
       >
         Q
       </button>

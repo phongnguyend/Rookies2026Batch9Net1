@@ -10,11 +10,13 @@ import Image from "next/image";
 const loginFormSchema = z.object({
   username: z
     .string()
-    .min(1, "Username is required")
+    .min(1, "Username is required.")
+    .max(100, "Username must not exceed 100 characters.")
+    .regex(/^[a-zA-Z]+$/, "Username must contain only letters.")
     .transform((val) => val.trim()),
   password: z
     .string()
-    .min(1, "Password is required")
+    .min(1, "Password is required.")
     .transform((val) => val.trim()),
 });
 
@@ -23,27 +25,33 @@ type LoginFormSchema = z.infer<typeof loginFormSchema>;
 interface LoginFormProps {
   onLogin: (data: LoginFormSchema) => void;
   isLoading?: boolean;
-  errorMessage?: string | null;
+  serverErrors?: string[];
 }
 
 export default function LoginForm({
   onLogin,
   isLoading = false,
-  errorMessage = null,
+  serverErrors = [],
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { isValid, isSubmitted, errors },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
+    mode: "onChange",
     defaultValues: {
       username: "",
       password: "",
     },
   });
+
+  // watch text fields for dynamic error visibility
+  const usernameValue = watch("username");
+  const passwordValue = watch("password");
 
   return (
     <div className="w-full max-w-md p-8 bg-base-100 rounded-2xl shadow-xl border border-base-200">
@@ -75,13 +83,15 @@ export default function LoginForm({
             type="text"
             placeholder="Enter your username"
             className={`input input-bordered w-full focus:input-primary transition-colors ${
-              errors.username ? "input-error focus:input-error" : ""
+              errors.username && (usernameValue !== "" || isSubmitted)
+                ? "input-error focus:input-error"
+                : ""
             }`}
             disabled={isLoading}
             {...register("username")}
             data-testid="txtUsername"
           />
-          {errors.username && (
+          {errors.username && (usernameValue !== "" || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.username.message}
@@ -100,7 +110,9 @@ export default function LoginForm({
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${
-                errors.password ? "input-error focus:input-error" : ""
+                errors.password && (passwordValue !== "" || isSubmitted)
+                  ? "input-error focus:input-error"
+                  : ""
               }`}
               disabled={isLoading}
               {...register("password")}
@@ -151,7 +163,7 @@ export default function LoginForm({
               )}
             </button>
           </div>
-          {errors.password && (
+          {errors.password && (passwordValue !== "" || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.password.message}
@@ -175,10 +187,18 @@ export default function LoginForm({
           )}
         </button>
 
-        {/* Error message from server */}
-        {errorMessage && (
-          <div className="p-3 text-sm text-error bg-error/10 border border-error/20 rounded-lg">
-            {errorMessage}
+        {/* Server-Side Error Display on bottom */}
+        {serverErrors.length > 0 && (
+          <div className="p-3 text-xs text-error bg-error/10 border border-error/20 rounded-lg font-sans space-y-1.5 w-full mt-4">
+            {serverErrors.length === 1 ? (
+              <p>{serverErrors[0]}</p>
+            ) : (
+              <ul className="list-disc pl-4 space-y-0.5">
+                {serverErrors.map((msg, idx) => (
+                  <li key={idx}>{msg}</li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </form>

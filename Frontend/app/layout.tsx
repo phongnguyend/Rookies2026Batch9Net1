@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
@@ -12,7 +11,7 @@ import Drawer from "@/features/shared/components/Drawer/Drawer";
 import { UserRoles } from "@/features/users/users.types";
 import DrawerCheckbox from "@/features/shared/components/Drawer/DrawerCheckbox";
 import FloatingDrawerButton from "@/features/shared/components/Drawer/FloatingDrawerButton";
-import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
+import { RouteGuard } from "@/features/shared/components/RouteGuard";
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess } from "@/features/auth/auth.slice";
@@ -51,22 +50,17 @@ export default function RootLayout({
   );
 }
 
-// wrap around the root layout to use the useAppSelector under the StoreProvider
+// wrap layout content under store provider
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user, isLoading } = useAppSelector(
+  const { isAuthenticated, user } = useAppSelector(
     (state) => state.authSlice,
   );
-  const pathname = usePathname();
-  const router = useRouter();
   const dispatch = useAppDispatch();
 
-  // Automatic session restoration on load/refresh if cookie exists
-  const { data: profile, isLoading: isProfileLoading } = useGetMeQuery(
-    undefined,
-    {
-      skip: isAuthenticated, // if false, then the query is firing under cookie at application tab
-    },
-  );
+  // restore session on page mount/refresh if cookie exists
+  const { data: profile } = useGetMeQuery(undefined, {
+    skip: isAuthenticated,
+  });
 
   useEffect(() => {
     if (profile && !isAuthenticated) {
@@ -83,43 +77,8 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     }
   }, [profile, isAuthenticated, dispatch]);
 
-  useEffect(() => {
-    if (isLoading || isProfileLoading) return;
-    if (isAuthenticated && pathname === "/") {
-      switch (user?.role) {
-        case UserRoles.Admin:
-          router.replace("/admin");
-          break;
-        case UserRoles.Staff:
-          router.replace("/staff");
-          break;
-        default:
-          router.replace("/");
-          break;
-      }
-    }
-  }, [isLoading, isProfileLoading, isAuthenticated, user, pathname, router]);
-
-  // if still loading, then load spinner
-  if (isLoading || isProfileLoading) {
-    return <LoadingSpinner />;
-  }
-
-  const isUnauthorizedAdmin =
-    pathname.startsWith("/admin") && user?.role !== UserRoles.Admin;
-  const isUnauthorizedStaff =
-    pathname.startsWith("/staff") &&
-    user?.role !== UserRoles.Staff &&
-    user?.role !== UserRoles.Admin;
-  const isLoggedOnHome = isAuthenticated && pathname === "/";
-
-  if (isUnauthorizedAdmin || isUnauthorizedStaff || isLoggedOnHome) {
-    //TODO: Will create unauthorized page later
-    return <div>You are not authorized to view this page</div>;
-  }
-
   return (
-    <>
+    <RouteGuard>
       {isAuthenticated ? (
         <>
           {/* Navbar */}
@@ -151,6 +110,6 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       ) : (
         children
       )}
-    </>
+    </RouteGuard>
   );
 }

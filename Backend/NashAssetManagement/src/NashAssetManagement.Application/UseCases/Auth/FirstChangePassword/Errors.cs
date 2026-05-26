@@ -23,5 +23,9 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
         public static readonly Error PersistenceFailed = Error.Failure(
             code: "FirstChangePassword.PersistenceFailed",
             description: "Unable to complete password change at this time. Please try again later.");
+
+        public static readonly Error DuplicatePassword = Error.Conflict(
+            code: "FirstChangePassword.DuplicatePassword",
+            description: "New password must be different from the current password.");
     }
 }
