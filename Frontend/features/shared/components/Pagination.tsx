@@ -49,7 +49,7 @@ export default function Pagination({
               type="button"
               onClick={() => onPageChange(current)}
               className={`join-item btn btn-sm ${pageNumber === current ? "btn-primary" : ""}`}
-              data-testid={pageNumber === current ? "btnCurrentPage" : undefined}
+              data-testid={`btnPage${current}`}
             >
               {current}
             </button>

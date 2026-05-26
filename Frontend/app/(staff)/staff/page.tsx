@@ -2,9 +2,9 @@ import { UserAssignmentsDataTable } from "@/features/assignments/user/components
 
 export default function StaffHomePage() {
   return (
-    <>
+    <div data-testid="mnuMyAssignment">
       <div className="text-lg font-bold text-primary mb-2">My Assignment</div>
       <UserAssignmentsDataTable></UserAssignmentsDataTable>
-    </>
+    </div>
   );
 }

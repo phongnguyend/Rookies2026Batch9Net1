@@ -114,6 +114,7 @@ export const UserAssignmentsDataTable = () => {
       />
 
       <UserAssignmentDetailDialog
+        data-testid={"dlgAssignmentDetail"}
         assignment={selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
       />

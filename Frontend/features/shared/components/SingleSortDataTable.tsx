@@ -7,6 +7,8 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
+  headerTestId?: string;
+  cellTestId?: string | ((row: T, index: number) => string);
 }
 
 export interface SortItem {
@@ -71,6 +73,7 @@ export default function SingleSortDataTable<T>({
               return (
                 <th
                   key={column.key}
+                  data-testid={column.headerTestId}
                   onClick={() => column.sortable && handleSort(column.key)}
                   className={`py-2 font-semibold ${column.className ?? ""} ${
                     column.sortable
@@ -120,6 +123,11 @@ export default function SingleSortDataTable<T>({
                   <td
                     key={column.key}
                     className={`py-2 ${column.className ?? ""}`}
+                    data-testid={
+                      typeof column.cellTestId === "function"
+                        ? column.cellTestId(row, rowIndex)
+                        : column.cellTestId
+                    }
                   >
                     {column.render
                       ? column.render(row, rowIndex)
