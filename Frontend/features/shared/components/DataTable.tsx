@@ -14,8 +14,6 @@ export interface SortItem {
   direction: SortDirection;
 }
 
-type SortDirection = "asc" | "desc";
-
 export interface SortItem {
   key: string;
   direction: SortDirection;
