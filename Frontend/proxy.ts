@@ -7,7 +7,7 @@ export function proxy(request: NextRequest) {
   const accessTokenCookieName = ENV_CONFIGS.accessTokenCookieName || "NashAssetManagement.Cookie.AccessToken";
   const hasSession = request.cookies.has(accessTokenCookieName);
 
-  // route guard
+  // route guard if dont have cookie
   if (!hasSession) {
     if (pathname !== "/") {
       return NextResponse.redirect(new URL("/", request.url));
