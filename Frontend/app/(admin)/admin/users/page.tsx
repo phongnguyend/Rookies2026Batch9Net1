@@ -6,7 +6,7 @@ import DataTable, {
   type ColumnDef,
   type SortItem,
 } from "@/features/users/components/DataTable";
-import DropdownFilter from "@/features/shared/components/DropdownFilter";
+import DropdownFilter from "@/features/users/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import { SortDirection } from "@/lib/api/base.types";
