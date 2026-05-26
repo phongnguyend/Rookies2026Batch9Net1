@@ -26,14 +26,14 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -57,14 +57,14 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(null);
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
@@ -77,7 +77,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -85,7 +85,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -100,7 +100,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -108,7 +108,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -123,7 +123,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -131,7 +131,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -145,7 +145,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -153,7 +153,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -167,7 +167,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -176,7 +176,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -191,7 +191,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -200,7 +200,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -215,7 +215,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 1,
             PageSize = 10,
@@ -224,7 +224,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -239,7 +239,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             PageNumber = 2,
             PageSize = 1,
@@ -248,7 +248,7 @@ public class HandlerTests
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -262,9 +262,9 @@ public class HandlerTests
     private static async Task<ErrorOr<PagedList<Response>>> HandleAsync(
         Mock<UserManager<User>> userManagerMock,
         Mock<ICurrentUser> currentUserMock,
-        Query query)
+        Request request)
     {
-        var handlerType = typeof(Query).Assembly.GetType(
+        var handlerType = typeof(Request).Assembly.GetType(
             "NashAssetManagement.Application.UseCases.Users.ViewList.Handler",
             throwOnError: true)!;
         var handler = Activator.CreateInstance(
@@ -278,7 +278,7 @@ public class HandlerTests
             BindingFlags.Instance | BindingFlags.Public)!;
         var task = (Task<ErrorOr<PagedList<Response>>>)handleMethod.Invoke(
             handler,
-            [query, CancellationToken.None])!;
+            [request, CancellationToken.None])!;
 
         return await task;
     }

@@ -4,7 +4,7 @@ using NashAssetManagement.Application.Utilities;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewList
 {
-    public record Query : IRequest<ErrorOr<PagedList<Response>>>
+    public record Request : IRequest<ErrorOr<PagedList<Response>>>
     {
         public int? PageNumber { get; init; } = 1;
         public int? PageSize { get; init;} = 10;

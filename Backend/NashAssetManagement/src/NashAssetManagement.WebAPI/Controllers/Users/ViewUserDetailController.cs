@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using GetUserDetail = NashAssetManagement.Application.UseCases.Users.ViewDetail;
+using NashAssetManagement.Application.UseCases.Users.ViewDetail;
 using NashAssetManagement.WebAPI.Utilities;
 using NashAssetManagement.Domain.Constants;
 
@@ -18,7 +18,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
     {
         [HttpGet]
         [Authorize(Roles = ApplicationRole.Admin)]
-        [ProducesResponseType(typeof(GetUserDetail.Response), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -27,7 +27,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         public async Task<IActionResult> GetDetail(Guid id)
         {
             logger.LogInformation("Getting user detail with id: {id}", id);
-            var result = await _sender.Send(new GetUserDetail.Query { Id = id });
+            var result = await _sender.Send(new Request { Id = id });
 
             return result.Match(
                 onValue: data =>

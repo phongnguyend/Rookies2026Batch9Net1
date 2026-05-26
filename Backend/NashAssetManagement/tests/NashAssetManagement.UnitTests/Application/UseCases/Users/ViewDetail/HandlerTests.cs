@@ -26,13 +26,13 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             Id = ExistingUserId
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -53,13 +53,13 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(null);
-        var query = new Query
+        var request = new Request
         {
             Id = ExistingUserId
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
@@ -73,13 +73,13 @@ public class HandlerTests
         var missingUserId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26999");
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             Id = missingUserId
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
@@ -93,13 +93,13 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(OtherLocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             Id = ExistingUserId
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
@@ -114,13 +114,13 @@ public class HandlerTests
         var userId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26002");
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var query = new Query
+        var request = new Request
         {
             Id = userId
         };
 
         // Act
-        var result = await HandleAsync(userManagerMock, currentUserMock, query);
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.False(result.IsError);
@@ -133,9 +133,9 @@ public class HandlerTests
     private static async Task<ErrorOr<Response>> HandleAsync(
         Mock<UserManager<User>> userManagerMock,
         Mock<ICurrentUser> currentUserMock,
-        Query query)
+        Request request)
     {
-        var handlerType = typeof(Query).Assembly.GetType(
+        var handlerType = typeof(Request).Assembly.GetType(
             "NashAssetManagement.Application.UseCases.Users.ViewDetail.Handler",
             throwOnError: true)!;
         var handler = Activator.CreateInstance(
@@ -149,7 +149,7 @@ public class HandlerTests
             BindingFlags.Instance | BindingFlags.Public)!;
         var task = (Task<ErrorOr<Response>>)handleMethod.Invoke(
             handler,
-            [query, CancellationToken.None])!;
+            [request, CancellationToken.None])!;
 
         return await task;
     }

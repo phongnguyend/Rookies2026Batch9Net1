@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.WebAPI.Utilities;
-using GetUsers = NashAssetManagement.Application.UseCases.Users.ViewList;
+using NashAssetManagement.Application.UseCases.Users.ViewList;
 using NashAssetManagement.Domain.Constants;
 
 namespace NashAssetManagement.WebAPI.Controllers.Users
@@ -18,15 +18,15 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
     {
         [HttpGet]
         [Authorize(Roles = ApplicationRole.Admin)]
-        [ProducesResponseType(typeof(PagedList<GetUsers.Response>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedList<Response>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Get([FromQuery] GetUsers.Query query)
+        public async Task<IActionResult> Get([FromQuery] Request request)
         {
-            logger.LogInformation("Getting users with query: {@Query}", query);
-            var result = await _sender.Send(query);
+            logger.LogInformation("Getting users with query: {@Query}", request);
+            var result = await _sender.Send(request);
 
             return result.Match(
                 onValue: data =>

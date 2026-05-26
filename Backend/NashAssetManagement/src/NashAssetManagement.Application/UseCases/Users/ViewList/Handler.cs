@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 namespace NashAssetManagement.Application.UseCases.Users.ViewList
 {
     internal class Handler(UserManager<User> userManager, ICurrentUser currentUser)
-    : IRequestHandler<Query, ErrorOr<PagedList<Response>>>
+    : IRequestHandler<Request, ErrorOr<PagedList<Response>>>
     {
         public async Task<ErrorOr<PagedList<Response>>> Handle(
-            Query query,
+            Request request,
             CancellationToken cancellationToken)
         {
             // Check current user id
@@ -30,9 +30,9 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
                 ;
 
             // Search
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var searchTerm = query.SearchTerm.Trim().ToLowerInvariant();
+                var searchTerm = request.SearchTerm.Trim().ToLowerInvariant();
                 var pattern = $"%{searchTerm}%";
 
                 usersQuery = usersQuery.Where(u =>
@@ -42,15 +42,15 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             }
 
             // Filter by user type
-            if (!string.IsNullOrEmpty(query.Type) &&
-                Enum.TryParse<UserType>(query.Type, ignoreCase: true, out var userType))
+            if (!string.IsNullOrEmpty(request.Type) &&
+                Enum.TryParse<UserType>(request.Type, ignoreCase: true, out var userType))
             {
                 usersQuery = usersQuery.Where(u => u.UserType == userType);
             }
 
             // Apply sorting
-            var sortBy = query.SortBy?.Trim().ToLowerInvariant();
-            var sortDesc = query.SortDesc.GetValueOrDefault();
+            var sortBy = request.SortBy?.Trim().ToLowerInvariant();
+            var sortDesc = request.SortDesc.GetValueOrDefault();
 
             if (string.IsNullOrEmpty(sortBy))
             {
@@ -88,8 +88,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
             // Apply paging
             var totalItems = await usersQuery.CountAsync(cancellationToken);
             var users = await usersQuery
-            .Skip((query.PageNumber!.Value -1) * query.PageSize!.Value)
-            .Take(query.PageSize.Value)
+            .Skip((request.PageNumber!.Value -1) * request.PageSize!.Value)
+            .Take(request.PageSize.Value)
             .Select(u => new Response(
                 u.Id,
                 u.StaffCode,
@@ -104,7 +104,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewList
                     a.State == AssignmentState.Accepted)
             })
             .ToListAsync(cancellationToken);
-            return new PagedList<Response>(users, totalItems, query.PageNumber!.Value, query.PageSize!.Value);
+            return new PagedList<Response>(users, totalItems, request.PageNumber!.Value, request.PageSize!.Value);
         }
     }
 }
