@@ -6,7 +6,8 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
     {
-        const string TableName = "role_claims";
+        const string TableName = "RoleClaims";
+
         public void Configure(EntityTypeBuilder<RoleClaim> builder)
         {
             builder.ToTable(TableName, DbSchema.Auth);
