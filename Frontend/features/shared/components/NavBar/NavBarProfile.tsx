@@ -3,8 +3,6 @@
 import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function NavbarProfile() {
-  const { username } = useAppSelector((state) => state.authSlice.user);
-
   const handleSignOut = () => {
     // will add sign out later
     console.log("Sign out clicked");
@@ -17,7 +15,7 @@ export default function NavbarProfile() {
         role="button"
         className="btn btn-ghost text-white text-base font-semibold normal-case flex items-center gap-1 hover:bg-white hover:text-primary"
       >
-        <span>{username}</span>
+        <span>binhnv</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
