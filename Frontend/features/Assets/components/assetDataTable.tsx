@@ -7,6 +7,7 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
+  testId?: string;
 }
 
 export interface SortItem {
@@ -79,6 +80,7 @@ export default function DataTable<T>({
             {columns.map((column) => (
               <th
                 key={column.key}
+                data-testid={column.testId}
                 onClick={() =>
                   column.sortable && handleSort(column.key)
                 }

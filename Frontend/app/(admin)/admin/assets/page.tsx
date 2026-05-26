@@ -98,13 +98,14 @@ function AssetsContent() {
 
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
-    { key: "assetCode", header: "Asset Code", sortable: true },
-    { key: "name", header: "Asset Name", sortable: true },
-    { key: "category", header: "Category", sortable: true },
+    { key: "assetCode", header: "Asset Code", sortable: true, testId: "btnSortAssetCode" },
+    { key: "name", header: "Asset Name", sortable: true , testId: "btnSortAssetName"},
+    { key: "category", header: "Category", sortable: true ,  testId: "btnSortCategory"},
     {
       key: "state",
       header: "State",
       sortable: true,
+      testId: "btnSortState",
       render: (row) => <span className="badge badge-outline">{row.state}</span>,
     },
     {
@@ -113,6 +114,7 @@ function AssetsContent() {
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
+            data-testid = "btnEdit"
             onClick={(e) => handleEdit(row, e)}
             className="btn btn-xs btn-outline"
           >
@@ -133,6 +135,7 @@ function AssetsContent() {
             </svg>
           </button>
           <button
+            data-testid = "btnIconDelete"
             onClick={(e) => handleDelete(row, e)}
             className="btn btn-xs btn-error btn-outline"
           >
@@ -168,7 +171,7 @@ function AssetsContent() {
 
       {/* Filters */}
       <div className="mb-4 flex items-center gap-3">
-        <div data-test-id="ddlState">
+        <div data-testid="ddlState">
           <DropdownFilter
             items={STATE_OPTIONS}
             values={selectedStates}
@@ -179,7 +182,7 @@ function AssetsContent() {
             allLabel="All States"
           />
         </div>
-        <div data-test-id="ddlCategory">
+        <div data-testid="ddlCategory">
           <DropdownFilter
             items={categoryOptions}
             values={selectedCategories}
@@ -190,7 +193,7 @@ function AssetsContent() {
             allLabel="All Categories"
           />
         </div>
-        <div className="ml-auto" data-test-id="txtSearch">
+        <div className="ml-auto" data-testid="txtSearch">
           <SearchInput
             value={searchInput}
             onChange={setSearchInput}
@@ -209,8 +212,8 @@ function AssetsContent() {
             placeholder="Search by asset code or name..."
           />
         </div>
-
         <button
+          data-testid="btnCreateAsset"
           onClick={() => router.push("")} // TODO: update route as needed
           className="btn btn-primary btn-sm"
         >
@@ -219,17 +222,19 @@ function AssetsContent() {
       </div>
 
       {/* Table */}
-      <DataTable<AssetListItem>
-        data={data?.items ?? []}
-        columns={columns}
-        isLoading={isLoading}
-        emptyMessage={
-          isError ? "No assets found." : "No assets found after filtering."
-        }
-        onRowClick={(row) => setSelectedAssetId(row.id)}
-        sort={sort}
-        onSortChange={setSort}
-      />
+      <div data-testid="dgdAsset">
+        <DataTable<AssetListItem>
+          data={data?.items ?? []}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage={
+            isError ? "No assets found." : "No assets found after filtering."
+          }
+          onRowClick={(row) => setSelectedAssetId(row.id)}
+          sort={sort}
+          onSortChange={setSort}
+        />
+      </div>
 
       {/* Pagination */}
       {data && (

@@ -18,7 +18,7 @@ export default function AssetHistoryTable({ items }: AssetHistoryTableProps) {
       </div>
 
       {/* Right side */}
-      <div className="flex-1">
+      <div className="flex-1" data-testid="tblAssetHistory">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-300">

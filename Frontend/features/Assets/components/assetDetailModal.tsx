@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetAssetByIdQuery } from "@/features/assets/assets.api";
+import { useGetAssetByIdQuery } from "@/features/Assets/assets.api";
 import AssetHistoryTable from "./assetHistoryTable";
 
 interface AssetDetailModalProps {
@@ -35,8 +35,8 @@ export default function AssetDetailModal({
     })) ?? [];
 
   return (
-    <dialog open className="modal modal-open">
-      <div className="modal-box max-w-3xl">
+    <dialog open className="modal modal-open" >
+      <div className="modal-box max-w-3xl" data-testid="dlgDetailedAssetInfo">
         {/* Header */}
         <div className="bg-primary text-white -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-bold text-lg">
@@ -44,6 +44,7 @@ export default function AssetDetailModal({
           </h3>
 
           <button
+            data-testid = "btnExit"
             onClick={onClose}
             className="text-white/80 hover:text-white"
           >
