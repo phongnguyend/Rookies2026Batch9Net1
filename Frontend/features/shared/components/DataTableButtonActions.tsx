@@ -6,6 +6,9 @@ interface DataTableButtonActionsProps<T> {
   disabledAccept?: boolean;
   disabledDecline?: boolean;
   disabledReturn?: boolean;
+  acceptBtnTestId?: string;
+  declineBtnTestId?: string;
+  returnBtnTestId?: string;
 }
 
 export default function DataTableButtonActions<T>({
@@ -16,6 +19,9 @@ export default function DataTableButtonActions<T>({
   disabledAccept = false,
   disabledDecline = false,
   disabledReturn = false,
+  acceptBtnTestId,
+  declineBtnTestId,
+  returnBtnTestId,
 }: DataTableButtonActionsProps<T>) {
   return (
     <div className="flex items-center gap-3">
@@ -27,6 +33,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onAccept(row);
           }}
+          data-testid={acceptBtnTestId}
           className="text-green-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Accept"
         >
@@ -42,6 +49,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onDecline(row);
           }}
+          data-testid={declineBtnTestId}
           className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Decline"
         >
@@ -57,6 +65,7 @@ export default function DataTableButtonActions<T>({
             e.stopPropagation();
             onReturn(row);
           }}
+          data-testid={returnBtnTestId}
           className="text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Return"
         >
