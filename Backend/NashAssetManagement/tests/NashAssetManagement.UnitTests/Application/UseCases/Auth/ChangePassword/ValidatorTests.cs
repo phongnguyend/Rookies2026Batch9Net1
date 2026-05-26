@@ -61,5 +61,19 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.ChangePassword
                 x => x.PropertyName == nameof(Request.NewPassword)
                      && x.ErrorMessage == "New password is required");
         }
+
+        [Fact]
+        public async Task Validate_Should_Return_Error_When_NewPassword_Is_Same_As_OldPassword()
+        {
+            var request = new Request("Password123", "Password123");
+
+            var result = await _validator.ValidateAsync(request);
+
+            Assert.False(result.IsValid);
+
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.NewPassword)
+                    && x.ErrorMessage == "New password must be different from old password");
+        }
     }
 }

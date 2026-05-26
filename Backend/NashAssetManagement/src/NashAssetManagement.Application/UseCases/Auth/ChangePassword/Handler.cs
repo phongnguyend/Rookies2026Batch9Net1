@@ -1,11 +1,9 @@
-using System.Globalization;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
-using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.Domain.Entities.Identity;
 

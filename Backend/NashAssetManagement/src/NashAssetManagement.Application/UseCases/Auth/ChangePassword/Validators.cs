@@ -13,6 +13,12 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
             RuleFor(x => x.NewPassword)
                 .NotEmpty()
                 .WithMessage("New password is required");
+                
+            RuleFor(x => x.NewPassword)
+                .NotEmpty()
+                .WithMessage("New password is required")
+                .NotEqual(x => x.OldPassword)
+                .WithMessage("New password must be different from old password");
         }
     }
 }
