@@ -2,9 +2,12 @@ using Asp.Versioning.ApiExplorer;
 using NashAssetManagement.Application;
 using NashAssetManagement.Infrastructure;
 using NashAssetManagement.Persistence;
+using NashAssetManagement.Persistence.SeedData;
 using NashAssetManagement.WebAPI;
 using Serilog;
 using NashAssetManagement.WebAPI.Configuration;
+using Microsoft.EntityFrameworkCore;
+using NashAssetManagement.Persistence.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 

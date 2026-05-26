@@ -2,7 +2,6 @@
 const getEnv = (key: string, value: string | undefined): string => {
   if (value) {
     // throw new Error(`MISSING ENVIRONMENT VARIABLE: ${key}`);
-    console.log(value);
   }
 
   return value ?? ""

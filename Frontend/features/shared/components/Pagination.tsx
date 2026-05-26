@@ -8,6 +8,9 @@ interface PaginationProps {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
   onPageChange: (page: number) => void;
+  btnPreviousPageTestId?: string;
+  btnNextPageTestId?: string;
+  btnCurrentPageTestId?: string;
 }
 
 export default function Pagination({
@@ -18,6 +21,9 @@ export default function Pagination({
   hasPreviousPage,
   hasNextPage,
   onPageChange,
+  btnPreviousPageTestId = "btnPreviousPage",
+  btnNextPageTestId = "btnNextPage",
+  btnCurrentPageTestId = "btnPage",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -35,7 +41,7 @@ export default function Pagination({
           className="join-item btn btn-sm"
           disabled={!hasPreviousPage}
           onClick={() => onPageChange(pageNumber - 1)}
-          data-testid="btnPreviousPage"
+          data-testid={btnPreviousPageTestId}
         >
           Previous
         </button>
@@ -49,7 +55,11 @@ export default function Pagination({
               type="button"
               onClick={() => onPageChange(current)}
               className={`join-item btn btn-sm ${pageNumber === current ? "btn-primary" : ""}`}
-              data-testid={pageNumber === current ? "btnCurrentPage" : undefined}
+              data-testid={
+                pageNumber === current
+                  ? (btnCurrentPageTestId ?? `btnPage${current}`)
+                  : `btnPage${current}`
+              }
             >
               {current}
             </button>
@@ -61,7 +71,7 @@ export default function Pagination({
           className="join-item btn btn-sm"
           disabled={!hasNextPage}
           onClick={() => onPageChange(pageNumber + 1)}
-          data-testid="btnNextPage"
+          data-testid={btnNextPageTestId}
         >
           Next
         </button>

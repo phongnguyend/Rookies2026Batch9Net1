@@ -28,6 +28,7 @@ namespace NashAssetManagement.WebAPI
             services.ConfigureApiVersioning();
             services.AddSwaggerDocumentation();
             services.AddCorsServices();
+            services.ConfigureApplicationOptions(configuration);
 
             return services;
         }

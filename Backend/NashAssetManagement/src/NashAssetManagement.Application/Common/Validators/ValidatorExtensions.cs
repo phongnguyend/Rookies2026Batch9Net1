@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace NashAssetManagement.Application.Common.Validators
 {
@@ -42,4 +42,5 @@ namespace NashAssetManagement.Application.Common.Validators
 
         #endregion
     }
+
 }
