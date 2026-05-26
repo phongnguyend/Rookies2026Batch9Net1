@@ -85,6 +85,8 @@ stages:
 - stage: BuildReactJs
   displayName: Build ReactJs
   dependsOn: []
+  variables:
+    - group: fe-variables
   jobs:
   - job: Build
     displayName: Build ReactJs
