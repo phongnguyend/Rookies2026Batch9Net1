@@ -30,3 +30,10 @@ export enum SortDirection {
   Asc = "Asc",
   Desc = "Desc",
 }
+
+export enum AssignmentState {
+  WaitingForAcceptance = "WaitingForAcceptance",
+  Accepted = "Accepted",
+  Declined = "Declined",
+  Returned = "Returned",
+}
