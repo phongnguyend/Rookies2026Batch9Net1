@@ -20,8 +20,7 @@ namespace NashAssetManagement.Persistence
             {
                 // For development
                 options.EnableSensitiveDataLogging(true);
-                options.UseNpgsql(configuration.GetConnectionString(ConnectionStringName))
-                        .UseSnakeCaseNamingConvention();
+                options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName));
             });
             services.AddRepositories();
             services.AddUnitOfWork();

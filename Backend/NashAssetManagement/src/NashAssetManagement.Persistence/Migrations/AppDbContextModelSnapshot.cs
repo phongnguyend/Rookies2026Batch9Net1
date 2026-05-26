@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NashAssetManagement.Persistence;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -18,634 +18,505 @@ namespace NashAssetManagement.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Auth.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiresAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsRevoked")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_revoked");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("RevokedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("revoked_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("pk_refresh_tokens");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_refresh_tokens_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("refresh_tokens", "auth");
+                    b.ToTable("RefreshTokens", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Asset", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AssetCode")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("asset_code");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("category_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("InstalledAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("installed_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("LocationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("location_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Specification")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("specification");
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("State")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("state");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_assets");
+                    b.HasKey("Id");
 
                     b.HasIndex("AssetCode")
-                        .IsUnique()
-                        .HasDatabaseName("ix_assets_asset_code");
+                        .IsUnique();
 
-                    b.HasIndex("CategoryId")
-                        .HasDatabaseName("ix_assets_category_id");
+                    b.HasIndex("CategoryId");
 
-                    b.HasIndex("LocationId")
-                        .HasDatabaseName("ix_assets_location_id");
+                    b.HasIndex("LocationId");
 
-                    b.ToTable("assets", "core");
+                    b.ToTable("Assets", "Core");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Assignment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AssetId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("asset_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AssignedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("assigned_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("AssignedByUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("assigned_by_user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AssignedToUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("assigned_to_user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsReturning")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_returning");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Note")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)")
-                        .HasColumnName("note");
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("State")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("state");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_assignments");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AssetId")
-                        .HasDatabaseName("ix_assignments_asset_id");
+                    b.HasIndex("AssetId");
 
-                    b.HasIndex("AssignedByUserId")
-                        .HasDatabaseName("ix_assignments_assigned_by_user_id");
+                    b.HasIndex("AssignedByUserId");
 
-                    b.HasIndex("AssignedToUserId")
-                        .HasDatabaseName("ix_assignments_assigned_to_user_id");
+                    b.HasIndex("AssignedToUserId");
 
-                    b.ToTable("assignments", "core");
+                    b.ToTable("Assignments", "Core");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("category_name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Prefix")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("prefix");
+                        .HasColumnType("nvarchar(10)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_categories");
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryName")
-                        .IsUnique()
-                        .HasDatabaseName("ix_categories_category_name");
+                        .IsUnique();
 
                     b.HasIndex("Prefix")
-                        .IsUnique()
-                        .HasDatabaseName("ix_categories_prefix");
+                        .IsUnique();
 
-                    b.ToTable("categories", "core");
+                    b.ToTable("Categories", "Core");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Location", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Prefix")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("prefix");
+                        .HasColumnType("nvarchar(10)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_locations");
+                    b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_locations_name");
+                        .IsUnique();
 
                     b.HasIndex("Prefix")
-                        .IsUnique()
-                        .HasDatabaseName("ix_locations_prefix");
+                        .IsUnique();
 
-                    b.ToTable("locations", "core");
+                    b.ToTable("Locations", "Core");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.ReturnRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("AcceptedByUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("accepted_by_user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AssignmentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("assignment_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("RequestedByUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("requested_by_user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ReturnedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("returned_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("State")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("state");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("pk_return_requests");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AcceptedByUserId")
-                        .HasDatabaseName("ix_return_requests_accepted_by_user_id");
+                    b.HasIndex("AcceptedByUserId");
 
-                    b.HasIndex("AssignmentId")
-                        .HasDatabaseName("ix_return_requests_assignment_id");
+                    b.HasIndex("AssignmentId");
 
-                    b.HasIndex("RequestedByUserId")
-                        .HasDatabaseName("ix_return_requests_requested_by_user_id");
+                    b.HasIndex("RequestedByUserId");
 
-                    b.ToTable("return_requests", "core");
+                    b.ToTable("ReturnRequests", "Core");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("text")
-                        .HasColumnName("concurrency_stamp");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("normalized_name");
+                        .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_roles");
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("roles", "auth");
+                    b.ToTable("Roles", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.RoleClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("text")
-                        .HasColumnName("claim_type");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("text")
-                        .HasColumnName("claim_value");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("pk_role_claims");
+                    b.HasKey("Id");
 
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_role_claims_role_id");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("role_claims", "auth");
+                    b.ToTable("RoleClaims", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("access_failed_count");
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("text")
-                        .HasColumnName("concurrency_stamp");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date_of_birth");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("email");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("email_confirmed");
+                        .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("first_name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("gender");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsFirstLogin")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_first_login");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("JoinedAtUtc")
-                        .HasColumnType("date")
-                        .HasColumnName("joined_at_utc");
+                        .HasColumnType("date");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("last_name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid>("LocationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("location_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("lockout_enabled");
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("lockout_end");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("normalized_email");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("normalized_user_name");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("text")
-                        .HasColumnName("phone_number");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean")
-                        .HasColumnName("phone_number_confirmed");
+                        .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("text")
-                        .HasColumnName("security_stamp");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StaffCode")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("staff_code");
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("two_factor_enabled");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at_utc");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("user_name");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("UserType")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("user_type");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("pk_users");
+                    b.HasKey("Id");
 
-                    b.HasIndex("LocationId")
-                        .HasDatabaseName("ix_users_location_id");
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex("StaffCode")
-                        .IsUnique()
-                        .HasDatabaseName("ix_users_staff_code");
+                        .IsUnique();
 
                     b.HasIndex("UserName")
                         .IsUnique()
-                        .HasDatabaseName("ix_users_user_name");
+                        .HasFilter("[UserName] IS NOT NULL");
 
-                    b.ToTable("users", "auth");
+                    b.ToTable("Users", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+                        .HasColumnType("int");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("text")
-                        .HasColumnName("claim_type");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("text")
-                        .HasColumnName("claim_value");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("pk_user_claims");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_claims_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("user_claims", "auth");
+                    b.ToTable("UserClaims", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text")
-                        .HasColumnName("login_provider");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("text")
-                        .HasColumnName("provider_key");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("text")
-                        .HasColumnName("provider_display_name");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("LoginProvider", "ProviderKey")
-                        .HasName("pk_user_logins");
+                    b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_user_logins_user_id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("user_logins", "auth");
+                    b.ToTable("UserLogins", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserRole", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("UserId", "RoleId")
-                        .HasName("pk_user_roles");
+                    b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_user_roles_role_id");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("user_roles", "auth");
+                    b.ToTable("UserRoles", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserToken", b =>
                 {
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text")
-                        .HasColumnName("login_provider");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("text")
-                        .HasColumnName("value");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId", "LoginProvider", "Name")
-                        .HasName("pk_user_tokens");
+                    b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("user_tokens", "auth");
+                    b.ToTable("UserTokens", "Auth");
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Auth.RefreshToken", b =>
@@ -654,8 +525,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_refresh_tokens_users_user_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Asset", b =>
@@ -664,15 +534,13 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany("Assets")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_assets_categories_category_id");
+                        .IsRequired();
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Core.Location", "Location")
                         .WithMany("Assets")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_assets_locations_location_id");
+                        .IsRequired();
 
                     b.Navigation("Category");
 
@@ -685,22 +553,19 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany("Assignments")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_assignments_assets_asset_id");
+                        .IsRequired();
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "AssignedByUser")
                         .WithMany("AssignedAssignments")
                         .HasForeignKey("AssignedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_assignments_asp_net_users_assigned_by_user_id");
+                        .IsRequired();
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "AssignedToUser")
                         .WithMany("ReceivedAssignments")
                         .HasForeignKey("AssignedToUserId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_assignments_asp_net_users_assigned_to_user_id");
+                        .IsRequired();
 
                     b.Navigation("Asset");
 
@@ -714,22 +579,19 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "AcceptedByUser")
                         .WithMany("AcceptedReturnRequests")
                         .HasForeignKey("AcceptedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_return_requests_asp_net_users_accepted_by_user_id");
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Core.Assignment", "Assignment")
                         .WithMany("ReturnRequests")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_return_requests_assignments_assignment_id");
+                        .IsRequired();
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "RequestedByUser")
                         .WithMany("RequestedReturnRequests")
                         .HasForeignKey("RequestedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_return_requests_asp_net_users_requested_by_user_id");
+                        .IsRequired();
 
                     b.Navigation("AcceptedByUser");
 
@@ -744,8 +606,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_role_claims_asp_net_roles_role_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.User", b =>
@@ -754,8 +615,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany("Users")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_users_locations_location_id");
+                        .IsRequired();
 
                     b.Navigation("Location");
                 });
@@ -766,8 +626,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_claims_asp_net_users_user_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserLogin", b =>
@@ -776,8 +635,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_logins_users_user_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Identity.UserRole", b =>
@@ -786,15 +644,13 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_roles_roles_role_id");
+                        .IsRequired();
 
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_roles_users_user_id");
+                        .IsRequired();
 
                     b.Navigation("Role");
 
@@ -807,8 +663,7 @@ namespace NashAssetManagement.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_user_tokens_users_user_id");
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Asset", b =>

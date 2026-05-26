@@ -4,15 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UserRoles } from "@/features/users/users.types";
 import { APP_ROUTES } from "@/lib/api/routes";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function NotFoundPage() {
   const router = useRouter();
-
-  //TODO: will implement auth later
-  const user: UserRoles = UserRoles.Admin;
+  const user = useAppSelector(state => state.authSlice.user);
 
   let homePath = APP_ROUTES.HOME;
-  switch (user as UserRoles) {
+  switch (user?.role as UserRoles) {
     case UserRoles.Admin: {
       homePath = APP_ROUTES.ADMIN_HOME;
       break;

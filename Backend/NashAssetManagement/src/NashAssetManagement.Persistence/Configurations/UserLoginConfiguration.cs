@@ -6,7 +6,8 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class UserLoginConfiguration : IEntityTypeConfiguration<UserLogin>
     {
-        const string TableName = "user_logins";
+        const string TableName = "UserLogins";
+
         public void Configure(EntityTypeBuilder<UserLogin> builder)
         {
             builder.ToTable(TableName, DbSchema.Auth);
