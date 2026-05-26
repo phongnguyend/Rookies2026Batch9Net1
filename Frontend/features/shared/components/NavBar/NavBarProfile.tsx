@@ -1,23 +1,15 @@
 "use client";
-import { useState } from "react";
-import ChangePasswordModal from "@/features/auth/components/ChangePasswordModal";
+
 import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function NavbarProfile() {
-
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-
-  const handleChangePassword = () => {
-    setIsChangePasswordOpen(true);
-  };
-
   const handleSignOut = () => {
     // will add sign out later
     console.log("Sign out clicked");
   };
 
   return (
-    <div className="dropdown dropdown-end" data-testid="mnuUserProfile">
+    <div className="dropdown dropdown-end">
       <div
         tabIndex={0}
         role="button"
@@ -45,16 +37,6 @@ export default function NavbarProfile() {
       >
         <li>
           <button
-            data-testid="mnuChangePassword"
-            onClick={handleChangePassword}
-            className="font-semibold hover:bg-primary hover:text-white active:bg-primary/80 active:text-white w-full text-left"
-          >
-            Change Password
-          </button>
-        </li>
-
-        <li>
-          <button
             onClick={handleSignOut}
             className="text-error font-semibold hover:bg-error hover:text-white active:bg-error/80 active:text-white w-full text-left"
           >
@@ -62,10 +44,6 @@ export default function NavbarProfile() {
           </button>
         </li>
       </ul>
-      <ChangePasswordModal
-        isOpen={isChangePasswordOpen}
-        onClose={() => setIsChangePasswordOpen(false)}
-      />
     </div>
   );
 }
