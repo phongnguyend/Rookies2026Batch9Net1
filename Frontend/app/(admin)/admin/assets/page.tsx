@@ -8,7 +8,7 @@ import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
 } from "@/features/Assets/assets.api";
-import { AssetState, type AssetListItem } from "@/features/assets/assets.types";
+import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
