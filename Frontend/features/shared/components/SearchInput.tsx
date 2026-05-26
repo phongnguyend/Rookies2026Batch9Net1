@@ -16,8 +16,8 @@ export default function SearchInput({
   onSearch,
   placeholder = "Search...",
   width = "w-60",
-  txtInputTestId,
-  btnSearchTestId
+  txtInputTestId = "txtSearch",
+  btnSearchTestId = "btnSearch",
 }: SearchInputProps) {
   return (
     <div

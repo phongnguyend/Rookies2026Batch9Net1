@@ -21,9 +21,9 @@ export default function Pagination({
   hasPreviousPage,
   hasNextPage,
   onPageChange,
-  btnPreviousPageTestId,
-  btnNextPageTestId,
-  btnCurrentPageTestId,
+  btnPreviousPageTestId = "btnPreviousPage",
+  btnNextPageTestId = "btnNextPage",
+  btnCurrentPageTestId = "btnCurrentPage",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
