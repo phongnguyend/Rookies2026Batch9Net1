@@ -18,13 +18,13 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
 
             Query.AsNoTracking()
                 .Select(x => new Response(
-                    x.Id,
-                    x.Asset!.AssetCode,
-                    x.Asset.Name,
-                    x.Asset.Category!.CategoryName,
-                    x.CreatedAtUtc,
-                    x.State.ToString(),
-                    x.IsReturning));
+                    Id: x.Id,
+                    AssetCode: x.Asset!.AssetCode,
+                    AssetName: x.Asset.Name,
+                    Category: x.Asset.Category!.CategoryName,
+                    AssignedDate: x.AssignedAtUtc,
+                    State: x.State.ToString(),
+                    IsReturning: x.IsReturning));
         }
     }
 }

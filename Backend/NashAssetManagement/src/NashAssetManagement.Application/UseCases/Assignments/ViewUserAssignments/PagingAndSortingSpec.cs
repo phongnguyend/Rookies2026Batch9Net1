@@ -24,7 +24,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
                 "assetname" => x => x.Asset!.Name,
                 "category" => x => x.Asset!.Category!.CategoryName,
                 "state" => x => x.State,
-                _ => x => x.CreatedAtUtc,
+                _ => x => x.AssignedAtUtc,
             };
             if (descending)
             {

@@ -11,15 +11,15 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
             Query.Where(x => x.Id == assignmentId && x.AssignedToUserId == assigneeId)
                 .AsNoTracking()
                 .Select(x => new Response(
-                    x.Id,
-                    x.Asset!.AssetCode,
-                    x.Asset.Name,
-                    x.Asset.Specification,
-                    x.AssignedByUser!.UserName!,
-                    x.AssignedToUser!.UserName!,
-                    x.CreatedAtUtc,
-                    x.State.ToString(),
-                    x.Note));
+                    AssignmentId: x.Id,
+                    AssetCode: x.Asset!.AssetCode,
+                    AssetName: x.Asset.Name,
+                    Specification: x.Asset.Specification,
+                    AssignerName: x.AssignedByUser!.UserName!,
+                    AssigneeName: x.AssignedToUser!.UserName!,
+                    AssignedDate: x.AssignedAtUtc,
+                    State: x.State.ToString(),
+                    Note: x.Note));
         }
     }
 }
