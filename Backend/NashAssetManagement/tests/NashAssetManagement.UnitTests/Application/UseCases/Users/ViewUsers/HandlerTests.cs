@@ -99,6 +99,24 @@ public class HandlerTests
     }
 
     [Fact]
+    public async Task Handle_Should_Filter_Users_By_FullName_When_SearchTerm_Contains_FirstName_And_LastName()
+    {
+        // Arrange
+        var userManagerMock = CreateUserManagerMock(CreateUsers());
+        var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
+        var request = new Request(1, 10, "binh nguyen", null, null, null);
+
+        // Act
+        var result = await HandleAsync(userManagerMock, currentUserMock, request);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Single(result.Value.Items);
+        Assert.Equal("SD1903", result.Value.Items[0].StaffCode);
+        Assert.Equal("Binh Nguyen", result.Value.Items[0].FullName);
+    }
+
+    [Fact]
     public async Task Handle_Should_Ignore_SearchTerm_When_SearchTerm_Is_Whitespace()
     {
         // Arrange

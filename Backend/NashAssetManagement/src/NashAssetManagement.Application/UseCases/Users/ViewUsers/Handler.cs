@@ -55,7 +55,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
                 usersQuery = usersQuery.Where(u =>
                     (u.StaffCode != null && EF.Functions.Like(u.StaffCode.ToLower(), pattern)) ||
                     (u.FirstName != null && EF.Functions.Like(u.FirstName.ToLower(), pattern)) ||
-                    (u.LastName != null && EF.Functions.Like(u.LastName.ToLower(), pattern)));
+                    (u.LastName != null && EF.Functions.Like(u.LastName.ToLower(), pattern)) ||
+                    EF.Functions.Like(((u.FirstName ?? "") + " " + (u.LastName ?? "")).ToLower(), pattern));
             }
 
             // Filter by user type
