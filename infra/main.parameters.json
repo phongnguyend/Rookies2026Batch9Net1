@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "southeastasia"
+    },
+    "adminUsername": {
+      "value": "Rookies2026Batch9Net1"
+    },
+    "adminPassword": {
+      "value": "sqladmin123!@#"
+    },
+    "sqlServerName": {
+      "value": "Rookies2026Batch9Net1"
+    },
+    "appServicePlanName": {
+      "value": "Rookies2026Batch9Net1"
+    },
+    "webAppNames": {
+      "value": [
+        "Rookies2026Batch9Net1-DEV",
+        "Rookies2026Batch9Net1-DEV-API",
+        "Rookies2026Batch9Net1-QC",
+        "Rookies2026Batch9Net1-QC-API"
+      ]
+    },
+    "dbNames": {
+      "value": [
+        "Rookies2026Batch9Net1-DEV",
+        "Rookies2026Batch9Net1-QC"
+      ]
+    }
+  }
+}
