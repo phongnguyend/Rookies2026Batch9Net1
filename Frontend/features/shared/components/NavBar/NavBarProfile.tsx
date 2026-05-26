@@ -4,7 +4,6 @@ import ChangePasswordModal from "@/features/auth/components/ChangePasswordModal"
 import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function NavbarProfile() {
-  const { username } = useAppSelector((state) => state.authSlice.user);
 
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
@@ -18,13 +17,13 @@ export default function NavbarProfile() {
   };
 
   return (
-    <div className="dropdown dropdown-end">
+    <div className="dropdown dropdown-end" data-testid="mnuUserProfile">
       <div
         tabIndex={0}
         role="button"
         className="btn btn-ghost text-white text-base font-semibold normal-case flex items-center gap-1 hover:bg-white hover:text-primary"
       >
-        <span>{username}</span>
+        <span>binhnv</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -46,6 +45,7 @@ export default function NavbarProfile() {
       >
         <li>
           <button
+            data-testid="mnuChangePassword"
             onClick={handleChangePassword}
             className="font-semibold hover:bg-primary hover:text-white active:bg-primary/80 active:text-white w-full text-left"
           >

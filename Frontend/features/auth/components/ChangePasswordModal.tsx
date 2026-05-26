@@ -114,6 +114,7 @@ export default function ChangePasswordModal({
         enqueueToast({
           message: "Password changed successfully.",
           type: ToastType.Success,
+          testId: "txtChangePasswordSuccess", 
         }),
       );
 
@@ -172,13 +173,15 @@ export default function ChangePasswordModal({
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="p-6 text-neutral-800 text-base leading-relaxed border-b border-gray-200 bg-[#fafafa] space-y-4">
-                {/* Current Password */}
+
+                {/* Current Password or Old Password*/}
                 <div>
                   <label className="block mb-1 font-semibold">
                     Current password
                   </label>
                   <div className="relative">
                     <input
+                      data-testid="txtOldPassword"
                       type={showOldPassword ? "text" : "password"}
                       className={`${inputClass(!!errors.oldPassword)} pr-12`}
                       disabled={isLoading}
@@ -186,6 +189,7 @@ export default function ChangePasswordModal({
                     />
 
                     <button
+                      data-testid="btnToggleOldPassword"
                       type="button"
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       onClick={() => setShowOldPassword(!showOldPassword)}
@@ -238,12 +242,14 @@ export default function ChangePasswordModal({
                   </label>
                   <div className="relative">
                     <input
+                      data-testid="txtNewPassword"
                       type={showNewPassword ? "text" : "password"}
                       className={inputClass(!!errors.newPassword)}
                       disabled={isLoading}
                       {...register("newPassword")}
                     />
                     <button
+                        data-testid="btnToggleNewPassword"
                         type="button"
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         onClick={() => setShowNewPassword(!showNewPassword)}
@@ -301,12 +307,14 @@ export default function ChangePasswordModal({
                   </label>
                   <div className="relative">
                     <input
+                      data-testid="txtConfirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       className={inputClass(!!errors.confirmPassword)}
                       disabled={isLoading}
                       {...register("confirmPassword")}
                     />
                     <button
+                      data-testid="btnToggleConfirmPassword"
                         type="button"
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -358,7 +366,10 @@ export default function ChangePasswordModal({
                 </div>
 
                 {errorMessage && (
-                  <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+                  <div
+                    data-testid="txtPasswordIncorrect"
+                    className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3"
+                  >
                     {errorMessage}
                   </div>
                 )}
@@ -366,6 +377,7 @@ export default function ChangePasswordModal({
 
               <div className="px-6 py-4 bg-white flex items-center justify-end gap-3">
                 <button
+                  data-testid="btnSave"
                   type="submit"
                   disabled={!isValid || isLoading}
                   className="px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
@@ -377,6 +389,7 @@ export default function ChangePasswordModal({
                 </button>
 
                 <button
+                  data-testid="btnCancel"
                   type="button"
                   onClick={onClose}
                   disabled={isLoading}
