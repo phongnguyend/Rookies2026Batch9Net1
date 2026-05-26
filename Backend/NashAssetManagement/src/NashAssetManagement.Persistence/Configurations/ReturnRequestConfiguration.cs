@@ -6,7 +6,7 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class ReturnRequestConfiguration : IEntityTypeConfiguration<ReturnRequest>
     {
-        const string TableName = "return_requests";
+        const string TableName = "ReturnRequests";
 
         public void Configure(EntityTypeBuilder<ReturnRequest> builder)
         {
