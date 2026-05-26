@@ -6,7 +6,8 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
     {
-        const string TableName = "user_roles";
+        const string TableName = "UserRoles";
+
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
             builder.ToTable(TableName, DbSchema.Auth);
