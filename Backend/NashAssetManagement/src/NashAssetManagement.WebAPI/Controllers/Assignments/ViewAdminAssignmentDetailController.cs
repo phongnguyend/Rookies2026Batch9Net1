@@ -6,17 +6,17 @@ using NashAssetManagement.Application.UseCases.Assignments.GetById;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
 
-namespace NashAssetManagement.WebAPI.Controllers.Assignment
+namespace NashAssetManagement.WebAPI.Controllers.Assignments
 {
     [Authorize(Roles = ApplicationRole.Admin)]
     [ApiVersion(1)]
-    [Route("api/v{version:apiVersion}/assignments")]
-    public sealed class GetAssignmentByIdController(
+    [Route("api/v{version:apiVersion}/admin/assignments")]
+    public sealed class ViewAdminAssignmentDetailController(
      ISender sender,
-     ILogger<GetAssignmentByIdController> logger)
+     ILogger<ViewAdminAssignmentDetailController> logger)
      : BaseApiController(sender)
     {
-        private readonly ILogger<GetAssignmentByIdController> _logger = logger;
+        private readonly ILogger<ViewAdminAssignmentDetailController> _logger = logger;
 
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]

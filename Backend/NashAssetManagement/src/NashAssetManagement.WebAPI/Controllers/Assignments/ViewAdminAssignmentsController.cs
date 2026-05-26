@@ -7,13 +7,13 @@ using NashAssetManagement.Application.UseCases.Assignments.GetAll;
 using NashAssetManagement.WebAPI.Utilities;
 using NashAssetManagement.Domain.Constants;
 
-namespace NashAssetManagement.WebAPI.Controllers.Assignment
+namespace NashAssetManagement.WebAPI.Controllers.Assignments
 {
     [Authorize(Roles = ApplicationRole.Admin)]
     [ApiVersion(1)]
-    [Route("api/v{version:apiVersion}/assignments")]
+    [Route("api/v{version:apiVersion}/admin/assignments")]
 
-    public sealed class GetAllAssignmentsController(
+    public sealed class ViewAdminAssignmentsController(
         ISender sender) 
         : BaseApiController(sender)
     {

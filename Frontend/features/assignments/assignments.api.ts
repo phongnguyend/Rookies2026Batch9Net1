@@ -68,7 +68,7 @@ export const assignmentApi =
           }
 
           return {
-            url: `v1/assignments?${searchParams.toString()}`,
+            url: `v1/admin/assignments?${searchParams.toString()}`,
             method: "GET",
           };
         },
@@ -81,7 +81,7 @@ export const assignmentApi =
         string
       >({
         query: (id) => ({
-          url: `v1/assignments/${id}`,
+          url: `v1/admin/assignments/${id}`,
           method: "GET",
         }),
 

@@ -23,7 +23,7 @@ export default function Pagination({
   onPageChange,
   btnPreviousPageTestId = "btnPreviousPage",
   btnNextPageTestId = "btnNextPage",
-  btnCurrentPageTestId = "btnCurrentPage",
+  btnCurrentPageTestId = "btnPage",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -55,7 +55,11 @@ export default function Pagination({
               type="button"
               onClick={() => onPageChange(current)}
               className={`join-item btn btn-sm ${pageNumber === current ? "btn-primary" : ""}`}
-              data-testid={pageNumber === current ? btnCurrentPageTestId : undefined}
+              data-testid={
+                pageNumber === current
+                  ? (btnCurrentPageTestId ?? `btnPage${current}`)
+                  : `btnPage${current}`
+              }
             >
               {current}
             </button>
