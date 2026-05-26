@@ -6,7 +6,7 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
-        const string TableName = "categories";
+        const string TableName = "Categories";
 
         public void Configure(EntityTypeBuilder<Category> builder)
         {
