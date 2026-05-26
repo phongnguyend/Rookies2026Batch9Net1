@@ -27,7 +27,6 @@ export default function DataTableButtonActions<T>({
     <div className="flex items-center gap-3">
       {onAccept && (
         <button
-          data-testid="btnAcceptAssignment"
           type="button"
           disabled={disabledAccept}
           onClick={(e) => {
@@ -44,7 +43,6 @@ export default function DataTableButtonActions<T>({
 
       {onDecline && (
         <button
-          data-testid="btnDeclineAssignment"
           type="button"
           disabled={disabledDecline}
           onClick={(e) => {
@@ -61,7 +59,6 @@ export default function DataTableButtonActions<T>({
 
       {onReturn && (
         <button
-          data-testid="btnReturnAssignment"
           type="button"
           disabled={disabledReturn}
           onClick={(e) => {
