@@ -34,11 +34,13 @@ function ActionIconButton({
   label,
   children,
   className = "text-slate-700 hover:text-primary",
+  disabled = false,
   onClick,
 }: {
   label: string;
   children: ReactNode;
   className?: string;
+  disabled?: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
@@ -46,8 +48,9 @@ function ActionIconButton({
       <button
         type="button"
         aria-label={label}
+        disabled={disabled}
         onClick={onClick}
-        className={`inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 shadow-none outline-none transition ${className}`}
+        className={`inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 shadow-none outline-none transition disabled:cursor-not-allowed disabled:opacity-35 ${className}`}
       >
         {children}
       </button>
@@ -229,7 +232,7 @@ export default function UsersPage() {
       key: "actions",
       header: "",
       className: "w-[72px] text-left",
-      render: () => (
+      render: (user) => (
         <div className="flex justify-start gap-2">
           <ActionIconButton
             label="Edit"
@@ -244,8 +247,13 @@ export default function UsersPage() {
           <ActionIconButton
             label="Disable"
             className="text-red-700 hover:text-red-800"
+            disabled={!user.canBeDisabled}
             onClick={(event) => {
               event.stopPropagation();
+              if (!user.canBeDisabled) {
+                return;
+              }
+
               // Disable user logic goes here
             }}
           >
