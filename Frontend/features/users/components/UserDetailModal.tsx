@@ -86,7 +86,7 @@ export default function UserDetailModal({
 
   return (
     <div
-      className="absolute inset-0 z-20 flex min-h-[420px] items-center justify-center px-4 py-6"
+      className="fixed inset-0 z-50 flex min-h-screen items-center justify-center px-4 py-6"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"

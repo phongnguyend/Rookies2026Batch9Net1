@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import DataTable, {
   type ColumnDef,
   type SortItem,
-} from "@/features/shared/components/DataTable";
+} from "@/features/users/components/DataTable";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";

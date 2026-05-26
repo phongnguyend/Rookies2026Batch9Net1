@@ -17,7 +17,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         : BaseApiController(sender)
     {
         [HttpGet]
-        // [Authorize(Roles = ApplicationRole.Admin)]
+        [Authorize(Roles = ApplicationRole.Admin)]
         [ProducesResponseType(typeof(GetUserDetail.Response), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
