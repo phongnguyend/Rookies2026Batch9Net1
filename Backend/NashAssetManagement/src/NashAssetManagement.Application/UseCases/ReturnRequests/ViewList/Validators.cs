@@ -16,7 +16,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
                 .Must(state =>
                     !string.IsNullOrWhiteSpace(state) &&
                     Enum.TryParse<ReturnRequestState>(state.Trim(), true, out _))
-                .WithMessage(state => $"Invalid state value: {state}.");
+                .WithMessage((_, state) => $"Invalid state value: {state}.");
         }
     }
 }
