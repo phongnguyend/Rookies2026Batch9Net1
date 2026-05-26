@@ -6,7 +6,7 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
     {
-        const string TableName = "assignments";
+        const string TableName = "Assignments";
 
         public void Configure(EntityTypeBuilder<Assignment> builder)
         {

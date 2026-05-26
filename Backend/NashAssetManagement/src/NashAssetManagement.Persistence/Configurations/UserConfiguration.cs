@@ -6,7 +6,7 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        const string TableName = "users";
+        const string TableName = "Users";
 
         public void Configure(EntityTypeBuilder<User> builder)
         {

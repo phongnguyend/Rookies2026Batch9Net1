@@ -6,7 +6,8 @@ namespace NashAssetManagement.Persistence.Configurations
 {
     internal class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
     {
-        const string TableName = "user_claims";
+        const string TableName = "UserClaims";
+
         public void Configure(EntityTypeBuilder<UserClaim> builder)
         {
             builder.ToTable(TableName, DbSchema.Auth);

@@ -2,7 +2,7 @@
 {
     internal static class DbSchema
     {
-        public const string Core = "core";
-        public const string Auth = "auth";
+        public const string Core = "Core";
+        public const string Auth = "Auth";
     }
 }
