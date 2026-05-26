@@ -1,12 +1,9 @@
-
 using FluentValidation;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
-using static NashAssetManagement.Application.UseCases.Assets.Specification.AssetDetailSpec;
-
 namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
-
 public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
 {
     private readonly IRepository<Category, Guid> _categoryRepository;

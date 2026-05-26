@@ -56,7 +56,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
                 request.PageNumber,
                 request.PageSize);
 
-        var spec = new AssetSpec(
+        var spec = new AssetListSpec(
             request.Categories,
             stateList,
             request.Search,

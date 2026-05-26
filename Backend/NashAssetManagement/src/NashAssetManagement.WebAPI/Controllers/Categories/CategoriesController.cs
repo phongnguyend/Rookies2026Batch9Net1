@@ -3,12 +3,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Categories.ViewList;
+using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
 
 namespace NashAssetManagement.WebAPI.Controllers;
 
 [ApiVersion(1)]
-[Authorize]
+[Authorize(Roles = ApplicationRole.Admin)]
 [Route("api/v{version:apiVersion}/categories")]
 public class CategoriesController : BaseApiController
 {
