@@ -31,11 +31,11 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
     GetAssetsRequest request,
     CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken); // ← validate first
+        await _validator.ValidateAndThrowAsync(request, cancellationToken); 
 
         var location = Guid.Parse(_currentUser.LocationId);
 
-        var stateList = request.States?   // ← parse after validation passes
+        var stateList = request.States?   
             .Select(s => Enum.Parse<AssetState>(s))
             .ToArray();
 

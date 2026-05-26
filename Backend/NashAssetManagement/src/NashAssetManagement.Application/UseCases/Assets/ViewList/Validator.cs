@@ -1,7 +1,6 @@
-using System.Data;
+
 using FluentValidation;
 using NashAssetManagement.Application.Abstractions.DataAccess;
-using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 using static NashAssetManagement.Application.UseCases.Assets.Specification.AssetDetailSpec;

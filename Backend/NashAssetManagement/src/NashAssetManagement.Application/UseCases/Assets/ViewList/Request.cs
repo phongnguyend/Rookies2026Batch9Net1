@@ -6,8 +6,8 @@ using NashAssetManagement.Domain.Enums;
 namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public record GetAssetsRequest(
-    string[]? Categories,       // filter by category name e.g. "Laptop"
-    string[]? States,           // filter by state e.g. Available
+    string[]? Categories,       
+    string[]? States,           
     string? SortBy,
     string? SortDirection,
     string? Search,      

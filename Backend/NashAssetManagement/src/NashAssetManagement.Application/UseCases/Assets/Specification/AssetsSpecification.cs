@@ -50,8 +50,8 @@ public sealed class AssetSpec : Specification<Asset, GetAssetsResponse>
 
         if (search is not null)
             Query.Where(a =>
-                a.AssetCode.Contains(search) ||  // ← search in AssetCode
-                a.Name.Contains(search));         // ← search in Name
+                a.AssetCode.Contains(search) || 
+                a.Name.Contains(search));         
 
         Query.Select(a => new GetAssetsResponse(
             a.Id,
@@ -70,7 +70,7 @@ public sealed class AssetCountSpec : Specification<Asset>
     {
         Query
         .Where(a => !a.IsDeleted)
-        .Where(a => a.LocationId == location);  // ← add location filter
+        .Where(a => a.LocationId == location);  
 
         if (categories is not null && categories.Length > 0)
             Query.Where(a => categories.Contains(a.Category!.CategoryName));
