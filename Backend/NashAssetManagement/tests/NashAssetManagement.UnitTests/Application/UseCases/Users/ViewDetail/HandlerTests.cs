@@ -26,10 +26,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            Id = ExistingUserId
-        };
+        var request = new Request(ExistingUserId.ToString());
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -40,7 +37,7 @@ public class HandlerTests
         Assert.Equal("SD1901", result.Value.StaffCode);
         Assert.Equal("An Tran", result.Value.FullName);
         Assert.Equal("ant", result.Value.UserName);
-        Assert.Equal("2022-08-10", result.Value.JoinedDate);
+        Assert.Equal("8/10/2022 12:00:00 AM", result.Value.JoinedDate);
         Assert.Equal(UserType.Staff.ToString(), result.Value.UserType);
         Assert.Equal("1998-02-14", result.Value.DateOfBirth);
         Assert.Equal(Gender.Male.ToString(), result.Value.Gender);
@@ -53,17 +50,14 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(null);
-        var request = new Request
-        {
-            Id = ExistingUserId
-        };
+        var request = new Request(ExistingUserId.ToString());
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
-        Assert.Equal("General.Unauthorized", result.FirstError.Code);
+        Assert.Equal("Users.NotFound", result.FirstError.Code);
     }
 
     [Fact]
@@ -73,10 +67,7 @@ public class HandlerTests
         var missingUserId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26999");
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            Id = missingUserId
-        };
+        var request = new Request(missingUserId.ToString());
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -93,10 +84,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(OtherLocationId.ToString());
-        var request = new Request
-        {
-            Id = ExistingUserId
-        };
+        var request = new Request(ExistingUserId.ToString());
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -114,10 +102,7 @@ public class HandlerTests
         var userId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26002");
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            Id = userId
-        };
+        var request = new Request(userId.ToString());
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -142,7 +127,7 @@ public class HandlerTests
             handlerType,
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             binder: null,
-            args: [userManagerMock.Object, currentUserMock.Object],
+            args: [userManagerMock.Object, currentUserMock.Object, new Validators()],
             culture: null)!;
         var handleMethod = handlerType.GetMethod(
             "Handle",
@@ -182,6 +167,10 @@ public class HandlerTests
         currentUserMock
             .Setup(currentUser => currentUser.LocationId)
             .Returns(locationId);
+
+        currentUserMock
+            .Setup(currentUser => currentUser.UserId)
+            .Returns(Guid.NewGuid());
 
         return currentUserMock;
     }

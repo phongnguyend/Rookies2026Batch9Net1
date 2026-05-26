@@ -26,11 +26,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10
-        };
+        var request = new Request(1, 10, null, null, null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -46,7 +42,7 @@ public class HandlerTests
         Assert.Equal("SD1903", firstUser.StaffCode);
         Assert.Equal("Binh Nguyen", firstUser.FullName);
         Assert.Equal("binhn", firstUser.UserName);
-        Assert.Equal("2024-01-15", firstUser.JoinedDate);
+        Assert.Equal("1/15/2024 12:00:00 AM", firstUser.JoinedDate);
         Assert.Equal(UserType.Staff.ToString(), firstUser.UserType);
         Assert.False(firstUser.CanBeDisabled);
     }
@@ -57,18 +53,14 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(null);
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10
-        };
+        var request = new Request(1, 10, null, null, null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
 
         // Assert
         Assert.True(result.IsError);
-        Assert.Equal("General.Unauthorized", result.FirstError.Code);
+        Assert.Equal("Users.NotFound", result.FirstError.Code);
     }
 
     [Fact]
@@ -77,12 +69,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            Type = UserType.Admin.ToString()
-        };
+        var request = new Request(1, 10, null, UserType.Admin.ToString(), null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -100,12 +87,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            SearchTerm = "binh"
-        };
+        var request = new Request(1, 10, "binh", null, null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -123,12 +105,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            SearchTerm = "   "
-        };
+        var request = new Request(1, 10, "   ", null, null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -145,12 +122,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            Type = "Unknown"
-        };
+        var request = new Request(1, 10, null, "Unknown", null, null);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -167,13 +139,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            SortBy = "staffCode",
-            SortDesc = false
-        };
+        var request = new Request(1, 10, null, null, "staffCode", false);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -191,13 +157,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            SortBy = "fullName",
-            SortDesc = true
-        };
+        var request = new Request(1, 10, null, null, "fullName", true);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -215,13 +175,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            SortBy = "staffCode",
-            SortDesc = false
-        };
+        var request = new Request(1, 10, null, null, "staffCode", false);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -239,13 +193,7 @@ public class HandlerTests
         // Arrange
         var userManagerMock = CreateUserManagerMock(CreateUsers());
         var currentUserMock = CreateCurrentUserMock(LocationId.ToString());
-        var request = new Request
-        {
-            PageNumber = 2,
-            PageSize = 1,
-            SortBy = "staffCode",
-            SortDesc = false
-        };
+        var request = new Request(2, 1, null, null, "staffCode", false);
 
         // Act
         var result = await HandleAsync(userManagerMock, currentUserMock, request);
@@ -271,7 +219,7 @@ public class HandlerTests
             handlerType,
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             binder: null,
-            args: [userManagerMock.Object, currentUserMock.Object],
+            args: [userManagerMock.Object, currentUserMock.Object, new Validators()],
             culture: null)!;
         var handleMethod = handlerType.GetMethod(
             "Handle",
@@ -311,6 +259,10 @@ public class HandlerTests
         currentUserMock
             .Setup(currentUser => currentUser.LocationId)
             .Returns(locationId);
+
+        currentUserMock
+            .Setup(currentUser => currentUser.UserId)
+            .Returns(Guid.NewGuid());
 
         return currentUserMock;
     }
