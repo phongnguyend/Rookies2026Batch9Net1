@@ -115,9 +115,6 @@ public sealed class AssetDetailSpec
                 asset.Category!.CategoryName,
                 asset.Location!.Name,
                 asset.Assignments
-                    .Where(a =>
-                        a.State == AssignmentState.Accepted ||
-                        a.State == AssignmentState.Returned)
                     .OrderByDescending(a => a.AssignedAtUtc)
                     .Select(a => new GetAssetAssignmentHistoryResponse(
                         a.AssignedAtUtc,
