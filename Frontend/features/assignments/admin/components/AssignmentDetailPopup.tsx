@@ -1,4 +1,4 @@
-import { useGetAssignmentByIdQuery } from "@/features/assignments/assignments.api";
+import { useGetAssignmentByIdQuery } from "@/features/assignments/admin/assignments.api";
 import { useEffect } from "react";
 
 function DetailRow({

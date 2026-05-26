@@ -3,17 +3,17 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   SortItem,
 } from "@/features/shared/components/DataTable";
-import { useGetAllAssignmentsQuery } from "@/features/assignments/assignments.api";
-import { Assignment, AssignmentState } from "@/features/assignments/assignments.types";
+import { useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
+import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
-import AssignmentTable, { ColumnDef } from "./components/AssignmentTable";
+import AssignmentTable, { ColumnDef } from "../../../../features/assignments/admin/components/AssignmentTable";
 import { useState } from "react";
-import AssignmentDetailPopup from "./components/AssignmentDetailPopup";
+import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
 
 const limit = 10;
 
