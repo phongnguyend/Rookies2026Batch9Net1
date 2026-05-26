@@ -23,7 +23,7 @@ const typeFilters = [
   { id: UserRoles.Staff, label: "Staff" },
 ];
 
-const pageSize = 10;
+const pageSize = 20;
 
 export default function UsersPage() {
   const router = useRouter();
