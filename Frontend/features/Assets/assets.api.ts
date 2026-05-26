@@ -16,11 +16,11 @@ export const assetsApi = baseApiSlice.injectEndpoints({
         url: "v1/assets",
         method: "GET",
         params: {
-          categories: params?.categories?.join(","),  // ← join array to string
+          categories: params?.categories?.join(","),
           states: params?.states?.join(","),
           search: params?.search,
           sortBy: params?.sortBy,
-          sortDirection: params?.sortDirection,     // ← join array to string
+          sortDirection: params?.sortDirection,     
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },

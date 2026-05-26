@@ -35,7 +35,14 @@ function AssetsContent() {
   // ─── Read from URL ─────────────────────────────
   const pageNumber = Number(searchParams.get("pageNumber") ?? "1");
   const selectedCategories = searchParams.getAll("categories");
-  const selectedStates = searchParams.getAll("states") as AssetState[];
+  const stateParams = searchParams.getAll("states") as AssetState[];
+
+  // ─── Requirement for default View ─────────────────────────────
+  const isFirstLoad = !searchParams.has("states");
+
+  const selectedStates = isFirstLoad
+    ? [AssetState.Available, AssetState.NotAvailable, AssetState.Assigned]
+    : stateParams;
 
   // ─── Write to URL ──────────────────────────────
   const updateMultipleUrl = (key: string, values: string[]) => {
@@ -77,7 +84,7 @@ function AssetsContent() {
         body: `Are you sure you want to delete "${row.name}"?`,
         yesButtonLabel: "Delete",
         noButtonLabel: "Cancel",
-        yesActionType: "asset/delete", // TODO: wire to actual delete handler
+        yesActionType: "", // TODO: wire to actual delete handler
         yesPayload: row.id,
       }),
     );
@@ -188,9 +195,14 @@ function AssetsContent() {
             value={searchInput}
             onChange={setSearchInput}
             onSearch={(value) => {
+              const trimmedValue = value.trim();
+              setSearchInput(trimmedValue);
               const current = new URLSearchParams(searchParams.toString());
-              if (value) current.set("search", value);
-              else current.delete("search");
+              if (trimmedValue) {
+                current.set("search", trimmedValue);
+              } else {
+                current.delete("search");
+              }
               current.set("pageNumber", "1");
               router.push(`?${current.toString()}`);
             }}
