@@ -1,4 +1,3 @@
-
 import { SortDirection } from "@/lib/api/base.types";
 import type { ReactNode } from "react";
 
@@ -8,6 +7,8 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
+  TitleColumnTestId?: string;
+  ColumnTestId?: (row: T, index: number) => string;
 }
 
 export interface SortItem {
@@ -25,6 +26,8 @@ interface DataTableProps<T> {
   // sort
   sorts?: SortItem[];
   onSortChange?: (sorts: SortItem[]) => void;
+  getRowKey?: (row: T, index: number) => React.Key;
+  rowTestId?: (row: T, index: number) => string;
 }
 
 export default function AssignmentTable<T>({
@@ -36,6 +39,7 @@ export default function AssignmentTable<T>({
   sorts = [],
   onSortChange,
   getRowKey,
+  rowTestId
 }: DataTableProps<T>) {
   const handleSort = (key: string) => {
     const currentSort = sorts.find((s) => s.key === key);
@@ -105,6 +109,7 @@ export default function AssignmentTable<T>({
                       : ""
                     }
                   `}
+                  data-testid={column.TitleColumnTestId}  //For column header in table
                 >
                   <div className="inline-flex items-center gap-1">
                     {column.header}
@@ -156,10 +161,12 @@ export default function AssignmentTable<T>({
                     : ""
                   }
                 `}
+                data-testid={rowTestId?.(row, rowIndex)}   //For assignment detail
               >
                 {columns.map((column) => (
                   <td
                     key={String(column.key)}
+                    data-testid={column.ColumnTestId?.(row, rowIndex)} //For colum value in table
                     className={`py-3 ${column.className ?? ""}`}
                   >
                     {column.render

@@ -60,6 +60,7 @@ export default function AssignmentDetailPopup({
       <div
         className="w-full max-w-xl overflow-hidden rounded-md border border-gray-200 bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        data-testid="dlgAssignmentDetail"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 bg-gray-100 px-5 py-3">
@@ -72,6 +73,7 @@ export default function AssignmentDetailPopup({
             onClick={onClose}
             aria-label="Close"
             className="flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
+            data-testid="btnClose"
           >
             ✕
           </button>

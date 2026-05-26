@@ -1,9 +1,7 @@
 "use client";
-
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   SortItem,
-  type ColumnDef,
 } from "@/features/shared/components/DataTable";
 import { useGetAllAssignmentsQuery } from "@/features/assignments/assignments.api";
 import { Assignment, AssignmentState } from "@/features/assignments/assignments.types";
@@ -13,7 +11,7 @@ import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
-import AssignmentTable from "./components/AssignmentTable";
+import AssignmentTable, { ColumnDef } from "./components/AssignmentTable";
 import { useState } from "react";
 import AssignmentDetailPopup from "./components/AssignmentDetailPopup";
 
@@ -85,32 +83,44 @@ export default function AssignmentsPage() {
     {
       key: "assetCode",
       header: "Asset Code",
-      sortable: true
+      sortable: true,
+      TitleColumnTestId: "btnSortAssetCode",
+      ColumnTestId: (_row, index) => `colAssetCode-${index}`,
     },
     {
       key: "assetName",
       header: "Asset Name",
-      sortable: true
+      sortable: true,
+      TitleColumnTestId: "btnSortAssetName",
+      ColumnTestId: (_row, index) => `colAssetName-${index}`,
     },
     {
       key: "assignedTo",
       header: "Assigned to",
-      sortable: true
+      sortable: true,
+      TitleColumnTestId: "btnSortAssignedTo",
+      ColumnTestId: (_row, index) => `colAssignedTo-${index}`,
     },
     {
       key: "assignedBy",
       header: "Assigned by",
-      sortable: true
+      sortable: true,
+      TitleColumnTestId: "btnSortAssignedBy",
+      ColumnTestId: (_row, index) => `colAssignedBy-${index}`,
     },
     {
       key: "assignedDate",
       header: "Assigned Date",
-      sortable: true
+      sortable: true,
+      TitleColumnTestId: "btnSortAssignedDate",
+      ColumnTestId: (_row, index) => `colAssignedDate-${index}`,
     },
     {
       key: "state",
       header: "State",
       sortable: true,
+      TitleColumnTestId: "btnSortState",
+      ColumnTestId: (_row, index) => `colState-${index}`,
     },
     {
       key: "actions",
@@ -135,6 +145,9 @@ export default function AssignmentsPage() {
             onAccept={(row) => console.log("accept", row)}
             onDecline={(row) => console.log("decline", row)}
             onReturn={(row) => console.log("return", row)}
+            acceptBtnTestId="btnAcceptAssignment"
+            declineBtnTestId="btnDeclineAssignment"
+            returnBtnTestId="btnReturnAssignment"
           />
         );
       },
@@ -168,7 +181,7 @@ export default function AssignmentsPage() {
                       page: "1",
                     })
                   }
-                  getTestIdAll={() => "chkStateAll"}
+                  getTestIdAll={"chkStateAll"}
                   getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
                 />
               </div>
@@ -202,6 +215,8 @@ export default function AssignmentsPage() {
                     page: "1",
                   });
                 }}
+                txtInputTestId="txtSearchAssignment"
+                btnSearchTestId="btnSearchAssignment"
               />
 
               <button className="rounded bg-primary px-5 py-2 font-semibold text-white"
@@ -231,6 +246,7 @@ export default function AssignmentsPage() {
             onRowClick={(row) => {
               setSelectedAssignmentId(row.id);
             }}
+            rowTestId={(_row, index) => `dgdAssignmentRow-${index}`} //assignment detail
           />
 
           {selectedAssignmentId && (
@@ -249,6 +265,9 @@ export default function AssignmentsPage() {
               hasPreviousPage={data?.hasPreviousPage ?? false}
               hasNextPage={data?.hasNextPage ?? false}
               onPageChange={(p) => updateParams({ page: String(p) })}
+              btnPreviousPageTestId="btnPreviousPage"
+              btnNextPageTestId="btnNextPage"
+              btnCurrentPageTestId="btnCurrentPage"
             />
           </div>
         </main>
