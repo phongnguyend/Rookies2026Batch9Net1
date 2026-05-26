@@ -10,10 +10,26 @@ import { useChangePasswordMutation } from "../auth.api";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 
+// password schema rules
 const changePasswordSchema = z
   .object({
     oldPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(6, "New password must be at least 6 characters"),
+    newPassword: z
+          .string()
+          .min(1, "New password is required.")
+          .min(
+            6,
+            "New password must be at least 6 characters long and less than 100 characters.",
+          )
+          .max(
+            100,
+            "New password must be at least 6 characters long and less than 100 characters.",
+          )
+          .regex(
+            /^(?=.*[A-Za-z])(?=.*\d)(?=.*@)[A-Za-z\d@]+$/,
+            "New password must contain at least one letter, one number, and one @ character.",
+          )
+          .transform((val) => val.trim()),
     confirmPassword: z.string().min(1, "Confirm password is required"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -46,9 +62,10 @@ export default function ChangePasswordModal({
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid},
   } = useForm<ChangePasswordForm>({
     resolver: zodResolver(changePasswordSchema),
+    mode:"onChange",
     defaultValues: {
       oldPassword: "",
       newPassword: "",
@@ -103,7 +120,6 @@ export default function ChangePasswordModal({
       reset();
       onClose();
     } catch (err: any) {
-        console.log(err);
       setErrorMessage(
         err?.detail ||
           err?.title ||"Failed to change password.",
@@ -351,7 +367,7 @@ export default function ChangePasswordModal({
               <div className="px-6 py-4 bg-white flex items-center justify-end gap-3">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={!isValid || isLoading}
                   className="px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading && (
