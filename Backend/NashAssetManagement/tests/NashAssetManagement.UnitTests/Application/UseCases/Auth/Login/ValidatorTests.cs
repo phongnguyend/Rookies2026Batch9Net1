@@ -10,7 +10,7 @@ public class ValidatorTests
     #region Username
     [Trait("UT", "Login")]
     [Fact]
-    public async Task Should_Return_Error_When_Username_Is_Empty()
+    public async Task Validator_UsernameIsEmpty_ShouldReturnError()
     {
         // Arrange
         var request = new Request("", "password123");
@@ -27,7 +27,7 @@ public class ValidatorTests
 
     [Trait("UT", "Login")]
     [Fact]
-    public async Task Should_Return_Error_When_Username_Exceeds_Max_Length()
+    public async Task Validator_UsernameExceedsMaxLength_ShouldReturnError()
     {
         // Arrange
         var username = new string('a', 101);
@@ -46,7 +46,7 @@ public class ValidatorTests
 
     [Trait("UT", "Login")]
     [Fact]
-    public async Task Should_Return_Error_When_Username_Format_Is_Invalid()
+    public async Task Validator_UsernameFormatInvalid_ShouldReturnError()
     {
         // Arrange
         var request = new Request("duy123", "password123");
@@ -66,7 +66,7 @@ public class ValidatorTests
     #region Password
     [Trait("UT", "Login")]
     [Fact]
-    public async Task Should_Return_Error_When_Password_Is_Empty()
+    public async Task Validator_PasswordIsEmpty_ShouldReturnError()
     {
         // Arrange
         var request = new Request("duy", "");
@@ -86,7 +86,7 @@ public class ValidatorTests
     #region Request
     [Trait("UT", "Login")]
     [Fact]
-    public async Task Should_Not_Return_Error_When_Request_Is_Valid()
+    public async Task Validator_RequestIsValid_ShouldNotReturnError()
     {
         // Arrange
         var request = new Request("duy", "password123");
