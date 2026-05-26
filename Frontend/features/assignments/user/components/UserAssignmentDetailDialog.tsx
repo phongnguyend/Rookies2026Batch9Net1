@@ -6,10 +6,11 @@ import { displayAssignmentState } from "@/utils/assignment.utils";
 interface Props {
   assignment: ViewUserAssignments.UserAssignmentSummary | null;
   onClose: () => void;
+  "data-testid"?: string;
 }
 
 const Field = ({ label, value }: { label: string; value?: string }) => (
-  <div className="flex gap-4">
+  <div data-testid="dgdAssignmentRow" className="flex gap-4">
     <span className="w-24 shrink-0 text-gray-500">{label}</span>
     <span className="wrap-break-word">{value ?? "—"}</span>
   </div>
@@ -18,6 +19,7 @@ const Field = ({ label, value }: { label: string; value?: string }) => (
 export default function UserAssignmentDetailDialog({
   assignment,
   onClose,
+  "data-testid": testId,
 }: Props) {
   const isOpen = !!assignment;
 
@@ -35,6 +37,7 @@ export default function UserAssignmentDetailDialog({
       onClick={onClose} // click backdrop to close
     >
       <div
+        data-testid={testId}
         className="relative w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-lg border"
         onClick={(e) => e.stopPropagation()} // prevent backdrop click from firing inside
       >
@@ -44,6 +47,7 @@ export default function UserAssignmentDetailDialog({
             Detailed Assignment Information
           </h2>
           <button
+            data-testid={"btnClose"}
             onClick={onClose}
             className="rounded border-3 font-semibold border-primary px-2 py-0.5 text-sm text-primary hover:cursor-pointer hover:font-bold"
           >

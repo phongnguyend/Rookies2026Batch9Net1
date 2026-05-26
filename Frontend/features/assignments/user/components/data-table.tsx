@@ -42,6 +42,7 @@ export const UserAssignmentsDataTable = () => {
   return (
     <div className="space-y-4">
       <SingleSortDataTable
+        data-testid={""}
         data={data?.items ?? []}
         columns={columns}
         isLoading={isLoading}
@@ -71,6 +72,7 @@ export const UserAssignmentsDataTable = () => {
       />
 
       <UserAssignmentDetailDialog
+        data-testid={"dlgAssignmentDetail"}
         assignment={selectedAssignment}
         onClose={() => setSelectedAssignment(null)}
       />
