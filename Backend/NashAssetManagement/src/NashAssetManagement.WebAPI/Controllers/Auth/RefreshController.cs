@@ -35,8 +35,8 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
             if (result.IsError)
             {
                 // Delete old cookies
-                Response.Cookies.Delete(Domain.Constants.JwtTokenConstants.CookieAccessToken);
-                Response.Cookies.Delete(Domain.Constants.JwtTokenConstants.CookieRefreshToken);
+                Response.DeleteAcccessCookie(Domain.Constants.JwtTokenConstants.CookieAccessToken);
+                Response.DeleteRefreshCookie(Domain.Constants.JwtTokenConstants.CookieRefreshToken);
 
                 return result.Errors.ToProblem();
             }

@@ -26,7 +26,7 @@ namespace NashAssetManagement.Infrastructure.Cookie
                 ExpiresAtUtc: expiresAtUtc,
                 HttpOnly: true,
                 Secure: true,
-                Path: "/api/auth/refresh", // sent only to the /api/auth/refresh server endpoint
+                Path: "/",
                 IsEssential: true
             );
         }

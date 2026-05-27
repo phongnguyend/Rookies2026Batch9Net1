@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import ChangePasswordModal from "@/features/auth/components/ChangePasswordModal";
-import { useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import ConfirmModal from "../Modal/ConfirmModal";
 import { useLogoutMutation } from "@/features/auth/auth.api";
+import { logoutAccount } from "@/features/auth/auth.slice";
 
 export default function NavbarProfile() {
   const { user, isLoading } = useAppSelector((state) => state.authSlice);
+  const dispatch = useAppDispatch();
 
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -25,6 +27,7 @@ export default function NavbarProfile() {
     try {
       await logout().unwrap();
       window.location.replace("/");
+      dispatch(logoutAccount());
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
@@ -97,7 +100,7 @@ export default function NavbarProfile() {
           isOpen={isChangePasswordOpen}
           onClose={() => setIsChangePasswordOpen(false)}
         />
-        
+
         {/* Confirm Logout Modal */}
         <ConfirmModal
           isOpen={isLogoutConfirmOpen}
