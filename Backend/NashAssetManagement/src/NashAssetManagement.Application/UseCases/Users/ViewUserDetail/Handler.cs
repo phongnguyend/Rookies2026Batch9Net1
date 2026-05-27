@@ -45,9 +45,9 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
                 user.StaffCode,
                 user.FirstName + " " + user.LastName,
                 user.UserName ?? "",
-                user.JoinedAtUtc.ToString(),
+                user.JoinedAtUtc,
                 user.UserType.ToString(),
-                user.DateOfBirth == null ? "" : user.DateOfBirth.Value.ToString("yyyy-MM-dd"),
+                user.DateOfBirth,
                 user.Gender.ToString(),
                 user.Location != null ? user.Location.Name : ""
             );

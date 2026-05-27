@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 using ErrorOr;
@@ -19,6 +18,8 @@ public class HandlerTests
     private static readonly Guid LocationId = Guid.Parse("a3b7ef5a-bce7-401f-bbe3-94c2f7bf0b94");
     private static readonly Guid OtherLocationId = Guid.Parse("6750e0d3-6e01-42f0-b99a-353519e5d6b1");
     private static readonly Guid ExistingUserId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26001");
+    private static readonly DateTime ExistingUserJoinedDate = new(2022, 8, 10, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime? ExistingUserDateOfBirth = new DateTime(1998, 2, 14, 0, 0, 0, DateTimeKind.Utc);
 
     [Fact]
     public async Task Handle_Should_Return_User_Detail_When_Request_Is_Valid()
@@ -37,9 +38,9 @@ public class HandlerTests
         Assert.Equal("SD1901", result.Value.StaffCode);
         Assert.Equal("An Tran", result.Value.FullName);
         Assert.Equal("ant", result.Value.UserName);
-        Assert.Equal("8/10/2022 12:00:00 AM", result.Value.JoinedDate);
+        Assert.Equal(ExistingUserJoinedDate, result.Value.JoinedDate);
         Assert.Equal(UserType.Staff.ToString(), result.Value.UserType);
-        Assert.Equal("1998-02-14", result.Value.DateOfBirth);
+        Assert.Equal(ExistingUserDateOfBirth, result.Value.DateOfBirth);
         Assert.Equal(Gender.Male.ToString(), result.Value.Gender);
         Assert.Equal("HCM", result.Value.Location);
     }
@@ -96,7 +97,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Return_Empty_Strings_For_Null_Optional_User_Fields()
+    public async Task Handle_Should_Return_Nulls_And_Empty_Strings_For_Null_Optional_User_Fields()
     {
         // Arrange
         var userId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26002");
@@ -111,7 +112,7 @@ public class HandlerTests
         Assert.False(result.IsError);
         Assert.Equal(userId, result.Value.Id);
         Assert.Equal("", result.Value.UserName);
-        Assert.Equal("", result.Value.DateOfBirth);
+        Assert.Null(result.Value.DateOfBirth);
         Assert.Equal("", result.Value.Location);
     }
 
@@ -186,9 +187,9 @@ public class HandlerTests
                 FirstName = "An",
                 LastName = "Tran",
                 UserName = "ant",
-                DateOfBirth = new DateTime(1998, 2, 14, 0, 0, 0, DateTimeKind.Utc),
+                DateOfBirth = ExistingUserDateOfBirth,
                 Gender = Gender.Male,
-                JoinedAtUtc = new DateTime(2022, 8, 10, 0, 0, 0, DateTimeKind.Utc),
+                JoinedAtUtc = ExistingUserJoinedDate,
                 UserType = UserType.Staff,
                 LocationId = LocationId,
                 Location = new Location

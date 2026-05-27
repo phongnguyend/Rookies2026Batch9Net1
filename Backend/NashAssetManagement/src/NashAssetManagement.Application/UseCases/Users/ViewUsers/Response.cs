@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
     public record Response(
@@ -10,7 +5,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
         string StaffCode,
         string FullName,
         string UserName,
-        string JoinedDate,
+        DateTime JoinedDate,
         string UserType
     )
     {

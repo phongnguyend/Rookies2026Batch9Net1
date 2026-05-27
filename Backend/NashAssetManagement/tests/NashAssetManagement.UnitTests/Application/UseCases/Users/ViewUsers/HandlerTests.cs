@@ -41,7 +41,7 @@ public class HandlerTests
         Assert.Equal("SD1903", firstUser.StaffCode);
         Assert.Equal("Binh Nguyen", firstUser.FullName);
         Assert.Equal("binhn", firstUser.UserName);
-        Assert.Equal("1/15/2024 12:00:00 AM", firstUser.JoinedDate);
+        Assert.Equal(new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc), firstUser.JoinedDate);
         Assert.Equal(UserType.Staff.ToString(), firstUser.UserType);
         Assert.False(firstUser.CanBeDisabled);
     }

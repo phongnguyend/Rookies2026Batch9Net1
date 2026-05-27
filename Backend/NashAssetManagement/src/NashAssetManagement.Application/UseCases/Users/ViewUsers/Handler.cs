@@ -113,7 +113,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
                 u.StaffCode,
                 u.FirstName + " " + u.LastName,
                 u.UserName ?? "",
-                u.JoinedAtUtc.ToString(),
+                u.JoinedAtUtc,
                 u.UserType.ToString()
             )
             {

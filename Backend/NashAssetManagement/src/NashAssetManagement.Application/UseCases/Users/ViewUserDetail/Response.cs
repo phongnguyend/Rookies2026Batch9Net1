@@ -7,9 +7,9 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
         string StaffCode,
         string FullName,
         string UserName,
-        string JoinedDate,
+        DateTime JoinedDate,
         string UserType,
-        string DateOfBirth,
+        DateTime? DateOfBirth,
         string Gender,
         string Location
     );
