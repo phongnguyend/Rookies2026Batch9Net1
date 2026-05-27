@@ -57,7 +57,7 @@ try
         Log.Information("Seed development data finished successfully.");
     }
 
-        app.UseCors();
+    app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
 
