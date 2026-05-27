@@ -15,7 +15,7 @@ export interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
   error: null,
 };
@@ -51,9 +51,14 @@ export const authSlice = createSlice({
       }
     },
 
-    // logout here
+    completeLoading: (state) => {
+      state.isLoading = false;
+    },
+
+    // logout
+    logout: () => { return { ...initialState, isLoading: false } }
   }
 })
 
-export const { loginStart, loginSuccess, loginFailure, completeFirstLogin } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, completeFirstLogin, completeLoading, logout } = authSlice.actions;
 export default authSlice.reducer;
