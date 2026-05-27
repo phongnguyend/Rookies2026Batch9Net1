@@ -69,6 +69,7 @@ export const UserAssignmentsDataTable = () => {
         enqueueToast({
           message: "Return request created successfully.",
           type: ToastType.Success,
+          testId: "toastSuccess",
         }),
       );
     } catch {
@@ -77,6 +78,7 @@ export const UserAssignmentsDataTable = () => {
         enqueueToast({
           message: "Failed to create return request. Please try again.",
           type: ToastType.Error,
+          testId: "toastError",
         }),
       );
     }

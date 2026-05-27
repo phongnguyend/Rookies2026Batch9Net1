@@ -14,6 +14,10 @@ export interface ConfirmModalProps {
   noButtonLabel?: string;
   isLoading?: boolean;
   size?: "sm" | "md" | "lg";
+  modalTestId?: string;
+  confirmBtnTestId?: string;
+  cancelBtnTestId?: string;
+  closeBtnTestId?: string;
 }
 
 export default function ConfirmModal({
@@ -27,6 +31,10 @@ export default function ConfirmModal({
   isLoading = false,
   noButtonLabel = "Cancel",
   size = "md",
+  modalTestId = "dlgConfirmPopup",
+  confirmBtnTestId = "btnConfirm",
+  cancelBtnTestId = "btnCancel",
+  closeBtnTestId = "btnClose",
 }: ConfirmModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +88,7 @@ export default function ConfirmModal({
           aria-modal="true"
         >
           <motion.div
+            data-testid={modalTestId}
             ref={modalRef}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -91,6 +100,7 @@ export default function ConfirmModal({
             <div className="bg-primary text-white px-6 py-4 flex items-center justify-between">
               <h2 className="text-lg font-bold tracking-wide">{title}</h2>
               <button
+                data-testid={closeBtnTestId}
                 onClick={onClose}
                 className="text-white/80 hover:text-white transition-colors duration-150 p-1 rounded-full hover:bg-white/10"
                 aria-label="Close modal"
@@ -120,6 +130,7 @@ export default function ConfirmModal({
             {/* Modal Actions */}
             <div className="px-6 py-4 bg-white flex items-center justify-end gap-3">
               <button
+                data-testid={confirmBtnTestId}
                 onClick={onYes}
                 disabled={isLoading}
                 className="px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
@@ -131,6 +142,7 @@ export default function ConfirmModal({
               </button>
 
               <button
+                data-testid={cancelBtnTestId}
                 onClick={() => {
                   if (onNo) {
                     onNo();
