@@ -61,6 +61,8 @@ export default function Drawer({ role }: DrawerProps) {
           let testId: string | undefined;
           if (role === UserRoles.Admin && item.href === APP_ROUTES.ADMIN_ASSIGNMENTS) {
             testId = "mnuAdminAssignment";
+          } else if (role === UserRoles.Admin && item.href === APP_ROUTES.ADMIN_RETURNS) {
+            testId = "mnuReturning";
           } else if (role === UserRoles.Staff && item.href === APP_ROUTES.STAFF_HOME) {
             testId = "mnuStaffAssignment";
           }
