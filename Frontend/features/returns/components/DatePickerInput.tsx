@@ -7,6 +7,7 @@ interface DatePickerInputProps {
   onChange: (date: Date | null) => void;
   placeholder?: string;
   width?: string;
+  testId?: string;
 }
 
 export default function DatePickerInput({
@@ -14,6 +15,7 @@ export default function DatePickerInput({
   onChange,
   placeholder = "Select Date",
   width = "w-56",
+  testId,
 }: DatePickerInputProps) {
   return (
     <div className={width}>
@@ -29,6 +31,7 @@ export default function DatePickerInput({
         yearDropdownItemNumber={80}
         dropdownMode="select"
         className="h-9 w-full rounded border border-gray-400 px-3"
+        data-testid={testId}
       />
     </div>
   );
