@@ -42,5 +42,4 @@ namespace NashAssetManagement.Application.Common.Validators
 
         #endregion
     }
-
 }

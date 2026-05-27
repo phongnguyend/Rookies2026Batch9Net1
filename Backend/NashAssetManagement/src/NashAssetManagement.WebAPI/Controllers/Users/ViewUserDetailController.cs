@@ -12,8 +12,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
     [ApiVersion(1)]
     [Route("api/v{version:apiVersion}/users/{id}")]
     public class ViewUserDetailController(
-        ISender sender,
-        ILogger<ViewUserDetailController> logger) 
+        ISender sender) 
         : BaseApiController(sender)
     {
         [HttpGet]
