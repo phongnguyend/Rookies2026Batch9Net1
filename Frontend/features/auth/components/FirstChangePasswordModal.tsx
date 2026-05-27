@@ -108,8 +108,8 @@ export default function FirstChangePasswordModal({
       const parsedErrors: string[] = [];
 
       // parse validation error list if present
-      if (err?.errors) {
-        Object.values(err.errors).forEach((messages: any) => {
+      if (err?.data?.errors) {
+        Object.values(err.data.errors).forEach((messages: any) => {
           if (Array.isArray(messages)) {
             parsedErrors.push(...messages);
           } else if (typeof messages === "string") {
@@ -121,7 +121,10 @@ export default function FirstChangePasswordModal({
       // fallback to single error description
       if (parsedErrors.length === 0) {
         const fallbackMsg =
-          err?.detail || "An unexpected error occurred. Please try again.";
+          err?.data?.detail ||
+          err?.data?.title ||
+          err?.detail ||
+          "An unexpected error occurred. Please try again.";
         parsedErrors.push(fallbackMsg);
       }
 

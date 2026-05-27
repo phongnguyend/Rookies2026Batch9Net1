@@ -8,6 +8,7 @@ using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.Auth.FirstChangePassword;
 using NashAssetManagement.Infrastructure.Jwt;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Auth
 {
@@ -28,6 +29,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.Authentication])]
         public async Task<IActionResult> FirstChangePassword(
             [FromBody] Request request,
             CancellationToken cancellationToken)

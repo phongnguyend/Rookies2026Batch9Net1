@@ -24,14 +24,14 @@ namespace NashAssetManagement.Persistence.SeedData
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
                     assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001102",
                     assetId:        "a0000000-0000-0000-0000-000000001102",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
+                    assignedDate:   new DateTime(2026, 5, 26),
                     state:          AssignmentState.WaitingForAcceptance,
                     isReturning:    false),
 
@@ -39,8 +39,8 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000001103",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 24),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001104",
@@ -55,7 +55,7 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000001105",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
+                    assignedDate:   new DateTime(2026, 5, 22),
                     state:          AssignmentState.WaitingForAcceptance,
                     isReturning:    false),
 
@@ -63,32 +63,32 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000001106",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 20),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001107",
                     assetId:        "a0000000-0000-0000-0000-000000001107",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 24),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001108",
                     assetId:        "a0000000-0000-0000-0000-000000001108",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 15),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001109",
                     assetId:        "a0000000-0000-0000-0000-000000001109",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 18),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 Build("b0000000-0000-0000-0000-000000001110",
@@ -96,7 +96,7 @@ namespace NashAssetManagement.Persistence.SeedData
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
                     assignedDate:   new DateTime(2026, 5, 25),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
 
                 // Asset: LT000001 | WaitingForAcceptance
@@ -104,8 +104,8 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000000001",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000001",
-                    assignedDate:   new DateTime(2026, 5, 29),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 13),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
  
                 // Asset: MN000001 | WaitingForAcceptance
@@ -113,7 +113,7 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000000006",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 6, 1),
+                    assignedDate:   new DateTime(2026, 5, 10),
                     state:          AssignmentState.WaitingForAcceptance,
                     isReturning:    false),
  
@@ -123,7 +123,7 @@ namespace NashAssetManagement.Persistence.SeedData
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000003",
                     assignedDate:   new DateTime(2026, 5, 27),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
  
                 // Asset: MS000001 | WaitingForAcceptance
@@ -131,8 +131,8 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000000016",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000001",
-                    assignedDate:   new DateTime(2026, 5, 28),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 23),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
  
                 // Asset: BM000001 | WaitingForAcceptance
@@ -167,8 +167,8 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000000036",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000002",
-                    assignedDate:   new DateTime(2026, 6, 2),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 15),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
  
                 // Asset: PJ000001 | WaitingForAcceptance
@@ -176,8 +176,8 @@ namespace NashAssetManagement.Persistence.SeedData
                     assetId:        "a0000000-0000-0000-0000-000000000041",
                     assignedTo:     "10000000-0000-0000-0000-000000000004",
                     assignedBy:     "10000000-0000-0000-0000-000000000003",
-                    assignedDate:   new DateTime(2026, 5, 29),
-                    state:          AssignmentState.WaitingForAcceptance,
+                    assignedDate:   new DateTime(2026, 5, 24),
+                    state:          AssignmentState.Accepted,
                     isReturning:    false),
  
                 // Asset: TB000001 | WaitingForAcceptance

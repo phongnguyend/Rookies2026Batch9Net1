@@ -7,6 +7,7 @@ using NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 using NashAssetManagement.Application.UseCases.Assets.ViewList;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers;
 
@@ -24,6 +25,9 @@ public class AssetsController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Get all assets.",
+        Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? categories,
         [FromQuery] string? states,
@@ -57,9 +61,10 @@ public class AssetsController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> GetById(
-    Guid id,
-    CancellationToken cancellationToken)
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
             new GetAssetDetailRequest(id.ToString()),
