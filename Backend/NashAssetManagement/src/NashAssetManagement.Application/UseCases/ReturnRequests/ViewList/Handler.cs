@@ -30,6 +30,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             if (currentUser.UserId == null)
                 return Errors.Unauthorized;
 
+            if (string.IsNullOrEmpty(currentUser.LocationId))
+                return Errors.UserHasNoLocation;
+
             var filterSpec = new FilterSpec(cleanedRequest, currentUser.LocationId);
             var spec = new PagingAndSortingSpec(cleanedRequest, currentUser.LocationId);
 

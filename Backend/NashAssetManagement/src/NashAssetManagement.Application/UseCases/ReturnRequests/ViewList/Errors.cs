@@ -12,5 +12,10 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             "ReturnRequests.ViewList.Validation",
             $"Invalid state value: {state}."
         );
+
+        public static Error UserHasNoLocation = Error.Conflict(
+            "ReturnRequests.ViewList.UserHasNoLocation",
+            "User has no location."
+        );
     }
 }
