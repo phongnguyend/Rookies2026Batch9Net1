@@ -9,7 +9,7 @@ namespace NashAssetManagement.Persistence
 {
     public static class ServiceCollectionExtensions
     {
-        const string ConnectionStringName = "Database";
+        const string ConnectionStringName = "DefaultConnection";
 
         public static IServiceCollection AddPersistenceServices(
             this IServiceCollection services,
