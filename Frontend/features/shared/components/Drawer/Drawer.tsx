@@ -37,7 +37,7 @@ export default function Drawer({ role }: DrawerProps) {
         <div className="flex items-center">
           <Image
             quality={100}
-            src="/assets/images/nashtech_logo.png"
+            src="/images/nashtech_logo.png"
             alt="NashTech Logo"
             width={80}
             height={0}
@@ -59,11 +59,20 @@ export default function Drawer({ role }: DrawerProps) {
 
           // add test id based on role
           let testId: string | undefined;
-          if (role === UserRoles.Admin && item.href === APP_ROUTES.ADMIN_USERS) {
+          if (
+            role === UserRoles.Admin &&
+            item.href === APP_ROUTES.ADMIN_USERS
+          ) {
             testId = "tabManagerUser";
-          } else if (role === UserRoles.Admin && item.href === APP_ROUTES.ADMIN_ASSIGNMENTS) {
+          } else if (
+            role === UserRoles.Admin &&
+            item.href === APP_ROUTES.ADMIN_ASSIGNMENTS
+          ) {
             testId = "mnuAdminAssignment";
-          } else if (role === UserRoles.Staff && item.href === APP_ROUTES.STAFF_HOME) {
+          } else if (
+            role === UserRoles.Staff &&
+            item.href === APP_ROUTES.STAFF_HOME
+          ) {
             testId = "mnuStaffAssignment";
           }
 
