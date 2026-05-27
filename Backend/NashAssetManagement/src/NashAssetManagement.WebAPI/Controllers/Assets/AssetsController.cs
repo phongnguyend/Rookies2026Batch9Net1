@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NashAssetManagement.Application.UseCases.Assets.Create;
 using NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 using NashAssetManagement.Application.UseCases.Assets.ViewList;
 using NashAssetManagement.Domain.Constants;
@@ -74,6 +75,28 @@ public class AssetsController : BaseApiController
                 {
                     StatusCode = problem.Status
                 };
+            });
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create(
+    [FromBody] CreateAssetRequest request,
+    CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request, cancellationToken);
+
+        return result.Match(
+            asset => CreatedAtAction(nameof(GetById), new { id = asset.Id }, asset),
+            errors =>
+            {
+                var problem = ProblemDetailsMapper.FromErrorOr(errors);
+                return new ObjectResult(problem) { StatusCode = problem.Status };
             });
     }
 }

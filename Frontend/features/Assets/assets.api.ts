@@ -4,13 +4,14 @@ import type {
   GetAssetsResponse,
   GetAssetDetailResponse,
   GetCategoriesResponse,
+  CreateAssetRequest,
+  CreateAssetResponse,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
 
   endpoints: (builder) => ({
-
     getAssets: builder.query<GetAssetsResponse, GetAssetsRequest | void>({
       query: (params) => ({
         url: "v1/assets",
@@ -20,7 +21,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
           states: params?.states?.join(","),
           search: params?.search,
           sortBy: params?.sortBy,
-          sortDirection: params?.sortDirection,     
+          sortDirection: params?.sortDirection,
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },
@@ -44,12 +45,20 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       providesTags: (_result, _error, id) => [{ type: "Asset", id }],
     }),
 
+    createAsset: builder.mutation<CreateAssetResponse, CreateAssetRequest>({
+      query: (body) => ({
+        url: "v1/assets",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Asset"],  // ← forces list to refetch → new asset on top
+    }),
   }),
 });
 
-// ← these are the hooks your page imports
 export const {
   useGetAssetsQuery,
   useGetAssetByIdQuery,
-  useGetCategoriesQuery
+  useGetCategoriesQuery,
+  useCreateAssetMutation,  // ← new
 } = assetsApi;

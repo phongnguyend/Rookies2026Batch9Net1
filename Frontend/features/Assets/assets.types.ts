@@ -48,7 +48,6 @@ export interface GetAssetDetailResponse {
   history: AssetHistoryItem[];
 }
 
-
 // ─── Categories ───────────────────────────────────────────
 export interface CategoryItem {
   id: string;
@@ -56,3 +55,22 @@ export interface CategoryItem {
 }
 
 export type GetCategoriesResponse = CategoryItem[];
+
+// ─── Create ───────────────────────────────────────────
+export interface CreateAssetRequest {
+  assetName: string;
+  specification: string;
+  installedDate: string;        // YYYY-MM-DD
+  state: string;                // "Available" | "NotAvailable"
+  categoryName: string;
+  categoryPrefix?: string;      // only for new category
+}
+
+export interface CreateAssetResponse {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  category: string;
+  state: AssetState;
+  location: string;
+}

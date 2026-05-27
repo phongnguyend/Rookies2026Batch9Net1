@@ -214,7 +214,7 @@ function AssetsContent() {
         </div>
         <button
           data-testid="btnCreateAsset"
-          onClick={() => router.push("")} // TODO: update route as needed
+          onClick={() => router.push("/admin/assets/create/")}
           className="btn btn-primary btn-sm"
         >
           + Create New Asset

@@ -1,0 +1,199 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useGetCategoriesQuery, useCreateAssetMutation } from "@/features/Assets/assets.api";
+import { AssetState } from "@/features/Assets/assets.types";
+import CategoryDropdown from "@/features/Assets/components/categoryDropdown";
+import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import type { ApiErrorResponse } from "@/lib/api/base.types";
+
+
+export default function CreateAssetPage() {
+  const router = useRouter();
+
+  // ─── Form State ────────────────────────────────────
+  const [assetName, setAssetName] = useState("");
+  const [specification, setSpecification] = useState("");
+  const [installedDate, setInstalledDate] = useState<Date | null>(null);  // ← Date | null
+  const [state, setState] = useState<string>(AssetState.Available);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryPrefix, setCategoryPrefix] = useState<string | undefined>();
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  // ─── API ───────────────────────────────────────────
+  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
+  const [createAsset, { isLoading: isCreating }] = useCreateAssetMutation();
+
+  // ─── Save enabled only when all fields filled ──────
+  const isFormValid =
+    assetName.trim() !== "" &&
+    categoryName !== "" &&
+    specification.trim() !== "" &&
+    installedDate !== null;    // ← check null not empty string
+
+  // ─── Handle category selection ─────────────────────
+  const handleCategoryChange = (name: string, prefix?: string) => {
+    setCategoryName(name);
+    setCategoryPrefix(prefix);
+  };
+
+  // ─── Convert Date → YYYY-MM-DD for backend ─────────
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // ─── Handle Save ───────────────────────────────────
+  const handleSave = async () => {
+    if (!installedDate) return;
+    setServerError(null);
+
+    try {
+      await createAsset({
+        assetName: assetName.trim(),
+        specification: specification.trim(),
+        installedDate: formatDate(installedDate),   // ← convert Date to YYYY-MM-DD
+        state,
+        categoryName,
+        categoryPrefix,
+      }).unwrap();
+
+      router.push("/admin/assets");
+    } catch (err) {
+      const apiError = err as ApiErrorResponse;
+      if (apiError?.status === 409 || apiError?.status === 400) {
+        setServerError(apiError.detail);
+      } else {
+        setServerError("Something went wrong. Please try again.");
+      }
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-lg">
+      <h1 className="text-primary font-bold text-xl mb-6">Create New Asset</h1>
+
+      {serverError && (
+        <div className="mb-4 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600">
+          {serverError}
+        </div>
+      )}
+
+      <div className="space-y-4">
+
+        {/* Name */}
+        <div className="flex items-start gap-4">
+          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+            Name <span className="text-red-500">*</span>
+          </label>
+          <div className="flex-1">
+            <input
+              type="text"
+              value={assetName}
+              onChange={(e) => setAssetName(e.target.value)}
+              className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
+            />
+          </div>
+        </div>
+
+        {/* Category */}
+        <div className="flex items-start gap-4">
+          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+            Category <span className="text-red-500">*</span>
+          </label>
+          <div className="flex-1">
+            <CategoryDropdown
+              categories={categoriesData ?? []}
+              isLoading={categoriesLoading}
+              value={categoryName}
+              onChange={handleCategoryChange}
+            />
+          </div>
+        </div>
+
+        {/* Specification */}
+        <div className="flex items-start gap-4">
+          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+            Specification <span className="text-red-500">*</span>
+          </label>
+          <div className="flex-1">
+            <textarea
+              value={specification}
+              onChange={(e) => setSpecification(e.target.value)}
+              rows={4}
+              className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Installed Date */}
+        <div className="flex items-start gap-4">
+          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+            Installed Date <span className="text-red-500">*</span>
+          </label>
+          <DatePickerInput
+            value={installedDate}
+            onChange={(date) => setInstalledDate(date)}
+            placeholder="Select date"
+            width="flex-1"                          // ← fills remaining space
+          />
+        </div>
+
+        {/* State */}
+        <div className="flex items-start gap-4">
+          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+            State
+          </label>
+          <div className="flex flex-col gap-2 pt-2">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="state"
+                value={AssetState.Available}
+                checked={state === AssetState.Available}
+                onChange={() => setState(AssetState.Available)}
+                className="radio radio-primary radio-sm"
+              />
+              Available
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="state"
+                value={AssetState.NotAvailable}
+                checked={state === AssetState.NotAvailable}
+                onChange={() => setState(AssetState.NotAvailable)}
+                className="radio radio-primary radio-sm"
+              />
+              Not available
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Actions */}
+      <div className="mt-8 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={!isFormValid || isCreating}
+          className="btn btn-primary btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isCreating ? "Saving..." : "Save"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => router.push("/admin/assets")}
+          className="btn btn-sm btn-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -2,6 +2,7 @@ using Moq;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Assets.ViewList;
+using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using Xunit;
 

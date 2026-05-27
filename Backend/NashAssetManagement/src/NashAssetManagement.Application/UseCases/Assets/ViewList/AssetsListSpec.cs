@@ -62,11 +62,3 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
         ));
     }
 }
-
-public sealed class CategoryByNameSpec : Specification<Category>
-{
-    public CategoryByNameSpec(string name)
-    {
-        Query.Where(c => c.CategoryName == name);
-    }
-}

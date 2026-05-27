@@ -1,6 +1,7 @@
 using FluentValidation;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
+using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
