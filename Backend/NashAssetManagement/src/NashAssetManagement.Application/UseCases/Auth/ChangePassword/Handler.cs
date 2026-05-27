@@ -40,7 +40,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.ChangePassword
 
             var userId = currentUser.UserId.ToString();
 
-            var user = await userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId!);
 
             if (user is null)
             {
