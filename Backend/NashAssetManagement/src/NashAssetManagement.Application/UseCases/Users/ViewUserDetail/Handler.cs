@@ -34,11 +34,11 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
                 .Include(u => u.Location)
                 .FirstOrDefaultAsync(u => u.Id.ToString().Equals(request.UserId), cancellationToken);
             if (user == null)
-                return Errors.UserWithIdNotFound(currentUser.UserId.ToString()!);
+                return Errors.UserWithIdNotFound(request.UserId!);
 
             // Check if user and current admin have same location
             if (!user.LocationId.ToString().Equals(currentUser.LocationId))
-                return Errors.UserHasDifferentLocation(currentUser.UserId.ToString()!);
+                return Errors.UserHasDifferentLocation(request.UserId!);
 
             return new Response(
                 user.Id,
