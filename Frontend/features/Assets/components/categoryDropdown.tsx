@@ -7,8 +7,7 @@ import type { CategoryItem } from "../assets.types";
 const toTitleCase = (str: string): string =>
   str.trim().replace(/\b\w/g, (char) => char.toUpperCase());
 
-const toUpperPrefix = (str: string): string =>
-  str.trim().toUpperCase();
+const toUpperPrefix = (str: string): string => str.trim().toUpperCase();
 
 interface CategoryDropdownProps {
   categories: CategoryItem[];
@@ -29,13 +28,19 @@ export default function CategoryDropdown({
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPrefix, setNewPrefix] = useState("");
-  const [addErrors, setAddErrors] = useState<{ name?: string; prefix?: string }>({});
+  const [addErrors, setAddErrors] = useState<{
+    name?: string;
+    prefix?: string;
+  }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
         setShowAddForm(false);
         setNewName("");
@@ -48,7 +53,7 @@ export default function CategoryDropdown({
   }, []);
 
   const handleSelectCategory = (name: string) => {
-    onChange(name, undefined);  // existing category — no prefix
+    onChange(name, undefined); // existing category — no prefix
     setIsOpen(false);
     setShowAddForm(false);
   };
@@ -56,20 +61,32 @@ export default function CategoryDropdown({
   const handleConfirmNewCategory = () => {
     const errors: { name?: string; prefix?: string } = {};
 
-    if (!newName.trim()) errors.name = "Name is required.";
-    if (!newPrefix.trim()) errors.prefix = "Prefix is required.";
-    else if (!/^[A-Z]+$/.test(toUpperPrefix(newPrefix)))
-      errors.prefix = "Prefix must contain letters only.";
+    const parsedName = toTitleCase(newName);
+    const parsedPrefix = toUpperPrefix(newPrefix);
+
+    // Name validation
+    if (!parsedName.trim()) {
+      errors.name = "Name is required.";
+    } else if (parsedName.length > 20) {
+      errors.name = "Category name must not exceed 20 characters.";
+    }
+
+    // Prefix validation
+    if (!parsedPrefix.trim()) {
+      errors.prefix = "Prefix is required.";
+    } else if (parsedPrefix.length > 2) {
+      errors.prefix = "Category prefix must not exceed 2 characters.";
+    } else if (!/^[A-Z]+$/.test(parsedPrefix)) {
+      errors.prefix = "Category prefix must contain uppercase letters only.";
+    }
 
     if (Object.keys(errors).length > 0) {
       setAddErrors(errors);
       return;
     }
 
-    const parsedName = toTitleCase(newName);
-    const parsedPrefix = toUpperPrefix(newPrefix);
+    onChange(parsedName, parsedPrefix);
 
-    onChange(parsedName, parsedPrefix);  // new category — include prefix
     setIsOpen(false);
     setShowAddForm(false);
     setNewName("");
@@ -86,7 +103,6 @@ export default function CategoryDropdown({
 
   return (
     <div ref={containerRef} className="relative w-full">
-
       {/* Trigger */}
       <button
         type="button"
@@ -104,7 +120,6 @@ export default function CategoryDropdown({
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute top-10 z-30 w-full rounded border border-gray-300 bg-white shadow-lg">
-
           {/* Category list */}
           {categories.map((cat) => (
             <div
@@ -132,12 +147,12 @@ export default function CategoryDropdown({
           ) : (
             <div className="px-3 py-2">
               <div className="flex items-center gap-2">
-
                 {/* Name input */}
                 <div className="flex-1">
                   <input
                     type="text"
                     value={newName}
+                    maxLength={20}
                     onChange={(e) => {
                       setNewName(e.target.value);
                       setAddErrors((prev) => ({ ...prev, name: undefined }));
@@ -156,11 +171,15 @@ export default function CategoryDropdown({
                     type="text"
                     value={newPrefix}
                     onChange={(e) => {
-                      setNewPrefix(e.target.value.toUpperCase());
+                      const value = e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z]/g, "");
+
+                      setNewPrefix(value);
                       setAddErrors((prev) => ({ ...prev, prefix: undefined }));
                     }}
                     placeholder="Prefix"
-                    maxLength={10}
+                    maxLength={2}
                     className={`h-8 w-full rounded border px-2 text-sm outline-none uppercase ${
                       addErrors.prefix ? "border-red-500" : "border-gray-400"
                     }`}
