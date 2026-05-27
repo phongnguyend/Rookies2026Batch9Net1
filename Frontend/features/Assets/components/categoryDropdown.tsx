@@ -152,7 +152,7 @@ export default function CategoryDropdown({
                   <input
                     type="text"
                     value={newName}
-                    maxLength={20}
+                    // maxLength={20}
                     onChange={(e) => {
                       setNewName(e.target.value);
                       setAddErrors((prev) => ({ ...prev, name: undefined }));
@@ -179,7 +179,7 @@ export default function CategoryDropdown({
                       setAddErrors((prev) => ({ ...prev, prefix: undefined }));
                     }}
                     placeholder="Prefix"
-                    maxLength={2}
+                    // maxLength={2}
                     className={`h-8 w-full rounded border px-2 text-sm outline-none uppercase ${
                       addErrors.prefix ? "border-red-500" : "border-gray-400"
                     }`}

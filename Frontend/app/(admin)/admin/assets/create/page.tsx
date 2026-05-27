@@ -127,6 +127,7 @@ export default function CreateAssetPage() {
       <div className="space-y-4">
         {/* Name */}
         <div className="flex-1">
+          Name
           <input
             type="text"
             value={assetName}
@@ -141,6 +142,7 @@ export default function CreateAssetPage() {
 
         {/* Category */}
         <div className="flex-1">
+          Category
           <CategoryDropdown
             categories={categoriesData ?? []}
             isLoading={categoriesLoading}
@@ -157,6 +159,7 @@ export default function CreateAssetPage() {
 
         {/* Specification */}
         <div className="flex-1">
+          Specification
           <textarea
             value={specification}
             onChange={(e) => setSpecification(e.target.value)}
@@ -173,6 +176,7 @@ export default function CreateAssetPage() {
 
         {/* Installed Date */}
         <div className="flex-1">
+          Installed Date
           <DatePickerInput
             value={installedDate}
             onChange={(date) => setInstalledDate(date)}
