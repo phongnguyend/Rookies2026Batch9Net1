@@ -10,7 +10,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         public FilterSpec(Request request, string locationId)
         {
             // Same location with current admin
-            Query.Where(x => x.Assignment.Asset.LocationId.ToString().Equals(locationId));
+            Query.Where(x => x.Assignment!.Asset!.LocationId.ToString().Equals(locationId));
 
             // Search
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -18,9 +18,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
                 var searchTerm = request.SearchTerm.Trim().ToLower();
 
                 Query.Where(x =>
-                    x.Assignment.Asset.AssetCode.ToLower().Contains(searchTerm) ||
-                    x.Assignment.Asset.Name.ToLower().Contains(searchTerm) ||
-                    x.RequestedByUser.UserName.ToLower().Contains(searchTerm));
+                    x.Assignment!.Asset!.AssetCode.ToLower().Contains(searchTerm) ||
+                    x.Assignment!.Asset!.Name.ToLower().Contains(searchTerm) ||
+                    x.RequestedByUser!.UserName!.ToLower().Contains(searchTerm));
             }
 
             // Filter with states
@@ -57,10 +57,10 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
                 .Select(x => new Response
                 (
                     x.Id,
-                    x.Assignment.Asset.AssetCode,
-                    x.Assignment.Asset.Name,
-                    x.RequestedByUser.UserName,
-                    x.Assignment.AssignedAtUtc,
+                    x.Assignment!.Asset!.AssetCode,
+                    x.Assignment!.Asset!.Name,
+                    x.RequestedByUser!.UserName!,
+                    x.Assignment!.AssignedAtUtc,
                     x.AcceptedByUser != null ? x.AcceptedByUser.UserName : null,
                     x.ReturnedAtUtc,
                     x.State.ToString()
