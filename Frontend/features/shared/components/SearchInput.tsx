@@ -6,6 +6,8 @@ interface SearchInputProps {
   onSearch?: (value: string) => void;
   placeholder?: string;
   width?: string;
+  txtInputTestId?: string;
+  btnSearchTestId?: string;
 }
 
 export default function SearchInput({
@@ -14,6 +16,8 @@ export default function SearchInput({
   onSearch,
   placeholder = "Search...",
   width = "w-60",
+  txtInputTestId = "txtSearch",
+  btnSearchTestId = "btnSearch",
 }: SearchInputProps) {
   return (
     <div
@@ -30,14 +34,14 @@ export default function SearchInput({
           }
         }}
         className="h-full flex-1 px-3 text-sm outline-none"
-        data-testid="txtSearch"
+        data-testid={txtInputTestId}
       />
 
       <button
         type="button"
         onClick={() => onSearch?.(value)}
         className="flex h-full w-10 items-center justify-center border-l border-gray-400 text-gray-600 hover:bg-gray-50"
-        data-testid="btnSearch"
+        data-testid={btnSearchTestId}
       >
         Q
       </button>

@@ -5,6 +5,7 @@ export interface AuthState {
   user: {
     username: string;
     role: UserRoles;
+    locationName: string;
     isFirstLogin: boolean;
   } | null;
   isLoading: boolean;
@@ -14,7 +15,7 @@ export interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
   error: null,
 };
@@ -30,7 +31,7 @@ export const authSlice = createSlice({
     },
 
     // save user data
-    loginSuccess: (state, action: PayloadAction<{ username: string; role: UserRoles; isFirstLogin: boolean; }>) => {
+    loginSuccess: (state, action: PayloadAction<{ username: string; role: UserRoles; isFirstLogin: boolean; locationName: string }>) => {
       state.isLoading = false;
       state.user = action.payload;
       state.isAuthenticated = true;
@@ -50,9 +51,14 @@ export const authSlice = createSlice({
       }
     },
 
-    // logout here
+    completeLoading: (state) => {
+      state.isLoading = false;
+    },
+
+    // logout
+    logout: () => { return { ...initialState, isLoading: false } }
   }
 })
 
-export const { loginStart, loginSuccess, loginFailure, completeFirstLogin } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, completeFirstLogin, completeLoading, logout } = authSlice.actions;
 export default authSlice.reducer;

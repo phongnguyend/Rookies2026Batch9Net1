@@ -10,4 +10,9 @@
     <ItemGroup>
         <ProjectReference Include="..\NashAssetManagement.Domain\NashAssetManagement.Domain.csproj" />
     </ItemGroup>
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>NashAssetManagement.UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>

@@ -38,3 +38,9 @@ export namespace ViewUserAssignmentDetail {
     note?: string;
   }
 }
+
+export namespace UserCreateReturnRequest {
+  export interface Request {
+    assignmentId: string;
+  }
+}

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setDrawerOpen } from "@/features/shared/drawer.slice";
 import {
+  APP_ROUTES,
   APP_SIDEBAR_ADMIN_ITEMS,
   APP_SIDEBAR_STAFF_ITEMS,
 } from "@/lib/api/routes";
@@ -36,7 +37,7 @@ export default function Drawer({ role }: DrawerProps) {
         <div className="flex items-center">
           <Image
             quality={100}
-            src="/assets/images/nashtech_logo.png"
+            src="/images/nashtech_logo.png"
             alt="NashTech Logo"
             width={80}
             height={0}
@@ -56,11 +57,31 @@ export default function Drawer({ role }: DrawerProps) {
             pathname === item.href ||
             (item.href !== "/admin" && pathname.startsWith(item.href));
 
+          // add test id based on role
+          let testId: string | undefined;
+          if (
+            role === UserRoles.Admin &&
+            item.href === APP_ROUTES.ADMIN_USERS
+          ) {
+            testId = "tabManagerUser";
+          } else if (
+            role === UserRoles.Admin &&
+            item.href === APP_ROUTES.ADMIN_ASSIGNMENTS
+          ) {
+            testId = "mnuAdminAssignment";
+          } else if (
+            role === UserRoles.Staff &&
+            item.href === APP_ROUTES.STAFF_HOME
+          ) {
+            testId = "mnuStaffAssignment";
+          }
+
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => dispatch(setDrawerOpen(false))}
+              data-testid={testId}
               className={`
                 px-6 py-3.5 transition-all duration-150 font-bold text-base block
                 ${index === 0 ? "border-t border-white" : ""}

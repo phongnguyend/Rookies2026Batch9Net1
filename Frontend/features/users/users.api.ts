@@ -1,0 +1,36 @@
+import { baseApiSlice } from "@/lib/api/base.api";
+import {
+  GetUserByIdResponse,
+  GetUsersRequest,
+  GetUsersResponse,
+} from "./users.types";
+
+export const usersApi = baseApiSlice.injectEndpoints({
+  overrideExisting: true,
+  endpoints: (builder) => ({
+    getUsers: builder.query<GetUsersResponse, GetUsersRequest>({
+      query: (params) => ({
+        url: "https://localhost:8081/api/v1/users",
+        method: "GET",
+        params: {
+          pageNumber: params.pageNumber,
+          pageSize: params.pageSize,
+          ...(params.searchTerm ? { searchTerm: params.searchTerm } : {}),
+          ...(params.type ? { type: params.type } : {}),
+          ...(params.sortBy ? { sortBy: params.sortBy } : {}),
+          ...(params.sortDesc ? { sortDesc: params.sortDesc } : {}),
+        },
+      }),
+      providesTags: ["Users"],
+    }),
+    getUserById: builder.query<GetUserByIdResponse, string>({
+      query: (id) => ({
+        url: `https://localhost:8081/api/v1/users/${id}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, id) => [{ type: "Users", id }],
+    }),
+  }),
+});
+
+export const { useGetUsersQuery, useGetUserByIdQuery } = usersApi;
