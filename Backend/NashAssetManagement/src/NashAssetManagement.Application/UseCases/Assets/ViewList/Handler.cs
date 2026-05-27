@@ -1,0 +1,78 @@
+using ErrorOr;
+using FluentValidation;
+using MediatR;
+using NashAssetManagement.Application.Abstractions.AppIdentity;
+using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.UseCases.Assets.Specification;
+using NashAssetManagement.Application.Utilities;
+using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Enums;
+
+namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
+
+public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedList<GetAssetsResponse>>>
+{
+    private readonly IRepository<Asset, Guid> _assetRepository;
+    private readonly GetAssetsValidator _validator;
+    private readonly ICurrentUser _currentUser;
+
+    public GetAssetsHandler(
+        IRepository<Asset, Guid> assetRepository,
+        GetAssetsValidator validator,
+        ICurrentUser currentUser
+    )
+    {
+        _assetRepository = assetRepository;
+        _validator = validator;
+        _currentUser = currentUser;
+    }
+
+    public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
+    GetAssetsRequest request,
+    CancellationToken cancellationToken)
+    {
+        await _validator.ValidateAndThrowAsync(request, cancellationToken);
+
+        var location = Guid.Parse(_currentUser.LocationId);
+        var sortBy = request.SortBy ?? "assetcode";
+        var sortDirection = request.SortDirection ?? "asc";
+        var normalizedSearch = request.Search?.Trim();
+
+        var stateList = request.States?
+            .Select(s => Enum.Parse<AssetState>(s))
+            .ToArray();
+
+        var countSpec = new AssetCountSpec(
+            request.Categories,
+            stateList,
+            normalizedSearch,
+            location);
+
+        var totalCount = await _assetRepository.CountAsync(countSpec, cancellationToken);
+
+        if (totalCount == 0)
+            return PagedList.Create(
+                new List<GetAssetsResponse>(),
+                0,
+                request.PageNumber,
+                request.PageSize);
+
+        var spec = new AssetListSpec(
+            request.Categories,
+            stateList,
+            normalizedSearch,
+            sortBy,
+            sortDirection,
+            request.PageNumber,
+            request.PageSize,
+            location);
+
+        var assets = await _assetRepository.ListAsync(spec, cancellationToken);
+
+        return PagedList.Create(
+            assets,
+            totalCount,
+            request.PageNumber,
+            request.PageSize);
+    }
+}
