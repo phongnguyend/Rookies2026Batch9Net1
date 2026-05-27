@@ -22,7 +22,8 @@ namespace NashAssetManagement.WebAPI.Controllers.ReturnRequests
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize]
         [SwaggerOperation(
-            Summary = "Allow user to create return request for their assignment.")]
+            Summary = "Allow user to create return request for their assignment.",
+            Tags = [ControllerTags.ReturningRequests])]
         [HttpPost("{assignmentId}/return-request")]
         public async Task<IActionResult> UserCreateReturnRequest(
             [FromRoute] string? assignmentId,

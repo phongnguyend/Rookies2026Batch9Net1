@@ -21,7 +21,8 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [HttpPost]
         [SwaggerOperation(
             Summary = "Change password for the currently authenticated user.",
-            Description = "Allows an authenticated user to change their password by providing the current password and a new password.")]
+            Description = "Allows an authenticated user to change their password by providing the current password and a new password.",
+            Tags = [ControllerTags.Authentication])]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

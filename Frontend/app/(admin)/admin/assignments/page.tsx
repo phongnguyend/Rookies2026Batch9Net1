@@ -14,6 +14,7 @@ import DataTableButtonActions from "@/features/shared/components/DataTableButton
 import AssignmentTable, { ColumnDef } from "../../../../features/assignments/admin/components/AssignmentTable";
 import { useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
+import AssignmentDateTimePicker from "@/features/assignments/admin/components/AssignmentDateTimePicker";
 
 const limit = 10;
 
@@ -186,7 +187,7 @@ export default function AssignmentsPage() {
                 />
               </div>
 
-              <div data-testid="dtpAssignedDate">
+              {/* <div data-testid="dtpAssignedDate">
                 <DatePickerInput
                   value={assignedDate}
                   onChange={(date) =>
@@ -198,7 +199,32 @@ export default function AssignmentsPage() {
                   }
                   placeholder="Assigned Date"
                 />
+              </div> */}
+
+              <div data-testid="dtpAssignedDate">
+                <AssignmentDateTimePicker
+                  value={assignedDate}
+                  onChange={(date) =>
+                    updateParams({
+                      assignedDate: date
+                        ? new Date(
+                          Date.UTC(
+                            date.getFullYear(),
+                            date.getMonth(),
+                            date.getDate()
+                          )
+                        )
+                          .toISOString()
+                          .split("T")[0]
+                        : undefined,
+                      page: "1",
+                    })
+                  }
+                  placeholder="Assigned Date"
+                  width="w-56"
+                />
               </div>
+
             </div>
 
             <div className="flex items-center gap-4">
