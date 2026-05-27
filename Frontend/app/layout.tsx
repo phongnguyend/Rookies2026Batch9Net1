@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
@@ -17,26 +16,13 @@ import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`h-full antialiased`}>
       <head>
         <title>Nash Asset Management Panel</title>
         <meta name="description" content="Admin Panel Management" />

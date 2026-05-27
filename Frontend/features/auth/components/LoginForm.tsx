@@ -58,7 +58,7 @@ export default function LoginForm({
       <div className="text-center mb-8 flex flex-col items-center gap-4">
         <Image
           quality={100}
-          src="/assets/images/nashtech_logo.png"
+          src="/images/nashtech_logo.png"
           alt="NashTech Logo"
           width={120}
           height={0}
