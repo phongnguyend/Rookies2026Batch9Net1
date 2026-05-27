@@ -44,8 +44,8 @@ export default function HomePage() {
       const parsedErrors: string[] = [];
 
       // parse validation error list if present
-      if (err?.errors) {
-        Object.values(err.errors).forEach((messages: any) => {
+      if (err?.data?.errors) {
+        Object.values(err.data.errors).forEach((messages: any) => {
           if (Array.isArray(messages)) {
             parsedErrors.push(...messages);
           } else if (typeof messages === "string") {
@@ -57,7 +57,10 @@ export default function HomePage() {
       // fallback to single error description
       if (parsedErrors.length === 0) {
         const fallbackMsg =
-          err?.detail || "Username or password is incorrect. Please try again.";
+          err?.data?.detail ||
+          err?.data?.title ||
+          err?.detail ||
+          "Username or password is incorrect. Please try again.";
         parsedErrors.push(fallbackMsg);
       }
 

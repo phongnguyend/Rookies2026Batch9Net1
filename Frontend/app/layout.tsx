@@ -13,7 +13,7 @@ import FloatingDrawerButton from "@/features/shared/components/Drawer/FloatingDr
 import { RouteGuard } from "@/features/shared/components/RouteGuard";
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
-import { loginSuccess } from "@/features/auth/auth.slice";
+import { loginSuccess, completeLoading } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
 
 export default function RootLayout({
@@ -42,7 +42,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
 
   // restore session on page mount/refresh if cookie exists
-  const { data: profile } = useGetMeQuery(undefined, {
+  const { data: profile, isError } = useGetMeQuery(undefined, {
     skip: isAuthenticated,
   });
 
@@ -59,8 +59,10 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           locationName: profile.locationName,
         }),
       );
+    } else if (isError && !isAuthenticated) {
+      dispatch(completeLoading());
     }
-  }, [profile, isAuthenticated, dispatch]);
+  }, [profile, isAuthenticated, isError, dispatch]);
 
   return (
     <RouteGuard>
