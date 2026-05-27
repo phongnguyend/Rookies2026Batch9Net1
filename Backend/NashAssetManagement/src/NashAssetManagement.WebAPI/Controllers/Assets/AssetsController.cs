@@ -91,8 +91,8 @@ public class AssetsController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create(
-    [FromBody] CreateAssetRequest request,
-    CancellationToken cancellationToken)
+        [FromBody] CreateAssetRequest request,
+        CancellationToken cancellationToken)
     {
         var result = await _sender.Send(request, cancellationToken);
 

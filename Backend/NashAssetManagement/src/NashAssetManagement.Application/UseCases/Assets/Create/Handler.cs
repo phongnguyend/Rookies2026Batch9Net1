@@ -1,67 +1,102 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 
-namespace NashAssetManagement.Application.UseCases.Categories.Create;
+namespace NashAssetManagement.Application.UseCases.Assets.Create;
 
-public class CreateCategoryHandler
-    : IRequestHandler<CreateCategoryRequest, ErrorOr<CreateCategoryResponse>>
+public class CreateAssetHandler
+    : IRequestHandler<CreateAssetRequest, ErrorOr<CreateAssetResponse>>
 {
+    private readonly IRepository<Asset, Guid> _assetRepository;
     private readonly IRepository<Category, Guid> _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly CreateCategoryValidator _validator;
+    private readonly CreateAssetValidator _validator;
+    private readonly ICurrentUser _currentUser;
 
-    public CreateCategoryHandler(
+    public CreateAssetHandler(
+        IRepository<Asset, Guid> assetRepository,
         IRepository<Category, Guid> categoryRepository,
         IUnitOfWork unitOfWork,
-        CreateCategoryValidator validator)
+        CreateAssetValidator validator,
+        ICurrentUser currentUser)
     {
+        _assetRepository = assetRepository;
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
+        _currentUser = currentUser;
     }
 
-    public async Task<ErrorOr<CreateCategoryResponse>> Handle(
-        CreateCategoryRequest request,
+    public async Task<ErrorOr<CreateAssetResponse>> Handle(
+        CreateAssetRequest request,
         CancellationToken cancellationToken)
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var categoryExists = await _categoryRepository.AnyAsync(
-            new CategoryByNameSpec(request.CategoryName),
-            cancellationToken);
-
-        if (categoryExists)
+        if (string.IsNullOrWhiteSpace(_currentUser.LocationId))
         {
-            return CreateCategoryErrors.CategoryAlreadyExists;
+            return CreateAssetErrors.LocationNotFound;
         }
 
-        var prefixExists = await _categoryRepository.AnyAsync(
-            new CategoryByPrefixSpec(request.CategoryPrefix),
+        var locationId = Guid.Parse(_currentUser.LocationId);
+
+        var category = await _categoryRepository.FirstOrDefaultAsync(
+            new CategoryWithPrefixSpec(request.CategoryName),
             cancellationToken);
 
-        if (prefixExists)
+        if (category is null)
         {
-            return CreateCategoryErrors.PrefixAlreadyExists;
+            return Error.NotFound(
+                "Asset.CategoryNotFound",
+                "Category not found.");
         }
 
-        var category = new Category
+        var maxCode = await _assetRepository.FirstOrDefaultAsync(
+            new AssetMaxCodeByPrefixSpec(category.Prefix),
+            cancellationToken);
+
+        int nextNumber = 1;
+
+        if (!string.IsNullOrWhiteSpace(maxCode))
+        {
+            var numberPart = maxCode.Replace(category.Prefix, "");
+
+            if (int.TryParse(numberPart, out var currentMax))
+            {
+                nextNumber = currentMax + 1;
+            }
+        }
+
+        var assetCode = $"{category.Prefix}{nextNumber:D6}";
+
+        var asset = new Asset
         {
             Id = Guid.NewGuid(),
-            CategoryName = request.CategoryName,
-            Prefix = request.CategoryPrefix,
+            AssetCode = assetCode,
+            Name = request.AssetName,
+            Specification = request.Specification,
+            InstalledAtUtc = request.InstalledDate,
+            State = request.State,
+            CategoryId = category.Id,
+            LocationId = locationId,
+            CreatedAtUtc = DateTime.UtcNow,
         };
 
-        await _categoryRepository.AddAsync(category, cancellationToken);
+        await _assetRepository.AddAsync(asset, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new CreateCategoryResponse(
-            category.Id,
-            category.CategoryName,
-            category.Prefix);
+        return new CreateAssetResponse(
+            asset.Id,
+            asset.AssetCode,
+            asset.Name,
+            category.Name,
+            asset.State,
+            locationId.ToString());
     }
 }
