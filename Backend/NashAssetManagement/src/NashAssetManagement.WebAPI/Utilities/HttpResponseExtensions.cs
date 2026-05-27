@@ -23,5 +23,29 @@ namespace NashAssetManagement.WebAPI.Utilities
                     SameSite = SameSiteMode.None
                 });
         }
+
+        public static void DeleteAcccessCookie(this HttpResponse response, string tokenName)
+        {
+            response.Cookies.Delete(tokenName, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                IsEssential = true,
+                Path = "/",
+                SameSite = SameSiteMode.None
+            });
+        }
+
+        public static void DeleteRefreshCookie(this HttpResponse response, string tokenName)
+        {
+            response.Cookies.Delete(tokenName, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                IsEssential = true,
+                Path = "/",
+                SameSite = SameSiteMode.None
+            });
+        }
     }
 }

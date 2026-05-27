@@ -19,8 +19,8 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         {
             var result = await _sender.Send(new Request(), cancellationToken);
 
-            Response.Cookies.Delete(JwtTokenConstants.CookieAccessToken);
-            Response.Cookies.Delete(JwtTokenConstants.CookieRefreshToken);
+            Response.DeleteAcccessCookie(JwtTokenConstants.CookieAccessToken);
+            Response.DeleteRefreshCookie(JwtTokenConstants.CookieRefreshToken);
 
             if (result.IsError)
             {
