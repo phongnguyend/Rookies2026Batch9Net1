@@ -10,7 +10,7 @@ public class ValidatorTests
     [Fact]
     public async Task Validate_Should_Return_Error_When_Id_Is_Empty()
     {
-        var request = new GetAssetDetailRequest(Guid.Empty);
+        var request = new GetAssetDetailRequest(string.Empty);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -22,7 +22,7 @@ public class ValidatorTests
     [Fact]
     public async Task Validate_Should_Pass_When_Id_Is_Valid()
     {
-        var request = new GetAssetDetailRequest(Guid.NewGuid());
+        var request = new GetAssetDetailRequest(Guid.NewGuid().ToString());
 
         var result = await _validator.ValidateAsync(request);
 

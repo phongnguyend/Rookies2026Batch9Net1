@@ -34,9 +34,10 @@ public class GetAssetDetailHandler
             cancellationToken);
 
         var locationId = Guid.Parse(_currentUser.LocationId!);
-
+        var assetId = Guid.Parse(request.Id);
+        
         var spec = new AssetDetailSpec(
-            request.Id,
+            assetId,
             locationId);
 
         var asset = await _assetRepository.FirstOrDefaultAsync(
@@ -45,7 +46,7 @@ public class GetAssetDetailHandler
 
         if (asset is null)
         {
-            return GetAssetDetailErrors.NotFound(request.Id);
+            return GetAssetDetailErrors.NotFound(assetId);
         }
 
         return asset;
