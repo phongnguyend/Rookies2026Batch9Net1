@@ -45,18 +45,17 @@ try
     });
 
     // // Only uncomment if you need SeedData
-    //if (app.Environment.IsDevelopment())
-    //{
-    //    using var scope = app.Services.CreateScope();
-    //    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    //    Log.Information("Begin database migration.");
-    //    await dbContext.Database.MigrateAsync();
-    //    Log.Information("Database migration successfully.");
-    //    var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
-    //    Log.Information("Begin seed development data.");
-    //    await seeder.SeedDataAsync(scope.ServiceProvider);
-    //    Log.Information("Seed development data finished successfully.");
-    //}
+    if (app.Environment.IsDevelopment())
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Log.Information("Begin seed development data.");
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.MigrateAsync();
+        var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
+        await seeder.SeedDataAsync(scope.ServiceProvider);
+        Log.Information("Seed development data finished successfully.");
+    }
 
     app.UseCors();
     app.UseAuthentication();
