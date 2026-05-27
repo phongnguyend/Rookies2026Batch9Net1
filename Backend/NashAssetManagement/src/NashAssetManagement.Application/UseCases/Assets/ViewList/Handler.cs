@@ -28,12 +28,12 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
     }
 
     public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
-    GetAssetsRequest request,
-    CancellationToken cancellationToken)
+        GetAssetsRequest request,
+        CancellationToken cancellationToken)
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var location = Guid.Parse(_currentUser.LocationId);
+        var location = Guid.Parse(_currentUser.LocationId!);
         var sortBy = request.SortBy ?? "assetcode";
         var sortDirection = request.SortDirection ?? "asc";
         var normalizedSearch = request.Search?.Trim();

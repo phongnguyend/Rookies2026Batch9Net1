@@ -2,22 +2,11 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { UserRoles } from "@/features/users/users.types";
 import { APP_ROUTES } from "@/lib/api/routes";
 import { useAppSelector } from "@/lib/redux/hooks";
 import StoreProvider from "./StoreProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
@@ -55,10 +44,7 @@ function GlobalErrorContent({ error, reset }: GlobalErrorProps) {
   }
 
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col items-center justify-center bg-[#f8f9fa] px-6 py-12 select-none">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-lg p-8 text-center relative overflow-hidden">
           {/* top error accent line */}
