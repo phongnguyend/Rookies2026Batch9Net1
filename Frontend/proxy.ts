@@ -4,15 +4,18 @@ import { ENV_CONFIGS } from "./lib/config/env";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const accessTokenCookieName = ENV_CONFIGS.accessTokenCookieName || "NashAssetManagement.Cookie.AccessToken";
-  const hasSession = request.cookies.has(accessTokenCookieName);
+  const accessTokenCookieName = ENV_CONFIGS.accessTokenCookieName;
+  const refreshTokenCookieName = ENV_CONFIGS.refreshTokenCookieName;
 
-  // route guard if dont have cookie
-  if (!hasSession && pathname !== "/") {
+  const hasAccessToken = request.cookies.has(accessTokenCookieName);
+  const hasRefreshToken = request.cookies.has(refreshTokenCookieName);
+
+  // route guard if don't have active session or refresh token
+  if (!hasAccessToken && !hasRefreshToken && pathname !== "/") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // if authenticated, let the request go through
+  // if authenticated or has refresh token to restore session, let request go through
   return NextResponse.next();
 }
 
