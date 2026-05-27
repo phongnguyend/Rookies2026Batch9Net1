@@ -35,7 +35,7 @@ export default function NavbarProfile() {
           role="button"
           className="btn btn-ghost text-white text-base font-semibold normal-case flex items-center gap-1 hover:bg-white hover:text-primary"
         >
-          <span>{user.username}</span>
+          <span data-testid="lblLocation">{user.username}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
