@@ -1,0 +1,14 @@
+using FluentValidation;
+using NashAssetManagement.Application.Common.Validators;
+
+namespace NashAssetManagement.Application.UseCases.Assets.ViewDetail;
+
+public class GetAssetDetailValidator : AbstractValidator<GetAssetDetailRequest>
+{
+    public GetAssetDetailValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Asset id is required.")
+            .MustBeValidGuid().WithMessage("Asset id must be a valid GUID.");
+    }
+}
