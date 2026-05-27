@@ -129,6 +129,7 @@ export default function CreateAssetPage() {
         <div className="flex-1">
           Name
           <input
+            data-testid="txtName"
             type="text"
             value={assetName}
             onChange={(e) => setAssetName(e.target.value)}
@@ -141,7 +142,7 @@ export default function CreateAssetPage() {
         </div>
 
         {/* Category */}
-        <div className="flex-1">
+        <div className="flex-1" >
           Category
           <CategoryDropdown
             categories={categoriesData ?? []}
@@ -161,6 +162,7 @@ export default function CreateAssetPage() {
         <div className="flex-1">
           Specification
           <textarea
+            data-testid="txaSpecification"
             value={specification}
             onChange={(e) => setSpecification(e.target.value)}
             rows={4}
@@ -175,7 +177,7 @@ export default function CreateAssetPage() {
         </div>
 
         {/* Installed Date */}
-        <div className="flex-1">
+        <div className="flex-1" data-testid="dtpInstalledDate">
           Installed Date
           <DatePickerInput
             value={installedDate}
@@ -199,6 +201,7 @@ export default function CreateAssetPage() {
           <div className="flex flex-col gap-2 pt-2">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
+                data-testid="rdoAvailable"
                 type="radio"
                 name="state"
                 value={AssetState.Available}
@@ -210,6 +213,7 @@ export default function CreateAssetPage() {
             </label>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
+                data-testid="rdoNotAvailable"
                 type="radio"
                 name="state"
                 value={AssetState.NotAvailable}
@@ -226,6 +230,7 @@ export default function CreateAssetPage() {
       {/* Actions */}
       <div className="mt-8 flex items-center justify-end gap-3">
         <button
+          data-testid="btnSave"
           type="button"
           onClick={handleSave}
           disabled={!isFormValid || isCreating}
@@ -235,6 +240,7 @@ export default function CreateAssetPage() {
         </button>
 
         <button
+          data-testid="btnCancel"
           type="button"
           onClick={() => router.push("/admin/assets")}
           className="btn btn-sm btn-outline"

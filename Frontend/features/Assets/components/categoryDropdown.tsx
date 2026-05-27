@@ -105,6 +105,7 @@ export default function CategoryDropdown({
     <div ref={containerRef} className="relative w-full">
       {/* Trigger */}
       <button
+        data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex h-9 w-full items-center justify-between rounded border px-3 text-sm bg-white ${
@@ -139,6 +140,7 @@ export default function CategoryDropdown({
           {/* Add new category */}
           {!showAddForm ? (
             <div
+              data-testid="lnkAddNewCategory"
               onClick={() => setShowAddForm(true)}
               className="cursor-pointer px-3 py-2 text-sm text-primary underline italic hover:bg-gray-50"
             >
@@ -150,6 +152,7 @@ export default function CategoryDropdown({
                 {/* Name input */}
                 <div className="flex-1">
                   <input
+                    data-testid="txtAddNewCategoryName"
                     type="text"
                     value={newName}
                     // maxLength={20}
@@ -168,6 +171,7 @@ export default function CategoryDropdown({
                 {/* Prefix input */}
                 <div className="w-20">
                   <input
+                    data-testid="txtAddNewCategoryPrefix"
                     type="text"
                     value={newPrefix}
                     onChange={(e) => {
@@ -188,6 +192,7 @@ export default function CategoryDropdown({
 
                 {/* Confirm */}
                 <button
+                  data-testid="btnAcceptCategory"
                   type="button"
                   onClick={handleConfirmNewCategory}
                   className="text-primary hover:text-primary/80 font-bold text-lg"
@@ -198,6 +203,7 @@ export default function CategoryDropdown({
 
                 {/* Cancel */}
                 <button
+                  data-testid="btnCancelCategory"
                   type="button"
                   onClick={handleCancelNewCategory}
                   className="text-gray-500 hover:text-gray-700 font-bold text-lg"
