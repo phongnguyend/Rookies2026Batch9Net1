@@ -1,12 +1,10 @@
-using System.Reflection;
 using Ardalis.Specification;
-using ErrorOr;
 using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.ReturnRequests.ViewList;
-using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 using Xunit;
@@ -16,91 +14,83 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
     public class HandlerTests
     {
         private static readonly Guid CurrentUserId = Guid.Parse("42af4a73-f42e-40bf-9075-6c9b559df450");
-        private static readonly Guid LocationId = Guid.Parse("a3b7ef5a-bce7-401f-bbe3-94c2f7bf0b94");
+        private const string LocationId = "a3b7ef5a-bce7-401f-bbe3-94c2f7bf0b94";
+
+        private readonly Mock<IRepository<ReturnRequest, Guid>> _mockRepo;
+        private readonly Mock<ICurrentUser> _mockUser;
+        private readonly Mock<IValidator<Request>> _mockValidator;
+        private readonly Handler _handler;
+
+        public HandlerTests()
+        {
+            _mockRepo = new Mock<IRepository<ReturnRequest, Guid>>();
+            _mockUser = new Mock<ICurrentUser>();
+            _mockValidator = new Mock<IValidator<Request>>();
+
+            _handler = new Handler(
+                _mockRepo.Object,
+                _mockUser.Object,
+                _mockValidator.Object
+            );
+        }
 
         [Fact]
-        public async Task Handle_CurrentUserIdIsNull_ShouldReturnUnauthorized()
+        public async Task Handle_ShouldThrowValidationException_WhenValidationFails()
         {
             // Arrange
-            var repositoryMock = CreateRepositoryMock();
-            var currentUserMock = CreateCurrentUserMock(null, LocationId.ToString());
-            var request = new Request(null, null, null, null, null, 10, 1);
+            var request = new Request(null, null, null, null, null, 10, 0);
+            var errors = new List<ValidationFailure>
+            {
+                new(nameof(Request.PageNumber), "Page number must be greater than 0.")
+            };
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult(errors));
 
             // Act
-            var result = await HandleAsync(repositoryMock, currentUserMock, request);
+            var act = () => _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            await Assert.ThrowsAsync<ValidationException>(act);
+            _mockRepo.Verify(
+                r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+            _mockRepo.Verify(
+                r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldReturnUnauthorizedError_WhenCannotGetUserId()
+        {
+            // Arrange
+            var request = new Request(null, null, null, null, null, 10, 1);
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.UserId).Returns((Guid?)null);
+
+            // Act
+            var result = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsError);
-            Assert.Equal("ReturnRequests.ViewList.Unauthorized", result.FirstError.Code);
-
-            repositoryMock.Verify(
-                x => x.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
+            Assert.Equal(Errors.Unauthorized, result.FirstError);
+            _mockRepo.Verify(
+                r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
                 Times.Never);
-
-            repositoryMock.Verify(
-                x => x.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
+            _mockRepo.Verify(
+                r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
                 Times.Never);
         }
 
         [Fact]
-        public async Task Handle_InvalidPageNumber_ShouldThrowValidationException()
+        public async Task Handle_ShouldReturnPagedList_WhenRequestIsValidAndUserIsAuthorized()
         {
             // Arrange
-            var repositoryMock = CreateRepositoryMock();
-            var currentUserMock = CreateCurrentUserMock(CurrentUserId, LocationId.ToString());
-            var request = new Request(null, null, null, null, null, 10, 0);
-
-            // Act
-            var exception = await Assert.ThrowsAsync<ValidationException>(
-                () => HandleAsync(repositoryMock, currentUserMock, request));
-
-            // Assert
-            Assert.Contains(exception.Errors,
-                x => x.PropertyName == nameof(Request.PageNumber)
-                     && x.ErrorMessage == "Page number must be greater than 0.");
-
-            repositoryMock.Verify(
-                x => x.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
-                Times.Never);
-
-            repositoryMock.Verify(
-                x => x.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
-                Times.Never);
-        }
-
-        [Fact]
-        public async Task Handle_InvalidState_ShouldThrowValidationException()
-        {
-            // Arrange
-            var repositoryMock = CreateRepositoryMock();
-            var currentUserMock = CreateCurrentUserMock(CurrentUserId, LocationId.ToString());
-            var request = new Request(null, ["InvalidState"], null, null, null, 10, 1);
-
-            // Act
-            var exception = await Assert.ThrowsAsync<ValidationException>(
-                () => HandleAsync(repositoryMock, currentUserMock, request));
-
-            // Assert
-            Assert.Contains(exception.Errors,
-                x => x.PropertyName.StartsWith(nameof(Request.States))
-                     && x.ErrorMessage == "Invalid state value: InvalidState.");
-
-            repositoryMock.Verify(
-                x => x.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
-                Times.Never);
-
-            repositoryMock.Verify(
-                x => x.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
-                Times.Never);
-        }
-
-        [Fact]
-        public async Task Handle_ValidRequest_ShouldReturnPagedReturnRequests()
-        {
-            // Arrange
-            var items = CreateResponses();
-            var repositoryMock = CreateRepositoryMock(totalItems: 5, items);
-            var currentUserMock = CreateCurrentUserMock(CurrentUserId, LocationId.ToString());
             var request = new Request(
                 SearchTerm: "laptop",
                 States: [ReturnRequestState.Completed.ToString()],
@@ -109,133 +99,144 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
                 SortDesc: false,
                 PageSize: 2,
                 PageNumber: 2);
+            var responses = CreateResponses();
+            const int expectedTotal = 5;
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.UserId).Returns(CurrentUserId);
+            _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+            _mockRepo
+                .Setup(r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedTotal);
+            _mockRepo
+                .Setup(r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(responses);
 
             // Act
-            var result = await HandleAsync(repositoryMock, currentUserMock, request);
+            var result = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsError);
-            Assert.Equal(5, result.Value.TotalCount);
+            Assert.NotNull(result.Value);
+            Assert.Equal(expectedTotal, result.Value.TotalCount);
             Assert.Equal(2, result.Value.PageNumber);
             Assert.Equal(2, result.Value.PageSize);
-            Assert.Equal(items, result.Value.Items);
-
-            repositoryMock.Verify(
-                x => x.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
+            Assert.Equal(responses, result.Value.Items);
+            _mockRepo.Verify(
+                r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()),
                 Times.Once);
-
-            repositoryMock.Verify(
-                x => x.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
+            _mockRepo.Verify(
+                r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
         [Fact]
-        public async Task Handle_NullPageNumberAndPageSize_ShouldUseDefaults()
+        public async Task Handle_ShouldUseDefaultPaging_WhenPageNumberAndPageSizeAreNull()
         {
             // Arrange
-            var items = CreateResponses();
-            var repositoryMock = CreateRepositoryMock(totalItems: 2, items);
-            var currentUserMock = CreateCurrentUserMock(CurrentUserId, LocationId.ToString());
             var request = new Request(null, null, null, null, null, null, null);
+            var responses = CreateResponses();
+            const int expectedTotal = 2;
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.UserId).Returns(CurrentUserId);
+            _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+            _mockRepo
+                .Setup(r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedTotal);
+            _mockRepo
+                .Setup(r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(responses);
 
             // Act
-            var result = await HandleAsync(repositoryMock, currentUserMock, request);
+            var result = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsError);
+            Assert.NotNull(result.Value);
+            Assert.Equal(expectedTotal, result.Value.TotalCount);
             Assert.Equal(1, result.Value.PageNumber);
             Assert.Equal(20, result.Value.PageSize);
-            Assert.Equal(2, result.Value.TotalCount);
-            Assert.Equal(items, result.Value.Items);
+            Assert.Equal(responses, result.Value.Items);
         }
 
         [Fact]
-        public async Task Handle_ShouldPassCancellationTokenToRepository()
+        public async Task Handle_ShouldPassCancellationTokenToRepository_WhenRequestIsValid()
         {
             // Arrange
-            var cancellationTokenSource = new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            var repositoryMock = CreateRepositoryMock(totalItems: 0, []);
-            var currentUserMock = CreateCurrentUserMock(CurrentUserId, LocationId.ToString());
             var request = new Request(null, null, null, null, null, 10, 1);
 
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.UserId).Returns(CurrentUserId);
+            _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+            _mockRepo
+                .Setup(r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(0);
+            _mockRepo
+                .Setup(r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
+
             // Act
-            var result = await HandleAsync(repositoryMock, currentUserMock, request, cancellationToken);
+            var result = await _handler.Handle(request, cancellationToken);
 
             // Assert
             Assert.False(result.IsError);
-
-            repositoryMock.Verify(
-                x => x.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), cancellationToken),
+            _mockRepo.Verify(
+                r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), cancellationToken),
                 Times.Once);
-
-            repositoryMock.Verify(
-                x => x.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), cancellationToken),
+            _mockRepo.Verify(
+                r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), cancellationToken),
                 Times.Once);
         }
 
-        private static async Task<ErrorOr<PagedList<Response>>> HandleAsync(
-            Mock<IRepository<ReturnRequest, Guid>> repositoryMock,
-            Mock<ICurrentUser> currentUserMock,
-            Request request,
-            CancellationToken cancellationToken = default)
+        [Fact]
+        public async Task Handle_ShouldValidateCleanedRequest_WhenSortByHasExtraSpaces()
         {
-            var handlerType = typeof(Request).Assembly.GetType(
-                "NashAssetManagement.Application.UseCases.ReturnRequests.ViewList.Handler",
-                throwOnError: true)!;
+            // Arrange
+            var request = new Request(null, null, null, " assetCode ", null, null, null);
 
-            var handler = Activator.CreateInstance(
-                handlerType,
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                binder: null,
-                args: [repositoryMock.Object, currentUserMock.Object, new Validators()],
-                culture: null)!;
-
-            var handleMethod = handlerType.GetMethod(
-                "Handle",
-                BindingFlags.Instance | BindingFlags.Public)!;
-
-            var task = (Task<ErrorOr<PagedList<Response>>>)handleMethod.Invoke(
-                handler,
-                [request, cancellationToken])!;
-
-            return await task;
-        }
-
-        private static Mock<IRepository<ReturnRequest, Guid>> CreateRepositoryMock(
-            int totalItems = 0,
-            List<Response>? items = null)
-        {
-            var repositoryMock = new Mock<IRepository<ReturnRequest, Guid>>();
-
-            repositoryMock
-                .Setup(x => x.CountAsync(
-                    It.IsAny<ISpecification<ReturnRequest>>(),
+            _mockValidator
+                .Setup(v => v.ValidateAsync(
+                    It.Is<Request>(r =>
+                        r.SortBy == "assetCode"
+                        && r.PageNumber == 1
+                        && r.PageSize == 20),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(totalItems);
+                .ReturnsAsync(new ValidationResult());
 
-            repositoryMock
-                .Setup(x => x.ListAsync(
-                    It.IsAny<ISpecification<ReturnRequest, Response>>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(items ?? []);
+            _mockUser.Setup(u => u.UserId).Returns(CurrentUserId);
+            _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+            _mockRepo
+                .Setup(r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(0);
+            _mockRepo
+                .Setup(r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync([]);
 
-            return repositoryMock;
-        }
+            // Act
+            var result = await _handler.Handle(request, CancellationToken.None);
 
-        private static Mock<ICurrentUser> CreateCurrentUserMock(Guid? userId, string? locationId)
-        {
-            var currentUserMock = new Mock<ICurrentUser>();
-
-            currentUserMock
-                .Setup(x => x.UserId)
-                .Returns(userId);
-
-            currentUserMock
-                .Setup(x => x.LocationId)
-                .Returns(locationId);
-
-            return currentUserMock;
+            // Assert
+            Assert.False(result.IsError);
+            _mockValidator.Verify(
+                v => v.ValidateAsync(
+                    It.Is<Request>(r =>
+                        r.SortBy == "assetCode"
+                        && r.PageNumber == 1
+                        && r.PageSize == 20),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
         private static List<Response> CreateResponses()
