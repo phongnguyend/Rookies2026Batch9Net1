@@ -22,5 +22,25 @@ steps:
         {
           "name": "Jwt__Audience",
           "value": "$(Jwt__Audience)"
-        }
+        },
+        {
+          "name": "Jwt__SecretKey",
+          "value": "$(Jwt__SecretKey)"
+        },
+        {
+          "name": "Jwt__AccessTokenExpiryInMilliseconds",
+          "value": "$(Jwt__AccessTokenExpiryInMilliseconds)"
+        },
+        {
+          "name": "Jwt__RefreshTokenExpiryInMilliseconds",
+          "value": "$(Jwt__RefreshTokenExpiryInMilliseconds)"
+        },
+        {
+          "name": "Cors__AllowedOrigins__0",
+          "value": "$(Cors__AllowedOrigins__0)"
+        },
+        {
+          "name": "Cors__AllowedOrigins__1",
+          "value": "$(Cors__AllowedOrigins__1)"
+        },
       ]
