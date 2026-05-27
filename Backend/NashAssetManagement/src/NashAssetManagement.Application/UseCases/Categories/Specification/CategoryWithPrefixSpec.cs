@@ -1,7 +1,7 @@
 using Ardalis.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 
-namespace NashAssetManagement.Application.UseCases.Assets.Specification;
+namespace NashAssetManagement.Application.UseCases.Categories.Specification;
 
 public sealed class CategoryWithPrefixSpec : Specification<Category, CategoryDto>
 {

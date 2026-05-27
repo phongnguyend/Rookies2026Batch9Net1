@@ -18,4 +18,9 @@ public static class CreateAssetErrors
         Error.Validation(
             "Asset.CategoryPrefixRequired",
             "Category prefix is required when creating a new category.");
+
+    public static Error LocationNotFound =>
+        Error.NotFound(
+            "Asset.LocationNotFound",
+            "Location not found. Please enter a valid location.");
 }

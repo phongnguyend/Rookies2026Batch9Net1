@@ -38,6 +38,11 @@ public class CreateAssetHandler
     {
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
+        if (string.IsNullOrWhiteSpace(_currentUser.LocationId))
+        {
+            return CreateAssetErrors.LocationNotFound;
+        }
+
         var locationId = Guid.Parse(_currentUser.LocationId);
 
         // ─── Resolve Category ──────────────────────────
