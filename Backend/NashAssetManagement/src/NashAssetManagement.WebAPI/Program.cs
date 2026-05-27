@@ -31,21 +31,19 @@ try
 
     app.UseExceptionHandler();
 
-    if (app.Environment.IsDevelopment())
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
     {
-        app.MapOpenApi();
-        app.UseSwagger();
-        app.UseSwaggerUI(options =>
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var description in provider.ApiVersionDescriptions)
         {
-            var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-            foreach (var description in provider.ApiVersionDescriptions)
-            {
-                options.SwaggerEndpoint(
-                    $"/swagger/{description.GroupName}/swagger.json",
-                    $"NashAssetManagement API {description.GroupName.ToUpperInvariant()}");
-            }
-        });
-    }
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"NashAssetManagement API {description.GroupName.ToUpperInvariant()}");
+        }
+    });
+
     // // Only uncomment if you need SeedData
     //if (app.Environment.IsDevelopment())
     //{
