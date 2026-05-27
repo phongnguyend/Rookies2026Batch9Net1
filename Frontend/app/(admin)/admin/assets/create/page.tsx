@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useGetCategoriesQuery, useCreateAssetMutation } from "@/features/Assets/assets.api";
+import {
+  useGetCategoriesQuery,
+  useCreateAssetMutation,
+} from "@/features/Assets/assets.api";
 import { AssetState } from "@/features/Assets/assets.types";
 import CategoryDropdown from "@/features/Assets/components/categoryDropdown";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
-
 
 export default function CreateAssetPage() {
   const router = useRouter();
@@ -15,14 +17,16 @@ export default function CreateAssetPage() {
   // ─── Form State ────────────────────────────────────
   const [assetName, setAssetName] = useState("");
   const [specification, setSpecification] = useState("");
-  const [installedDate, setInstalledDate] = useState<Date | null>(null);  // ← Date | null
+  const [installedDate, setInstalledDate] = useState<Date | null>(null); // ← Date | null
   const [state, setState] = useState<string>(AssetState.Available);
   const [categoryName, setCategoryName] = useState("");
   const [categoryPrefix, setCategoryPrefix] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // ─── API ───────────────────────────────────────────
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetCategoriesQuery();
   const [createAsset, { isLoading: isCreating }] = useCreateAssetMutation();
 
   // ─── Save enabled only when all fields filled ──────
@@ -30,7 +34,7 @@ export default function CreateAssetPage() {
     assetName.trim() !== "" &&
     categoryName !== "" &&
     specification.trim() !== "" &&
-    installedDate !== null;    // ← check null not empty string
+    installedDate !== null; // ← check null not empty string
 
   // ─── Handle category selection ─────────────────────
   const handleCategoryChange = (name: string, prefix?: string) => {
@@ -48,14 +52,15 @@ export default function CreateAssetPage() {
 
   // ─── Handle Save ───────────────────────────────────
   const handleSave = async () => {
-    if (!installedDate) return;
     setServerError(null);
+    const isValid = validateForm();
+    if (!isValid || !installedDate) return;
 
     try {
       await createAsset({
         assetName: assetName.trim(),
         specification: specification.trim(),
-        installedDate: formatDate(installedDate),   // ← convert Date to YYYY-MM-DD
+        installedDate: formatDate(installedDate), // ← convert Date to YYYY-MM-DD
         state,
         categoryName,
         categoryPrefix,
@@ -72,6 +77,43 @@ export default function CreateAssetPage() {
     }
   };
 
+  // ─── Validation form ───────────────────────────────────────
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    if (!assetName.trim()) {
+      errors.assetName = "Asset name is required.";
+    } else if (assetName.length > 100) {
+      errors.assetName = "Asset name must not exceed 100 characters.";
+    }
+
+    if (!categoryName.trim()) {
+      errors.categoryName = "Category name is required.";
+    }
+
+    if (!specification.trim()) {
+      errors.specification = "Specification is required.";
+    } else if (specification.length > 500) {
+      errors.specification = "Specification must not exceed 500 characters.";
+    }
+
+    if (!installedDate) {
+      errors.installedDate = "Installed date is required.";
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (installedDate > today) {
+        errors.installedDate = "Installed date cannot be in the future.";
+      }
+    }
+
+    setFieldErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
+  // ─── Render ───────────────────────────────────────
   return (
     <div className="p-6 max-w-lg">
       <h1 className="text-primary font-bold text-xl mb-6">Create New Asset</h1>
@@ -83,63 +125,66 @@ export default function CreateAssetPage() {
       )}
 
       <div className="space-y-4">
-
         {/* Name */}
-        <div className="flex items-start gap-4">
-          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
-            Name <span className="text-red-500">*</span>
-          </label>
-          <div className="flex-1">
-            <input
-              type="text"
-              value={assetName}
-              onChange={(e) => setAssetName(e.target.value)}
-              className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
-            />
-          </div>
+        <div className="flex-1">
+          <input
+            type="text"
+            value={assetName}
+            onChange={(e) => setAssetName(e.target.value)}
+            className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
+          />
+
+          {fieldErrors.assetName && (
+            <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
+          )}
         </div>
 
         {/* Category */}
-        <div className="flex items-start gap-4">
-          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
-            Category <span className="text-red-500">*</span>
-          </label>
-          <div className="flex-1">
-            <CategoryDropdown
-              categories={categoriesData ?? []}
-              isLoading={categoriesLoading}
-              value={categoryName}
-              onChange={handleCategoryChange}
-            />
-          </div>
+        <div className="flex-1">
+          <CategoryDropdown
+            categories={categoriesData ?? []}
+            isLoading={categoriesLoading}
+            value={categoryName}
+            onChange={handleCategoryChange}
+          />
+
+          {fieldErrors.categoryName && (
+            <p className="mt-1 text-sm text-red-500">
+              {fieldErrors.categoryName}
+            </p>
+          )}
         </div>
 
         {/* Specification */}
-        <div className="flex items-start gap-4">
-          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
-            Specification <span className="text-red-500">*</span>
-          </label>
-          <div className="flex-1">
-            <textarea
-              value={specification}
-              onChange={(e) => setSpecification(e.target.value)}
-              rows={4}
-              className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
-            />
-          </div>
+        <div className="flex-1">
+          <textarea
+            value={specification}
+            onChange={(e) => setSpecification(e.target.value)}
+            rows={4}
+            className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
+          />
+
+          {fieldErrors.specification && (
+            <p className="mt-1 text-sm text-red-500">
+              {fieldErrors.specification}
+            </p>
+          )}
         </div>
 
         {/* Installed Date */}
-        <div className="flex items-start gap-4">
-          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
-            Installed Date <span className="text-red-500">*</span>
-          </label>
+        <div className="flex-1">
           <DatePickerInput
             value={installedDate}
             onChange={(date) => setInstalledDate(date)}
             placeholder="Select date"
-            width="flex-1"                          // ← fills remaining space
+            width="w-full"
           />
+
+          {fieldErrors.installedDate && (
+            <p className="mt-1 text-sm text-red-500">
+              {fieldErrors.installedDate}
+            </p>
+          )}
         </div>
 
         {/* State */}
@@ -172,7 +217,6 @@ export default function CreateAssetPage() {
             </label>
           </div>
         </div>
-
       </div>
 
       {/* Actions */}
