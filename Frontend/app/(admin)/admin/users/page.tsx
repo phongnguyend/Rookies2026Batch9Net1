@@ -191,7 +191,9 @@ export default function UsersPage() {
       }
 
       const queryString = nextSearchParams.toString();
-      router.replace(queryString ? `?${queryString}` : "/admin/users");
+      router.replace(queryString ? `?${queryString}` : "/admin/users", {
+        scroll: false,
+      });
     },
     [router, searchParams],
   );
