@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import DataTable, {
   type ColumnDef,
   type SortItem,
-} from "@/features/shared/components/DataTable";
+} from "@/features/returns/components/DataTable";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
@@ -108,6 +108,7 @@ function RequestActions({ row }: { row: ReturnRequestRow }) {
         aria-label="Completed"
         title="Completed"
         className={`text-primary ${isWaiting ? enabledClass : disabledClass}`}
+        data-testid="btnAccept"
       >
         ✓
       </button>
@@ -117,8 +118,19 @@ function RequestActions({ row }: { row: ReturnRequestRow }) {
         aria-label="Cancelled"
         title="Cancelled"
         className={`text-black ${isWaiting ? enabledClass : disabledClass}`}
+        data-testid="btnDecline"
       >
         ×
+      </button>
+      <button
+        type="button"
+        disabled
+        aria-label="Return"
+        title="Return"
+        className={`text-blue-600 ${disabledClass}`}
+        data-testid="btnReturn"
+      >
+        â†»
       </button>
     </div>
   );
@@ -218,7 +230,9 @@ export default function ReturnsPage() {
       }
 
       const queryString = nextSearchParams.toString();
-      router.replace(queryString ? `?${queryString}` : "/admin/returns");
+      router.replace(queryString ? `?${queryString}` : "/admin/returns", {
+        scroll: false,
+      });
     },
     [router, searchParams],
   );
@@ -249,18 +263,21 @@ export default function ReturnsPage() {
       header: "Asset Code",
       sortable: true,
       className: "w-[110px]",
+      cellTestId: () => "txtAssetCode",
     },
     {
       key: "assetName",
       header: "Asset Name",
       sortable: true,
       className: "w-[210px]",
+      cellTestId: () => "txtAssetName",
     },
     {
       key: "requestedBy",
       header: "Requested by",
       sortable: true,
       className: "w-[126px]",
+      cellTestId: () => "txtReported",
     },
     {
       key: "assignedDate",
@@ -268,6 +285,7 @@ export default function ReturnsPage() {
       sortable: true,
       className: "w-[126px]",
       render: (request) => formatUtcDateToUtcPlus7(request.assignedDate),
+      cellTestId: () => "dpAssignedDate",
     },
     {
       key: "acceptedBy",
@@ -275,6 +293,7 @@ export default function ReturnsPage() {
       sortable: true,
       className: "w-[126px]",
       render: (request) => request.acceptedBy ?? "",
+      cellTestId: () => "txtAcceptedBy",
     },
     {
       key: "returnedDate",
@@ -282,6 +301,7 @@ export default function ReturnsPage() {
       sortable: true,
       className: "w-[132px]",
       render: (request) => formatUtcDateToUtcPlus7(request.returnedDate),
+      cellTestId: () => "dpReturnedDate",
     },
     {
       key: "state",
@@ -289,6 +309,7 @@ export default function ReturnsPage() {
       sortable: true,
       className: "w-[182px]",
       render: (request) => getStateLabel(request.state),
+      cellTestId: () => "txtState",
     },
     {
       key: "actions",
@@ -299,30 +320,32 @@ export default function ReturnsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333]">
+    <div className="min-h-screen bg-white text-[#333]" data-testid="mnuReturning">
       <div className="flex">
         <main className="flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
           <div className="mb-6 flex items-center justify-between">
             <div className="flex gap-5">
-              <DropdownFilter
-                items={stateFilters}
-                values={selectedStates}
-                placeholder="State"
-                width="w-[200px]"
-                getKey={(state) => state.id}
-                getLabel={(state) => state.label}
-                onChange={(values) => {
-                  // Filter changes always restart the list from page 1.
-                  updateQueryParams({
-                    page: 1,
-                    states:
-                      values.length === stateFilters.length ? [] : values,
-                  });
-                }}
-                allLabel="All"
-              />
+              <div data-testid="ddlState">
+                <DropdownFilter
+                  items={stateFilters}
+                  values={selectedStates}
+                  placeholder="State"
+                  width="w-[200px]"
+                  getKey={(state) => state.id}
+                  getLabel={(state) => state.label}
+                  onChange={(values) => {
+                    // Filter changes always restart the list from page 1.
+                    updateQueryParams({
+                      page: 1,
+                      states:
+                        values.length === stateFilters.length ? [] : values,
+                    });
+                  }}
+                  allLabel="All"
+                />
+              </div>
 
               <DatePickerInput
                 value={returnedDate}
@@ -337,6 +360,7 @@ export default function ReturnsPage() {
                 }}
                 placeholder="Returned Date"
                 width="w-[220px]"
+                testId="dpReturned"
               />
             </div>
 
@@ -356,6 +380,8 @@ export default function ReturnsPage() {
                 // Search changes always restart the list from page 1.
                 updateQueryParams({ page: 1, search: nextSearch });
               }}
+              txtInputTestId="txtSearch"
+              btnSearchTestId="btnSearch"
             />
           </div>
 
@@ -365,6 +391,7 @@ export default function ReturnsPage() {
             isLoading={isLoading}
             emptyMessage="No return requests found."
             sorts={sorts}
+            tableTestId="dgdReturningList"
             onSortChange={(newSorts) => {
               const nextSort = newSorts.at(-1);
               updateQueryParams({
