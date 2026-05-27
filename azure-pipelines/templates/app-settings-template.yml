@@ -1,0 +1,26 @@
+parameters:
+- name: serviceConnection
+  type: string
+- name: appName
+  type: string
+- name: resourceGroupName
+  type: string
+
+steps:
+- task: AzureAppServiceSettings@1
+  displayName: 'Configure App Service Settings'
+  inputs:
+    azureSubscription: ${{ parameters.serviceConnection }}
+    appName: ${{ parameters.appName }}
+    resourceGroupName: ${{ parameters.resourceGroupName }}
+    appSettings: |
+      [
+        {
+          "name": "Jwt__Issuer",
+          "value": "$(Jwt__Issuer)"
+        },
+        {
+          "name": "Jwt__Audience",
+          "value": "$(Jwt__Audience)"
+        }
+      ]

@@ -61,7 +61,7 @@ public class AssetsController : BaseApiController
     CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetAssetDetailRequest(id),
+            new GetAssetDetailRequest(id.ToString()),
             cancellationToken);
 
         return result.Match(
