@@ -22,6 +22,7 @@ import {
   type GetUsersRequest,
   type UserRow,
 } from "@/features/users/users.types";
+import { formatDate } from "@/utils/datetime.utils";
 
 const typeFilters = [
   { id: UserRoles.Admin, label: "Admin" },
@@ -251,6 +252,7 @@ export default function UsersPage() {
       header: "Joined Date",
       sortable: true,
       headerTestId: "lblJoinedDate",
+      render: (user) => (user.joinedDate ? formatDate(user.joinedDate) : ""),
     },
     {
       key: "userType",

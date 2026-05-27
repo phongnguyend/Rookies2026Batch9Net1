@@ -3,6 +3,7 @@
 import { useEffect, useRef, type MouseEvent } from "react";
 import { useGetUserByIdQuery } from "@/features/users/users.api";
 import { UserRoles, type UserDetail } from "@/features/users/users.types";
+import { formatDate } from "@/utils/datetime.utils";
 
 interface UserDetailModalProps {
   userId: string | null;
@@ -22,14 +23,7 @@ const emptyUserDetail: UserDetail = {
   location: "",
 };
 
-const formatDate = (value: string) => {
-  if (!value) return "";
-
-  const [year, month, day] = value.split("T")[0].split("-");
-  if (!year || !month || !day) return value;
-
-  return `${day}/${month}/${year}`;
-};
+const formatUserDate = (value: string) => (value ? formatDate(value) : "");
 
 export default function UserDetailModal({
   userId,
@@ -77,9 +71,9 @@ export default function UserDetailModal({
     ["Staff Code", user.staffCode, "lblStaffCodeDetail"],
     ["Full Name", user.fullName, "lblFullNameDetail"],
     ["Username", user.userName, "lblUsernameDetail"],
-    ["Date of Birth", formatDate(user.dateOfBirth), "lblDateOfBirthDetail"],
+    ["Date of Birth", formatUserDate(user.dateOfBirth), "lblDateOfBirthDetail"],
     ["Gender", user.gender, "lblGenderDetail"],
-    ["Joined Date", formatDate(user.joinedDate), "lblJoinedDateDetail"],
+    ["Joined Date", formatUserDate(user.joinedDate), "lblJoinedDateDetail"],
     ["Type", user.userType, "lblUserTypeDetail"],
     ["Location", user.location, "lblLocationDetail"],
   ];
