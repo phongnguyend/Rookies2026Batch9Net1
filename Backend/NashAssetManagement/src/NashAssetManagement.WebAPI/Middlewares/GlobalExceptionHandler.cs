@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.WebAPI.Utilities;
@@ -27,7 +27,7 @@ namespace NashAssetManagement.WebAPI.Middlewares
                     Title = "Unexpected error occurred",
                     Status = StatusCodes.Status500InternalServerError,
                     Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
-                    Detail = "An unexpected error occurred in the server.",
+                    Detail = $"An unexpected error occurred in the server: {exception.Message}\nFull Exception: {exception}",
                 };
             }
             httpContext.Response.StatusCode = problem.Status!.Value;
