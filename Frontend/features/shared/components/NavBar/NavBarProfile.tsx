@@ -1,20 +1,38 @@
 "use client";
 import { useState } from "react";
 import ChangePasswordModal from "@/features/auth/components/ChangePasswordModal";
-import { useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import ConfirmModal from "../Modal/ConfirmModal";
+import { useLogoutMutation } from "@/features/auth/auth.api";
+import { logoutAccount } from "@/features/auth/auth.slice";
 
 export default function NavbarProfile() {
   const { user, isLoading } = useAppSelector((state) => state.authSlice);
+  const dispatch = useAppDispatch();
 
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   const handleChangePassword = () => {
     setIsChangePasswordOpen(true);
   };
 
   const handleSignOut = () => {
-    // will add sign out later
-    console.log("Sign out clicked");
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await logout().unwrap();
+      window.location.replace("/");
+      dispatch(logoutAccount());
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLogoutConfirmOpen(false);
+    }
   };
 
   if (user == null || isLoading) {
@@ -65,18 +83,36 @@ export default function NavbarProfile() {
             </button>
           </li>
 
+          {/* Logout  */}
           <li>
             <button
+              data-testid="mnuLogout"
               onClick={handleSignOut}
               className="text-error font-semibold hover:bg-error hover:text-white active:bg-error/80 active:text-white w-full text-left"
             >
-              Sign out
+              Logout
             </button>
           </li>
         </ul>
         <ChangePasswordModal
           isOpen={isChangePasswordOpen}
           onClose={() => setIsChangePasswordOpen(false)}
+        />
+
+        {/* Confirm Logout Modal */}
+        <ConfirmModal
+          isOpen={isLogoutConfirmOpen}
+          onClose={() => setIsLogoutConfirmOpen(false)}
+          onYes={handleConfirmLogout}
+          title="Are you sure?"
+          body="Do you want to log out?"
+          yesButtonLabel="Log out"
+          noButtonLabel="Cancel"
+          isLoading={isLoggingOut}
+          size="sm"
+          modalTestId="LogoutConfirmationModal"
+          confirmBtnTestId="btnLogout"
+          cancelBtnTestId="btnCancel"
         />
       </div>
     </div>

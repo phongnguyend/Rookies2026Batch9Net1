@@ -27,7 +27,7 @@ namespace NashAssetManagement.WebAPI.Middlewares
                     Title = "Unexpected error occurred",
                     Status = StatusCodes.Status500InternalServerError,
                     Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
-                    Detail = $"An unexpected error occurred in the server: {exception.Message}\nFull Exception: {exception}",
+                    Detail = $"An unexpected error occurred in the server",
                 };
             }
             httpContext.Response.StatusCode = problem.Status!.Value;

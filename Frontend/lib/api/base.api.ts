@@ -2,11 +2,11 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ENV_CONFIGS } from "../config/env";
 import { ApiErrorResponse } from "./base.types";
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
-import { logout } from "@/features/auth/auth.slice";
+import { logoutAccount } from "@/features/auth/auth.slice";
 
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: ENV_CONFIGS.apiUrl,
+  baseUrl: ENV_CONFIGS.apiUrl + "/api",
   credentials: 'include', // send cookie automatic
 });
 
@@ -41,7 +41,7 @@ const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
     if (!refreshResult.error) {
       result = await rawBaseQuery(args, api, extraOptions);
     } else {
-      api.dispatch(logout());
+      api.dispatch(logoutAccount());
       return result;
     }
   }

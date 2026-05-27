@@ -2,10 +2,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Application.UseCases.Assignments.GetAll;
-using NashAssetManagement.WebAPI.Utilities;
+using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Assignments
 {
@@ -21,7 +22,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [ProducesResponseType(typeof(PagedList<Response>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-      
+        [SwaggerOperation(Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> GetAll([FromQuery] Query query)
         {
             var result = await _sender.Send(query);

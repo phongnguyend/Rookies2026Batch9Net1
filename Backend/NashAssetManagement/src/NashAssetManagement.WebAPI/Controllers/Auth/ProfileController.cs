@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Auth.Profile;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Auth
 {
@@ -15,6 +16,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [HttpGet]
         [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [SwaggerOperation(Tags = [ControllerTags.Authentication])]
         public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
             var request = new Request();

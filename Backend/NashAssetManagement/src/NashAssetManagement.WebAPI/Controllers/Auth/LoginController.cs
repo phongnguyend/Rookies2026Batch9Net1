@@ -7,6 +7,7 @@ using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.Auth.Login;
 using NashAssetManagement.Infrastructure.Jwt;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Auth
 {
@@ -24,6 +25,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.Authentication])]
         public async Task<IActionResult> Login(
             [FromBody] Request request,
             CancellationToken cancellationToken)
