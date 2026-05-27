@@ -35,12 +35,14 @@ function ActionIconButton({
   children,
   className = "text-slate-700 hover:text-primary",
   disabled = false,
+  testId,
   onClick,
 }: {
   label: string;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
+  testId?: string;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   return (
@@ -51,6 +53,7 @@ function ActionIconButton({
         disabled={disabled}
         onClick={onClick}
         className={`inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 shadow-none outline-none transition disabled:cursor-not-allowed disabled:opacity-35 ${className}`}
+        data-testid={testId}
       >
         {children}
       </button>
@@ -223,11 +226,36 @@ export default function UsersPage() {
   };
 
   const columns: ColumnDef<UserRow>[] = [
-    { key: "staffCode", header: "Staff Code", sortable: true },
-    { key: "fullName", header: "Full Name", sortable: true },
-    { key: "userName", header: "Username", sortable: true },
-    { key: "joinedDate", header: "Joined Date", sortable: true },
-    { key: "userType", header: "Type", sortable: true },
+    {
+      key: "staffCode",
+      header: "Staff Code",
+      sortable: true,
+      headerTestId: "lblStaffCode",
+    },
+    {
+      key: "fullName",
+      header: "Full Name",
+      sortable: true,
+      headerTestId: "lblFullName",
+    },
+    {
+      key: "userName",
+      header: "Username",
+      sortable: true,
+      headerTestId: "lblUsername",
+    },
+    {
+      key: "joinedDate",
+      header: "Joined Date",
+      sortable: true,
+      headerTestId: "lblJoinedDate",
+    },
+    {
+      key: "userType",
+      header: "Type",
+      sortable: true,
+      headerTestId: "lblUserType",
+    },
     {
       key: "actions",
       header: "",
@@ -236,6 +264,7 @@ export default function UsersPage() {
         <div className="flex justify-start gap-2">
           <ActionIconButton
             label="Edit"
+            testId="btnEditUser"
             onClick={(event) => {
               event.stopPropagation();
               // Navigate to edit user page for user.id
@@ -248,6 +277,7 @@ export default function UsersPage() {
             label="Disable"
             className="text-red-700 hover:text-red-800"
             disabled={!user.canBeDisabled}
+            testId="btnDisableUser"
             onClick={(event) => {
               event.stopPropagation();
               if (!user.canBeDisabled) {
@@ -265,30 +295,38 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333]">
+    <div className="min-h-screen bg-white text-[#333]" data-testid="tabManagerUser">
       <div className="flex">
-        <main className="flex-1 px-32 pt-24">
+        <main className="flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
           <div className="mb-6 mt-4 flex items-center justify-between">
             <div className="flex gap-5">
-              <DropdownFilter
-                items={typeFilters}
-                values={selectedTypes}
-                placeholder="Type"
-                width="w-40"
-                getKey={(item) => item.id}
-                getLabel={(item) => item.label}
-                onChange={(values) => {
-                  // Empty values mean "All"; otherwise keep selected roles in
-                  // the URL so refresh/back navigation preserves the filter.
-                  updateQueryParams({
-                    page: 1,
-                    type: values.length > 0 ? values.join(",") : null,
-                  });
-                }}
-                allLabel="All"
-              />
+              <div data-testid="ddlFilterType">
+                <DropdownFilter
+                  items={typeFilters}
+                  values={selectedTypes}
+                  placeholder="Type"
+                  width="w-40"
+                  getKey={(item) => item.id}
+                  getLabel={(item) => item.label}
+                  onChange={(values) => {
+                    // Empty values mean "All"; otherwise keep selected roles in
+                    // the URL so refresh/back navigation preserves the filter.
+                    updateQueryParams({
+                      page: 1,
+                      type: values.length > 0 ? values.join(",") : null,
+                    });
+                  }}
+                  allLabel="All"
+                  getTestIdAll={() => "ddlFilterAll"}
+                  getTestId={(item) =>
+                    item.id === UserRoles.Admin
+                      ? "ddlFilterAdmin"
+                      : "ddlFilterStaff"
+                  }
+                />
+              </div>
             </div>
 
             <div className="flex gap-8">
@@ -306,10 +344,13 @@ export default function UsersPage() {
                   });
                   updateQueryParams({ page: 1, search: nextSearch });
                 }}
+                txtInputTestId="txtSearchUser"
+                btnSearchTestId="btnSearchUser"
               />
 
               <button
                 type="button"
+                data-testid="btnCreateUser"
                 onClick={() => {
                   // TODO: navigate to create user page, e.g. router.push('/admin/users/create')
                 }}
@@ -329,6 +370,7 @@ export default function UsersPage() {
               onRowClick={(user) => setSelectedUserId(user.id)}
               isLoading={isLoading}
               emptyMessage="No users found."
+              tableTestId="dgdUserList"
             />
 
             <UserDetailModal
@@ -346,6 +388,8 @@ export default function UsersPage() {
             hasPreviousPage={Boolean(data?.hasPreviousPage)}
             hasNextPage={Boolean(data?.hasNextPage)}
             onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
+            btnPreviousPageTestId="btnPrevPage"
+            btnNextPageTestId="btnNextPage"
           />
         </main>
       </div>

@@ -74,14 +74,14 @@ export default function UserDetailModal({
   if (!isOpen) return null;
 
   const details = [
-    ["Staff Code", user.staffCode],
-    ["Full Name", user.fullName],
-    ["Username", user.userName],
-    ["Date of Birth", formatDate(user.dateOfBirth)],
-    ["Gender", user.gender],
-    ["Joined Date", formatDate(user.joinedDate)],
-    ["Type", user.userType],
-    ["Location", user.location],
+    ["Staff Code", user.staffCode, "lblStaffCodeDetail"],
+    ["Full Name", user.fullName, "lblFullNameDetail"],
+    ["Username", user.userName, "lblUsernameDetail"],
+    ["Date of Birth", formatDate(user.dateOfBirth), "lblDateOfBirthDetail"],
+    ["Gender", user.gender, "lblGenderDetail"],
+    ["Joined Date", formatDate(user.joinedDate), "lblJoinedDateDetail"],
+    ["Type", user.userType, "lblUserTypeDetail"],
+    ["Location", user.location, "lblLocationDetail"],
   ];
 
   return (
@@ -109,6 +109,7 @@ export default function UserDetailModal({
             onClick={onClose}
             aria-label="Close detailed user information"
             className="flex h-[29px] w-[29px] items-center justify-center rounded-[5px] border-[3px] border-primary bg-white text-[26px] font-black leading-none text-primary transition hover:bg-red-50"
+            data-testid="btnCloseUserDetail"
           >
             x
           </button>
@@ -125,10 +126,13 @@ export default function UserDetailModal({
             </div>
           ) : (
             <dl className="grid grid-cols-[126px_1fr] gap-x-6 gap-y-[14px] text-[19px] leading-[1.45]">
-              {details.map(([label, value]) => (
+              {details.map(([label, value, testId]) => (
                 <div key={label} className="contents">
                   <dt className="font-normal text-[#70757b]">{label}</dt>
-                  <dd className="min-w-0 break-words text-[#70757b]">
+                  <dd
+                    className="min-w-0 break-words text-[#70757b]"
+                    data-testid={testId}
+                  >
                     {value || "-"}
                   </dd>
                 </div>
