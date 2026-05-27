@@ -122,16 +122,6 @@ function RequestActions({ row }: { row: ReturnRequestRow }) {
       >
         ×
       </button>
-      <button
-        type="button"
-        disabled
-        aria-label="Return"
-        title="Return"
-        className={`text-blue-600 ${disabledClass}`}
-        data-testid="btnReturn"
-      >
-        â†»
-      </button>
     </div>
   );
 }

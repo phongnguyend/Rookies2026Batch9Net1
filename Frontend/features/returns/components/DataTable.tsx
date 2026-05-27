@@ -90,12 +90,6 @@ export default function DataTable<T>({
                       {getSortIcon(currentSort?.direction)}
                     </span>
                   )}
-
-                  {currentSort && (
-                    <span className="ml-1 text-xs text-gray-400">
-                      {sortIndex + 1}
-                    </span>
-                  )}
                 </th>
               );
             })}
