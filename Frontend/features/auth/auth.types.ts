@@ -45,3 +45,8 @@ export namespace ChangePassword {
     message: string;
   }
 }
+
+export namespace Logout {
+  export type Request = void;
+  export type Response = void;
+}

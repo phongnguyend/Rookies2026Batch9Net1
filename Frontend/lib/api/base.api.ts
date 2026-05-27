@@ -6,7 +6,7 @@ import { logout } from "@/features/auth/auth.slice";
 
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: ENV_CONFIGS.apiUrl,
+  baseUrl: ENV_CONFIGS.apiUrl + "/api",
   credentials: 'include', // send cookie automatic
 });
 
