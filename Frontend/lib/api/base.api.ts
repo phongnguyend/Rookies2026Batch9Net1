@@ -4,10 +4,9 @@ import { ApiErrorResponse } from "./base.types";
 import { BaseQueryFn } from "@reduxjs/toolkit/query";
 import { logoutAccount } from "@/features/auth/auth.slice";
 
-const apiBaseUrl = ENV_CONFIGS.apiUrl.replace(/\/+$/, "");
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: apiBaseUrl,
+  baseUrl: ENV_CONFIGS.apiUrl + "/api",
   credentials: 'include', // send cookie automatic
 });
 
