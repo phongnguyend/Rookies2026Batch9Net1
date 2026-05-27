@@ -45,8 +45,8 @@ try
     });
 
     // // Only uncomment if you need SeedData
-    //if (app.Environment.IsDevelopment())
-    //{
+    // if (app.Environment.IsDevelopment())
+    // {
     //    using var scope = app.Services.CreateScope();
     //    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     //    Log.Information("Begin database migration.");
@@ -56,7 +56,7 @@ try
     //    Log.Information("Begin seed development data.");
     //    await seeder.SeedDataAsync(scope.ServiceProvider);
     //    Log.Information("Seed development data finished successfully.");
-    //}
+    // }
 
     app.UseCors();
     app.UseAuthentication();
