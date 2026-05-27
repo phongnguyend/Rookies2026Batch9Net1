@@ -26,7 +26,7 @@ interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
 
-  // sort 
+  // sort
   sorts?: SortItem[];
   onSortChange?: (sorts: SortItem[]) => void;
 }
@@ -63,7 +63,7 @@ export default function DataTable<T>({
     if (direction === SortDirection.Desc) return "↓";
     return "↕";
   };
-  
+
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-left text-sm">

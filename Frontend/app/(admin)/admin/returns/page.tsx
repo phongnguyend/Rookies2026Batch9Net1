@@ -301,8 +301,8 @@ export default function ReturnsPage() {
   return (
     <div className="min-h-screen bg-white text-[#333]">
       <div className="flex">
-        <main className="flex-1 px-6 pt-4">
-          <h2 className="mb-6 text-lg font-bold text-primary">Request List</h2>
+        <main className="flex-1">
+          <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
           <div className="mb-6 flex items-center justify-between">
             <div className="flex gap-5">
