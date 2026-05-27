@@ -1,3 +1,4 @@
+using FluentValidation.TestHelper;
 using NashAssetManagement.Application.UseCases.Users.ViewUsers;
 using Xunit;
 
@@ -5,99 +6,126 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers
 {
     public class ValidatorTests
     {
-        private readonly Validators _validator = new();
+        private readonly Validators _validator;
+
+        public ValidatorTests()
+        {
+            _validator = new Validators();
+        }
 
         [Fact]
-        public async Task ViewUserListValidator_PageNumberIsZero_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForPageNumber_WhenPageNumberIs0()
         {
+            // Arrange
             var request = new Request(0, 10, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
-            Assert.Contains(result.Errors,
-                x => x.PropertyName == nameof(Request.PageNumber)
-                     && x.ErrorMessage == "Page number must be greater than 0.");
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.PageNumber);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.PageNumber), error.PropertyName);
+            Assert.Equal("Page number must be greater than 0.", error.ErrorMessage);
         }
 
         [Fact]
-        public async Task ViewUserListValidator_PageNumberIsNegative_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForPageNumber_WhenPageNumberIsNegative()
         {
+            // Arrange
             var request = new Request(-1, 10, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
-            Assert.Contains(result.Errors,
-                x => x.PropertyName == nameof(Request.PageNumber)
-                     && x.ErrorMessage == "Page number must be greater than 0.");
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.PageNumber);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.PageNumber), error.PropertyName);
+            Assert.Equal("Page number must be greater than 0.", error.ErrorMessage);
         }
 
         [Fact]
-        public async Task ViewUserListValidator_PageSizeIsZero_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForPageSize_WhenPageSizeIs0()
         {
+            // Arrange
             var request = new Request(1, 0, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
-            Assert.Contains(result.Errors,
-                x => x.PropertyName == nameof(Request.PageSize)
-                     && x.ErrorMessage == "'Page Size' must be greater than '0'.");
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.PageSize);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.PageSize), error.PropertyName);
+            Assert.Equal("'Page Size' must be greater than '0'.", error.ErrorMessage);
         }
 
         [Fact]
-        public async Task ViewUserListValidator_PageSizeIsGreaterThanMax_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForPageSize_WhenPageSizeIsTooLarge()
         {
+            // Arrange
             var request = new Request(1, 101, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
-            Assert.Contains(result.Errors,
-                x => x.PropertyName == nameof(Request.PageSize)
-                     && x.ErrorMessage == "Page size must be between 0 and 100.");
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.PageSize);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.PageSize), error.PropertyName);
+            Assert.Equal("Page size must be between 0 and 100.", error.ErrorMessage);
         }
 
         [Fact]
-        public async Task ViewUserListValidator_PageNumberAndPageSizeAreInvalid_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrors_WhenPageNumberAndPageSizeAreInvalid()
         {
+            // Arrange
             var request = new Request(0, 0, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.PageNumber);
+            result.ShouldHaveValidationErrorFor(x => x.PageSize);
             Assert.Equal(2, result.Errors.Count);
-
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.PageNumber)
                      && x.ErrorMessage == "Page number must be greater than 0.");
-
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.PageSize)
                      && x.ErrorMessage == "'Page Size' must be greater than '0'.");
         }
 
         [Fact]
-        public async Task ViewUserListValidator_NullPaging_ShouldPassValidation()
+        public void TestValidate_ShouldNotHaveAnyValidationErrors_WhenValuesAreNulls()
         {
+            // Arrange
             var request = new Request(null, null, null, null, null, null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.True(result.IsValid);
-            Assert.Empty(result.Errors);
+            // Assert
+            result.ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
-        public async Task ViewUserListValidator_ValidRequest_ShouldPassValidation()
+        public void TestValidate_ShouldNotHaveAnyValidationErrors_WhenRequestIsValid()
         {
+            // Arrange
             var request = new Request(1, 20, "staff", "Admin", "staffCode", false);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.True(result.IsValid);
-            Assert.Empty(result.Errors);
+            // Assert
+            result.ShouldNotHaveAnyValidationErrors();
         }
     }
 }
