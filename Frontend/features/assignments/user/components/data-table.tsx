@@ -95,6 +95,7 @@ export const UserAssignmentsDataTable = () => {
         emptyMessage="No assignments found."
       />
 
+      {/* Pagination */}
       <Pagination
         pageNumber={data?.pageNumber ?? 1}
         totalPages={data?.totalPages ?? 1}

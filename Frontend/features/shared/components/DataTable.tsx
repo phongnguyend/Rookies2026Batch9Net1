@@ -14,6 +14,11 @@ export interface SortItem {
   direction: SortDirection;
 }
 
+export interface SortItem {
+  key: string;
+  direction: SortDirection;
+}
+
 interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
@@ -83,6 +88,12 @@ export default function DataTable<T>({
                   {column.sortable && (
                     <span className="ml-1">
                       {getSortIcon(currentSort?.direction)}
+                    </span>
+                  )}
+
+                  {currentSort && (
+                    <span className="ml-1 text-xs text-gray-400">
+                      {sortIndex + 1}
                     </span>
                   )}
 

@@ -8,7 +8,6 @@ import { loginSuccess, loginFailure } from "@/features/auth/auth.slice";
 import { UserRoles } from "@/features/users/users.types";
 import { useState } from "react";
 import { Login } from "@/features/auth/auth.types";
-import { ApiErrorResponse } from "@/lib/api/base.types";
 
 export default function HomePage() {
   // Queries and hooks
@@ -26,15 +25,18 @@ export default function HomePage() {
         username: data.username,
         password: data.password,
       }).unwrap();
+
       const profile = await getMe().unwrap();
-      const userRole = profile.roles.includes("Admin")
+      const userRole = profile.roles.includes(UserRoles.Admin)
         ? UserRoles.Admin
         : UserRoles.Staff;
+
       dispatch(
         loginSuccess({
           username: profile.userName,
           role: userRole,
           isFirstLogin: profile.isFirstLogin,
+          locationName: profile.locationName,
         }),
       );
     } catch (err: any) {
@@ -54,7 +56,8 @@ export default function HomePage() {
 
       // fallback to single error description
       if (parsedErrors.length === 0) {
-        const fallbackMsg = err?.detail || "Username or password is incorrect. Please try again.";
+        const fallbackMsg =
+          err?.detail || "Username or password is incorrect. Please try again.";
         parsedErrors.push(fallbackMsg);
       }
 
