@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Categories.ViewList;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers;
 
@@ -22,6 +23,7 @@ public class CategoriesController : BaseApiController
     public CategoriesController(ISender sender) : base(sender) { }
 
     [HttpGet]
+    [SwaggerOperation(Tags = [ControllerTags.Categories])]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetCategoriesRequest(), cancellationToken);

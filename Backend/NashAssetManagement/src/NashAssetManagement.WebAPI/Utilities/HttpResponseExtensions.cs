@@ -6,8 +6,8 @@ namespace NashAssetManagement.WebAPI.Utilities
     {
         public static void AppendAuthCookie(this HttpResponse response, AuthCookie authCookie)
         {
-            var host = response.HttpContext.Request.Host.Host;
-            var isLocalhost = host == "localhost" || host == "127.0.0.1";
+            // var host = response.HttpContext.Request.Host.Host;
+            // var isLocalhost = host == "localhost" || host == "127.0.0.1";
 
             response.Cookies.Append(
                 authCookie.TokenName,
@@ -19,7 +19,8 @@ namespace NashAssetManagement.WebAPI.Utilities
                     IsEssential = authCookie.IsEssential,
                     Path = authCookie.Path,
                     Expires = authCookie.ExpiresAtUtc,
-                    SameSite = isLocalhost ? SameSiteMode.None : SameSiteMode.Lax
+                    // SameSite = isLocalhost ? SameSiteMode.None : SameSiteMode.Lax
+                    SameSite = SameSiteMode.None
                 });
         }
     }
