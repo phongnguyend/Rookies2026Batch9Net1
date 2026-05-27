@@ -25,7 +25,9 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [Authorize]
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Get user's assignments. Assignments will be in state 'Waiting for acceptance' or 'Accepted'. Only assignments from the past to current date will be fetched.")]
+            Summary = "Get user's assignments",
+            Description = "Allow user to view their own assignments. Assignments will be in state 'Waiting for acceptance' or 'Accepted'. Only assignments from the past to current date will be fetched.",
+            Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> ViewUserAssignments(
             [FromQuery] Request request,
             CancellationToken cancellationToken)

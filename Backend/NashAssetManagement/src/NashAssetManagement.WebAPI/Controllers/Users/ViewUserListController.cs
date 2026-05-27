@@ -2,10 +2,11 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NashAssetManagement.Application.Utilities;
-using NashAssetManagement.WebAPI.Utilities;
 using NashAssetManagement.Application.UseCases.Users.ViewUsers;
+using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Users
 {
@@ -22,6 +23,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.Users])]
         public async Task<IActionResult> Get([FromQuery] Request request)
         {
             var result = await _sender.Send(request);

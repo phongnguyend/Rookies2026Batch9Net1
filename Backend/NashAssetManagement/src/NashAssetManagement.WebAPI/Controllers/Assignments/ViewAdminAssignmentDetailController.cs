@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Assignments.GetById;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.Assignments
 {
@@ -23,6 +24,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _sender.Send(new Query(id));
