@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Users.ViewUserDetail;
-using NashAssetManagement.WebAPI.Utilities;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 
 namespace NashAssetManagement.WebAPI.Controllers.Users
@@ -12,7 +13,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
     [ApiVersion(1)]
     [Route("api/v{version:apiVersion}/users/{id}")]
     public class ViewUserDetailController(
-        ISender sender) 
+        ISender sender)
         : BaseApiController(sender)
     {
         [HttpGet]
@@ -23,6 +24,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.Users])]
         public async Task<IActionResult> GetDetail(string id)
         {
             var result = await _sender.Send(new Request(id));
