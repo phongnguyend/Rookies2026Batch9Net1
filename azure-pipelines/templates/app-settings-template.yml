@@ -38,9 +38,5 @@ steps:
         {
           "name": "Cors__AllowedOrigins__0",
           "value": "$(Cors__AllowedOrigins__0)"
-        },
-        {
-          "name": "Cors__AllowedOrigins__1",
-          "value": "$(Cors__AllowedOrigins__1)"
-        },
+        }
       ]
