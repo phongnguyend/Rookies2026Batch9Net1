@@ -19,7 +19,7 @@ namespace NashAssetManagement.Application.UseCases.Auth.Logout
         public async Task<ErrorOr<Deleted>> Handle(Request request, CancellationToken cancellationToken)
         {
             // authenticated user
-            if (!currentUser.UserId.HasValue)
+            if (currentUser == null || !currentUser.UserId.HasValue)
             {
                 return Errors.Unauthorized;
             }
