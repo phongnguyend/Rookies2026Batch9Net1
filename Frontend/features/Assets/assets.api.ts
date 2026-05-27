@@ -6,6 +6,8 @@ import type {
   GetCategoriesResponse,
   CreateAssetRequest,
   CreateAssetResponse,
+  CreateCategoryRequest,
+  CreateCategoryResponse,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
@@ -53,6 +55,19 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Asset"],  // ← forces list to refetch → new asset on top
     }),
+
+    createCategory: builder.mutation<
+      CreateCategoryResponse,
+      CreateCategoryRequest
+    >({
+      query: (body) => ({
+        url: "v1/categories",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Asset"],
+    }),
+
   }),
 });
 
@@ -60,5 +75,6 @@ export const {
   useGetAssetsQuery,
   useGetAssetByIdQuery,
   useGetCategoriesQuery,
-  useCreateAssetMutation,  // ← new
+  useCreateAssetMutation,  
+  useCreateCategoryMutation,
 } = assetsApi;

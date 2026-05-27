@@ -52,11 +52,21 @@ export interface GetAssetDetailResponse {
 export interface CategoryItem {
   id: string;
   name: string;
+  prefix: string;
+}
+export interface CreateCategoryRequest {
+  categoryName: string;
+  categoryPrefix: string;
+}
+export interface CreateCategoryResponse {
+  id: string;
+  name: string;
+  prefix: string;
 }
 
 export type GetCategoriesResponse = CategoryItem[];
 
-// ─── Create ───────────────────────────────────────────
+// ─── Create Assets ───────────────────────────────────────────
 export interface CreateAssetRequest {
   assetName: string;
   specification: string;
