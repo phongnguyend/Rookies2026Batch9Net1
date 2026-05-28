@@ -128,6 +128,7 @@ export default function CreateAssetPage() {
         <div className="flex-1">
           Name
           <input
+            maxLength={100}
             data-testid="txtName"
             type="text"
             value={assetName}
@@ -160,6 +161,7 @@ export default function CreateAssetPage() {
           Specification
           <textarea
             data-testid="txaSpecification"
+            maxLength={500}
             value={specification}
             onChange={(e) => setSpecification(e.target.value)}
             rows={4}

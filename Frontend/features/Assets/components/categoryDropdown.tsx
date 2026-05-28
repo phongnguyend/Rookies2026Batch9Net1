@@ -14,8 +14,8 @@ const toUpperPrefix = (str: string): string => str.trim().toUpperCase();
 interface CategoryDropdownProps {
   categories: CategoryItem[];
   isLoading?: boolean;
-  value: string;            // ← display value (category name)
-  onChange: (id: string, name: string) => void;  // ← passes id + name
+  value: string; // ← display value (category name)
+  onChange: (id: string, name: string) => void; // ← passes id + name
   error?: string;
 }
 
@@ -43,7 +43,10 @@ export default function CategoryDropdown({
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
         resetAddForm();
       }
@@ -54,7 +57,7 @@ export default function CategoryDropdown({
 
   // ─── Select existing category ──────────────────────
   const handleSelectCategory = (cat: CategoryItem) => {
-    onChange(cat.id, cat.name);  // ← pass id + name to parent
+    onChange(cat.id, cat.name); // ← pass id + name to parent
     setIsOpen(false);
     resetAddForm();
   };
@@ -66,10 +69,10 @@ export default function CategoryDropdown({
 
     // Client-side duplicate check
     const nameExists = categories.some(
-      (c) => c.name.toLowerCase() === parsedName.toLowerCase()
+      (c) => c.name.toLowerCase() === parsedName.toLowerCase(),
     );
     const prefixExists = categories.some(
-      (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase()
+      (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase(),
     );
 
     const toastErrors: string[] = [];
@@ -77,18 +80,22 @@ export default function CategoryDropdown({
     if (!parsedName) {
       toastErrors.push("Category name is required.");
     } else if (nameExists) {
-      toastErrors.push("Category is already existed. Please enter a different category");
+      toastErrors.push(
+        "Category is already existed. Please enter a different category",
+      );
     }
 
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
     } else if (prefixExists) {
-      toastErrors.push("Prefix is already existed. Please enter a different prefix");
+      toastErrors.push(
+        "Prefix is already existed. Please enter a different prefix",
+      );
     }
 
     if (toastErrors.length > 0) {
       toastErrors.forEach((msg) =>
-        dispatch(enqueueToast({ message: msg, type: ToastType.Error }))
+        dispatch(enqueueToast({ message: msg, type: ToastType.Error })),
       );
       return;
     }
@@ -99,111 +106,120 @@ export default function CategoryDropdown({
         categoryPrefix: parsedPrefix,
       }).unwrap();
 
-      onChange(result.id, result.name);  // ← pass id + name from API response
+      onChange(result.id, result.name); // ← pass id + name from API response
 
-      dispatch(enqueueToast({
-        message: `Category "${result.name}" created successfully.`,
-        type: ToastType.Success,
-      }));
+      dispatch(
+        enqueueToast({
+          message: `Category "${result.name}" created successfully.`,
+          type: ToastType.Success,
+        }),
+      );
 
       resetAddForm();
-
     } catch {
-      dispatch(enqueueToast({
-        message: "Category is already existed. Please enter a different category name.",
-        type: ToastType.Error,
-      }));
+      dispatch(
+        enqueueToast({
+          message:
+            "Category is already existed. Please enter a different category name.",
+          type: ToastType.Error,
+        }),
+      );
     }
   };
 
   return (
     <div ref={containerRef} className="relative w-full">
-
       {/* Trigger */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex h-9 w-full items-center justify-between rounded border px-3 text-sm bg-white ${
-          error ? "border-red-500" : "border-gray-400"
+        className={`btn w-full justify-between ${
+          error ? "btn-error" : "btn-outline"
         }`}
       >
-        <span className={value ? "text-gray-800" : "text-gray-400"}>
+        <span className="truncate">
           {isLoading ? "Loading..." : value || "Select category"}
         </span>
-        <span>▼</span>
+
+        <span className="text-xs">▼</span>
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-10 z-30 w-full rounded border border-gray-300 bg-white shadow-lg">
-
+        <div className="absolute left-0 top-12 z-30 max-h-60 w-full overflow-y-auto rounded-box border border-base-300 bg-base-100 shadow-lg">
           {categories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => handleSelectCategory(cat)}
-              className={`cursor-pointer px-3 py-2 text-sm hover:bg-gray-100 ${
-                value === cat.name ? "bg-gray-50 font-semibold" : ""
+              className={`cursor-pointer px-4 py-2 text-sm hover:bg-base-200 ${
+                value === cat.name ? "bg-base-200 font-semibold" : ""
               }`}
             >
               {cat.name}
             </div>
           ))}
 
-          <div className="border-t border-gray-200" />
+          <div className="divider my-0" />
 
           {!showAddForm ? (
             <div
               data-testid="lnkAddNewCategory"
               onClick={() => setShowAddForm(true)}
-              className="cursor-pointer px-3 py-2 text-sm text-primary underline italic hover:bg-gray-50"
+              className="cursor-pointer px-4 py-2 text-sm italic text-primary hover:bg-base-200"
             >
               Add new category
             </div>
           ) : (
-            <div className="px-3 py-2">
-              <div className="flex items-center gap-2">
+            <div className="p-3">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <input
+                  maxLength={20}
                   data-testid="txtAddNewCategoryName"
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onBlur={(e) => setNewName(toTitleCase(e.target.value))}
                   placeholder="Category name"
-                  className="h-8 flex-1 rounded border border-gray-400 px-2 text-sm outline-none"
+                  className="input input-bordered input-sm w-full"
                   autoFocus
                 />
+
                 <input
                   data-testid="txtAddNewCategoryPrefix"
+                  maxLength={2}
                   type="text"
                   value={newPrefix}
                   onChange={(e) => setNewPrefix(e.target.value.toUpperCase())}
                   placeholder="Prefix"
-                  maxLength={10}
-                  className="h-8 w-20 rounded border border-gray-400 px-2 text-sm outline-none uppercase"
+                  className="input input-bordered input-sm w-full sm:w-20 uppercase"
                 />
-                <button
-                  data-testid="btnAcceptCategory"
-                  type="button"
-                  onClick={handleConfirm}
-                  className="text-primary hover:text-primary/80 font-bold text-lg"
-                >
-                  ✓
-                </button>
-                <button
-                  data-testid="btnCancelCategory"
-                  type="button"
-                  onClick={resetAddForm}
-                  className="text-gray-500 hover:text-gray-700 font-bold text-lg"
-                >
-                  ✕
-                </button>
+
+                <div className="flex gap-2 sm:self-center">
+                  <button
+                    data-testid="btnAcceptCategory"
+                    type="button"
+                    onClick={handleConfirm}
+                    className="btn btn-primary btn-sm"
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    data-testid="btnCancelCategory"
+                    type="button"
+                    onClick={resetAddForm}
+                    className="btn btn-ghost btn-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="mt-1 text-xs text-error">{error}</p>}
     </div>
   );
 }
