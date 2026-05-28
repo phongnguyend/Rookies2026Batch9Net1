@@ -104,7 +104,7 @@ export default function LoginForm({
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${errors.password && (passwordValue !== "" || isSubmitted)
                 ? "input-error focus:input-error"
                 : ""
