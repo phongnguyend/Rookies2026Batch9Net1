@@ -7,11 +7,8 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
-}
-
-export interface SortItem {
-  key: string;
-  direction: SortDirection;
+  headerTestId?: string;
+  cellTestId?: (row: T, index: number) => string;
 }
 
 export interface SortItem {
@@ -29,6 +26,7 @@ interface DataTableProps<T> {
   // sort
   sorts?: SortItem[];
   onSortChange?: (sorts: SortItem[]) => void;
+  tableTestId?: string;
 }
 
 export default function DataTable<T>({
@@ -39,6 +37,7 @@ export default function DataTable<T>({
   emptyMessage = "No records found.",
   sorts = [],
   onSortChange,
+  tableTestId,
 }: DataTableProps<T>) {
   const handleSort = (key: string) => {
     const currentSort = sorts.find((s) => s.key === key);
@@ -49,7 +48,7 @@ export default function DataTable<T>({
       nextSorts = [...sorts, { key, direction: SortDirection.Asc }];
     } else if (currentSort.direction === SortDirection.Asc) {
       nextSorts = sorts.map((s) =>
-        s.key === key ? { ...s, direction: SortDirection.Desc } : s
+        s.key === key ? { ...s, direction: SortDirection.Desc } : s,
       );
     } else {
       nextSorts = sorts.filter((s) => s.key !== key);
@@ -59,14 +58,14 @@ export default function DataTable<T>({
   };
 
   const getSortIcon = (direction?: SortDirection) => {
-    if (direction === SortDirection.Asc) return "↑";
-    if (direction === SortDirection.Desc) return "↓";
-    return "↕";
+    if (direction === SortDirection.Asc) return "\u2191";
+    if (direction === SortDirection.Desc) return "\u2193";
+    return "\u2195";
   };
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm">
+      <table className="w-full text-left text-sm" data-testid={tableTestId}>
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
@@ -82,24 +81,13 @@ export default function DataTable<T>({
                       ? "cursor-pointer select-none hover:text-primary"
                       : ""
                   }`}
+                  data-testid={column.headerTestId}
                 >
                   {column.header}
 
                   {column.sortable && (
                     <span className="ml-1">
                       {getSortIcon(currentSort?.direction)}
-                    </span>
-                  )}
-
-                  {currentSort && (
-                    <span className="ml-1 text-xs text-gray-400">
-                      {sortIndex + 1}
-                    </span>
-                  )}
-
-                  {currentSort && (
-                    <span className="ml-1 text-xs text-gray-400">
-                      {sortIndex + 1}
                     </span>
                   )}
                 </th>
@@ -137,6 +125,7 @@ export default function DataTable<T>({
                   <td
                     key={column.key}
                     className={`py-2 ${column.className ?? ""}`}
+                    data-testid={column.cellTestId?.(row, rowIndex)}
                   >
                     {column.render
                       ? column.render(row, rowIndex)
