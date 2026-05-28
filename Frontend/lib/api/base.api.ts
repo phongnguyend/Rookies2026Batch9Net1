@@ -1,73 +1,146 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ENV_CONFIGS } from "../config/env";
 import { ApiErrorResponse } from "./base.types";
-import { BaseQueryFn } from "@reduxjs/toolkit/query";
+import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { logoutAccount } from "@/features/auth/auth.slice";
-
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: ENV_CONFIGS.apiUrl + "/api",
   credentials: 'include', // send cookie automatic
 });
 
-let refreshPromise: Promise<any> | null = null;
+let refreshPromise: ReturnType<typeof rawBaseQuery> | null = null;
 
-const customBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
-  let result = await rawBaseQuery(args, api, extraOptions);
-
-  const isRefreshRequest = typeof args === "string"
-    ? args === "/auth/refresh"
-    : (args as { url?: string })?.url === "/auth/refresh";
-
-  // automaticaly call the /auth/refresh when ever the access token expired
-  if (result.error?.status == 401 && !isRefreshRequest) {
-    if (!refreshPromise) {
-      refreshPromise = (async () => {
-        return await rawBaseQuery(
-          {
-            url: "/auth/refresh",
-            method: "POST"
-          },
-          api,
-          extraOptions
-        );
-      })();
-    }
-
-    const refreshResult = await refreshPromise;
-    refreshPromise = null;
-
-    // if refresh successful (no error), then continue with result query
-    if (!refreshResult.error) {
-      result = await rawBaseQuery(args, api, extraOptions);
-    } else {
-      api.dispatch(logoutAccount());
-      return result;
-    }
+// Avoid recalling the refresh endpoint itself
+// - checking if the request is the refresh request or not
+const isRefreshRequest = (args: string | FetchArgs): boolean => {
+  if (typeof args === "string") {
+    return args === "/auth/refresh";
   }
 
+  return args.url === "/auth/refresh";
+}
 
-  // remapping error object to have a response format like in server
-  if (result.error) {
-    const rawErrordata = result.error.data as
-      | Record<string, unknown>
-      | undefined;
+const refreshToken = async (
+  api: any,
+  extraOptions: any,
+) => {
 
-    const customErrorResponse: ApiErrorResponse = {
-      title: (rawErrordata?.title as string) || "An error occurred",
-      type: (rawErrordata?.type as string) || "Unknown",
-      status: Number(result.error.status) || 500,
-      detail:
-        (rawErrordata?.detail as string) ||
-        "Something went wrong. Please try again later.",
-      errors: (rawErrordata?.errors as ApiErrorResponse["errors"]) || undefined,
-    };
-
-    return { error: customErrorResponse };
+  // If no refreshIs current requested, calling one
+  if (!refreshPromise) {
+    refreshPromise = rawBaseQuery(
+      {
+        url: "/auth/refresh",
+        method: "POST",
+      },
+      api,
+      extraOptions,
+    );
   }
+
+  const result = await refreshPromise;
+  refreshPromise = null;
 
   return result;
 };
+
+// Error Response Mapping
+// - Mapping errors from server to client
+const mapErrorResponse = (
+  error: FetchBaseQueryError,
+): ApiErrorResponse => {
+  const rawErrorData =
+    (error.data as Record<string, unknown>) || {};
+
+  return {
+    title:
+      (rawErrorData.title as string) ||
+      "An error occurred",
+
+    type:
+      (rawErrorData.type as string) ||
+      "Unknown",
+
+    status:
+      Number(error.status) || 500,
+
+    detail:
+      (rawErrorData.detail as string) ||
+      "Something went wrong. Please try again later.",
+
+    errors:
+      rawErrorData.errors as ApiErrorResponse["errors"],
+  };
+};
+
+// Handle Auth Failure
+// - refresh token expired
+// - refresh endpoint failed
+const handleAuthFailure = (api: any) => {
+
+  // Remove auth state, must know
+  api.dispatch(logoutAccount())
+
+  // Redirect user to login form if not already on the login page
+  if (typeof window !== "undefined") {
+    const currentPath = window.location.pathname;
+    if (currentPath !== "/" && currentPath !== "/index.html" && currentPath !== "/login") {
+      window.location.replace("/");
+    }
+  }
+}
+
+// ================= Base Query + Refresh Token Revocation + Access Token Revocation ==============
+
+const customBaseQuery: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  ApiErrorResponse
+> = async (
+  args,
+  api,
+  extraOptions,
+) => {
+
+    // Rule 0: Run original request (e.g. /categories)
+    let result = await rawBaseQuery(
+      args,
+      api,
+      extraOptions
+    );
+
+    // Rule 1: Access Token expired
+    // - response 401 Authorized, then try to call the refresh token
+    if (result.error?.status === 401 && !isRefreshRequest(args)) {
+      const refreshTokenResult = await refreshToken(api, extraOptions);
+
+      // if refreshToken return is still valid
+      if (!refreshTokenResult.error) {
+        result = await rawBaseQuery(args, api, extraOptions);
+      }
+
+      // if refrsth token also invalid
+      else {
+        handleAuthFailure(api);
+        return {
+          error: mapErrorResponse(refreshTokenResult.error)
+        }
+      }
+    }
+
+
+    // Rule 2: Continue with original response, Normalize API errors
+    if (result.error) {
+      return {
+        error: mapErrorResponse(
+          result.error,
+        ),
+      };
+    }
+
+    // Rule 3: If no error, just continue the original request
+    return result;
+  }
 
 export const baseApiSlice = createApi({
   reducerPath: "api",
