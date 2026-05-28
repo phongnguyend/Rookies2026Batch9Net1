@@ -14,8 +14,8 @@ const toUpperPrefix = (str: string): string => str.trim().toUpperCase();
 interface CategoryDropdownProps {
   categories: CategoryItem[];
   isLoading?: boolean;
-  value: string;
-  onChange: (name: string, prefix?: string) => void;
+  value: string;            // ← display value (category name)
+  onChange: (id: string, name: string) => void;  // ← passes id + name
   error?: string;
 }
 
@@ -28,27 +28,22 @@ export default function CategoryDropdown({
 }: CategoryDropdownProps) {
   const dispatch = useAppDispatch();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [createCategory] = useCreateCategoryMutation();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPrefix, setNewPrefix] = useState("");
-  const [createCategory] = useCreateCategoryMutation();
-  // All categories including newly added ones
-  const allCategories = categories;
 
-  // Close on outside click
   const resetAddForm = () => {
     setShowAddForm(false);
     setNewName("");
     setNewPrefix("");
   };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
         resetAddForm();
       }
@@ -57,22 +52,24 @@ export default function CategoryDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelectCategory = (cat: { name: string; prefix: string }) => {
-    onChange(cat.name, cat.prefix);
+  // ─── Select existing category ──────────────────────
+  const handleSelectCategory = (cat: CategoryItem) => {
+    onChange(cat.id, cat.name);  // ← pass id + name to parent
     setIsOpen(false);
     resetAddForm();
   };
 
+  // ─── Confirm new category ──────────────────────────
   const handleConfirm = async () => {
     const parsedName = toTitleCase(newName);
     const parsedPrefix = toUpperPrefix(newPrefix);
 
-    const nameExists = allCategories.some(
-      (c) => c.name.toLowerCase() === parsedName.toLowerCase(),
+    // Client-side duplicate check
+    const nameExists = categories.some(
+      (c) => c.name.toLowerCase() === parsedName.toLowerCase()
     );
-
-    const prefixExists = allCategories.some(
-      (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase(),
+    const prefixExists = categories.some(
+      (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase()
     );
 
     const toastErrors: string[] = [];
@@ -80,22 +77,18 @@ export default function CategoryDropdown({
     if (!parsedName) {
       toastErrors.push("Category name is required.");
     } else if (nameExists) {
-      toastErrors.push(
-        "Category is already existed. Please enter a different category",
-      );
+      toastErrors.push("Category is already existed. Please enter a different category");
     }
 
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
     } else if (prefixExists) {
-      toastErrors.push(
-        "Prefix is already existed. Please enter a different prefix",
-      );
+      toastErrors.push("Prefix is already existed. Please enter a different prefix");
     }
 
     if (toastErrors.length > 0) {
       toastErrors.forEach((msg) =>
-        dispatch(enqueueToast({ message: msg, type: ToastType.Error })),
+        dispatch(enqueueToast({ message: msg, type: ToastType.Error }))
       );
       return;
     }
@@ -106,39 +99,26 @@ export default function CategoryDropdown({
         categoryPrefix: parsedPrefix,
       }).unwrap();
 
-      onChange(result.name, result.prefix);
+      onChange(result.id, result.name);  // ← pass id + name from API response
 
-      dispatch(
-        enqueueToast({
-          message: `Category "${result.name}" created successfully.`,
-          type: ToastType.Success,
-        }),
-      );
+      dispatch(enqueueToast({
+        message: `Category "${result.name}" created successfully.`,
+        type: ToastType.Success,
+      }));
+
+      resetAddForm();
+
     } catch {
-      dispatch(
-        enqueueToast({
-          message:
-            "Category is already existed. Please enter a different category",
-          type: ToastType.Error,
-        }),
-      );
-
-      dispatch(
-        enqueueToast({
-          message: "Prefix is already existed. Please enter a different prefix",
-          type: ToastType.Error,
-        }),
-      );
+      dispatch(enqueueToast({
+        message: "Category is already existed. Please enter a different category name.",
+        type: ToastType.Error,
+      }));
     }
-  };
-
-  const handleCancel = () => {
-    resetAddForm();
-    // ← dropdown stays open, form disappears, fields cleared
   };
 
   return (
     <div ref={containerRef} className="relative w-full">
+
       {/* Trigger */}
       <button
         type="button"
@@ -156,10 +136,10 @@ export default function CategoryDropdown({
       {/* Dropdown */}
       {isOpen && (
         <div className="absolute top-10 z-30 w-full rounded border border-gray-300 bg-white shadow-lg">
-          {/* Existing + pending categories */}
-          {allCategories.map((cat, index) => (
+
+          {categories.map((cat) => (
             <div
-              key={cat.id || `pending-${index}`}
+              key={cat.id}
               onClick={() => handleSelectCategory(cat)}
               className={`cursor-pointer px-3 py-2 text-sm hover:bg-gray-100 ${
                 value === cat.name ? "bg-gray-50 font-semibold" : ""
@@ -169,10 +149,8 @@ export default function CategoryDropdown({
             </div>
           ))}
 
-          {/* Divider */}
           <div className="border-t border-gray-200" />
 
-          {/* Add new category trigger */}
           {!showAddForm ? (
             <div
               data-testid="lnkAddNewCategory"
@@ -182,7 +160,6 @@ export default function CategoryDropdown({
               Add new category
             </div>
           ) : (
-            // ─── Inline add form ──────────────────
             <div className="px-3 py-2">
               <div className="flex items-center gap-2">
                 <input
@@ -209,16 +186,14 @@ export default function CategoryDropdown({
                   type="button"
                   onClick={handleConfirm}
                   className="text-primary hover:text-primary/80 font-bold text-lg"
-                  title="Confirm"
                 >
                   ✓
                 </button>
                 <button
                   data-testid="btnCancelCategory"
                   type="button"
-                  onClick={handleCancel}
+                  onClick={resetAddForm}
                   className="text-gray-500 hover:text-gray-700 font-bold text-lg"
-                  title="Cancel"
                 >
                   ✕
                 </button>

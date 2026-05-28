@@ -70,10 +70,9 @@ export type GetCategoriesResponse = CategoryItem[];
 export interface CreateAssetRequest {
   assetName: string;
   specification: string;
-  installedDate: string;        // YYYY-MM-DD
-  state: string;                // "Available" | "NotAvailable"
-  categoryName: string;
-  categoryPrefix?: string;      // only for new category
+  installedDate: string;
+  state: string;
+  categoryId: string;
 }
 
 export interface CreateAssetResponse {

@@ -19,10 +19,10 @@ export default function CreateAssetPage() {
   const [specification, setSpecification] = useState("");
   const [installedDate, setInstalledDate] = useState<Date | null>(null); // ← Date | null
   const [state, setState] = useState<string>(AssetState.Available);
-  const [categoryName, setCategoryName] = useState("");
-  const [categoryPrefix, setCategoryPrefix] = useState<string | undefined>();
   const [serverError, setServerError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [categoryId, setCategoryId] = useState("");      // ← sent to API
+  const [categoryName, setCategoryName] = useState("");   // ← shown in dropdown
 
   // ─── API ───────────────────────────────────────────
   const { data: categoriesData, isLoading: categoriesLoading } =
@@ -32,14 +32,14 @@ export default function CreateAssetPage() {
   // ─── Save enabled only when all fields filled ──────
   const isFormValid =
     assetName.trim() !== "" &&
-    categoryName !== "" &&
+    categoryId !== "" &&
     specification.trim() !== "" &&
     installedDate !== null; // ← check null not empty string
 
   // ─── Handle category selection ─────────────────────
-  const handleCategoryChange = (name: string, prefix?: string) => {
+  const handleCategoryChange = (id: string, name: string) => {  // ← accept id + name
+    setCategoryId(id);
     setCategoryName(name);
-    setCategoryPrefix(prefix);
   };
 
   // ─── Convert Date → YYYY-MM-DD for backend ─────────
@@ -62,8 +62,7 @@ export default function CreateAssetPage() {
         specification: specification.trim(),
         installedDate: formatDate(installedDate), // ← convert Date to YYYY-MM-DD
         state,
-        categoryName,
-        categoryPrefix,
+        categoryId,
       }).unwrap();
 
       router.push("/admin/assets");
@@ -87,7 +86,7 @@ export default function CreateAssetPage() {
       errors.assetName = "Asset name must not exceed 100 characters.";
     }
 
-    if (!categoryName.trim()) {
+    if (!categoryId.trim()) {
       errors.categoryName = "Category name is required.";
     }
 
@@ -135,14 +134,13 @@ export default function CreateAssetPage() {
             onChange={(e) => setAssetName(e.target.value)}
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
-
           {fieldErrors.assetName && (
             <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
           )}
         </div>
 
         {/* Category */}
-        <div className="flex-1" >
+        <div className="flex-1">
           Category
           <CategoryDropdown
             categories={categoriesData ?? []}
@@ -150,10 +148,9 @@ export default function CreateAssetPage() {
             value={categoryName}
             onChange={handleCategoryChange}
           />
-
-          {fieldErrors.categoryName && (
+          {fieldErrors.categoryId && (
             <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.categoryName}
+              {fieldErrors.categoryId}
             </p>
           )}
         </div>
@@ -168,7 +165,6 @@ export default function CreateAssetPage() {
             rows={4}
             className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
           />
-
           {fieldErrors.specification && (
             <p className="mt-1 text-sm text-red-500">
               {fieldErrors.specification}
@@ -185,7 +181,6 @@ export default function CreateAssetPage() {
             placeholder="Select date"
             width="w-full"
           />
-
           {fieldErrors.installedDate && (
             <p className="mt-1 text-sm text-red-500">
               {fieldErrors.installedDate}
