@@ -31,6 +31,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       providesTags: ["Asset"],
     }),
 
+    // This Api should be moved to separate file, but for now we can keep it here since it's related to assets
     getCategories: builder.query<GetCategoriesResponse, void>({
       query: () => ({
         url: "v1/categories",
@@ -75,6 +76,6 @@ export const {
   useGetAssetsQuery,
   useGetAssetByIdQuery,
   useGetCategoriesQuery,
-  useCreateAssetMutation,  
+  useCreateAssetMutation,
   useCreateCategoryMutation,
 } = assetsApi;

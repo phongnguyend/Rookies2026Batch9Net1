@@ -1,6 +1,7 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
@@ -17,19 +18,22 @@ public class CreateAssetHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly CreateAssetValidator _validator;
     private readonly ICurrentUser _currentUser;
+    private readonly ILogger<CreateAssetHandler> _logger;
 
     public CreateAssetHandler(
         IRepository<Asset, Guid> assetRepository,
         IRepository<Category, Guid> categoryRepository,
         IUnitOfWork unitOfWork,
         CreateAssetValidator validator,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        ILogger<CreateAssetHandler> logger)
     {
         _assetRepository = assetRepository;
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
         _currentUser = currentUser;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<CreateAssetResponse>> Handle(
@@ -53,6 +57,7 @@ public class CreateAssetHandler
             return CreateAssetErrors.LocationNotFound;
         }
 
+        //Try parse
         var locationId = Guid.Parse(_currentUser.LocationId);
 
         var category = await _categoryRepository.FirstOrDefaultAsync(
@@ -64,32 +69,18 @@ public class CreateAssetHandler
             return CreateAssetErrors.CategoryNotFound;
         }
 
-        var maxCode = await _assetRepository.FirstOrDefaultAsync(
-            new AssetMaxCodeByPrefixSpec(category.Prefix),
+        var count = await _assetRepository.CountAsync(
+            new AssetCountByCategorySpec(category.Id, locationId),
             cancellationToken);
+            
+        var nextNumber = count + 1;
 
-        int nextNumber = 1;
-
-        if (!string.IsNullOrWhiteSpace(maxCode))
+        if (nextNumber > 999999)
         {
-            var numberPart = maxCode.Replace(category.Prefix, "");
-
-            var isValid = int.TryParse(numberPart, out var currentMax);
-
-            if (!isValid)
-            {
-                return CreateAssetErrors.InvalidAssetCodeFormat;
-            }
-
-            if (currentMax >= 999999)
-            {
-                return CreateAssetErrors.AssetCodeLimitReached;
-            }
-
-            nextNumber = currentMax + 1;
+            return CreateAssetErrors.AssetCodeLimitReached;
         }
 
-        var assetCode = $"{category.Prefix}{nextNumber:D6}";
+        var assetCode = $"{category.Prefix}{nextNumber:000000}";
 
         var asset = new Asset
         {

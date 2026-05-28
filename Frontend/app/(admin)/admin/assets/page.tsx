@@ -71,7 +71,7 @@ function AssetsContent() {
 
   const categoryOptions =
     categoriesData?.map((c) => ({
-      key: c.name,
+      key: c.id,
       label: c.name,
     })) ?? [];
 
