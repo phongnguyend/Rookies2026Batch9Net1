@@ -30,6 +30,10 @@ const typeFilters = [
 ];
 
 const pageSize = 10;
+const defaultSort: SortItem = {
+  key: "staffCode",
+  direction: SortDirection.Asc,
+};
 
 function ActionIconButton({
   label,
@@ -128,7 +132,7 @@ export default function UsersPage() {
             sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
         },
       ]
-    : [];
+    : [defaultSort];
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -207,7 +211,7 @@ export default function UsersPage() {
     // Backend currently accepts a single type value. When both roles are
     // selected, the dropdown normalizes to "All", so no type filter is sent.
     ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
-    ...(sorts[0]?.key ? { sortBy: sorts[0]!.key } : {}),
+    sortBy: sorts[0]?.key ?? defaultSort.key,
     ...(sorts[0]?.direction === SortDirection.Desc ? { sortDesc: true } : {}),
   };
 
@@ -384,17 +388,24 @@ export default function UsersPage() {
             />
           </div>
 
-          <Pagination
-            pageNumber={data?.pageNumber ?? queryPage}
-            totalPages={data?.totalPages ?? 1}
-            pageSize={data?.pageSize ?? pageSize}
-            totalCount={data?.totalCount ?? users.length}
-            hasPreviousPage={Boolean(data?.hasPreviousPage)}
-            hasNextPage={Boolean(data?.hasNextPage)}
-            onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
-            btnPreviousPageTestId="btnPrevPage"
-            btnNextPageTestId="btnNextPage"
-          />
+          {(data?.totalPages ?? 1) <= 1 ? (
+            <p className="mt-6 text-sm text-gray-500">
+              Page {data?.pageNumber ?? queryPage} of {data?.totalPages ?? 1} -
+              Total {data?.totalCount ?? users.length} items
+            </p>
+          ) : (
+            <Pagination
+              pageNumber={data?.pageNumber ?? queryPage}
+              totalPages={data?.totalPages ?? 1}
+              pageSize={data?.pageSize ?? pageSize}
+              totalCount={data?.totalCount ?? users.length}
+              hasPreviousPage={Boolean(data?.hasPreviousPage)}
+              hasNextPage={Boolean(data?.hasNextPage)}
+              onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
+              btnPreviousPageTestId="btnPrevPage"
+              btnNextPageTestId="btnNextPage"
+            />
+          )}
         </main>
       </div>
     </div>

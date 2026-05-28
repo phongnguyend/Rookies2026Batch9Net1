@@ -406,15 +406,22 @@ export default function ReturnsPage() {
             }}
           />
 
-          <Pagination
-            pageNumber={data?.pageNumber ?? page}
-            totalPages={data?.totalPages ?? 1}
-            pageSize={data?.pageSize ?? pageSize}
-            totalCount={data?.totalCount ?? 0}
-            hasPreviousPage={data?.hasPreviousPage ?? false}
-            hasNextPage={data?.hasNextPage ?? false}
-            onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
-          />
+          {(data?.totalPages ?? 1) <= 1 ? (
+            <p className="mt-6 text-sm text-gray-500">
+              Page {data?.pageNumber ?? page} of {data?.totalPages ?? 1} -
+              Total {data?.totalCount ?? 0} items
+            </p>
+          ) : (
+            <Pagination
+              pageNumber={data?.pageNumber ?? page}
+              totalPages={data?.totalPages ?? 1}
+              pageSize={data?.pageSize ?? pageSize}
+              totalCount={data?.totalCount ?? 0}
+              hasPreviousPage={data?.hasPreviousPage ?? false}
+              hasNextPage={data?.hasNextPage ?? false}
+              onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
+            />
+          )}
         </main>
       </div>
     </div>
