@@ -40,8 +40,8 @@ export default function HomePage() {
         }),
       );
     } catch (err: any) {
-      console.error("Login failed error object:", err);
-      
+      // console.error("Login failed error object:", err);
+
       const errorData = err?.data || err;
       let errorMessage = "";
       if (errorData?.errors) {
@@ -59,7 +59,8 @@ export default function HomePage() {
       }
 
       if (!errorMessage) {
-        errorMessage = errorData?.detail || "Something went wrong. Please try again later.";
+        errorMessage =
+          errorData?.detail || "Something went wrong. Please try again later.";
       }
 
       const parsedErrors = [errorMessage];
