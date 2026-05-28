@@ -80,7 +80,7 @@ export default function AssignmentDetailPopup({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4">
+        <div className="px-6 py-4" data-testid="dgdAssignmentRow">
           {isLoading ? (
             <div className="py-8 text-center">
               Loading...
