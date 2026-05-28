@@ -56,7 +56,7 @@ export const authSlice = createSlice({
     },
 
     // logout
-    logoutAccount: () => { return { ...initialState, isLoading: false } }
+    logoutAccount: () => { return { ...initialState, isLoading: false, isAuthenticated: false } }
   }
 })
 
