@@ -18,22 +18,19 @@ public class CreateAssetHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly CreateAssetValidator _validator;
     private readonly ICurrentUser _currentUser;
-    private readonly ILogger<CreateAssetHandler> _logger;
 
     public CreateAssetHandler(
         IRepository<Asset, Guid> assetRepository,
         IRepository<Category, Guid> categoryRepository,
         IUnitOfWork unitOfWork,
         CreateAssetValidator validator,
-        ICurrentUser currentUser,
-        ILogger<CreateAssetHandler> logger)
+        ICurrentUser currentUser)
     {
         _assetRepository = assetRepository;
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
         _currentUser = currentUser;
-        _logger = logger;
     }
 
     public async Task<ErrorOr<CreateAssetResponse>> Handle(
@@ -57,8 +54,10 @@ public class CreateAssetHandler
             return CreateAssetErrors.LocationNotFound;
         }
 
-        //Try parse
-        var locationId = Guid.Parse(_currentUser.LocationId);
+        if (!Guid.TryParse(_currentUser.LocationId, out var locationId))
+        {
+            return CreateAssetErrors.LocationNotFound;
+        }
 
         var category = await _categoryRepository.FirstOrDefaultAsync(
             new CategoryByIdSpec(request.CategoryId),
