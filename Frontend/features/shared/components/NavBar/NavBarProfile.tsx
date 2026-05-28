@@ -26,12 +26,12 @@ export default function NavbarProfile() {
   const handleConfirmLogout = async () => {
     try {
       await logout().unwrap();
-      window.location.replace("/");
-      dispatch(logoutAccount());
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Logout API failed:", error);
     } finally {
+      dispatch(logoutAccount());
       setIsLogoutConfirmOpen(false);
+      window.location.replace("/");
     }
   };
 

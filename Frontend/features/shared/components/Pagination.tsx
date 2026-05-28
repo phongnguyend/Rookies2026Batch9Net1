@@ -101,7 +101,7 @@ export default function Pagination({
       {typeof totalCount === "number" &&
         typeof pageSize === "number" && (
           <p className="text-sm text-gray-500">
-            Page {pageNumber} of {totalPages} — Total {totalCount} item {totalCount > 1 ? "s" : ""}
+            Page {pageNumber} of {totalPages} — Total {totalCount} item{totalCount > 1 ? "s" : ""}
           </p>
         )}
 
