@@ -5,6 +5,14 @@ import { formatDate } from "@/utils/datetime.utils";
 import { AssignmentState } from "@/lib/api/base.types";
 import { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 
+const isAcceptedAndReturning = (
+  assignment: ViewUserAssignments.UserAssignmentSummary,
+): boolean => {
+  return (
+    assignment.state === AssignmentState.Accepted && assignment.isReturning
+  );
+};
+
 export function createColumns(handlers: {
   onReturnClick: (
     assignment: ViewUserAssignments.UserAssignmentSummary,
@@ -44,7 +52,14 @@ export function createColumns(handlers: {
       key: "state",
       header: "State",
       sortable: true,
-      render: (assignment) => displayAssignmentState(assignment.state),
+      render: (assignment) => {
+        return (
+          <span>
+            {displayAssignmentState(assignment.state)}
+            {isAcceptedAndReturning(assignment) && " - Returning"}
+          </span>
+        );
+      },
       headerTestId: "btnSortState",
       cellTestId: (_, index) => `colState-${index}`,
     },
