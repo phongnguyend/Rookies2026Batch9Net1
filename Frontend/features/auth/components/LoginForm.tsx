@@ -14,10 +14,7 @@ const loginFormSchema = z.object({
     .max(100, "Username must not exceed 100 characters.")
     .regex(/^[a-zA-Z]+$/, "Username must contain only letters.")
     .transform((val) => val.trim()),
-  password: z
-    .string()
-    .min(1, "Password is required.")
-    .transform((val) => val.trim()),
+  password: z.string().min(1, "Password is required."),
 });
 
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
@@ -82,11 +79,10 @@ export default function LoginForm({
           <input
             type="text"
             placeholder="Enter your username"
-            className={`input input-bordered w-full focus:input-primary transition-colors ${
-              errors.username && (usernameValue !== "" || isSubmitted)
-                ? "input-error focus:input-error"
-                : ""
-            }`}
+            className={`input input-bordered w-full focus:input-primary transition-colors ${errors.username && (usernameValue !== "" || isSubmitted)
+              ? "input-error focus:input-error"
+              : ""
+              }`}
             disabled={isLoading}
             {...register("username")}
             data-testid="txtUsername"
@@ -109,11 +105,10 @@ export default function LoginForm({
             <input
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
-              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${
-                errors.password && (passwordValue !== "" || isSubmitted)
-                  ? "input-error focus:input-error"
-                  : ""
-              }`}
+              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${errors.password && (passwordValue !== "" || isSubmitted)
+                ? "input-error focus:input-error"
+                : ""
+                }`}
               disabled={isLoading}
               {...register("password")}
               data-testid="txtPassword"
@@ -189,7 +184,7 @@ export default function LoginForm({
 
         {/* Server-Side Error Display on bottom */}
         {serverErrors.length > 0 && (
-          <div className="p-3 text-xs text-error bg-error/10 border border-error/20 rounded-lg font-sans space-y-1.5 w-full mt-4">
+          <div className="p-3 text-xs text-error bg-error/10 border border-error/20 rounded-lg font-sans space-y-1.5 w-full mt-4 whitespace-pre-line">
             {serverErrors.length === 1 ? (
               <p>{serverErrors[0]}</p>
             ) : (
