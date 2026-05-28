@@ -82,6 +82,8 @@ function AssetsContent() {
     sortDirection: sort?.direction,
   });
 
+  const displayItems = data?.items ?? [];
+
   const categoryOptions =
     categoriesData?.map((c) => ({
       key: c.id,
@@ -279,7 +281,7 @@ function AssetsContent() {
         <Pagination
           pageNumber={data.pageNumber}
           totalPages={data.totalPages}
-          totalCount={data.totalCount}
+          totalCount={displayItems.length}
           pageSize={data.pageSize}
           hasPreviousPage={data.hasPreviousPage}
           hasNextPage={data.hasNextPage}
