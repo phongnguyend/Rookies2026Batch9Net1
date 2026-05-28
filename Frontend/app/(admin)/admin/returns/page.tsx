@@ -18,6 +18,7 @@ import {
 import { SortDirection } from "@/lib/api/base.types";
 
 const pageSize = 10;
+const returnRequestTimeZone = "Asia/Bangkok";
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
@@ -45,19 +46,53 @@ function parseDateParam(value: string | null) {
   return new Date(year, month - 1, day);
 }
 
+function getTimeZoneOffsetInMilliseconds(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+
+  const valueByType = new Map(
+    parts.map((part) => [part.type, Number(part.value)]),
+  );
+
+  return (
+    Date.UTC(
+      valueByType.get("year") ?? 0,
+      (valueByType.get("month") ?? 1) - 1,
+      valueByType.get("day") ?? 1,
+      valueByType.get("hour") ?? 0,
+      valueByType.get("minute") ?? 0,
+      valueByType.get("second") ?? 0,
+    ) - date.getTime()
+  );
+}
+
+function getStartOfDayInTimeZoneAsUtc(date: Date, timeZone: string) {
+  const utcDate = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+
+  return new Date(
+    utcDate.getTime() - getTimeZoneOffsetInMilliseconds(utcDate, timeZone),
+  );
+}
+
 function formatReturnedDateForQuery(date: Date | null) {
   if (!date) {
     return undefined;
   }
 
-  // The picker gives a local calendar day. The API stores UTC, so send the
-  // start of that local day converted back to UTC by subtracting 7 hours.
-  const utcDate = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
-      7 * 60 * 60 * 1000,
-  );
-
-  return utcDate.toISOString();
+  return getStartOfDayInTimeZoneAsUtc(
+    date,
+    returnRequestTimeZone,
+  ).toISOString();
 }
 
 function formatUtcDateToUtcPlus7(utc?: string | null) {
@@ -73,7 +108,7 @@ function formatUtcDateToUtcPlus7(utc?: string | null) {
   }
 
   const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Bangkok",
+    timeZone: returnRequestTimeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

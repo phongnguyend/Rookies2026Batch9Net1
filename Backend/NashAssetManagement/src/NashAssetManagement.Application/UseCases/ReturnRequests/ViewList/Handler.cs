@@ -19,6 +19,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         {
             var cleanedRequest = request with
             {
+              SearchTerm = request.SearchTerm?.Trim(),
               SortBy = request.SortBy?.Trim(),
               PageNumber = request.PageNumber ?? 1,
               PageSize = request.PageSize ?? 20  

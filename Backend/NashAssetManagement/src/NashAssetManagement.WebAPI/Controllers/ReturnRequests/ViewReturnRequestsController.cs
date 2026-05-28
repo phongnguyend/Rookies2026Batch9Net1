@@ -6,6 +6,7 @@ using NashAssetManagement.Application.UseCases.ReturnRequests.ViewList;
 using NashAssetManagement.Application.Utilities;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers.ReturnRequests
 {
@@ -25,6 +26,7 @@ namespace NashAssetManagement.WebAPI.Controllers.ReturnRequests
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerOperation(Tags = [ControllerTags.ReturningRequests])]
         public async Task<IActionResult> ViewReturnRequests(
             [FromQuery] Request request,
             CancellationToken cancellationToken

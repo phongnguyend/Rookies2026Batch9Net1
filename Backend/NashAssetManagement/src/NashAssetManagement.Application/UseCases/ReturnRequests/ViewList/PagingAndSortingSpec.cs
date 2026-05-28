@@ -18,14 +18,15 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         private void ApplySort(string? sortBy, bool? sortDesc)
         {
             bool descending = sortDesc ?? true;
-            Expression<Func<ReturnRequest, object>> keySelector 
+            // cSpell:words assetcode assetname requestedby assigneddate acceptedby returneddate
+            Expression<Func<ReturnRequest, object?>> keySelector 
                 = sortBy?.Trim().ToLowerInvariant() switch
             {
-                "assetcode" => x => x.Assignment.Asset.AssetCode,
-                "assetname" => x => x.Assignment.Asset.Name,
-                "requestedby" => x => x.RequestedByUser.UserName,
-                "assigneddate" => x => x.Assignment.AssignedAtUtc,
-                "acceptedby" => x => x.AcceptedByUser.UserName,
+                "assetcode" => x => x.Assignment!.Asset!.AssetCode,
+                "assetname" => x => x.Assignment!.Asset!.Name,
+                "requestedby" => x => x.RequestedByUser!.UserName,
+                "assigneddate" => x => x.Assignment!.AssignedAtUtc,
+                "acceptedby" => x => x.AcceptedByUser != null ? x.AcceptedByUser.UserName : null,
                 "returneddate" => x => x.ReturnedAtUtc,
                 "state" => x => x.State,
                 _ => x => x.CreatedAtUtc

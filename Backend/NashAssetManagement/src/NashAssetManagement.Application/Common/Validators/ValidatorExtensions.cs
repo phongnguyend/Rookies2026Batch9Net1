@@ -1,6 +1,5 @@
 using FluentValidation;
 
-
 namespace NashAssetManagement.Application.Common.Validators
 {
     internal static class ValidatorExtensions
@@ -43,5 +42,4 @@ namespace NashAssetManagement.Application.Common.Validators
 
         #endregion
     }
-
 }

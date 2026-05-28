@@ -1,6 +1,5 @@
 using Ardalis.Specification;
 using NashAssetManagement.Domain.Entities.Core;
-using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
 {
@@ -15,42 +14,30 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             // Search
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var searchTerm = request.SearchTerm.Trim().ToLower();
+                var searchTerm = $"%{request.SearchTerm.Trim().ToLower()}%";
 
-                Query.Where(x =>
-                    x.Assignment!.Asset!.AssetCode.ToLower().Contains(searchTerm) ||
-                    x.Assignment!.Asset!.Name.ToLower().Contains(searchTerm) ||
-                    x.RequestedByUser!.UserName!.ToLower().Contains(searchTerm));
+                Query
+                    .Search(x => x.Assignment!.Asset!.AssetCode.ToLower(), searchTerm)
+                    .Search(x => x.Assignment!.Asset!.Name.ToLower(), searchTerm)
+                    .Search(x => x.RequestedByUser!.UserName!.ToLower(), searchTerm);
             }
 
             // Filter with states
             if (request.States is { Count: > 0 })
             {
-                var states = request.States
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Select(x => Enum.TryParse<ReturnRequestState>(x.Trim(), true, out var state)
-                        ? state
-                        : (ReturnRequestState?)null)
-                    .Where(x => x.HasValue)
-                    .Select(x => x!.Value)
-                    .ToList();
-
-                if (states.Count > 0)
-                {
-                    Query.Where(x => states.Contains(x.State));
-                }
+                Query.Where(x => request.States.Contains(x.State));
             }
 
             // Filter with returned date
             if (DateTime.TryParse(request.ReturnedDate, out var returnedDate))
             {
                 var from = returnedDate.Date;
-                var to = from.AddDays(1);
+                var to = from.AddDays(1).AddTicks(-1);
 
                 Query.Where(x =>
                     x.ReturnedAtUtc.HasValue &&
                     x.ReturnedAtUtc.Value >= from &&
-                    x.ReturnedAtUtc.Value < to);
+                    x.ReturnedAtUtc.Value <= to);
             }
 
             Query.AsNoTracking()

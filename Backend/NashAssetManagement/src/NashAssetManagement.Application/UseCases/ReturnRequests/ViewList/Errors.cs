@@ -8,11 +8,6 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             "ReturnRequests.ViewList.Unauthorized",
             "Unauthorized to view return requests.");
 
-        public static Error InvalidStateValue (string state) => Error.Validation(
-            "ReturnRequests.ViewList.Validation",
-            $"Invalid state value: {state}."
-        );
-
         public static Error UserHasNoLocation = Error.Conflict(
             "ReturnRequests.ViewList.UserHasNoLocation",
             "User has no location."

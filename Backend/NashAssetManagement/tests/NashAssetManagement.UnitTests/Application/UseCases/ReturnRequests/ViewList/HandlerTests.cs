@@ -93,7 +93,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
             // Arrange
             var request = new Request(
                 SearchTerm: "laptop",
-                States: [ReturnRequestState.Completed.ToString()],
+                States: [ReturnRequestState.Completed],
                 ReturnedDate: "2026-05-26",
                 SortBy: " assetCode ",
                 SortDesc: false,
@@ -201,15 +201,16 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
         }
 
         [Fact]
-        public async Task Handle_ShouldValidateCleanedRequest_WhenSortByHasExtraSpaces()
+        public async Task Handle_ShouldValidateCleanedRequest_WhenSearchTermAndSortByHaveExtraSpaces()
         {
             // Arrange
-            var request = new Request(null, null, null, " assetCode ", null, null, null);
+            var request = new Request(" laptop ", null, null, " assetCode ", null, null, null);
 
             _mockValidator
                 .Setup(v => v.ValidateAsync(
                     It.Is<Request>(r =>
-                        r.SortBy == "assetCode"
+                        r.SearchTerm == "laptop"
+                        && r.SortBy == "assetCode"
                         && r.PageNumber == 1
                         && r.PageSize == 20),
                     It.IsAny<CancellationToken>()))
@@ -232,7 +233,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
             _mockValidator.Verify(
                 v => v.ValidateAsync(
                     It.Is<Request>(r =>
-                        r.SortBy == "assetCode"
+                        r.SearchTerm == "laptop"
+                        && r.SortBy == "assetCode"
                         && r.PageNumber == 1
                         && r.PageSize == 20),
                     It.IsAny<CancellationToken>()),
