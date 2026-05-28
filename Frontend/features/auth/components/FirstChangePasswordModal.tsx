@@ -58,7 +58,7 @@ export default function FirstChangePasswordModal({
     register,
     handleSubmit,
     watch,
-    formState: { errors, isValid, isSubmitted },
+    formState: { errors, isValid, isSubmitted, touchedFields },
     reset,
   } = useForm<ChangePasswordForm>({
     resolver: zodResolver(changePasswordSchema),
@@ -105,7 +105,7 @@ export default function FirstChangePasswordModal({
       reset();
     } catch (err: any) {
       console.error("Change password error:", err);
-      
+
       const errorData = err?.data || err;
       let errorMessage = "";
       if (errorData?.errors) {
@@ -123,7 +123,9 @@ export default function FirstChangePasswordModal({
       }
 
       if (!errorMessage) {
-        errorMessage = errorData?.detail || "An unexpected error occurred. Please try again.";
+        errorMessage =
+          errorData?.detail ||
+          "An unexpected error occurred. Please try again.";
       }
 
       const parsedErrors = [errorMessage];
@@ -227,7 +229,7 @@ export default function FirstChangePasswordModal({
                     </div>
                   </div>
                   {errors.newPassword &&
-                    (newPasswordValue !== "" || isSubmitted) && (
+                    (touchedFields.newPassword || isSubmitted) && (
                       <p className="text-xs text-red-600 pl-30.5 leading-snug font-sans">
                         {errors.newPassword.message}
                       </p>
@@ -292,7 +294,7 @@ export default function FirstChangePasswordModal({
                   </div>
                   {/* Show the errors message if the user has entered a value for the field or if the form has been submitted */}
                   {errors.confirmPassword &&
-                    (confirmPasswordValue !== "" || isSubmitted) && (
+                    (touchedFields.confirmPassword || isSubmitted) && (
                       <p className="text-xs text-red-600 pl-30.5 leading-snug font-sans">
                         {errors.confirmPassword.message}
                       </p>
@@ -318,8 +320,8 @@ export default function FirstChangePasswordModal({
                 <div className="flex justify-end pt-1.5">
                   <button
                     type="submit"
-                    className="px-5 py-1.5 bg-[#cf2a2a] hover:bg-[#b52222] text-white font-semibold text-[13px] rounded transition-all active:scale-[0.98] disabled:opacity-50 font-sans cursor-pointer"
-                    disabled={(isSubmitted && !isValid) || isLoading}
+                    className="px-5 py-1.5 bg-[#cf2a2a] hover:bg-[#b52222] text-white font-semibold text-[13px] rounded transition-all active:scale-[0.98] disabled:opacity-50 font-sans cursor-pointer disabled:cursor-not-allowed"
+                    disabled={!isValid || isLoading}
                     data-testid="btnSave"
                   >
                     {isLoading ? (
