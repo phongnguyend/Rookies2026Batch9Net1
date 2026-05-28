@@ -116,7 +116,7 @@ public class CreateAssetHandler
             asset.Id,
             asset.AssetCode,
             asset.Name,
-            category.Name,
+            category.CategoryName,
             asset.State,
             locationId.ToString());
     }
