@@ -17,6 +17,7 @@ import DataTable, {
   ColumnDef,
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
+import DropdownStateFilter from "@/features/Assets/components/stateDtopdown";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,
@@ -31,6 +32,8 @@ function AssetsContent() {
   const [sort, setSort] = useState<SortItem | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(search ?? "");
+  const [EditDisabledStates] = useState(false);
+  const [DeleteDisabledStates] = useState(false);
 
   // ─── Read from URL ─────────────────────────────
   const pageNumber = Number(searchParams.get("pageNumber") ?? "1");
@@ -40,9 +43,19 @@ function AssetsContent() {
   // ─── Requirement for default View ─────────────────────────────
   const isFirstLoad = !searchParams.has("states");
 
+  const defaultStates = [
+      AssetState.Available,
+      AssetState.NotAvailable,
+      AssetState.Assigned,
+    ];
+
   const selectedStates = isFirstLoad
-    ? [AssetState.Available, AssetState.NotAvailable, AssetState.Assigned]
+    ? defaultStates
     : stateParams;
+
+  const isDefaultStateSelection =
+    selectedStates.length === defaultStates.length &&
+    defaultStates.every((s) => selectedStates.includes(s));
 
   // ─── Write to URL ──────────────────────────────
   const updateMultipleUrl = (key: string, values: string[]) => {
@@ -71,7 +84,7 @@ function AssetsContent() {
 
   const categoryOptions =
     categoriesData?.map((c) => ({
-      key: c.name,
+      key: c.id,
       label: c.name,
     })) ?? [];
 
@@ -98,9 +111,24 @@ function AssetsContent() {
 
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
-    { key: "assetCode", header: "Asset Code", sortable: true, testId: "btnSortAssetCode" },
-    { key: "name", header: "Asset Name", sortable: true , testId: "btnSortAssetName"},
-    { key: "category", header: "Category", sortable: true ,  testId: "btnSortCategory"},
+    {
+      key: "assetCode",
+      header: "Asset Code",
+      sortable: true,
+      testId: "btnSortAssetCode",
+    },
+    {
+      key: "name",
+      header: "Asset Name",
+      sortable: true,
+      testId: "btnSortAssetName",
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      testId: "btnSortCategory",
+    },
     {
       key: "state",
       header: "State",
@@ -114,7 +142,12 @@ function AssetsContent() {
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
-            data-testid = "btnEdit"
+            disabled={
+              EditDisabledStates
+                ? EditDisabledStates
+                : row.state === AssetState.Assigned
+            }
+            data-testid="btnEdit"
             onClick={(e) => handleEdit(row, e)}
             className="btn btn-xs btn-outline"
           >
@@ -134,10 +167,16 @@ function AssetsContent() {
               <path d="m15 5 4 4" />
             </svg>
           </button>
+
           <button
-            data-testid = "btnIconDelete"
+            data-testid="btnIconDelete"
             onClick={(e) => handleDelete(row, e)}
             className="btn btn-xs btn-error btn-outline"
+            disabled={
+              DeleteDisabledStates
+                ? DeleteDisabledStates
+                : row.state === AssetState.Assigned
+            }
           >
             {/* X Circle icon */}
             <svg
@@ -172,14 +211,13 @@ function AssetsContent() {
       {/* Filters */}
       <div className="mb-4 flex items-center gap-3">
         <div data-testid="ddlState">
-          <DropdownFilter
+          <DropdownStateFilter
             items={STATE_OPTIONS}
             values={selectedStates}
-            placeholder="State"
             getKey={(item) => item.key}
             getLabel={(item) => item.label}
             onChange={(values) => updateMultipleUrl("states", values)}
-            allLabel="All States"
+            customLabel={isDefaultStateSelection ? "State" : undefined}
           />
         </div>
         <div data-testid="ddlCategory">
