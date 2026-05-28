@@ -42,9 +42,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
 
   // restore session on page mount/refresh if cookie exists
-  const { data: profile, isError } = useGetMeQuery(undefined, {
-    skip: isAuthenticated,
-  });
+  const { data: profile, isError } = useGetMeQuery();
 
   useEffect(() => {
     if (profile && !isAuthenticated) {
