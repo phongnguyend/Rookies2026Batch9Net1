@@ -1,29 +1,275 @@
 "use client";
 
-import DatePicker from "react-datepicker";
+import { Month } from "@/lib/api/base.types";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useMemo, useRef, useState, useEffect } from "react";
 
 interface DatePickerInputProps {
   value: Date | null;
   onChange: (date: Date | null) => void;
   placeholder?: string;
   width?: string;
+  txtInputTestId?: string;
 }
+
+const MONTHS = Object.values(Month);
+const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
+
+const DATE_REGEX = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+
+const parseDate = (input: string): Date | null => {
+  if (!DATE_REGEX.test(input)) return null;
+
+  const [day, month, year] = input.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  const isValidDate =
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day;
+
+  if (!isValidDate) return null;
+
+  const currentYear = new Date().getFullYear();
+
+  if (year < currentYear - 100 || year > currentYear + 100) {
+    return null;
+  }
+
+  return date;
+};
 
 export default function DatePickerInput({
   value,
   onChange,
-  placeholder = "Select Date",
-  width = "w-56",
+  placeholder = "Assigned Date",
+  width = "w-full sm:w-64",
+  txtInputTestId = "txtDatePicker",
 }: DatePickerInputProps) {
+  const today = new Date();
+
+  const [open, setOpen] = useState(false);
+  const [cursor, setCursor] = useState(value ?? today);
+
+  const [error, setError] = useState("");
+  const dispatch = useAppDispatch();
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+
+  useEffect(() => {
+    const handleClickOutside = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
+  }, []);
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const monthValue = String(date.getMonth() + 1).padStart(2, "0");
+
+    return `${day}/${monthValue}/${date.getFullYear()}`;
+  };
+
+  const [inputValue, setInputValue] = useState(formatDate(value));
+
+  const isSameDay = (a: Date, b: Date | null) =>
+    !!b &&
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+
+  const days = useMemo(() => {
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+    const result: { date: Date; inMonth: boolean }[] = [];
+
+    for (let i = firstDay - 1; i >= 0; i--) {
+      result.push({
+        date: new Date(year, month - 1, prevMonthTotalDays - i),
+        inMonth: false,
+      });
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      result.push({
+        date: new Date(year, month, day),
+        inMonth: true,
+      });
+    }
+
+    while (result.length < 35) {
+      const lastDate = result[result.length - 1].date;
+
+      result.push({
+        date: new Date(
+          lastDate.getFullYear(),
+          lastDate.getMonth(),
+          lastDate.getDate() + 1,
+        ),
+        inMonth: false,
+      });
+    }
+
+    return result;
+  }, [year, month]);
+
+  const selectDate = (date: Date) => {
+    onChange(date);
+    setInputValue(formatDate(date));
+    setCursor(date);
+    setError("");
+    setOpen(false);
+  };
+
   return (
-    <div className={width}>
-      <DatePicker
-        selected={value}
-        onChange={onChange}
-        placeholderText={placeholder}
-        dateFormat="dd/MM/yyyy"
-        className="h-9 w-full rounded border border-gray-400 px-3"
-      />
+    <div ref={ref} className={`relative ${width}`}>
+      {/* Date Picker Input */}
+      <div className="flex h-10 overflow-hidden rounded border border-gray-400 bg-base-100">
+        <input
+          data-testid="txtAssignedDate"
+          value={inputValue}
+          placeholder={placeholder}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            setError("");
+          }}
+          onBlur={() => {
+            if (!inputValue.trim()) {
+              onChange(null);
+              setError("");
+              return;
+            }
+
+            const parsedDate = parseDate(inputValue);
+
+            if (!parsedDate) {
+              setError("Date must be valid and follow dd/MM/yyyy format");
+
+              dispatch(
+                enqueueToast({
+                  message: "Date must be valid and follow dd/MM/yyyy format.",
+                  type: ToastType.Error,
+                  testId: "txtDateValidationError",
+                }),
+              );
+
+              return;
+            }
+
+            onChange(parsedDate);
+            setCursor(parsedDate);
+            setError("");
+          }}
+          className={`h-full min-w-0 flex-1 px-3 text-sm outline-none ${
+            error ? "text-error" : ""
+          }`}
+        />
+
+        <button
+          data-testid="btnAssignedDateCalendar"
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300"
+        >
+          📅
+        </button>
+      </div>
+
+      {open && (
+        <div className="absolute left-0 top-[38px] z-50 w-[320px] overflow-hidden rounded-sm border border-gray-400 bg-base-100 shadow">
+          {/* Year and Month Navigator */}
+          <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-base-200 px-4">
+            <div className="flex gap-2">
+              <button
+                data-testid="btnPreviousYear"
+                type="button"
+                onClick={() => setCursor(new Date(year - 1, month, 1))}
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+              >
+                «
+              </button>
+
+              <button
+                data-testid="btnPreviousMonth"
+                type="button"
+                onClick={() => setCursor(new Date(year, month - 1, 1))}
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+              >
+                ‹
+              </button>
+            </div>
+
+            <div className="text-base font-normal text-gray-700">
+              {MONTHS[month]} {year}
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                data-testid="btnNextMonth"
+                type="button"
+                onClick={() => setCursor(new Date(year, month + 1, 1))}
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+              >
+                ›
+              </button>
+
+              <button
+                data-testid="btnNextYear"
+                type="button"
+                onClick={() => setCursor(new Date(year + 1, month, 1))}
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+              >
+                »
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 px-4 pb-2 pt-4 text-center text-sm font-medium text-gray-500">
+            {WEEKDAYS.map((day, index) => (
+              <div key={`${day}-${index}`}>{day}</div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 px-4 pb-4 text-center">
+            {days.map(({ date, inMonth }, index) => {
+              const selected = isSameDay(date, value);
+              const currentDay = isSameDay(date, today);
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => selectDate(date)}
+                  className={[
+                    "mx-auto my-0.5 h-8 w-8 rounded text-sm leading-8 transition",
+                    selected
+                      ? "bg-primary text-primary-content"
+                      : currentDay
+                        ? "text-error"
+                        : inMonth
+                          ? "text-gray-600 hover:bg-base-200"
+                          : "text-gray-300",
+                  ].join(" ")}
+                >
+                  {date.getDate()}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

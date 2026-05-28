@@ -32,9 +32,22 @@ const changePasswordSchema = z
           .transform((val) => val.trim()),
     confirmPassword: z.string().min(1, "Confirm password is required"),
   })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Confirm password does not match",
-    path: ["confirmPassword"],
+  .superRefine((data, ctx) => {
+    if (data.oldPassword === data.newPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["newPassword"],
+        message: "New password must be different from old password",
+      });
+    }
+
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmPassword"],
+        message: "Confirm password does not match",
+      });
+    }
   });
 
 type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
@@ -63,7 +76,9 @@ export default function ChangePasswordModal({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isValid},
+    watch,
+    trigger,
+    formState: { errors, isValid, isSubmitted, touchedFields},
   } = useForm<ChangePasswordForm>({
     resolver: zodResolver(changePasswordSchema),
     mode:"onChange",
@@ -73,6 +88,22 @@ export default function ChangePasswordModal({
       confirmPassword: "",
     },
   });
+
+  const oldPassword = watch("oldPassword");
+  const newPassword = watch("newPassword");
+
+  useEffect(() => {
+    trigger(["newPassword", "confirmPassword"]);
+  }, [oldPassword, newPassword, trigger]);
+
+  const showOldPasswordError =
+    !!errors.oldPassword && (touchedFields.oldPassword || isSubmitted);
+
+  const showNewPasswordError =
+    !!errors.newPassword && (touchedFields.newPassword || isSubmitted);
+
+  const showConfirmPasswordError =
+    !!errors.confirmPassword && (touchedFields.confirmPassword || isSubmitted);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -123,6 +154,7 @@ export default function ChangePasswordModal({
       onClose();
       setIsSuccessOpen(true);
     } catch (err: any) {
+      console.log(err);
       setErrorMessage(
         err?.detail ||
           err?.title ||"Failed to change password.",
@@ -186,7 +218,7 @@ export default function ChangePasswordModal({
                       <input
                         data-testid="txtOldPassword"
                         type={showOldPassword ? "text" : "password"}
-                        className={`${inputClass(!!errors.oldPassword)} pr-12`}
+                        className={`${inputClass(showOldPasswordError)} pr-12`}
                         disabled={isLoading}
                         {...register("oldPassword")}
                       />
@@ -236,6 +268,13 @@ export default function ChangePasswordModal({
                         )}
                       </button>
                     </div>
+                    
+                    {/* Old Password Error */}
+                    {showOldPasswordError && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.oldPassword?.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* New Password */}
@@ -247,7 +286,7 @@ export default function ChangePasswordModal({
                       <input
                         data-testid="txtNewPassword"
                         type={showNewPassword ? "text" : "password"}
-                        className={inputClass(!!errors.newPassword)}
+                        className={inputClass(showNewPasswordError)}
                         disabled={isLoading}
                         {...register("newPassword")}
                       />
@@ -296,9 +335,11 @@ export default function ChangePasswordModal({
                           )}
                       </button>
                     </div>
-                    {errors.newPassword && (
+
+                    {/* New Password Error */}
+                    {showNewPasswordError && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.newPassword.message}
+                        {errors.newPassword?.message}
                       </p>
                     )}
                   </div>
@@ -312,7 +353,7 @@ export default function ChangePasswordModal({
                       <input
                         data-testid="txtConfirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
-                        className={inputClass(!!errors.confirmPassword)}
+                        className={inputClass(showConfirmPasswordError)}
                         disabled={isLoading}
                         {...register("confirmPassword")}
                       />
@@ -361,9 +402,11 @@ export default function ChangePasswordModal({
                           )}
                       </button>
                     </div>
-                    {errors.confirmPassword && (
+                    
+                    {/* Confirm Password Error */}
+                    {showConfirmPasswordError && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.confirmPassword.message}
+                        {errors.confirmPassword?.message}
                       </p>
                     )}
                   </div>
