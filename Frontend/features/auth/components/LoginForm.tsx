@@ -66,7 +66,7 @@ export default function LoginForm({
           loading="eager"
         />
         <h2 className="text-3xl font-bold tracking-tight text-primary">
-          Nash Asset Management
+          Online Asset Management
         </h2>
         <p className="text-sm text-base-content/60">
           Please enter your details to sign in
