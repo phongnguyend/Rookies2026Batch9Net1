@@ -11,14 +11,13 @@ const rawBaseQuery = fetchBaseQuery({
 
 let refreshPromise: ReturnType<typeof rawBaseQuery> | null = null;
 
-// Avoid recalling the refresh endpoint itself
-// - checking if the request is the refresh request or not
-const isRefreshRequest = (args: string | FetchArgs): boolean => {
-  if (typeof args === "string") {
-    return args === "/auth/refresh";
-  }
-
-  return args.url === "/auth/refresh";
+// Skip refresh token calling for those route
+// - /auth/login (login fails with 401 should show credential errors, not refresh errors)
+// - /auth/refresh (cannot refresh a refresh request)
+// - /auth/logout (logout fails with 401 should just logout cleanly)
+const shouldSkipRefresh = (args: string | FetchArgs): boolean => {
+  const url = typeof args === "string" ? args : args.url;
+  return url.includes("/login") || url.includes("/refresh") || url.includes("/logout");
 }
 
 const refreshToken = async (
@@ -111,7 +110,7 @@ const customBaseQuery: BaseQueryFn<
 
     // Rule 1: Access Token expired
     // - response 401 Authorized, then try to call the refresh token
-    if (result.error?.status === 401 && !isRefreshRequest(args)) {
+    if (result.error?.status === 401 && !shouldSkipRefresh(args)) {
       const refreshTokenResult = await refreshToken(api, extraOptions);
 
       // if refreshToken return is still valid
