@@ -26,15 +26,9 @@ namespace NashAssetManagement.Application.UseCases.Auth.FirstChangePassword
         : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(
-            Request orgReq,
+            Request request,
             CancellationToken cancellationToken)
-        {
-            // Pre-cleaning
-            var request = orgReq with
-            {
-                NewPassword = orgReq.NewPassword.Trim()
-            };
-
+        {            
             // Validation
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)

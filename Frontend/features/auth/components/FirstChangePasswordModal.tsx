@@ -105,29 +105,28 @@ export default function FirstChangePasswordModal({
       reset();
     } catch (err: any) {
       console.error("Change password error:", err);
-      const parsedErrors: string[] = [];
-
-      // parse validation error list if present
-      if (err?.data?.errors) {
-        Object.values(err.data.errors).forEach((messages: any) => {
+      
+      const errorData = err?.data || err;
+      let errorMessage = "";
+      if (errorData?.errors) {
+        const errorList: string[] = [];
+        Object.values(errorData.errors).forEach((messages: any) => {
           if (Array.isArray(messages)) {
-            parsedErrors.push(...messages);
+            errorList.push(...messages);
           } else if (typeof messages === "string") {
-            parsedErrors.push(messages);
+            errorList.push(messages);
           }
         });
+        if (errorList.length > 0) {
+          errorMessage = errorList.join("\n");
+        }
       }
 
-      // fallback to single error description
-      if (parsedErrors.length === 0) {
-        const fallbackMsg =
-          err?.data?.detail ||
-          err?.data?.title ||
-          err?.detail ||
-          "An unexpected error occurred. Please try again.";
-        parsedErrors.push(fallbackMsg);
+      if (!errorMessage) {
+        errorMessage = errorData?.detail || "An unexpected error occurred. Please try again.";
       }
 
+      const parsedErrors = [errorMessage];
       setServerErrors(parsedErrors);
     }
   };
@@ -302,7 +301,7 @@ export default function FirstChangePasswordModal({
 
                 {/* Server-Side Error Display on botom */}
                 {serverErrors.length > 0 && (
-                  <div className="p-3 text-xs text-red-600 bg-red-50 border border-red-200 rounded font-sans space-y-1.5">
+                  <div className="p-3 text-xs text-red-600 bg-red-50 border border-red-200 rounded font-sans space-y-1.5 whitespace-pre-line">
                     {serverErrors.length === 1 ? (
                       <p>{serverErrors[0]}</p>
                     ) : (

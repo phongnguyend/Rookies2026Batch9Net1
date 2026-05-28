@@ -17,7 +17,8 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
                 .Matches("^[a-zA-Z]+$").WithMessage(UsernameFormat);
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage(PasswordRequired);
+                .NotNull().WithMessage(PasswordRequired)
+                .Must(x => x == null || x.Length > 0).WithMessage(PasswordRequired);
         }
     }
 }
