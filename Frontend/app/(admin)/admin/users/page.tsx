@@ -388,25 +388,17 @@ export default function UsersPage() {
             />
           </div>
 
-          {(data?.totalCount ?? users.length) > 0 &&
-          (data?.totalPages ?? 1) <= 1 ? (
-            <p className="mt-6 text-sm text-gray-500">
-              Page {data?.pageNumber ?? queryPage} of {data?.totalPages ?? 1} -
-              Total {data?.totalCount ?? users.length} items
-            </p>
-          ) : (data?.totalPages ?? 1) > 1 ? (
-            <Pagination
-              pageNumber={data?.pageNumber ?? queryPage}
-              totalPages={data?.totalPages ?? 1}
-              pageSize={data?.pageSize ?? pageSize}
-              totalCount={data?.totalCount ?? users.length}
-              hasPreviousPage={Boolean(data?.hasPreviousPage)}
-              hasNextPage={Boolean(data?.hasNextPage)}
-              onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
-              btnPreviousPageTestId="btnPrevPage"
-              btnNextPageTestId="btnNextPage"
-            />
-          ) : null}
+          <Pagination
+            pageNumber={data?.pageNumber ?? queryPage}
+            totalPages={data?.totalPages ?? 1}
+            pageSize={data?.pageSize ?? pageSize}
+            totalCount={data?.totalCount ?? users.length}
+            hasPreviousPage={Boolean(data?.hasPreviousPage)}
+            hasNextPage={Boolean(data?.hasNextPage)}
+            onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
+            btnPreviousPageTestId="btnPrevPage"
+            btnNextPageTestId="btnNextPage"
+          />
         </main>
       </div>
     </div>
