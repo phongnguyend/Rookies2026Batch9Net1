@@ -27,7 +27,6 @@ namespace NashAssetManagement.Application.UseCases.Auth.Login
             var request = orgReq with
             {
                 Username = orgReq.Username.Trim(),
-                Password = orgReq.Password.Trim()
             };
 
             // Validation
