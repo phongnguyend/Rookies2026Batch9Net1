@@ -72,7 +72,6 @@ export default function DataTable<T>({
   return (
     <div className="w-full overflow-x-auto rounded border border-gray-200">
       <table className="w-full min-w-[600px] text-left text-sm">
-        {" "}
         {/* ← min-w ensures scroll on mobile */}
         <thead>
           <tr className="border-b border-gray-400 bg-gray-50">
