@@ -16,6 +16,7 @@ import {
   type ReturnRequestRow,
 } from "@/features/returns/returns.types";
 import { SortDirection } from "@/lib/api/base.types";
+import { formatDate } from "@/utils/datetime.utils";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
@@ -93,32 +94,6 @@ function formatReturnedDateForQuery(date: Date | null) {
     date,
     returnRequestTimeZone,
   ).toISOString();
-}
-
-function formatUtcDateToUtcPlus7(utc?: string | null) {
-  if (!utc) {
-    return "";
-  }
-
-  const hasTimeZone = /(?:z|[+-]\d{2}:?\d{2})$/i.test(utc.trim());
-  const date = new Date(hasTimeZone ? utc : `${utc}Z`);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: returnRequestTimeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
-
-  return year && month && day ? `${year}-${month}-${day}` : "";
 }
 
 function getStateLabel(state: string) {
@@ -309,7 +284,7 @@ export default function ReturnsPage() {
       header: "Assigned Date",
       sortable: true,
       className: "w-[126px]",
-      render: (request) => formatUtcDateToUtcPlus7(request.assignedDate),
+      render: (request) => formatDate(request.assignedDate),
       cellTestId: () => "dpAssignedDate",
     },
     {
@@ -325,7 +300,8 @@ export default function ReturnsPage() {
       header: "Returned Date",
       sortable: true,
       className: "w-[132px]",
-      render: (request) => formatUtcDateToUtcPlus7(request.returnedDate),
+      render: (request) =>
+        request.returnedDate ? formatDate(request.returnedDate) : "",
       cellTestId: () => "dpReturnedDate",
     },
     {
