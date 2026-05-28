@@ -7,7 +7,6 @@ using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
 using Swashbuckle.AspNetCore.Annotations;
 
-
 namespace NashAssetManagement.WebAPI.Controllers.Users
 {
     [ApiVersion(1)]

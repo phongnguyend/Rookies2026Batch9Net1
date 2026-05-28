@@ -94,6 +94,8 @@ export default function NavbarProfile() {
             </button>
           </li>
         </ul>
+
+        {/* Change Password Modal */}
         <ChangePasswordModal
           isOpen={isChangePasswordOpen}
           onClose={() => setIsChangePasswordOpen(false)}
