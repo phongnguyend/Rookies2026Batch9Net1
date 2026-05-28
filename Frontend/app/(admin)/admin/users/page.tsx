@@ -30,6 +30,10 @@ const typeFilters = [
 ];
 
 const pageSize = 10;
+const defaultSort: SortItem = {
+  key: "staffCode",
+  direction: SortDirection.Asc,
+};
 
 function ActionIconButton({
   label,
@@ -128,7 +132,7 @@ export default function UsersPage() {
             sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
         },
       ]
-    : [];
+    : [defaultSort];
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -207,7 +211,7 @@ export default function UsersPage() {
     // Backend currently accepts a single type value. When both roles are
     // selected, the dropdown normalizes to "All", so no type filter is sent.
     ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
-    ...(sorts[0]?.key ? { sortBy: sorts[0]!.key } : {}),
+    sortBy: sorts[0]?.key ?? defaultSort.key,
     ...(sorts[0]?.direction === SortDirection.Desc ? { sortDesc: true } : {}),
   };
 
