@@ -65,7 +65,10 @@ export default function DataTable<T>({
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm" data-testid={tableTestId}>
+      <table
+        className="min-w-[1080px] w-full text-left text-sm"
+        data-testid={tableTestId}
+      >
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
@@ -76,7 +79,7 @@ export default function DataTable<T>({
                 <th
                   key={column.key}
                   onClick={() => column.sortable && handleSort(column.key)}
-                  className={`py-2 font-semibold ${column.className ?? ""} ${
+                  className={`whitespace-nowrap py-2 font-semibold ${column.className ?? ""} ${
                     column.sortable
                       ? "cursor-pointer select-none hover:text-primary"
                       : ""
@@ -124,7 +127,7 @@ export default function DataTable<T>({
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={`py-2 ${column.className ?? ""}`}
+                    className={`whitespace-nowrap py-2 ${column.className ?? ""}`}
                     data-testid={column.cellTestId?.(row, rowIndex)}
                   >
                     {column.render
