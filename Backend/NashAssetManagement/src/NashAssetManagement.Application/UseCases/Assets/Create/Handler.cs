@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
@@ -18,19 +19,25 @@ public class CreateAssetHandler
     private readonly IUnitOfWork _unitOfWork;
     private readonly CreateAssetValidator _validator;
     private readonly ICurrentUser _currentUser;
+    private readonly IDateTimeProvider _dateTimeProvider ;
+    private readonly ILogger<CreateAssetHandler> _logger;
 
     public CreateAssetHandler(
         IRepository<Asset, Guid> assetRepository,
         IRepository<Category, Guid> categoryRepository,
         IUnitOfWork unitOfWork,
         CreateAssetValidator validator,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        IDateTimeProvider dateTimeProvider,
+        ILogger<CreateAssetHandler> logger)
     {
         _assetRepository = assetRepository;
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
         _currentUser = currentUser;
+        _dateTimeProvider = dateTimeProvider;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<CreateAssetResponse>> Handle(
@@ -91,7 +98,7 @@ public class CreateAssetHandler
             State = request.State,
             CategoryId = category.Id,
             LocationId = locationId,
-            CreatedAtUtc = DateTime.UtcNow,
+            CreatedAtUtc = _dateTimeProvider.UtcNow,
         };
 
         try
@@ -99,8 +106,9 @@ public class CreateAssetHandler
             await _assetRepository.AddAsync(asset, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "An error occurred while creating the asset.");
             return CreateAssetErrors.AssetCreationFailed;
         }
 

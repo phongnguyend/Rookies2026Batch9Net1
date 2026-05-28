@@ -1,6 +1,7 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
@@ -13,22 +14,29 @@ public class CreateCategoryHandler
     private readonly IRepository<Category, Guid> _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly CreateCategoryValidator _validator;
+    private readonly ILogger<CreateCategoryHandler> _logger;
 
     public CreateCategoryHandler(
         IRepository<Category, Guid> categoryRepository,
         IUnitOfWork unitOfWork,
-        CreateCategoryValidator validator)
+        CreateCategoryValidator validator,
+        ILogger<CreateCategoryHandler> logger)
     {
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<CreateCategoryResponse>> Handle(
         CreateCategoryRequest request,
         CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
 
         var categoryExists = await _categoryRepository.AnyAsync(
             new CategoryByNameSpec(request.CategoryName),
@@ -62,6 +70,7 @@ public class CreateCategoryHandler
         }
         catch
         {
+            _logger.LogError("An error occurred while creating the category with name '{CategoryName}' and prefix '{CategoryPrefix}'.", request.CategoryName, request.CategoryPrefix);
             return CreateCategoryErrors.CategoryCreationFailed;
         }
 
