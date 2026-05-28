@@ -224,6 +224,7 @@ export function AssignmentDateTimePicker({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="min-w-0 flex-1 bg-transparent text-sm text-gray-700 outline-none"
+          data-testid="txtAssignedDate"  //For input field in date picker
         />
 
         {value && (
@@ -250,6 +251,7 @@ export function AssignmentDateTimePicker({
           }}
           className="flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:bg-gray-100"
           aria-label="Open calendar"
+          data-testid="btnAssignedDateCalendar"
         >
           📅
         </button>
@@ -266,6 +268,7 @@ export function AssignmentDateTimePicker({
                   setCursor(new Date(year - 1, month, 1))
                 }
                 className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                data-testid="btnPreviousYear"
               >
                 ≪
               </button>
@@ -277,6 +280,7 @@ export function AssignmentDateTimePicker({
                     setCursor(new Date(year, month - 1, 1))
                   }
                   className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                  data-testid="btnPreviousMonth"
                 >
                   ‹
                 </button>
@@ -310,6 +314,7 @@ export function AssignmentDateTimePicker({
                     setCursor(new Date(year, month + 1, 1))
                   }
                   className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                  data-testid="btnNextMonth"
                 >
                   ›
                 </button>
@@ -321,6 +326,7 @@ export function AssignmentDateTimePicker({
                   setCursor(new Date(year + 1, month, 1))
                 }
                 className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                data-testid="btnNextYear"
               >
                 ≫
               </button>

@@ -46,16 +46,21 @@ export default function Drawer({ role }: DrawerProps) {
           />
         </div>
         <div className="text-primary font-bold text-lg leading-snug">
-          Nash Asset Management
+          Online Asset Management
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex flex-col">
         {sideBarItems(role).map((item, index) => {
+          const normalizedPathname =
+            pathname.endsWith("/") && pathname !== "/"
+              ? pathname.slice(0, -1)
+              : pathname;
           const isActive =
-            pathname === item.href ||
-            (item.href !== "/admin" && pathname.startsWith(item.href));
+            normalizedPathname === item.href ||
+            (item.href !== "/admin" &&
+              normalizedPathname.startsWith(item.href));
 
           // add test id based on role
           let testId: string | undefined;

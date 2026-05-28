@@ -5,7 +5,6 @@ import {
 } from "@/features/shared/components/DataTable";
 import { useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
 import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
-import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
@@ -72,6 +71,13 @@ export default function AssignmentsPage() {
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
   });
 
+  const formatText = (text: string) => {
+    return text
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/_/g, " ");
+  };
+
+
   const assignments = data?.items ?? [];
 
   const columns: ColumnDef<Assignment>[] = [
@@ -122,6 +128,11 @@ export default function AssignmentsPage() {
       sortable: true,
       TitleColumnTestId: "btnSortState",
       ColumnTestId: (_row, index) => `colState-${index}`,
+      render: (row) =>
+        row.state
+          .replace(/([a-z])([A-Z])/g, "$1 $2")
+          .toLowerCase()
+          .replace(/^./, (char) => char.toUpperCase()),
     },
     {
       key: "actions",
@@ -186,20 +197,6 @@ export default function AssignmentsPage() {
                   getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
                 />
               </div>
-
-              {/* <div data-testid="dtpAssignedDate">
-                <DatePickerInput
-                  value={assignedDate}
-                  onChange={(date) =>
-                    updateParams({
-                      assignedDate:
-                        date?.toLocaleDateString("en-CA"),
-                      page: "1",
-                    })
-                  }
-                  placeholder="Assigned Date"
-                />
-              </div> */}
 
               <div data-testid="dtpAssignedDate">
                 <AssignmentDateTimePicker

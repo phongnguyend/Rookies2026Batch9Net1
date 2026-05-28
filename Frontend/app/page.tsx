@@ -40,30 +40,30 @@ export default function HomePage() {
         }),
       );
     } catch (err: any) {
-      console.error("Login failed error object:", err);
-      const parsedErrors: string[] = [];
+      // console.error("Login failed error object:", err);
 
-      // parse validation error list if present
-      if (err?.data?.errors) {
-        Object.values(err.data.errors).forEach((messages: any) => {
+      const errorData = err?.data || err;
+      let errorMessage = "";
+      if (errorData?.errors) {
+        const errorList: string[] = [];
+        Object.values(errorData.errors).forEach((messages: any) => {
           if (Array.isArray(messages)) {
-            parsedErrors.push(...messages);
+            errorList.push(...messages);
           } else if (typeof messages === "string") {
-            parsedErrors.push(messages);
+            errorList.push(messages);
           }
         });
+        if (errorList.length > 0) {
+          errorMessage = errorList.join("\n");
+        }
       }
 
-      // fallback to single error description
-      if (parsedErrors.length === 0) {
-        const fallbackMsg =
-          err?.data?.detail ||
-          err?.data?.title ||
-          err?.detail ||
-          "Username or password is incorrect. Please try again.";
-        parsedErrors.push(fallbackMsg);
+      if (!errorMessage) {
+        errorMessage =
+          errorData?.detail || "Something went wrong. Please try again later.";
       }
 
+      const parsedErrors = [errorMessage];
       setServerErrors(parsedErrors);
       dispatch(loginFailure(parsedErrors[0]));
     }
