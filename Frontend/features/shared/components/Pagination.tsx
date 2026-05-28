@@ -1,5 +1,5 @@
 "use client";
-import {useState} from "react";
+import { useState } from "react";
 
 interface PaginationProps {
   pageNumber: number;
@@ -182,9 +182,8 @@ export default function Pagination({
                   key={current}
                   type="button"
                   onClick={() => onPageChange(current)}
-                  className={`join-item btn btn-sm shrink-0 ${
-                    pageNumber === current ? "btn-primary" : ""
-                  }`}
+                  className={`join-item btn btn-sm shrink-0 ${pageNumber === current ? "btn-primary" : ""
+                    }`}
                   data-testid={
                     pageNumber === current
                       ? btnCurrentPageTestId
@@ -209,6 +208,6 @@ export default function Pagination({
           </div>
         </div>
       )}
-  </div>
+    </div>
   );
 }
