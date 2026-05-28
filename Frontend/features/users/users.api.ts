@@ -28,7 +28,7 @@ export const usersApi = baseApiSlice.injectEndpoints({
         url: `v1/users/${id}`,
         method: "GET",
       }),
-      providesTags: (_result, _error, id) => [{ type: "Users", id }],
+      providesTags: ["Users"],
     }),
   }),
 });
