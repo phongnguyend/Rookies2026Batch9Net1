@@ -63,8 +63,8 @@ export default function SingleSortDataTable<T>({
   };
 
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm table-fixed">
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
@@ -84,7 +84,7 @@ export default function SingleSortDataTable<T>({
                   {column.header}
 
                   {column.sortable && (
-                    <span className="ml-1">
+                    <span className="ml-1 inline-block w-4 text-center">
                       {getSortIcon(currentSort?.direction)}
                     </span>
                   )}
