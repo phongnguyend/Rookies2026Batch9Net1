@@ -5,14 +5,6 @@ import { formatDate } from "@/utils/datetime.utils";
 import { AssignmentState } from "@/lib/api/base.types";
 import { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 
-const isAcceptedAndReturning = (
-  assignment: ViewUserAssignments.UserAssignmentSummary,
-): boolean => {
-  return (
-    assignment.state === AssignmentState.Accepted && assignment.isReturning
-  );
-};
-
 export function createColumns(handlers: {
   onReturnClick: (
     assignment: ViewUserAssignments.UserAssignmentSummary,
@@ -25,6 +17,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortAssetCode",
       cellTestId: (_, index) => `colAssetCode-${index}`,
+      className: "w-32",
     },
     {
       key: "assetName",
@@ -32,6 +25,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortAssetName",
       cellTestId: (_, index) => `colAssetName-${index}`,
+      className: "w-60",
     },
     {
       key: "category",
@@ -39,6 +33,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortCategory",
       cellTestId: (_, index) => `colCategory-${index}`,
+      className: "w-36",
     },
     {
       key: "assignedDate",
@@ -47,25 +42,21 @@ export function createColumns(handlers: {
       render: (assignment) => formatDate(assignment.assignedDate),
       headerTestId: "btnSortAssignedDate",
       cellTestId: (_, index) => `colAssignedDate-${index}`,
+      className: "w-36",
     },
     {
       key: "state",
       header: "State",
       sortable: true,
-      render: (assignment) => {
-        return (
-          <span>
-            {displayAssignmentState(assignment.state)}
-            {isAcceptedAndReturning(assignment) && " - Returning"}
-          </span>
-        );
-      },
+      render: (assignment) => displayAssignmentState(assignment.state),
       headerTestId: "btnSortState",
       cellTestId: (_, index) => `colState-${index}`,
+      className: "w-40",
     },
     {
       key: "actions",
       header: "",
+      className: "w-36",
       render: (assignment) => {
         return (
           <DataTableButtonActions
