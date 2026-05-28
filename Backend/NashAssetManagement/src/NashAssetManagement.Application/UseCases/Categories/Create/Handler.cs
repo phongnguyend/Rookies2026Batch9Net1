@@ -54,10 +54,16 @@ public class CreateCategoryHandler
             CategoryName = request.CategoryName,
             Prefix = request.CategoryPrefix,
         };
-
-        await _categoryRepository.AddAsync(category, cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        try
+        {
+            await _categoryRepository.AddAsync(category, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            return CreateCategoryErrors.CategoryCreationFailed;
+        }
 
         return new CreateCategoryResponse(
             category.Id,

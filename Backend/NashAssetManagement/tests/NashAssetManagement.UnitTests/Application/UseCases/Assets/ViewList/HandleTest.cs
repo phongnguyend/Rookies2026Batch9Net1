@@ -49,7 +49,7 @@ public class HandlerTests
     // ─── Happy Path ───────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_PagedList_When_Assets_Exist()
+    public async Task Handle_AssetsExist_ShouldReturnPagedList()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -100,7 +100,7 @@ public class HandlerTests
     // ─── Empty Result ────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_Empty_PagedList_When_No_Assets_Found()
+    public async Task Handle_NoAssetsFound_ShouldReturnEmptyPagedList()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -132,7 +132,7 @@ public class HandlerTests
     // ─── Validation ──────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_PageNumber_Is_Invalid()
+    public async Task Handle_PageNumberInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -147,7 +147,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_State_Is_Invalid()
+    public async Task Handle_StateInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -161,7 +161,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_SortBy_Is_Invalid()
+    public async Task Handle_SortByInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -175,7 +175,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_SortDirection_Is_Invalid()
+    public async Task Handle_SortDirectionInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -189,7 +189,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Search_Contains_Only_Whitespace()
+    public async Task Handle_SearchContainsOnlyWhitespace_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -203,7 +203,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Search_Exceeds_Max_Length()
+    public async Task Handle_SearchExceedsMaxLength_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -219,7 +219,7 @@ public class HandlerTests
     // ─── Repository Call Protection ──────────────────────
 
     [Fact]
-    public async Task Handle_Should_Not_Call_Repository_When_Validation_Fails()
+    public async Task Handle_ValidationFails_ShouldNotCallRepository()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -242,7 +242,7 @@ public class HandlerTests
     // ─── Pagination ──────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_Correct_Pagination_Metadata()
+    public async Task  Handle_Pagination_ShouldReturnCorrectMetadata()
     {
         var request = new GetAssetsRequest(
             Categories: null,

@@ -9,6 +9,5 @@ public record CreateAssetRequest(
     string Specification,
     DateTime InstalledDate,
     AssetState State,
-    string CategoryName,
-    string? CategoryPrefix
+    Guid CategoryId
 ) : IRequest<ErrorOr<CreateAssetResponse>>;

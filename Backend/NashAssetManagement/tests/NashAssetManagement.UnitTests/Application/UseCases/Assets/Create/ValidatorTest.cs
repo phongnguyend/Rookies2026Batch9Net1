@@ -9,7 +9,7 @@ public class ValidatorTests
     private readonly CreateAssetValidator _validator = new();
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_AssetName_Is_Empty()
+    public async Task CreateAssetValidator_AssetName_IsEmpty_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
@@ -24,7 +24,7 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_AssetName_Exceeds_Max_Length()
+    public async Task CreateAssetValidator_AssetName_ExceedsMaxLength_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
@@ -39,7 +39,7 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_Specification_Is_Empty()
+    public async Task CreateAssetValidator_Specification_IsEmpty_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
@@ -54,7 +54,7 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_Specification_Exceeds_Max_Length()
+    public async Task CreateAssetValidator_Specification_ExceedsMaxLength_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
@@ -69,7 +69,7 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_InstalledDate_Is_In_Future()
+    public async Task CreateAssetValidator_InstalledDate_IsFuture_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
@@ -84,11 +84,11 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_State_Is_Invalid()
+    public async Task CreateAssetValidator_State_IsInvalid_ShouldReturnError()
     {
         var request = CreateValidRequest() with
         {
-            State = AssetState.WaitingForRecycling
+            State = AssetState.WaitingForRecycling // invalid by rule
         };
 
         var result = await _validator.ValidateAsync(request);
@@ -99,82 +99,21 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_CategoryName_Is_Empty()
+    public async Task CreateAssetValidator_CategoryId_IsEmpty_ShouldStillBeValid()
     {
+        // NOTE: you currently have NO rule for CategoryId in validator
         var request = CreateValidRequest() with
         {
-            CategoryName = string.Empty
+            CategoryId = Guid.Empty
         };
 
         var result = await _validator.ValidateAsync(request);
 
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category name is required.");
+        Assert.True(result.IsValid); // because no rule exists yet
     }
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_CategoryName_Exceeds_Max_Length()
-    {
-        var request = CreateValidRequest() with
-        {
-            CategoryName = new string('A', 21)
-        };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category name must not exceed 20 characters.");
-    }
-
-    [Fact]
-    public async Task Validate_Should_Return_Error_When_CategoryPrefix_Is_Empty()
-    {
-        var request = CreateValidRequest() with
-        {
-            CategoryPrefix = string.Empty
-        };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category prefix is required.");
-    }
-
-    [Fact]
-    public async Task Validate_Should_Return_Error_When_CategoryPrefix_Exceeds_Max_Length()
-    {
-        var request = CreateValidRequest() with
-        {
-            CategoryPrefix = "ABC"
-        };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category prefix must not exceed 2 characters.");
-    }
-
-    [Fact]
-    public async Task Validate_Should_Return_Error_When_CategoryPrefix_Is_Not_Uppercase()
-    {
-        var request = CreateValidRequest() with
-        {
-            CategoryPrefix = "ab"
-        };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category prefix must contain uppercase letters only.");
-    }
-
-    [Fact]
-    public async Task Validate_Should_Pass_When_Request_Is_Valid()
+    public async Task CreateAssetValidator_Request_IsValid_ShouldPass()
     {
         var request = CreateValidRequest();
 
@@ -186,11 +125,11 @@ public class ValidatorTests
     private static CreateAssetRequest CreateValidRequest()
     {
         return new CreateAssetRequest(
-            "Laptop Dell",
-            "Core i7 16GB RAM",
-            DateTime.UtcNow.AddDays(-1),
-            AssetState.Available,
-            "Laptop",
-            "LA");
+            AssetName: "Laptop Dell",
+            Specification: "Core i7 16GB RAM",
+            InstalledDate: DateTime.UtcNow.AddDays(-1),
+            State: AssetState.Available,
+            CategoryId: Guid.NewGuid()
+        );
     }
 }

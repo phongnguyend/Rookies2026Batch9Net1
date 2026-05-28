@@ -7,6 +7,6 @@ public sealed class CategoryByPrefixSpec : Specification<Category>
 {
     public CategoryByPrefixSpec(string prefix)
     {
-        Query.Where(c => c.Prefix == prefix);
+        Query.Where(c => c.Prefix == prefix).AsNoTracking();
     }
 }

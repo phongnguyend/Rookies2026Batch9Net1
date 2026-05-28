@@ -1,15 +1,18 @@
 using Ardalis.Specification;
+using NashAssetManagement.Application.UseCases.Categories.Create;
 using NashAssetManagement.Domain.Entities.Core;
 
 namespace NashAssetManagement.Application.UseCases.Categories.Specification;
 
-public sealed class CategoryWithPrefixSpec : Specification<Category, CategoryDto>
+public sealed class CategoryByIdSpec : Specification<Category, CreateCategoryResponse>
 {
-    public CategoryWithPrefixSpec(string name)
+    public CategoryByIdSpec(Guid categoryId)
     {
-        Query.Where(c => c.CategoryName == name);
-        Query.Select(c => new CategoryDto(c.Id, c.CategoryName, c.Prefix));
+        Query
+            .Where(c => c.Id == categoryId)
+            .Select(c => new CreateCategoryResponse(
+                c.Id,
+                c.CategoryName,
+                c.Prefix));
     }
 }
-
-public record CategoryDto(Guid Id, string Name, string Prefix);

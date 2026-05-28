@@ -8,9 +8,8 @@ public class ValidatorTests
     private readonly GetAssetDetailValidator _validator = new();
 
     [Fact]
-    public async Task Validate_Should_Return_Error_When_Id_Is_Empty()
+    public async Task Validate_IdIsEmpty_ShouldReturnError()
     {
-
         var request = new GetAssetDetailRequest(string.Empty);
 
         var result = await _validator.ValidateAsync(request);
@@ -21,9 +20,8 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_Should_Pass_When_Id_Is_Valid()
+    public async Task Validate_IdIsValid_ShouldPass()
     {
-        
         var request = new GetAssetDetailRequest(Guid.NewGuid().ToString());
 
         var result = await _validator.ValidateAsync(request);

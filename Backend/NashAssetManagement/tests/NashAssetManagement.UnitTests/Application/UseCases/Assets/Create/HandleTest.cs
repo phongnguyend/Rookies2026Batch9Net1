@@ -1,151 +1,195 @@
-using ErrorOr;
 using FluentValidation;
 using Moq;
+using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.UseCases.Assets.Create;
+using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Categories.Create;
 using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Enums;
 using Xunit;
 
-namespace NashAssetManagement.UnitTests.Application.UseCases.Categories.Create;
+namespace NashAssetManagement.UnitTests.Application.UseCases.Assets.Create;
 
 public class HandlerTests
 {
-    private readonly Mock<IRepository<Category, Guid>> _categoryRepositoryMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly CreateCategoryValidator _validator;
-    private readonly CreateCategoryHandler _handler;
+    private readonly Mock<IRepository<Asset, Guid>> _assetRepositoryMock = new();
+    private readonly Mock<IRepository<Category, Guid>> _categoryRepositoryMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<ICurrentUser> _currentUserMock = new();
+
+    private readonly CreateAssetValidator _validator = new();
+
+    private readonly CreateAssetHandler _handler;
+
+    private readonly Guid _categoryId = Guid.NewGuid();
+    private readonly Guid _locationId = Guid.NewGuid();
 
     public HandlerTests()
     {
-        _categoryRepositoryMock = new Mock<IRepository<Category, Guid>>();
-        _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _validator = new CreateCategoryValidator();
+        _currentUserMock
+            .Setup(x => x.LocationId)
+            .Returns(_locationId.ToString());
 
-        _handler = new CreateCategoryHandler(
+        _handler = new CreateAssetHandler(
+            _assetRepositoryMock.Object,
             _categoryRepositoryMock.Object,
             _unitOfWorkMock.Object,
-            _validator);
+            _validator,
+            _currentUserMock.Object);
     }
 
+    // ─────────────────────────────
+    // SUCCESS CASE
+    // ─────────────────────────────
     [Fact]
-    public async Task Handle_Should_Create_Category_Successfully()
+    public async Task Handle_Should_CreateAsset_When_Request_IsValid()
     {
-        // Arrange
-        var request = new CreateCategoryRequest(
-            CategoryName: "Laptop",
-            CategoryPrefix: "LA");
+        var request = CreateRequest();
+
+        var category = new CreateCategoryResponse(
+            _categoryId,
+            "Laptop",
+            "LA"
+        );
 
         _categoryRepositoryMock
-            .Setup(r => r.AnyAsync(
-                It.IsAny<CategoryByNameSpec>(),
+            .Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<CategoryByIdSpec>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+            .ReturnsAsync(category);
 
-        _categoryRepositoryMock
-            .Setup(r => r.AnyAsync(
-                It.IsAny<CategoryByPrefixSpec>(),
+        _assetRepositoryMock
+            .Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<AssetMaxCodeByPrefixSpec>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+            .ReturnsAsync("LA000001");
 
-        // Act
+        _assetRepositoryMock
+            .Setup(r => r.AddAsync(
+                It.IsAny<Asset>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
         var result = await _handler.Handle(request, CancellationToken.None);
 
-        // Assert
         Assert.False(result.IsError);
-
-        Assert.Equal("Laptop", result.Value.Name);
-        Assert.Equal("LA", result.Value.Prefix);
-
-        _categoryRepositoryMock.Verify(
-            r => r.AddAsync(
-                It.IsAny<Category>(),
-                It.IsAny<CancellationToken>()),
-            Times.Once);
-
-        _unitOfWorkMock.Verify(
-            u => u.SaveChangesAsync(It.IsAny<CancellationToken>()),
-            Times.Once);
+        Assert.Equal("LA000002", result.Value.AssetCode);
     }
 
+    // ─────────────────────────────
+    // VALIDATION FAILURE
+    // ─────────────────────────────
     [Fact]
-    public async Task Handle_Should_Return_Error_When_Category_Already_Exists()
+    public async Task Handle_Should_ThrowValidationException_When_Request_IsInvalid()
     {
-        // Arrange
-        var request = new CreateCategoryRequest(
-            CategoryName: "Laptop",
-            CategoryPrefix: "LA");
+        var request = CreateRequest() with
+        {
+            AssetName = ""
+        };
 
-        _categoryRepositoryMock
-            .Setup(r => r.AnyAsync(
-                It.IsAny<CategoryByNameSpec>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        // Act
-        var result = await _handler.Handle(request, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsError);
-
-        Assert.Equal(
-            CreateCategoryErrors.CategoryAlreadyExists.Code,
-            result.FirstError.Code);
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            _handler.Handle(request, CancellationToken.None));
 
         _categoryRepositoryMock.Verify(
+            r => r.FirstOrDefaultAsync(
+                It.IsAny<CategoryByIdSpec>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        _assetRepositoryMock.Verify(
             r => r.AddAsync(
-                It.IsAny<Category>(),
+                It.IsAny<Asset>(),
                 It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
+    // ─────────────────────────────
+    // LOCATION NULL
+    // ─────────────────────────────
     [Fact]
-    public async Task Handle_Should_Return_Error_When_Prefix_Already_Exists()
+    public async Task Handle_Should_ReturnLocationNotFound_When_LocationMissing()
     {
-        // Arrange
-        var request = new CreateCategoryRequest(
-            CategoryName: "Laptop",
-            CategoryPrefix: "LA");
+        _currentUserMock.Setup(x => x.LocationId).Returns((string?)null);
 
-        _categoryRepositoryMock
-            .Setup(r => r.AnyAsync(
-                It.IsAny<CategoryByNameSpec>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        var request = CreateRequest();
 
-        _categoryRepositoryMock
-            .Setup(r => r.AnyAsync(
-                It.IsAny<CategoryByPrefixSpec>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
-
-        // Act
         var result = await _handler.Handle(request, CancellationToken.None);
 
-        // Assert
         Assert.True(result.IsError);
-
-        Assert.Equal(
-            CreateCategoryErrors.PrefixAlreadyExists.Code,
-            result.FirstError.Code);
-
-        _categoryRepositoryMock.Verify(
-            r => r.AddAsync(
-                It.IsAny<Category>(),
-                It.IsAny<CancellationToken>()),
-            Times.Never);
+        Assert.Equal(CreateAssetErrors.LocationNotFound.Code, result.FirstError.Code);
     }
 
+    // ─────────────────────────────
+    // CATEGORY NOT FOUND
+    // ─────────────────────────────
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Request_Is_Invalid()
+    public async Task Handle_Should_ReturnCategoryNotFound_When_CategoryMissing()
     {
-        // Arrange
-        var request = new CreateCategoryRequest(
-            CategoryName: "",
-            CategoryPrefix: "");
+        var request = CreateRequest();
 
-        // Act & Assert
-        await Assert.ThrowsAsync<ValidationException>(
-            () => _handler.Handle(request, CancellationToken.None));
+        _categoryRepositoryMock
+            .Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<CategoryByIdSpec>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((CreateCategoryResponse?)null);
+
+        var result = await _handler.Handle(request, CancellationToken.None);
+
+        Assert.True(result.IsError);
+        Assert.Equal(CreateAssetErrors.CategoryNotFound.Code, result.FirstError.Code);
+    }
+
+    // ─────────────────────────────
+    // INVALID CODE FORMAT
+    // ─────────────────────────────
+    [Fact]
+    public async Task Handle_Should_ReturnInvalidCodeFormat_When_CodeInvalid()
+    {
+        var request = CreateRequest();
+
+        var category = new CreateCategoryResponse(
+            _categoryId,
+            "Laptop",
+            "LA"
+        );
+
+        _categoryRepositoryMock
+            .Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<CategoryByIdSpec>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(category);
+
+        _assetRepositoryMock
+            .Setup(r => r.FirstOrDefaultAsync(
+                It.IsAny<AssetMaxCodeByPrefixSpec>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync("LAABC001");
+
+        var result = await _handler.Handle(request, CancellationToken.None);
+
+        Assert.True(result.IsError);
+        Assert.Equal(
+            CreateAssetErrors.InvalidAssetCodeFormat.Code,
+            result.FirstError.Code);
+    }
+
+    // ─────────────────────────────
+    // HELPER
+    // ─────────────────────────────
+    private CreateAssetRequest CreateRequest()
+    {
+        return new CreateAssetRequest(
+            "Laptop Dell",
+            "Core i7",
+            DateTime.UtcNow.AddDays(-1),
+            AssetState.Available,
+            _categoryId
+        );
     }
 }

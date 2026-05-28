@@ -36,7 +36,17 @@ public class CreateAssetHandler
         CreateAssetRequest request,
         CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken);
+        var normalizedRequest = request with
+        {
+            AssetName = request.AssetName.Trim(),
+            Specification = request.Specification.Trim()
+        };
+        
+        var validationResult = await _validator.ValidateAsync(normalizedRequest, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
 
         if (string.IsNullOrWhiteSpace(_currentUser.LocationId))
         {
@@ -46,14 +56,12 @@ public class CreateAssetHandler
         var locationId = Guid.Parse(_currentUser.LocationId);
 
         var category = await _categoryRepository.FirstOrDefaultAsync(
-            new CategoryWithPrefixSpec(request.CategoryName),
+            new CategoryByIdSpec(request.CategoryId),
             cancellationToken);
 
         if (category is null)
         {
-            return Error.NotFound(
-                "Asset.CategoryNotFound",
-                "Category not found.");
+            return CreateAssetErrors.CategoryNotFound;
         }
 
         var maxCode = await _assetRepository.FirstOrDefaultAsync(
@@ -66,10 +74,19 @@ public class CreateAssetHandler
         {
             var numberPart = maxCode.Replace(category.Prefix, "");
 
-            if (int.TryParse(numberPart, out var currentMax))
+            var isValid = int.TryParse(numberPart, out var currentMax);
+
+            if (!isValid)
             {
-                nextNumber = currentMax + 1;
+                return CreateAssetErrors.InvalidAssetCodeFormat;
             }
+
+            if (currentMax >= 999999)
+            {
+                return CreateAssetErrors.AssetCodeLimitReached;
+            }
+
+            nextNumber = currentMax + 1;
         }
 
         var assetCode = $"{category.Prefix}{nextNumber:D6}";
@@ -78,8 +95,8 @@ public class CreateAssetHandler
         {
             Id = Guid.NewGuid(),
             AssetCode = assetCode,
-            Name = request.AssetName,
-            Specification = request.Specification,
+            Name = normalizedRequest.AssetName,
+            Specification = normalizedRequest.Specification,
             InstalledAtUtc = request.InstalledDate,
             State = request.State,
             CategoryId = category.Id,
@@ -87,9 +104,15 @@ public class CreateAssetHandler
             CreatedAtUtc = DateTime.UtcNow,
         };
 
-        await _assetRepository.AddAsync(asset, cancellationToken);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _assetRepository.AddAsync(asset, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return CreateAssetErrors.AssetCreationFailed;
+        }
 
         return new CreateAssetResponse(
             asset.Id,

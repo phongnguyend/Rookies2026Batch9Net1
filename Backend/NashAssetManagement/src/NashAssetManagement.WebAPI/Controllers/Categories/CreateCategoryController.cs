@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using NashAssetManagement.Application.UseCases.Categories.Create;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.WebAPI.Utilities;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NashAssetManagement.WebAPI.Controllers;
 
@@ -21,6 +22,9 @@ public class CreateCategoryController : BaseApiController
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [SwaggerOperation(Summary = "Create a new category.", Tags = [ControllerTags.Categories])]
     public async Task<IActionResult> Create(
         [FromBody] CreateCategoryRequest request,
         CancellationToken cancellationToken)
@@ -28,17 +32,7 @@ public class CreateCategoryController : BaseApiController
         var result = await _sender.Send(request, cancellationToken);
 
         return result.Match(
-            category => Created(
-                $"/api/v1/categories/{category.Id}",
-                category),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-
-                return new ObjectResult(problem)
-                {
-                    StatusCode = problem.Status
-                };
-            });
+            category => Ok(category),
+            errors => errors.ToProblem());
     }
 }

@@ -22,15 +22,5 @@ public class CreateAssetValidator : AbstractValidator<CreateAssetRequest>
         RuleFor(x => x.State)
             .Must(s => s == AssetState.Available || s == AssetState.NotAvailable)
             .WithMessage("State must be Available or NotAvailable.");
-
-        RuleFor(x => x.CategoryName)
-            .NotEmpty().WithMessage("Category name is required.")
-            .MaximumLength(20).WithMessage("Category name must not exceed 20 characters.");
-
-        RuleFor(x => x.CategoryPrefix)
-            .NotEmpty().WithMessage("Category prefix is required.")
-            .MaximumLength(2).WithMessage("Category prefix must not exceed 2 characters.")
-            .Matches("^[A-Z]+$").WithMessage("Category prefix must contain uppercase letters only.")
-            .When(x => x.CategoryPrefix is not null);
     }
 }

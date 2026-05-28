@@ -23,7 +23,7 @@ public class CategoriesController : BaseApiController
     public CategoriesController(ISender sender) : base(sender) { }
 
     [HttpGet]
-    [SwaggerOperation(Tags = [ControllerTags.Categories])]
+    [SwaggerOperation(summary: "Get category list.",Tags = [ControllerTags.Categories])]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await _sender.Send(new GetCategoriesRequest(), cancellationToken);
