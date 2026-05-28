@@ -300,11 +300,11 @@ export default function UsersPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#333]" data-testid="tabManagerUser">
-      <div className="flex">
-        <main className="flex-1">
+      <div className="flex min-w-0">
+        <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
-          <div className="mb-6 mt-4 flex items-center justify-between">
+          <div className="mb-6 mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex gap-5">
               <div data-testid="ddlFilterType">
                 <DropdownFilter
@@ -333,7 +333,7 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <div className="flex gap-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
