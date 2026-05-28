@@ -388,12 +388,13 @@ export default function UsersPage() {
             />
           </div>
 
-          {(data?.totalPages ?? 1) <= 1 ? (
+          {(data?.totalCount ?? users.length) > 0 &&
+          (data?.totalPages ?? 1) <= 1 ? (
             <p className="mt-6 text-sm text-gray-500">
               Page {data?.pageNumber ?? queryPage} of {data?.totalPages ?? 1} -
               Total {data?.totalCount ?? users.length} items
             </p>
-          ) : (
+          ) : (data?.totalPages ?? 1) > 1 ? (
             <Pagination
               pageNumber={data?.pageNumber ?? queryPage}
               totalPages={data?.totalPages ?? 1}
@@ -405,7 +406,7 @@ export default function UsersPage() {
               btnPreviousPageTestId="btnPrevPage"
               btnNextPageTestId="btnNextPage"
             />
-          )}
+          ) : null}
         </main>
       </div>
     </div>

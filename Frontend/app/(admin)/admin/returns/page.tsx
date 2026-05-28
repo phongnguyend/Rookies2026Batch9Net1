@@ -404,12 +404,12 @@ export default function ReturnsPage() {
             }}
           />
 
-          {(data?.totalPages ?? 1) <= 1 ? (
+          {(data?.totalCount ?? 0) > 0 && (data?.totalPages ?? 1) <= 1 ? (
             <p className="mt-6 text-sm text-gray-500">
               Page {data?.pageNumber ?? page} of {data?.totalPages ?? 1} -
               Total {data?.totalCount ?? 0} items
             </p>
-          ) : (
+          ) : (data?.totalPages ?? 1) > 1 ? (
             <Pagination
               pageNumber={data?.pageNumber ?? page}
               totalPages={data?.totalPages ?? 1}
@@ -419,7 +419,7 @@ export default function ReturnsPage() {
               hasNextPage={data?.hasNextPage ?? false}
               onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
             />
-          )}
+          ) : null}
         </main>
       </div>
     </div>
