@@ -345,7 +345,7 @@ export default function ReturnsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333]">
+    <div className="min-h-screen bg-white text-[#333]" data-testid="mnuReturning">
       <div className="flex">
         <main className="flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>

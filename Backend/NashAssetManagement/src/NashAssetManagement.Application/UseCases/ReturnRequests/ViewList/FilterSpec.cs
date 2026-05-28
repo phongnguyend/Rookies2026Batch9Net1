@@ -31,8 +31,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             // Filter with returned date
             if (DateTime.TryParse(request.ReturnedDate, out var returnedDate))
             {
-                var from = returnedDate.Date;
-                var to = from.AddDays(1).AddTicks(-1);
+                var returnedDateBeginningOfDay = returnedDate.Date;
+                var from = returnedDateBeginningOfDay;
+                var to = returnedDateBeginningOfDay.AddDays(1).AddTicks(-1);
 
                 Query.Where(x =>
                     x.ReturnedAtUtc.HasValue &&
