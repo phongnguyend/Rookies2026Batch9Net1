@@ -10,7 +10,7 @@ export const usersApi = baseApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query<GetUsersResponse, GetUsersRequest>({
       query: (params) => ({
-        url: "https://localhost:8081/api/v1/users",
+        url: "v1/users",
         method: "GET",
         params: {
           pageNumber: params.pageNumber,
@@ -18,17 +18,17 @@ export const usersApi = baseApiSlice.injectEndpoints({
           ...(params.searchTerm ? { searchTerm: params.searchTerm } : {}),
           ...(params.type ? { type: params.type } : {}),
           ...(params.sortBy ? { sortBy: params.sortBy } : {}),
-          ...(params.sortDesc ? { sortDesc: params.sortDesc } : {}),
+          ...(params.sortDesc !== undefined ? { sortDesc: params.sortDesc } : {}),
         },
       }),
       providesTags: ["Users"],
     }),
     getUserById: builder.query<GetUserByIdResponse, string>({
       query: (id) => ({
-        url: `https://localhost:8081/api/v1/users/${id}`,
+        url: `v1/users/${id}`,
         method: "GET",
       }),
-      providesTags: (_result, _error, id) => [{ type: "Users", id }],
+      providesTags: ["Users"],
     }),
   }),
 });

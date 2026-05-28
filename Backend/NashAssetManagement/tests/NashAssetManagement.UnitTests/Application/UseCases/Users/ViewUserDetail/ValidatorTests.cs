@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using FluentValidation.TestHelper;
 using NashAssetManagement.Application.UseCases.Users.ViewUserDetail;
 using Xunit;
 
@@ -6,69 +6,89 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetai
 {
     public class ValidatorTests
     {
-        private readonly Validators _validator = new();
+        private readonly Validators _validator;
+
+        public ValidatorTests()
+        {
+            _validator = new Validators();
+        }
 
         [Fact]
-        public async Task ViewUserDetailValidator_UserIdIsNull_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForUserId_WhenUserIdIsNull()
         {
+            // Arrange
             var request = new Request(null);
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
                      && x.ErrorMessage == "User Id is required.");
         }
 
         [Fact]
-        public async Task ViewUserDetailValidator_UserIdIsEmpty_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForUserId_WhenUserIdIsEmpty()
         {
+            // Arrange
             var request = new Request("");
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
                      && x.ErrorMessage == "User Id is required.");
         }
 
         [Fact]
-        public async Task ViewUserDetailValidator_UserIdIsWhitespace_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForUserId_WhenUserIdIsWhitespace()
         {
+            // Arrange
             var request = new Request("   ");
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
                      && x.ErrorMessage == "User Id is required.");
         }
 
         [Fact]
-        public async Task ViewUserDetailValidator_UserIdIsNotGuid_ShouldReturnErrors()
+        public void TestValidate_ShouldHaveValidationErrorForUserId_WhenUserIdIsNotGuid()
         {
+            // Arrange
             var request = new Request("not-a-guid");
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.False(result.IsValid);
-            Assert.Contains(result.Errors,
-                x => x.PropertyName == nameof(Request.UserId)
-                     && x.ErrorMessage == "User Id must be a valid Guid/uuid.");
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.UserId);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.UserId), error.PropertyName);
+            Assert.Equal("User Id must be a valid Guid/uuid.", error.ErrorMessage);
         }
 
         [Fact]
-        public async Task ViewUserDetailValidator_ValidRequest_ShouldPassValidation()
+        public void TestValidate_ShouldNotHaveAnyValidationErrors_WhenRequestIsValid()
         {
+            // Arrange
             var request = new Request("36c29308-4d9c-4e1b-9baf-a5dc11f26001");
 
-            var result = await _validator.ValidateAsync(request);
+            // Act
+            var result = _validator.TestValidate(request);
 
-            Assert.True(result.IsValid);
-            Assert.Empty(result.Errors);
+            // Assert
+            result.ShouldNotHaveAnyValidationErrors();
         }
     }
 }
