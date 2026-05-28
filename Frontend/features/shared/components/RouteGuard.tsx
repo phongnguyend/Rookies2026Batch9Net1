@@ -15,11 +15,25 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   const isProtectedRoute =
     pathname.startsWith("/admin") || pathname.startsWith("/staff");
-  const isHome = pathname === "/";
+
+  // add to explicitly match login page when accessing from IIS
+  const isHome = pathname === "/" || pathname === "/index.html";
 
   // check if user role conflicts with secure namespaces
-  const isUnauthorized =
-    pathname.startsWith("/admin") && user?.role !== UserRoles.Admin;
+  let isUnauthorized = false;
+  if (user?.role) {
+    switch (user.role as UserRoles) {
+      case UserRoles.Admin:
+        isUnauthorized = pathname.startsWith("/staff");
+        break;
+      case UserRoles.Staff:
+        isUnauthorized = pathname.startsWith("/admin");
+        break;
+      default:
+        isUnauthorized = isProtectedRoute;
+        break;
+    }
+  }
 
   useEffect(() => {
     if (isLoading) return;
