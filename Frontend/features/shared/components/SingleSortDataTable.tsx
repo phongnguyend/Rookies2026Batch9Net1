@@ -62,9 +62,21 @@ export default function SingleSortDataTable<T>({
     return "↕";
   };
 
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return <p className="py-8 text-center text-gray-500">{emptyMessage}</p>;
+  }
+
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto">
+      <table className="w-full text-left text-sm table-fixed">
         <thead>
           <tr className="border-b border-gray-400">
             {columns.map((column) => {
@@ -84,7 +96,7 @@ export default function SingleSortDataTable<T>({
                   {column.header}
 
                   {column.sortable && (
-                    <span className="ml-1">
+                    <span className="ml-1 inline-block w-4 text-center">
                       {getSortIcon(currentSort?.direction)}
                     </span>
                   )}
@@ -99,15 +111,6 @@ export default function SingleSortDataTable<T>({
             <tr>
               <td colSpan={columns.length} className="py-8 text-center">
                 Loading...
-              </td>
-            </tr>
-          ) : data.length === 0 ? (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="py-8 text-center text-gray-500"
-              >
-                {emptyMessage}
               </td>
             </tr>
           ) : (
