@@ -17,7 +17,7 @@ import DataTable, {
   ColumnDef,
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
-import DropdownStateFilter from "@/features/Assets/components/stateDtopdown";
+import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,
