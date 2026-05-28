@@ -41,10 +41,10 @@ export default function NavbarProfile() {
 
   return (
     <div className="flex flex-row space-x-2 align-center">
-      <div className="w-20 rounded-full bg-white text-primary flex items-center justify-center font-bold shadow-2xs">
+      <div className="hidden md:flex w-20 rounded-full bg-white text-primary items-center justify-center font-bold shadow-2xs">
         {user.role}
       </div>
-      <div className="w-auto px-3 rounded-full bg-white text-primary flex items-center justify-center font-bold shadow-2xs">
+      <div className="hidden md:flex w-auto px-3 rounded-full bg-white text-primary items-center justify-center font-bold shadow-2xs">
         {user.locationName}
       </div>
       <div className="dropdown dropdown-end" data-testid="mnuUserProfile">
@@ -71,13 +71,24 @@ export default function NavbarProfile() {
         </div>
         <ul
           tabIndex={0}
-          className="dropdown-content menu bg-base-100 rounded-box z-100 w-40 p-2 shadow text-base-content mt-2 border border-base-200"
+          className="dropdown-content menu bg-base-100 rounded-box z-100 w-42 p-2 shadow text-base-content mt-2 border border-base-200"
         >
+          <div className="px-3 py-2 text-xs select-text cursor-text md:hidden">
+            Role: <span className="text-primary font-bold">{user.role}</span>
+          </div>
+          <div className="px-3 py-2 text-xs select-text cursor-text md:hidden">
+            Location:{" "}
+            <span className="text-primary font-bold">{user.locationName}</span>
+          </div>
+
+          {/* Separator */}
+          <div className="border-t border-base-300 my-1 md:hidden" />
+
           <li>
             <button
               data-testid="mnuChangePassword"
               onClick={handleChangePassword}
-              className="font-semibold hover:bg-primary hover:text-white active:bg-primary/80 active:text-white w-full text-left"
+              className="whitespace-nowrap font-semibold hover:bg-primary hover:text-white active:bg-primary/80 active:text-white w-full text-left"
             >
               Change Password
             </button>
