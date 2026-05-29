@@ -14,8 +14,8 @@ export const authApi = baseApiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log("Data received:", data)
-          if (data?.accessToken && data?.refreshToken) {
+
+          if (data != null && data?.accessToken && data?.refreshToken) {
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
           }

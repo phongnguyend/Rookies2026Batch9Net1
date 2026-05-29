@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
@@ -41,28 +41,18 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
-  const [hasToken, setHasToken] = useState<boolean>(false);
-  const [isCheckingToken, setIsCheckingToken] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token =
-        localStorage.getItem("accessToken") ||
-        localStorage.getItem("refreshToken");
-      setHasToken(!!token);
-    }
-    setIsCheckingToken(false);
-  }, []);
+  const hasToken =
+    typeof window !== "undefined" &&
+    (!!localStorage.getItem("accessToken") ||
+      !!localStorage.getItem("refreshToken"));
 
   // restore session on page mount/refresh if token exists
-  // restore if having token
+  // - do not call the hook when user is authenticated, or when user has the token from localStorage
   const { data: profile, isError } = useGetMeQuery(undefined, {
-    skip: isCheckingToken || !hasToken,
+    skip: isAuthenticated || !hasToken,
   });
 
   useEffect(() => {
-    if (isCheckingToken) return;
-
     if (!hasToken) {
       dispatch(completeLoading());
       return;
@@ -83,7 +73,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     } else if (isError && !isAuthenticated) {
       dispatch(completeLoading());
     }
-  }, [profile, isAuthenticated, isError, dispatch, isCheckingToken, hasToken]);
+  }, [profile, isAuthenticated, isError, dispatch, hasToken]);
 
   return (
     <RouteGuard>

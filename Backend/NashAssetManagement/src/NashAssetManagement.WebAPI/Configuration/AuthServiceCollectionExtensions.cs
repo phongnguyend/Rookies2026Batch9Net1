@@ -41,10 +41,10 @@ namespace NashAssetManagement.WebAPI.Configuration
                             var token = context.Request.Cookies[JwtTokenConstants.CookieAccessToken];
 
                             // if failed, back up and get from request header
-                            if (string.IsNullOrEmpty(token))
+                            if (string.IsNullOrWhiteSpace(token))
                             {
                                 var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-                                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                                if (!string.IsNullOrWhiteSpace(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                                 {
                                     token = authHeader.Substring("Bearer ".Length).Trim();
                                 }

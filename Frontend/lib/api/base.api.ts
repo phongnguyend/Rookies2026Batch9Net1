@@ -110,10 +110,9 @@ const handleAuthFailure = (api: any) => {
   // Remove auth state, must know
   api.dispatch(logoutAccount())
 
-  // Clear tokens
+  // Clear tokens from local storage
   if (typeof window !== "undefined") {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.clear();
   }
 
   // Redirect user to login form if not already on the login page
