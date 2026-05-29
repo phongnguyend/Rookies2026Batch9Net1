@@ -16,9 +16,14 @@ import {
   type ReturnRequestRow,
 } from "@/features/returns/returns.types";
 import { SortDirection } from "@/lib/api/base.types";
+import { formatDate } from "@/utils/datetime.utils";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
+const defaultSort: SortItem = {
+  key: "assetCode",
+  direction: SortDirection.Asc,
+};
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
@@ -95,32 +100,6 @@ function formatReturnedDateForQuery(date: Date | null) {
   ).toISOString();
 }
 
-function formatUtcDateToUtcPlus7(utc?: string | null) {
-  if (!utc) {
-    return "";
-  }
-
-  const hasTimeZone = /(?:z|[+-]\d{2}:?\d{2})$/i.test(utc.trim());
-  const date = new Date(hasTimeZone ? utc : `${utc}Z`);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: returnRequestTimeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
-  const day = parts.find((part) => part.type === "day")?.value;
-
-  return year && month && day ? `${year}-${month}-${day}` : "";
-}
-
 function getStateLabel(state: string) {
   if (state === ReturnRequestState.WaitingForReturning) {
     return "Waiting for returning";
@@ -183,7 +162,7 @@ export default function ReturnsPage() {
             sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
         },
       ]
-    : [];
+    : [defaultSort];
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -270,8 +249,8 @@ export default function ReturnsPage() {
     ...(returnedDate
       ? { returnedDate: formatReturnedDateForQuery(returnedDate) }
       : {}),
-    ...(sorts[0]?.key ? { sortBy: sorts[0].key } : {}),
-    ...(sorts[0]?.direction ? { sortDirection: sorts[0].direction } : {}),
+    sortBy: sorts[0]?.key ?? defaultSort.key,
+    sortDirection: sorts[0]?.direction ?? defaultSort.direction,
   });
 
   const requests = data?.items ?? [];
@@ -309,7 +288,7 @@ export default function ReturnsPage() {
       header: "Assigned Date",
       sortable: true,
       className: "w-[126px]",
-      render: (request) => formatUtcDateToUtcPlus7(request.assignedDate),
+      render: (request) => formatDate(request.assignedDate),
       cellTestId: () => "dpAssignedDate",
     },
     {
@@ -325,7 +304,8 @@ export default function ReturnsPage() {
       header: "Returned Date",
       sortable: true,
       className: "w-[132px]",
-      render: (request) => formatUtcDateToUtcPlus7(request.returnedDate),
+      render: (request) =>
+        request.returnedDate ? formatDate(request.returnedDate) : "",
       cellTestId: () => "dpReturnedDate",
     },
     {
@@ -385,7 +365,7 @@ export default function ReturnsPage() {
                 }}
                 placeholder="Returned Date"
                 width="w-[220px]"
-                testId="dpReturned"
+                txtInputTestId="dpReturned"
               />
             </div>
 

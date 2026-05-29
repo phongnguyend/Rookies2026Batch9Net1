@@ -17,6 +17,7 @@ import DataTable, {
   ColumnDef,
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
+import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
 
 const STATE_OPTIONS = Object.values(AssetState).map((s) => ({
   key: s,
@@ -31,6 +32,8 @@ function AssetsContent() {
   const [sort, setSort] = useState<SortItem | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(search ?? "");
+  const [EditDisabledStates] = useState(false);
+  const [DeleteDisabledStates] = useState(false);
 
   // ─── Read from URL ─────────────────────────────
   const pageNumber = Number(searchParams.get("pageNumber") ?? "1");
@@ -40,9 +43,19 @@ function AssetsContent() {
   // ─── Requirement for default View ─────────────────────────────
   const isFirstLoad = !searchParams.has("states");
 
+  const defaultStates = [
+      AssetState.Available,
+      AssetState.NotAvailable,
+      AssetState.Assigned,
+    ];
+
   const selectedStates = isFirstLoad
-    ? [AssetState.Available, AssetState.NotAvailable, AssetState.Assigned]
+    ? defaultStates
     : stateParams;
+
+  const isDefaultStateSelection =
+    selectedStates.length === defaultStates.length &&
+    defaultStates.every((s) => selectedStates.includes(s));
 
   // ─── Write to URL ──────────────────────────────
   const updateMultipleUrl = (key: string, values: string[]) => {
@@ -68,6 +81,8 @@ function AssetsContent() {
     sortBy: sort?.key,
     sortDirection: sort?.direction,
   });
+
+  const displayItems = data?.items ?? [];
 
   const categoryOptions =
     categoriesData?.map((c) => ({
@@ -98,9 +113,24 @@ function AssetsContent() {
 
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
-    { key: "assetCode", header: "Asset Code", sortable: true, testId: "btnSortAssetCode" },
-    { key: "name", header: "Asset Name", sortable: true , testId: "btnSortAssetName"},
-    { key: "category", header: "Category", sortable: true ,  testId: "btnSortCategory"},
+    {
+      key: "assetCode",
+      header: "Asset Code",
+      sortable: true,
+      testId: "btnSortAssetCode",
+    },
+    {
+      key: "name",
+      header: "Asset Name",
+      sortable: true,
+      testId: "btnSortAssetName",
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      testId: "btnSortCategory",
+    },
     {
       key: "state",
       header: "State",
@@ -114,7 +144,12 @@ function AssetsContent() {
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
-            data-testid = "btnEdit"
+            disabled={
+              EditDisabledStates
+                ? EditDisabledStates
+                : row.state === AssetState.Assigned
+            }
+            data-testid="btnEdit"
             onClick={(e) => handleEdit(row, e)}
             className="btn btn-xs btn-outline"
           >
@@ -134,10 +169,16 @@ function AssetsContent() {
               <path d="m15 5 4 4" />
             </svg>
           </button>
+
           <button
-            data-testid = "btnIconDelete"
+            data-testid="btnIconDelete"
             onClick={(e) => handleDelete(row, e)}
             className="btn btn-xs btn-error btn-outline"
+            disabled={
+              DeleteDisabledStates
+                ? DeleteDisabledStates
+                : row.state === AssetState.Assigned
+            }
           >
             {/* X Circle icon */}
             <svg
@@ -161,28 +202,30 @@ function AssetsContent() {
     },
   ];
 
-  return (
-    <>
-      {/* Detail Modal */}
-      <AssetDetailModal
-        assetId={selectedAssetId}
-        onClose={() => setSelectedAssetId(null)}
-      />
+return (
+  <>
+    {/* Detail Modal */}
+    <AssetDetailModal
+      assetId={selectedAssetId}
+      onClose={() => setSelectedAssetId(null)}
+    />
 
-      {/* Filters */}
-      <div className="mb-4 flex items-center gap-3">
-        <div data-testid="ddlState">
-          <DropdownFilter
+    {/* Filters */}
+    <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+
+      {/* ─── Left group: State + Category ──────── */}
+      <div className="flex flex-wrap gap-3">
+        <div data-testid="ddlState" className="flex-1 min-w-[160px] sm:flex-none">
+          <DropdownStateFilter
             items={STATE_OPTIONS}
             values={selectedStates}
-            placeholder="State"
             getKey={(item) => item.key}
             getLabel={(item) => item.label}
             onChange={(values) => updateMultipleUrl("states", values)}
-            allLabel="All States"
+            customLabel={isDefaultStateSelection ? "State" : undefined}
           />
         </div>
-        <div data-testid="ddlCategory">
+        <div data-testid="ddlCategory" className="flex-1 min-w-[160px] sm:flex-none">
           <DropdownFilter
             items={categoryOptions}
             values={selectedCategories}
@@ -193,7 +236,11 @@ function AssetsContent() {
             allLabel="All Categories"
           />
         </div>
-        <div className="ml-auto" data-testid="txtSearch">
+      </div>
+
+      {/* ─── Right group: Search + Create ──────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+        <div data-testid="txtSearch" className="w-full sm:w-60">
           <SearchInput
             value={searchInput}
             onChange={setSearchInput}
@@ -201,64 +248,61 @@ function AssetsContent() {
               const trimmedValue = value.trim();
               setSearchInput(trimmedValue);
               const current = new URLSearchParams(searchParams.toString());
-              if (trimmedValue) {
-                current.set("search", trimmedValue);
-              } else {
-                current.delete("search");
-              }
+              if (trimmedValue) current.set("search", trimmedValue);
+              else current.delete("search");
               current.set("pageNumber", "1");
               router.push(`?${current.toString()}`);
             }}
             placeholder="Search by asset code or name..."
+            width="w-full"
           />
         </div>
         <button
           data-testid="btnCreateAsset"
-          onClick={() => router.push("")} // TODO: update route as needed
-          className="btn btn-primary btn-sm"
+          onClick={() => router.push("")}
+          className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
         >
           + Create New Asset
         </button>
       </div>
+    </div>
 
-      {/* Table */}
-      <div data-testid="dgdAsset">
-        <DataTable<AssetListItem>
-          data={data?.items ?? []}
-          columns={columns}
-          isLoading={isLoading}
-          emptyMessage={
-            isError ? "No assets found." : "No assets found after filtering."
-          }
-          onRowClick={(row) => setSelectedAssetId(row.id)}
-          sort={sort}
-          onSortChange={setSort}
-        />
-      </div>
+    {/* Table — already has overflow-x-auto inside DataTable */}
+    <div data-testid="dgdAsset">
+      <DataTable<AssetListItem>
+        data={displayItems}
+        columns={columns}
+        isLoading={isLoading}
+        emptyMessage={isError ? "No assets found." : "No assets found after filtering."}
+        onRowClick={(row) => setSelectedAssetId(row.id)}
+        sort={sort}
+        onSortChange={setSort}
+      />
+    </div>
 
-      {/* Pagination */}
-      {data && (
-        <Pagination
-          pageNumber={data.pageNumber}
-          totalPages={data.totalPages}
-          totalCount={data.totalCount}
-          pageSize={data.pageSize}
-          hasPreviousPage={data.hasPreviousPage}
-          hasNextPage={data.hasNextPage}
-          onPageChange={(page) => {
-            const current = new URLSearchParams(searchParams.toString());
-            current.set("pageNumber", String(page));
-            router.push(`?${current.toString()}`);
-          }}
-        />
-      )}
-    </>
-  );
+    {/* Pagination */}
+    {data && (
+      <Pagination
+        pageNumber={data.pageNumber}
+        totalPages={data.totalPages}
+        totalCount={displayItems.length}
+        pageSize={data.pageSize}
+        hasPreviousPage={data.hasPreviousPage}
+        hasNextPage={data.hasNextPage}
+        onPageChange={(page) => {
+          const current = new URLSearchParams(searchParams.toString());
+          current.set("pageNumber", String(page));
+          router.push(`?${current.toString()}`);
+        }}
+      />
+    )}
+  </>
+);
 }
 
 export default function AssetsPage() {
   return (
-    <div className="p-6">
+   <div className="p-4 sm:p-6">
       <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <AssetsContent />

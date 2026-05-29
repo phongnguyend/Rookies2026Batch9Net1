@@ -14,10 +14,7 @@ const loginFormSchema = z.object({
     .max(100, "Username must not exceed 100 characters.")
     .regex(/^[a-zA-Z]+$/, "Username must contain only letters.")
     .transform((val) => val.trim()),
-  password: z
-    .string()
-    .min(1, "Password is required.")
-    .transform((val) => val.trim()),
+  password: z.string().min(1, "Password is required."),
 });
 
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
@@ -39,7 +36,7 @@ export default function LoginForm({
     register,
     handleSubmit,
     watch,
-    formState: { isValid, isSubmitted, errors },
+    formState: { isValid, isSubmitted, errors, touchedFields },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
     mode: "onChange",
@@ -66,7 +63,7 @@ export default function LoginForm({
           loading="eager"
         />
         <h2 className="text-3xl font-bold tracking-tight text-primary">
-          Nash Asset Management
+          Online Asset Management
         </h2>
         <p className="text-sm text-base-content/60">
           Please enter your details to sign in
@@ -83,7 +80,7 @@ export default function LoginForm({
             type="text"
             placeholder="Enter your username"
             className={`input input-bordered w-full focus:input-primary transition-colors ${
-              errors.username && (usernameValue !== "" || isSubmitted)
+              errors.username && (touchedFields.username || isSubmitted)
                 ? "input-error focus:input-error"
                 : ""
             }`}
@@ -91,7 +88,7 @@ export default function LoginForm({
             {...register("username")}
             data-testid="txtUsername"
           />
-          {errors.username && (usernameValue !== "" || isSubmitted) && (
+          {errors.username && (touchedFields.username || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.username.message}
@@ -108,9 +105,9 @@ export default function LoginForm({
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${
-                errors.password && (passwordValue !== "" || isSubmitted)
+                errors.password && (touchedFields.password || isSubmitted)
                   ? "input-error focus:input-error"
                   : ""
               }`}
@@ -163,7 +160,7 @@ export default function LoginForm({
               )}
             </button>
           </div>
-          {errors.password && (passwordValue !== "" || isSubmitted) && (
+          {errors.password && (touchedFields.password || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.password.message}
@@ -176,8 +173,8 @@ export default function LoginForm({
         {/* enable initially, disable after a failed submission or form is not valid */}
         <button
           type="submit"
-          className="btn btn-primary w-full text-white font-semibold transition-all shadow-md active:scale-[0.98]"
-          disabled={(isSubmitted && !isValid) || isLoading}
+          className="w-full bg-primary hover:bg-[#b52222] text-white font-semibold py-2.5 rounded-lg transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!isValid || isLoading}
           data-testid="btnLogin"
         >
           {isLoading ? (
@@ -189,7 +186,7 @@ export default function LoginForm({
 
         {/* Server-Side Error Display on bottom */}
         {serverErrors.length > 0 && (
-          <div className="p-3 text-xs text-error bg-error/10 border border-error/20 rounded-lg font-sans space-y-1.5 w-full mt-4">
+          <div className="p-3 text-xs text-error bg-error/10 border border-error/20 rounded-lg font-sans space-y-1.5 w-full mt-4 whitespace-pre-line">
             {serverErrors.length === 1 ? (
               <p>{serverErrors[0]}</p>
             ) : (

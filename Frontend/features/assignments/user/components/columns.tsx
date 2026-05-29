@@ -17,6 +17,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortAssetCode",
       cellTestId: (_, index) => `colAssetCode-${index}`,
+      className: "w-32",
     },
     {
       key: "assetName",
@@ -24,6 +25,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortAssetName",
       cellTestId: (_, index) => `colAssetName-${index}`,
+      className: "w-60",
     },
     {
       key: "category",
@@ -31,6 +33,7 @@ export function createColumns(handlers: {
       sortable: true,
       headerTestId: "btnSortCategory",
       cellTestId: (_, index) => `colCategory-${index}`,
+      className: "w-36",
     },
     {
       key: "assignedDate",
@@ -39,6 +42,7 @@ export function createColumns(handlers: {
       render: (assignment) => formatDate(assignment.assignedDate),
       headerTestId: "btnSortAssignedDate",
       cellTestId: (_, index) => `colAssignedDate-${index}`,
+      className: "w-36",
     },
     {
       key: "state",
@@ -47,10 +51,12 @@ export function createColumns(handlers: {
       render: (assignment) => displayAssignmentState(assignment.state),
       headerTestId: "btnSortState",
       cellTestId: (_, index) => `colState-${index}`,
+      className: "w-40",
     },
     {
       key: "actions",
       header: "",
+      className: "w-36",
       render: (assignment) => {
         return (
           <DataTableButtonActions
