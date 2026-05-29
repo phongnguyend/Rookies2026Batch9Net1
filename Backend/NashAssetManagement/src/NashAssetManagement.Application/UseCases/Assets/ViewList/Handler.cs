@@ -34,8 +34,6 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         await _validator.ValidateAndThrowAsync(request, cancellationToken);
 
         var location = Guid.Parse(_currentUser.LocationId!);
-        var sortBy = request.SortBy ?? "assetcode";
-        var sortDirection = request.SortDirection ?? "asc";
         var normalizedSearch = request.Search?.Trim();
 
         var stateList = request.States?
@@ -61,8 +59,8 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
             request.Categories,
             stateList,
             normalizedSearch,
-            sortBy,
-            sortDirection,
+            request.SortBy,
+            request.SortDirection,
             request.PageNumber,
             request.PageSize,
             location);
