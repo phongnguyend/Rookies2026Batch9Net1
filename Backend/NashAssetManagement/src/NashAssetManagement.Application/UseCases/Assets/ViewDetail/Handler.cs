@@ -1,3 +1,4 @@
+using System.Data;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
@@ -29,15 +30,15 @@ public class GetAssetDetailHandler
         GetAssetDetailRequest request,
         CancellationToken cancellationToken = default)
     {
-        await _validator.ValidateAndThrowAsync(
-            request,
-            cancellationToken);
+        Guid locationId =  Guid.TryParse(_currentUser.LocationId, out Guid location) ? location:Guid.Empty;
 
-        var locationId = Guid.Parse(_currentUser.LocationId!);
-        var assetId = Guid.Parse(request.Id);
-        
+        if (locationId == Guid.Empty)
+        {
+            return GetAssetDetailErrors.NotFoundLocation;
+        }
+
         var spec = new AssetDetailSpec(
-            assetId,
+            request.Id,
             locationId);
 
         var asset = await _assetRepository.FirstOrDefaultAsync(
@@ -46,7 +47,7 @@ public class GetAssetDetailHandler
 
         if (asset is null)
         {
-            return GetAssetDetailErrors.NotFound(assetId);
+            return GetAssetDetailErrors.NotFoundAssetId;
         }
 
         return asset;

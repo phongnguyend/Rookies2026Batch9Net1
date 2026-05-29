@@ -4,6 +4,13 @@ namespace NashAssetManagement.Application.UseCases.Assets.ViewDetail;
 
 public static class GetAssetDetailErrors
 {
-    public static Error NotFound(Guid id) =>
-        Error.NotFound("Asset.NotFound", $"Asset with id '{id}' was not found.");
+    public static readonly Error NotFoundAssetId = Error.NotFound(
+        code:"GetAssetDetail",
+        description:"GetAssetDetail.AssetNotFound"
+    );
+
+    public static readonly Error NotFoundLocation = Error.NotFound(
+        code:"GetAssetDetail",
+        description: "GetAssetDetail.LocationNotFound"
+    );
 }
