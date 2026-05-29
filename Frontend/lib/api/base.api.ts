@@ -7,6 +7,17 @@ import { logoutAccount } from "@/features/auth/auth.slice";
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: ENV_CONFIGS.apiUrl + "/api",
   credentials: 'include', // send cookie automatic
+
+  // fallback to send access token to the server
+  prepareHeaders: (headers) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+    }
+    return headers;
+  },
 });
 
 let refreshPromise: ReturnType<typeof rawBaseQuery> | null = null;
@@ -27,10 +38,19 @@ const refreshToken = async (
 
   // If no refreshIs current requested, calling one
   if (!refreshPromise) {
+
+    // fallback to get refersh token from the localStorage
+    const storedRefreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
+    const headers: Record<string, string> = {};
+    if (storedRefreshToken) {
+      headers["X-Refresh-Token"] = storedRefreshToken;
+    }
+
     refreshPromise = rawBaseQuery(
       {
         url: "/auth/refresh",
         method: "POST",
+        headers,
       },
       api,
       extraOptions,
@@ -39,6 +59,16 @@ const refreshToken = async (
 
   const result = await refreshPromise;
   refreshPromise = null;
+
+  if (result.data) {
+    const data = result.data as any;
+    if (data.accessToken && data.refreshToken) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
+    }
+  }
 
   return result;
 };
@@ -79,6 +109,12 @@ const handleAuthFailure = (api: any) => {
 
   // Remove auth state, must know
   api.dispatch(logoutAccount())
+
+  // Clear tokens
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+  }
 
   // Redirect user to login form if not already on the login page
   if (typeof window !== "undefined") {

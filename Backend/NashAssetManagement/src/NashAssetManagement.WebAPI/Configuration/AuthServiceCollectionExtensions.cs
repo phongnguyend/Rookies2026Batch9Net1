@@ -34,7 +34,22 @@ namespace NashAssetManagement.WebAPI.Configuration
                     {
                         OnMessageReceived = context =>
                         {
-                            context.Token = context.Request.Cookies[JwtTokenConstants.CookieAccessToken];
+                            // since BE priority to use the token from the cookie, send the backup access token and referesh token on the response 
+                            // to support utility on mobile and accessibility
+
+                            // get from cookie first
+                            var token = context.Request.Cookies[JwtTokenConstants.CookieAccessToken];
+
+                            // if failed, back up and get from request header
+                            if (string.IsNullOrEmpty(token))
+                            {
+                                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    token = authHeader.Substring("Bearer ".Length).Trim();
+                                }
+                            }
+                            context.Token = token;
                             return Task.CompletedTask;
                         },
 

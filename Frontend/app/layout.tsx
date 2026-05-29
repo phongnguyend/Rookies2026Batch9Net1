@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./globals.css";
 import NavBar from "@/features/shared/components/NavBar/NavBar";
 import StoreProvider from "./StoreProvider";
@@ -41,10 +41,33 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
-  // restore session on page mount/refresh if cookie exists
-  const { data: profile, isError } = useGetMeQuery();
+  const [hasToken, setHasToken] = useState<boolean>(false);
+  const [isCheckingToken, setIsCheckingToken] = useState<boolean>(true);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token =
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("refreshToken");
+      setHasToken(!!token);
+    }
+    setIsCheckingToken(false);
+  }, []);
+
+  // restore session on page mount/refresh if token exists
+  // restore if having token
+  const { data: profile, isError } = useGetMeQuery(undefined, {
+    skip: isCheckingToken || !hasToken,
+  });
+
+  useEffect(() => {
+    if (isCheckingToken) return;
+
+    if (!hasToken) {
+      dispatch(completeLoading());
+      return;
+    }
+
     if (profile && !isAuthenticated) {
       const userRole = profile.roles.includes(UserRoles.Admin)
         ? UserRoles.Admin
@@ -60,7 +83,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     } else if (isError && !isAuthenticated) {
       dispatch(completeLoading());
     }
-  }, [profile, isAuthenticated, isError, dispatch]);
+  }, [profile, isAuthenticated, isError, dispatch, isCheckingToken, hasToken]);
 
   return (
     <RouteGuard>
