@@ -1,5 +1,4 @@
-"use client";
-
+import { useEffect, useRef } from "react";
 import { useGetAssetByIdQuery } from "@/features/Assets/assets.api";
 import AssetHistoryTable from "./assetHistoryTable";
 
@@ -20,9 +19,19 @@ export default function AssetDetailModal({
   assetId,
   onClose,
 }: AssetDetailModalProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const { data, isLoading } = useGetAssetByIdQuery(assetId!, {
     skip: !assetId,
   });
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (dialog && assetId) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+    }
+  }, [assetId]);
 
   if (!assetId) return null;
 
@@ -34,10 +43,16 @@ export default function AssetDetailModal({
       returnedDate: formatDate(item.returnedAtUtc),
     })) ?? [];
 
-  return (
+  const handleClose = () => {
+    if (dialogRef.current) {
+      dialogRef.current.close();
+    } else {
+      onClose();
+    }
+  };
 
-    // Using div instead of dialog to avoid Native Focus Shifting
-    <div className="modal modal-open" >
+  return (
+    <dialog ref={dialogRef} className="modal" onClose={onClose}>
       <div className="modal-box max-w-3xl" data-testid="dlgDetailedAssetInfo">
         {/* Header */}
         <div className="bg-primary text-white -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
@@ -47,8 +62,8 @@ export default function AssetDetailModal({
 
           <button
             data-testid="btnExit"
-            onClick={onClose}
-            className="text-white/80 hover:text-white"
+            onClick={handleClose}
+            className="text-white/80 hover:text-white hover:cursor-pointer"
           >
             ✕
           </button>
@@ -88,8 +103,8 @@ export default function AssetDetailModal({
       </div>
 
       {/* Backdrop */}
-      <div className="modal-backdrop" onClick={onClose} />
-    </div>
+      <div className="modal-backdrop" onClick={handleClose} />
+    </dialog>
   );
 }
 

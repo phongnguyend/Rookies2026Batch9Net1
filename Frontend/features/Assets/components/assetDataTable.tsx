@@ -113,7 +113,7 @@ export default function DataTable<T>({
           ) : (
             data.map((row, rowIndex) => (
               <tr
-                key={rowIndex}
+                key={(row as any).id ?? rowIndex}
                 onClick={() => {
                   onRowClick?.(row);
                 }}
