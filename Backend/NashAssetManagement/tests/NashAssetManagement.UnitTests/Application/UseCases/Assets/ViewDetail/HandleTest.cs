@@ -29,7 +29,7 @@ public class HandlerTests
 
         _currentUserMock
             .Setup(u => u.LocationId)
-            .Returns(_locationId.ToString());
+            .Returns(_locationId.ToString);
 
         _handler = new GetAssetDetailHandler(
             _assetRepositoryMock.Object,
@@ -38,9 +38,9 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Return_AssetDetail_When_Asset_Exists()
+    public async Task Handle_ShouldReturnAssetDetail_WhenAssetExists()
     {
-        var request = new GetAssetDetailRequest(_assetId.ToString());
+        var request = new GetAssetDetailRequest(_assetId);
 
         var expectedResponse = new GetAssetDetailResponse(
             Id: _assetId,
@@ -78,9 +78,9 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Return_NotFound_When_Asset_Does_Not_Exist()
+    public async Task Handle_ShouldReturnNotFound_WhenAssetDoesNotExist()
     {
-        var request = new GetAssetDetailRequest(_assetId.ToString());
+        var request = new GetAssetDetailRequest(_assetId);
 
         _assetRepositoryMock
             .Setup(r => r.FirstOrDefaultAsync(
@@ -92,22 +92,22 @@ public class HandlerTests
 
         Assert.True(result.IsError);
         Assert.Equal(ErrorType.NotFound, result.FirstError.Type);
-        Assert.Equal(GetAssetDetailErrors.NotFound(_assetId).Code, result.FirstError.Code);
+        Assert.Equal(GetAssetDetailErrors.NotFoundAssetId.Code,result.FirstError.Code);
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Id_Is_Empty()
+    public async Task Handle_ShouldThrowValidationException_WhenIdIsEmpty()
     {
-        var request = new GetAssetDetailRequest(string.Empty);
+        var request = new GetAssetDetailRequest(Guid.Empty);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Call_Repository_Once_When_Request_Is_Valid()
+    public async Task Handle_ShouldCallRepository_OnceWhenRequestIsValid()
     {
-        var request = new GetAssetDetailRequest(_assetId.ToString());
+        var request = new GetAssetDetailRequest(_assetId);
 
         _assetRepositoryMock
             .Setup(r => r.FirstOrDefaultAsync(
@@ -125,9 +125,9 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_Should_Not_Call_Repository_When_Validation_Fails()
+    public async Task Handle_ShouldNotCall_RepositoryWhenValidationFails()
     {
-        var request = new GetAssetDetailRequest(string.Empty);
+        var request = new GetAssetDetailRequest(Guid.Empty);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));

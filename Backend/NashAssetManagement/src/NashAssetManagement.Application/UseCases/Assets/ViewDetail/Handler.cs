@@ -30,6 +30,13 @@ public class GetAssetDetailHandler
         GetAssetDetailRequest request,
         CancellationToken cancellationToken = default)
     {
+        var validatorResult = await _validator.ValidateAsync(request,cancellationToken);
+       
+        if (!validatorResult.IsValid)
+        {
+            throw new ValidationException(validatorResult.Errors);
+        }
+
         Guid locationId =  Guid.TryParse(_currentUser.LocationId, out Guid location) ? location:Guid.Empty;
 
         if (locationId == Guid.Empty)
