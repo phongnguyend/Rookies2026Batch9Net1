@@ -114,7 +114,14 @@ export default function DataTable<T>({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                onClick={() => onRowClick?.(row)}
+                onClick={(e) => {
+                  const selection = window.getSelection();
+                  if (selection && selection.toString().length > 0) {
+                    e.preventDefault();
+                    return;
+                  }
+                  onRowClick?.(row);
+                }}
                 className={`border-b border-gray-300 ${
                   onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
                 }`}
