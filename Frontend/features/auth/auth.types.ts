@@ -6,13 +6,18 @@ export namespace Login {
     password: string;
   }
 
-  // return only cookie, no tokens returns
-  export interface Response { };
+  export interface Response {
+    accessToken: string;
+    refreshToken: string;
+  }
 }
 
 export namespace Refresh {
   export interface Request { }
-  export interface Response { }
+  export interface Response {
+    accessToken: string;
+    refreshToken: string;
+  }
 }
 
 export namespace GetMe {

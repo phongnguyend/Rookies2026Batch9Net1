@@ -326,7 +326,6 @@ export default function UsersPage() {
                       type: values.length > 0 ? values.join(",") : null,
                     });
                   }}
-                  allLabel="All"
                   getTestIdAll={() => "ddlFilterAll"}
                   getTestId={(item) =>
                     item.id === UserRoles.Admin
@@ -340,7 +339,7 @@ export default function UsersPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
-                placeholder="Search..."
+                placeholder=""
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
                 }
