@@ -39,7 +39,7 @@ export default function DropdownFilter<T>({
   const isAllSelected = selectedKeys.length === 0;
 
   const selectedLabel = isAllSelected
-    ? allLabel || placeholder
+    ? placeholder
     : selectedKeys.length === 1
       ? getLabel(items.find((item) => getKey(item) === selectedKeys[0])!)
       : `${selectedKeys.length} selected`;
