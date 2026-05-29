@@ -20,6 +20,10 @@ import { formatDate } from "@/utils/datetime.utils";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
+const defaultSort: SortItem = {
+  key: "assetCode",
+  direction: SortDirection.Asc,
+};
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
@@ -158,7 +162,7 @@ export default function ReturnsPage() {
             sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
         },
       ]
-    : [];
+    : [defaultSort];
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -245,8 +249,8 @@ export default function ReturnsPage() {
     ...(returnedDate
       ? { returnedDate: formatReturnedDateForQuery(returnedDate) }
       : {}),
-    ...(sorts[0]?.key ? { sortBy: sorts[0].key } : {}),
-    ...(sorts[0]?.direction ? { sortDirection: sorts[0].direction } : {}),
+    sortBy: sorts[0]?.key ?? defaultSort.key,
+    sortDirection: sorts[0]?.direction ?? defaultSort.direction,
   });
 
   const requests = data?.items ?? [];
