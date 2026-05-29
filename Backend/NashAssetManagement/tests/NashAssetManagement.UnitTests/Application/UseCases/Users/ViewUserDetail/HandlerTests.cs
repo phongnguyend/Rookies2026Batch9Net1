@@ -49,7 +49,7 @@ public class HandlerTests
         var request = new Request("not-a-guid");
         var errors = new List<ValidationFailure>
         {
-            new(nameof(Request.UserId), "User Id must be a valid Guid/uuid.")
+            new(nameof(Request.UserId), "User id must be a valid GUID.")
         };
 
         _mockUser.Setup(u => u.UserId).Returns(Guid.NewGuid());

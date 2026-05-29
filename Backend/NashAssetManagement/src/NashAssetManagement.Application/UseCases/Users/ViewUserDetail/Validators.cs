@@ -1,5 +1,4 @@
 using FluentValidation;
-using NashAssetManagement.Application.Common.Validators;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
 {
@@ -8,7 +7,10 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
         public Validators()
         {
             RuleFor(x => x.UserId)
-                .MustBeValidGuid();
+                .NotEmpty()
+                .WithMessage("User id is required.")
+                .Must(value => value is not null && Guid.TryParse(value, out _))
+                .WithMessage("User id must be a valid GUID.");
         }
     }
 }

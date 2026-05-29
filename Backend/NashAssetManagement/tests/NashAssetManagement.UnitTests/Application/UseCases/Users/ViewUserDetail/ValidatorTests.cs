@@ -26,7 +26,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetai
             result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
-                     && x.ErrorMessage == "User Id is required.");
+                     && x.ErrorMessage == "User id is required.");
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetai
             result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
-                     && x.ErrorMessage == "User Id is required.");
+                     && x.ErrorMessage == "User id is required.");
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetai
             result.ShouldHaveValidationErrorFor(x => x.UserId);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserId)
-                     && x.ErrorMessage == "User Id is required.");
+                     && x.ErrorMessage == "User id is required.");
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUserDetai
             Assert.Single(result.Errors);
             var error = result.Errors[0];
             Assert.Equal(nameof(Request.UserId), error.PropertyName);
-            Assert.Equal("User Id must be a valid Guid/uuid.", error.ErrorMessage);
+            Assert.Equal("User id must be a valid GUID.", error.ErrorMessage);
         }
 
         [Fact]
