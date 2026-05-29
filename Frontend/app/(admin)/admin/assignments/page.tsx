@@ -167,65 +167,65 @@ export default function AssignmentsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-[#333]" data-testid="mnuManageAssignment">
-      <div className="flex">
-        <main className="flex-1">
-          <h2 className="mb-6 text-xl font-bold text-primary">
-            Assignment List
-          </h2>
+    <div data-testid="mnuManageAssignment">
+      <div className="text-lg font-bold text-primary mb-2">
+        Assignment List
+      </div>
 
-          <div className="mb-6 flex items-center justify-between">
-            {/* Left side */}
-            <div className="flex items-center gap-4">
-              <div data-testid="ddlState">
-                <DropdownFilter
-                  items={Object.values(AssignmentState).map((s) => ({
-                    key: s,
-                    label: s,
-                  }))}
-                  values={states}
-                  placeholder="State"
-                  getKey={(item) => item.key}
-                  getLabel={(item) => item.label}
-                  onChange={(values) =>
-                    updateParams({
-                      state: values,
-                      page: "1",
-                    })
-                  }
-                  getTestIdAll={"chkStateAll"}
-                  getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
-                />
-              </div>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
 
-              <div data-testid="dtpAssignedDate">
-                <AssignmentDateTimePicker
-                  value={assignedDate}
-                  onChange={(date) =>
-                    updateParams({
-                      assignedDate: date
-                        ? new Date(
-                          Date.UTC(
-                            date.getFullYear(),
-                            date.getMonth(),
-                            date.getDate()
-                          )
-                        )
-                          .toISOString()
-                          .split("T")[0]
-                        : undefined,
-                      page: "1",
-                    })
-                  }
-                  placeholder="Assigned Date"
-                  width="w-56"
-                />
-              </div>
-
+          {/* Left group: State + Assigned Date */}
+          <div className="flex items-center gap-2 min-w-0">
+            <div data-testid="ddlState" className="min-w-0">
+              <DropdownFilter
+                items={Object.values(AssignmentState).map((s) => ({
+                  key: s,
+                  label: s,
+                }))}
+                values={states}
+                placeholder="State"
+                getKey={(item) => item.key}
+                getLabel={(item) => item.label}
+                onChange={(values) =>
+                  updateParams({
+                    state: values,
+                    page: "1",
+                  })
+                }
+                getTestIdAll={"chkStateAll"}
+                getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
+              />
             </div>
 
-            <div className="flex items-center gap-4">
-              {/* Right side */}
+            <div data-testid="dtpAssignedDate" className="min-w-0">
+              <AssignmentDateTimePicker
+                value={assignedDate}
+                onChange={(date) =>
+                  updateParams({
+                    assignedDate: date
+                      ? new Date(
+                        Date.UTC(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate()
+                        )
+                      )
+                        .toISOString()
+                        .split("T")[0]
+                      : undefined,
+                    page: "1",
+                  })
+                }
+                placeholder="Assigned Date"
+                width="w-36 sm:w-50"
+              />
+            </div>
+          </div>
+
+          {/* Right group: Search + Create button */}
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="min-w-0">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
@@ -241,60 +241,63 @@ export default function AssignmentsPage() {
                 txtInputTestId="txtSearchAssignment"
                 btnSearchTestId="btnSearchAssignment"
               />
-
-              <button className="rounded bg-primary px-5 py-2 font-semibold text-white"
-                data-testid="btnCreateNewAssignment">
-                Create new assignment
-              </button>
             </div>
+
+            <button
+              className="rounded bg-primary px-3 sm:px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base shrink-0"
+              data-testid="btnCreateNewAssignment"
+            >
+              <span className="sm:hidden">+ New</span>
+              <span className="hidden sm:inline">Create new assignment</span>
+            </button>
           </div>
 
-          <AssignmentTable<Assignment>
-            data={assignments}
-            columns={columns}
-            isLoading={isLoading}
-            emptyMessage="No assignments found."
-            sorts={sorts}
-            onSortChange={(newSorts) => {
-              const sort = newSorts[0];
-              updateParams({
-                sortBy: sort?.key,
-                sortDesc:
-                  sort?.direction === SortDirection.Desc
-                    ? "true"
-                    : undefined,
-                page: "1",
-              });
-            }}
-            onRowClick={(row) => {
-              setSelectedAssignmentId(row.id);
-            }}
-            rowTestId={(_row, index) => `dgdAssignmentRow-${index}`} //assignment detail
+        </div>
+
+        <AssignmentTable<Assignment>
+          data={assignments}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage="No assignments found."
+          sorts={sorts}
+          onSortChange={(newSorts) => {
+            const sort = newSorts[0];
+            updateParams({
+              sortBy: sort?.key,
+              sortDesc:
+                sort?.direction === SortDirection.Desc ? "true" : undefined,
+              page: "1",
+            });
+          }}
+          onRowClick={(row) => {
+            setSelectedAssignmentId(row.id);
+          }}
+          rowTestId={(_row, index) => `dgdAssignmentRow-${index}`}
+        />
+
+        {selectedAssignmentId && (
+          <AssignmentDetailPopup
+            id={selectedAssignmentId}
+            onClose={() => setSelectedAssignmentId(null)}
           />
+        )}
 
-          {selectedAssignmentId && (
-            <AssignmentDetailPopup
-              id={selectedAssignmentId}
-              onClose={() => setSelectedAssignmentId(null)}
-            />
-          )}
-
-          <div data-testid="pagination">
-            <Pagination
-              pageNumber={data?.pageNumber ?? page}
-              totalPages={data?.totalPages ?? 1}
-              pageSize={data?.pageSize ?? limit}
-              totalCount={data?.totalCount ?? 0}
-              hasPreviousPage={data?.hasPreviousPage ?? false}
-              hasNextPage={data?.hasNextPage ?? false}
-              onPageChange={(p) => updateParams({ page: String(p) })}
-              btnPreviousPageTestId="btnPreviousPage"
-              btnNextPageTestId="btnNextPage"
-              btnCurrentPageTestId="btnCurrentPage"
-            />
-          </div>
-        </main>
+        <div data-testid="pagination">
+          <Pagination
+            pageNumber={data?.pageNumber ?? page}
+            totalPages={data?.totalPages ?? 1}
+            pageSize={data?.pageSize ?? limit}
+            totalCount={data?.totalCount ?? 0}
+            hasPreviousPage={data?.hasPreviousPage ?? false}
+            hasNextPage={data?.hasNextPage ?? false}
+            onPageChange={(p) => updateParams({ page: String(p) })}
+            btnPreviousPageTestId="btnPreviousPage"
+            btnNextPageTestId="btnNextPage"
+            btnCurrentPageTestId="btnCurrentPage"
+          />
+        </div>
       </div>
     </div>
   );
 }
+

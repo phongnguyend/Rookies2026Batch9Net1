@@ -36,7 +36,6 @@ export default function DataTable<T>({
   sort,
   onSortChange,
 }: DataTableProps<T>) {
-
   const handleSort = (key: string) => {
     // no current sort → ASC
     if (!sort || sort.key !== key) {
@@ -63,52 +62,42 @@ export default function DataTable<T>({
   };
 
   const getSortIcon = (columnKey: string) => {
-    if (!sort || sort.key !== columnKey)
-      return "↕";
+    if (!sort || sort.key !== columnKey) return "↕";
 
-    if (sort.direction === SortDirection.Asc)
-      return "↑";
+    if (sort.direction === SortDirection.Asc) return "↑";
 
     return "↓";
   };
 
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div className="w-full overflow-x-auto rounded border border-gray-200">
+      <table className="w-full min-w-[600px] text-left text-sm">
+        {/* ← min-w ensures scroll on mobile */}
         <thead>
-          <tr className="border-b border-gray-400">
+          <tr className="border-b border-gray-400 bg-gray-50">
             {columns.map((column) => (
               <th
                 key={column.key}
                 data-testid={column.testId}
-                onClick={() =>
-                  column.sortable && handleSort(column.key)
-                }
-                className={`py-2 font-semibold ${column.className ?? ""} ${
+                onClick={() => column.sortable && handleSort(column.key)}
+                className={`px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm ${column.className ?? ""} ${
                   column.sortable
                     ? "cursor-pointer select-none hover:text-primary"
                     : ""
                 }`}
               >
                 {column.header}
-
                 {column.sortable && (
-                  <span className="ml-1">
-                    {getSortIcon(column.key)}
-                  </span>
+                  <span className="ml-1">{getSortIcon(column.key)}</span>
                 )}
               </th>
             ))}
           </tr>
         </thead>
-
         <tbody>
           {isLoading ? (
             <tr>
-              <td
-                colSpan={columns.length}
-                className="py-8 text-center"
-              >
+              <td colSpan={columns.length} className="py-8 text-center text-sm">
                 Loading...
               </td>
             </tr>
@@ -116,7 +105,7 @@ export default function DataTable<T>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="py-8 text-center text-gray-500"
+                className="py-8 text-center text-sm text-gray-500"
               >
                 {emptyMessage}
               </td>
@@ -127,15 +116,13 @@ export default function DataTable<T>({
                 key={rowIndex}
                 onClick={() => onRowClick?.(row)}
                 className={`border-b border-gray-300 ${
-                  onRowClick
-                    ? "cursor-pointer hover:bg-gray-50"
-                    : ""
+                  onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
                 }`}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={`py-2 ${column.className ?? ""}`}
+                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${column.className ?? ""}`}
                   >
                     {column.render
                       ? column.render(row, rowIndex)

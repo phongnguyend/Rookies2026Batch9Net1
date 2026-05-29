@@ -85,7 +85,7 @@ export default function AssignmentTable<T>({
   };
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="relative z-0 w-full overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-gray-400">

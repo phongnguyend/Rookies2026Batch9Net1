@@ -36,7 +36,7 @@ export default function LoginForm({
     register,
     handleSubmit,
     watch,
-    formState: { isValid, isSubmitted, errors },
+    formState: { isValid, isSubmitted, errors, touchedFields },
   } = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
     mode: "onChange",
@@ -79,15 +79,16 @@ export default function LoginForm({
           <input
             type="text"
             placeholder="Enter your username"
-            className={`input input-bordered w-full focus:input-primary transition-colors ${errors.username && (usernameValue !== "" || isSubmitted)
-              ? "input-error focus:input-error"
-              : ""
-              }`}
+            className={`input input-bordered w-full focus:input-primary transition-colors ${
+              errors.username && (touchedFields.username || isSubmitted)
+                ? "input-error focus:input-error"
+                : ""
+            }`}
             disabled={isLoading}
             {...register("username")}
             data-testid="txtUsername"
           />
-          {errors.username && (usernameValue !== "" || isSubmitted) && (
+          {errors.username && (touchedFields.username || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.username.message}
@@ -104,11 +105,12 @@ export default function LoginForm({
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${errors.password && (passwordValue !== "" || isSubmitted)
-                ? "input-error focus:input-error"
-                : ""
-                }`}
+              placeholder="Enter your password"
+              className={`input input-bordered w-full pr-12 focus:input-primary transition-colors ${
+                errors.password && (touchedFields.password || isSubmitted)
+                  ? "input-error focus:input-error"
+                  : ""
+              }`}
               disabled={isLoading}
               {...register("password")}
               data-testid="txtPassword"
@@ -158,7 +160,7 @@ export default function LoginForm({
               )}
             </button>
           </div>
-          {errors.password && (passwordValue !== "" || isSubmitted) && (
+          {errors.password && (touchedFields.password || isSubmitted) && (
             <label className="label pb-0">
               <span className="label-text-alt text-error font-medium">
                 {errors.password.message}
@@ -171,8 +173,8 @@ export default function LoginForm({
         {/* enable initially, disable after a failed submission or form is not valid */}
         <button
           type="submit"
-          className="btn btn-primary w-full text-white font-semibold transition-all shadow-md active:scale-[0.98]"
-          disabled={(isSubmitted && !isValid) || isLoading}
+          className="w-full bg-primary hover:bg-[#b52222] text-white font-semibold py-2.5 rounded-lg transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!isValid || isLoading}
           data-testid="btnLogin"
         >
           {isLoading ? (

@@ -2,12 +2,22 @@ import { formatDate } from "@/utils/datetime.utils";
 import { ViewUserAssignments } from "../user-assignment.types";
 import { userAssignmentApi } from "../user-assignment.api";
 import { displayAssignmentState } from "@/utils/assignment.utils";
+import { AssignmentState } from "@/lib/api/base.types";
 
 interface Props {
   assignment: ViewUserAssignments.UserAssignmentSummary | null;
   onClose: () => void;
   "data-testid"?: string;
 }
+
+const isAcceptedAndReturning = (
+  assignment: ViewUserAssignments.UserAssignmentSummary,
+): boolean => {
+  return (
+    assignment.state === AssignmentState.Accepted && assignment.isReturning
+  );
+};
+
 
 const Field = ({ label, value }: { label: string; value?: string }) => (
   <div data-testid="dgdAssignmentRow" className="flex gap-4">
@@ -77,6 +87,9 @@ export default function UserAssignmentDetailDialog({
                 value={displayAssignmentState(data?.state!)}
               />
               <Field label="Note" value={data?.note} />
+              {isAcceptedAndReturning(assignment) && <div className="text-center my-2 text-gray-500">
+                Assignment is currently in returning process
+              </div>}
             </div>
           )}
         </div>
