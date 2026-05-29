@@ -6,6 +6,12 @@ import { AssignmentState } from "@/lib/api/base.types";
 import { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 
 export function createColumns(handlers: {
+  onAcceptClick: (
+    assignment: ViewUserAssignments.UserAssignmentSummary,
+  ) => void;
+  onDeclineClick: (
+    assignment: ViewUserAssignments.UserAssignmentSummary,
+  ) => void;
   onReturnClick: (
     assignment: ViewUserAssignments.UserAssignmentSummary,
   ) => void;
@@ -71,8 +77,8 @@ export function createColumns(handlers: {
               assignment.state !== AssignmentState.Accepted ||
               assignment.isReturning
             }
-            onAccept={(row) => console.log("accept", row)}
-            onDecline={(row) => console.log("decline", row)}
+            onAccept={handlers.onAcceptClick}
+            onDecline={handlers.onDeclineClick}
             onReturn={handlers.onReturnClick}
           />
         );

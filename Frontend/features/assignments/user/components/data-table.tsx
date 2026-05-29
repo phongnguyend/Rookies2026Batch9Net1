@@ -24,6 +24,10 @@ export const UserAssignmentsDataTable = () => {
 
   const [returningAssignment, setReturningAssignment] =
     useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
+  const [acceptingAssignment, setAcceptingAssignment] =
+    useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
+  const [decliningAssignment, setDecliningAssignment] =
+    useState<ViewUserAssignments.UserAssignmentSummary | null>(null);
 
   const sorts: SortItem[] = params.sortBy
     ? [
@@ -40,7 +44,10 @@ export const UserAssignmentsDataTable = () => {
     userAssignmentApi.useUserCreateReturnRequestMutation();
 
   const columns = useMemo(
-    () => createColumns({ onReturnClick: setReturningAssignment }),
+    () => createColumns({
+      onAcceptClick: setAcceptingAssignment,
+      onDeclineClick: setDecliningAssignment,
+      onReturnClick: setReturningAssignment }),
     [],
   );
 
@@ -122,6 +129,26 @@ export const UserAssignmentsDataTable = () => {
         onClose={() => setSelectedAssignment(null)}
       />
 
+      <ConfirmModal
+        isOpen={!!acceptingAssignment}
+        onClose={() => setAcceptingAssignment(null)}
+        onYes={() => console.log("Accepted assignment")}
+        isLoading={false}
+        title="Are you sure?"
+        body={<p>Do you want to accept this assignment?</p>}
+        yesButtonLabel="Accept"
+        noButtonLabel="Cancel"
+      />
+      <ConfirmModal
+        isOpen={!!decliningAssignment}
+        onClose={() => setDecliningAssignment(null)}
+        onYes={() => console.log("Declined assignment")}
+        isLoading={false}
+        title="Are you sure?"
+        body={<p>Do you want to decline this assignment?</p>}
+        yesButtonLabel="Decline"
+        noButtonLabel="Cancel"
+      />
       <ConfirmModal
         isOpen={!!returningAssignment}
         onClose={() => setReturningAssignment(null)}
