@@ -35,7 +35,9 @@ export default function AssetDetailModal({
     })) ?? [];
 
   return (
-    <dialog open className="modal modal-open" >
+
+    // Using div instead of dialog to avoid Native Focus Shifting
+    <div className="modal modal-open" >
       <div className="modal-box max-w-3xl" data-testid="dlgDetailedAssetInfo">
         {/* Header */}
         <div className="bg-primary text-white -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
@@ -44,7 +46,7 @@ export default function AssetDetailModal({
           </h3>
 
           <button
-            data-testid = "btnExit"
+            data-testid="btnExit"
             onClick={onClose}
             className="text-white/80 hover:text-white"
           >
@@ -87,7 +89,7 @@ export default function AssetDetailModal({
 
       {/* Backdrop */}
       <div className="modal-backdrop" onClick={onClose} />
-    </dialog>
+    </div>
   );
 }
 
