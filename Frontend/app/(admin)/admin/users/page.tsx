@@ -326,7 +326,6 @@ export default function UsersPage() {
                       type: values.length > 0 ? values.join(",") : null,
                     });
                   }}
-                  allLabel="All"
                   getTestIdAll={() => "ddlFilterAll"}
                   getTestId={(item) =>
                     item.id === UserRoles.Admin
