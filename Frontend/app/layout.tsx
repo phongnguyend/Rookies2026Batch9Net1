@@ -41,10 +41,23 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
-  // restore session on page mount/refresh if cookie exists
-  const { data: profile, isError } = useGetMeQuery();
+  const hasToken =
+    typeof window !== "undefined" &&
+    (!!localStorage.getItem("accessToken") ||
+      !!localStorage.getItem("refreshToken"));
+
+  // restore session on page mount/refresh if token exists
+  // - do not call the hook when user is authenticated, or when user has the token from localStorage
+  const { data: profile, isError } = useGetMeQuery(undefined, {
+    skip: isAuthenticated || !hasToken,
+  });
 
   useEffect(() => {
+    if (!hasToken) {
+      dispatch(completeLoading());
+      return;
+    }
+
     if (profile && !isAuthenticated) {
       const userRole = profile.roles.includes(UserRoles.Admin)
         ? UserRoles.Admin
@@ -60,7 +73,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     } else if (isError && !isAuthenticated) {
       dispatch(completeLoading());
     }
-  }, [profile, isAuthenticated, isError, dispatch]);
+  }, [profile, isAuthenticated, isError, dispatch, hasToken]);
 
   return (
     <RouteGuard>

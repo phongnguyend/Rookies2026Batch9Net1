@@ -48,7 +48,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
                 dateTimeProvider.UtcNow.AddMilliseconds(jwtOptions.Value.RefreshTokenExpiryInMilliseconds));
             Response.AppendAuthCookie(refreshTokenCookie);
 
-            return Ok();
+            return Ok(result.Value);
         }
     }
 }
