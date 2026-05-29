@@ -25,6 +25,23 @@ const emptyUserDetail: UserDetail = {
 
 const formatUserDate = (value: string) => (value ? formatDate(value) : "");
 
+const Field = ({
+  label,
+  value,
+  testId,
+}: {
+  label: string;
+  value?: string;
+  testId: string;
+}) => (
+  <div className="flex gap-4">
+    <span className="w-24 shrink-0 text-gray-500">{label}</span>
+    <span className="wrap-break-word" data-testid={testId}>
+      {value || "-"}
+    </span>
+  </div>
+);
+
 export default function UserDetailModal({
   userId,
   isOpen,
@@ -80,7 +97,7 @@ export default function UserDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex min-h-screen items-center justify-center px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -88,12 +105,12 @@ export default function UserDetailModal({
     >
       <div
         ref={modalRef}
-        className="w-full max-w-[calc(100vw-2rem)] overflow-hidden rounded-[10px] border-2 border-[#777d84] bg-white text-[#6f7378] shadow-[0_1px_3px_rgba(0,0,0,0.28)] sm:max-w-[570px]"
+        className="relative w-full max-w-xl overflow-hidden rounded-lg border bg-white shadow-lg"
       >
-        <div className="flex min-h-[64px] items-center justify-between gap-4 border-b-2 border-[#777d84] bg-[#f3f6fa] px-5 py-4 sm:min-h-[73px] sm:px-[58px]">
+        <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
           <h2
             id="user-detail-title"
-            className="text-lg font-bold leading-tight text-primary sm:text-[22px]"
+            className="text-lg font-semibold text-primary"
           >
             Detailed User Information
           </h2>
@@ -102,36 +119,33 @@ export default function UserDetailModal({
             type="button"
             onClick={onClose}
             aria-label="Close detailed user information"
-            className="flex h-[29px] w-[29px] items-center justify-center rounded-[5px] border-[3px] border-primary bg-white pb-[2px] text-[22px] font-bold leading-none text-primary transition hover:bg-red-50"
+            className="rounded border-3 border-primary px-2 py-0.5 text-sm font-semibold text-primary hover:cursor-pointer hover:font-bold"
             data-testid="btnCloseUserDetail"
           >
-            &times;
+            x
           </button>
         </div>
 
-        <div className="max-h-[calc(100vh-11rem)] overflow-y-auto bg-white px-5 pb-8 pt-6 sm:min-h-[368px] sm:px-[58px] sm:pb-10 sm:pt-7">
+        <div className="max-h-[calc(100vh-8rem)] overflow-y-auto px-10 py-4">
           {isFetching ? (
-            <div className="pt-10 text-center text-lg text-[#6f7378]">
+            <div className="py-8 text-center text-gray-400">
               Loading...
             </div>
           ) : isError ? (
-            <div className="pt-10 text-center text-lg text-primary">
+            <div className="py-8 text-center text-primary">
               Cannot load user information.
             </div>
           ) : (
-            <dl className="grid grid-cols-[minmax(96px,0.42fr)_1fr] gap-x-4 gap-y-3 text-base leading-[1.45] sm:grid-cols-[126px_1fr] sm:gap-x-6 sm:gap-y-[14px] sm:text-[19px]">
+            <div className="space-y-3 text-sm">
               {details.map(([label, value, testId]) => (
-                <div key={label} className="contents">
-                  <dt className="font-normal text-[#70757b]">{label}</dt>
-                  <dd
-                    className="min-w-0 break-words text-[#70757b]"
-                    data-testid={testId}
-                  >
-                    {value || "-"}
-                  </dd>
-                </div>
+                <Field
+                  key={label}
+                  label={label}
+                  value={value}
+                  testId={testId}
+                />
               ))}
-            </dl>
+            </div>
           )}
         </div>
       </div>
