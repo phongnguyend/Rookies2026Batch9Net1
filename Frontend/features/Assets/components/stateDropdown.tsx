@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 interface DropdownStateFilterProps<T> {
-  items: T[];
+  items: T[]; // This one to show chosen Item on UI
   values: string[];
   placeholder?: string;
   width?: string;
@@ -11,9 +11,8 @@ interface DropdownStateFilterProps<T> {
   getLabel: (item: T) => string;
   onChange: (values: string[]) => void;
   allLabel?: string;
-  getTestId?: (item: T) => string;
-  getTestIdAll?: string;
   customLabel?: string;
+  defaultValue?: string[];
 }
 
 export default function DropdownStateFilter<T>({
@@ -25,15 +24,15 @@ export default function DropdownStateFilter<T>({
   getLabel,
   onChange,
   allLabel = "All",
-  getTestId,
-  getTestIdAll,
   customLabel,
+  defaultValue,
 }: DropdownStateFilterProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const isAllSelected = values.length === 0 || values.length === items.length;
+  const isAllSelected = values.length === items.length;
 
-  const selectedLabel = customLabel ??
+  const selectedLabel =
+    customLabel ??
     (values.length === 0
       ? placeholder
       : values.length === 1
@@ -42,7 +41,8 @@ export default function DropdownStateFilter<T>({
 
   const handleToggleItem = (itemKey: string) => {
     if (values.includes(itemKey)) {
-      onChange(values.filter((value) => value !== itemKey));
+      const filteredValues = values.filter((value) => value !== itemKey);
+      onChange(filteredValues.length === 0 ? defaultValue ?? [] : filteredValues);
     } else {
       onChange([...values, itemKey]);
     }
@@ -50,7 +50,7 @@ export default function DropdownStateFilter<T>({
 
   const handleToggleAll = () => {
     if (isAllSelected) {
-      onChange([]);
+      onChange(defaultValue!);
     } else {
       onChange(items.map((item) => getKey(item)));
     }
@@ -59,6 +59,7 @@ export default function DropdownStateFilter<T>({
   return (
     <div className="relative">
       <button
+        data-testid="ddlState"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex h-9 items-center justify-between rounded border border-gray-400 px-3 ${width}`}
@@ -77,7 +78,6 @@ export default function DropdownStateFilter<T>({
               checked={isAllSelected}
               onChange={handleToggleAll}
               className="checkbox checkbox-xs"
-              data-testid={getTestIdAll}
             />
             <span>{allLabel}</span>
           </label>
@@ -85,7 +85,6 @@ export default function DropdownStateFilter<T>({
           {items.map((item) => {
             const itemKey = getKey(item);
             const itemLabel = getLabel(item);
-
             return (
               <label
                 key={itemKey}
@@ -96,7 +95,6 @@ export default function DropdownStateFilter<T>({
                   checked={values.includes(itemKey)}
                   onChange={() => handleToggleItem(itemKey)}
                   className="checkbox checkbox-xs"
-                  data-testid={getTestId?.(item)}
                 />
                 <span>{itemLabel}</span>
               </label>

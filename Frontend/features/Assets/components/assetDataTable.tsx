@@ -114,12 +114,7 @@ export default function DataTable<T>({
             data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                onClick={(e) => {
-                  const selection = window.getSelection();
-                  if (selection && selection.toString().length > 0) {
-                    e.preventDefault();
-                    return;
-                  }
+                onClick={() => {
                   onRowClick?.(row);
                 }}
                 className={`border-b border-gray-300 ${
