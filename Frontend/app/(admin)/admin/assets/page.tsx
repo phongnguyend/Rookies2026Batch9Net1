@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { showModal } from "@/features/shared/modal.slice";
@@ -18,6 +18,7 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -45,9 +46,7 @@ function AssetsContent() {
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [EditDisabledStates] = useState(false);
   const [DeleteDisabledStates] = useState(false);
-  const isCreatedNewAsset = useAppSelector(
-    (state) => state.asset.isCreatedNewAsset,
-  );
+  const isCreatedNewAsset = useAppSelector((state)=>state.asset.isCreatedNewAsset);
 
   // ─── Default state check ───────────────────────
   const isDefaultStateSelection =
@@ -60,7 +59,11 @@ function AssetsContent() {
     isLoading: categoriesLoading,
     isError,
   } = useGetCategoriesQuery();
-
+  useEffect(() => {
+    if (isCreatedNewAsset) {
+      dispatch(setCreatedNewAsset(false));
+    }
+  }, [isCreatedNewAsset, dispatch]);
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
     pageSize: 10,

@@ -97,7 +97,6 @@ public class HandlerTests
     }
 
     [Fact]
-
     public async Task Handle_ShouldThrowValidationException_WhenIdIsEmpty()
     {
         var request = new GetAssetDetailRequest(string.Empty);

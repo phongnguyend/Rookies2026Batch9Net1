@@ -44,6 +44,7 @@ public class GetAssetDetailHandler
             return GetAssetDetailErrors.NotFoundLocation;
         }
         if (assetId == Guid.Empty)
+
         {
             return GetAssetDetailErrors.NotFoundAssetId;
         }
