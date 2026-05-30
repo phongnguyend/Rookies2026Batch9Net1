@@ -14,10 +14,6 @@ public static class CreateAssetErrors
         description: "Failed to create asset. Please try again."
     );
 
-    public static readonly Error InvalidAssetCodeFormat = Error.Failure(
-        code: "AssetCreate.InvalidAssetCodeFormat",
-        description: "Existing asset code format is invalid.");
-
     public static readonly Error AssetCodeLimitReached = Error.Failure(
         code: "AssetCreate.AssetCodeLimitReached",
         description: "Asset code limit has been reached for this category.");

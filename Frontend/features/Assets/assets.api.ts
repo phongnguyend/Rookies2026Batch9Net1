@@ -24,6 +24,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
           search: params?.search,
           sortBy: params?.sortBy,
           sortDirection: params?.sortDirection,
+          isCreatedNewAsset: params?.isCreatedNewAsset ?? false,  // ← add this
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },
@@ -54,7 +55,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Asset"],  // ← forces list to refetch → new asset on top
+      invalidatesTags: ["Asset"],
     }),
 
     createCategory: builder.mutation<

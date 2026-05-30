@@ -15,6 +15,7 @@ export interface GetAssetsRequest extends PaginationRequest {
   search?: string;
   sortBy?: string;
   sortDirection?: string;
+  isCreatedNewAsset?: boolean
 }
 
 export interface AssetListItem {

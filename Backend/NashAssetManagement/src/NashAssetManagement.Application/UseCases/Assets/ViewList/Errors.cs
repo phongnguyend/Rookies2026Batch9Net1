@@ -4,6 +4,8 @@ namespace NashAssetManagement.Application.UseCases.Assets.ViewList;
 
 public static class GetAssetsErrors
 {
-    public static Error NotFound =>
-        Error.NotFound("Asset.NotFound", "No assets were found.");
+    public static readonly Error AssetViewList = Error.Failure(
+        code: "AssetViewList.FailedGetList",
+        description: "Failed to get list assets. Please try again."
+    );
 }

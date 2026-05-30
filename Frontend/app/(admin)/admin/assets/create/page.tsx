@@ -10,10 +10,12 @@ import { AssetState } from "@/features/Assets/assets.types";
 import CategoryDropdown from "@/features/Assets/components/categoryDropdown";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
+import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
+import { useAppDispatch } from "@/lib/redux/hooks";
 
 export default function CreateAssetPage() {
   const router = useRouter();
-
+  const dispatch = useAppDispatch();
   // ─── Form State ────────────────────────────────────
   const [assetName, setAssetName] = useState("");
   const [specification, setSpecification] = useState("");
@@ -21,8 +23,8 @@ export default function CreateAssetPage() {
   const [state, setState] = useState<string>(AssetState.Available);
   const [serverError, setServerError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [categoryId, setCategoryId] = useState("");      // ← sent to API
-  const [categoryName, setCategoryName] = useState("");   // ← shown in dropdown
+  const [categoryId, setCategoryId] = useState(""); // ← sent to API
+  const [categoryName, setCategoryName] = useState(""); // ← shown in dropdown
 
   // ─── API ───────────────────────────────────────────
   const { data: categoriesData, isLoading: categoriesLoading } =
@@ -37,7 +39,8 @@ export default function CreateAssetPage() {
     installedDate !== null; // ← check null not empty string
 
   // ─── Handle category selection ─────────────────────
-  const handleCategoryChange = (id: string, name: string) => {  // ← accept id + name
+  const handleCategoryChange = (id: string, name: string) => {
+    // ← accept id + name
     setCategoryId(id);
     setCategoryName(name);
   };
@@ -60,11 +63,11 @@ export default function CreateAssetPage() {
       await createAsset({
         assetName: assetName.trim(),
         specification: specification.trim(),
-        installedDate: formatDate(installedDate), // ← convert Date to YYYY-MM-DD
+        installedDate: formatDate(installedDate!),
         state,
         categoryId,
       }).unwrap();
-
+      dispatch(setCreatedNewAsset(true))
       router.push("/admin/assets");
     } catch (err) {
       const apiError = err as ApiErrorResponse;
@@ -248,3 +251,4 @@ export default function CreateAssetPage() {
     </div>
   );
 }
+

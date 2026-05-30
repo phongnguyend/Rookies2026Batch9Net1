@@ -31,20 +31,8 @@ public class CreateAssetController : BaseApiController
         var result = await _sender.Send(request, cancellationToken);
 
         return result.Match(
-            asset => CreatedAtAction(
-                actionName: nameof(ViewAssetDetailController.GetById),
-                controllerName: "ViewAssetDetail",
-                routeValues: new { id = asset.Id },
-                value: asset),
-            errors =>
-                {
-                    var problem = ProblemDetailsMapper.FromErrorOr(errors);
-
-                    return new ObjectResult(problem)
-                    {
-                        StatusCode = problem.Status
-                    };
-                }
+            asset => Ok(asset),
+            errors => errors.ToProblem()
         );
     }
 }
