@@ -5,8 +5,8 @@ namespace NashAssetManagement.Application.UseCases.Assets.Specification;
 
 public sealed class AssetCountByCategorySpec : Specification<Asset>
 {
-    public AssetCountByCategorySpec(Guid categoryId, Guid locationId)
+    public AssetCountByCategorySpec(Guid categoryId)
     {
-        Query.Where(a => a.CategoryId == categoryId && a.LocationId == locationId);
+        Query.Where(a => a.CategoryId == categoryId);
     }
 }

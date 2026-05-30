@@ -56,12 +56,9 @@ public class CreateAssetHandler
             throw new ValidationException(validationResult.Errors);
         }
 
-        if (string.IsNullOrWhiteSpace(_currentUser.LocationId))
-        {
-            return CreateAssetErrors.LocationNotFound;
-        }
+        Guid location = Guid.TryParse(_currentUser.LocationId, out Guid locationId) ? locationId : Guid.Empty;
 
-        if (!Guid.TryParse(_currentUser.LocationId, out var locationId))
+        if (location == Guid.Empty)
         {
             return CreateAssetErrors.LocationNotFound;
         }
@@ -76,7 +73,7 @@ public class CreateAssetHandler
         }
 
         var count = await _assetRepository.CountAsync(
-            new AssetCountByCategorySpec(category.Id, locationId),
+            new AssetCountByCategorySpec(category.Id),
             cancellationToken);
             
         var nextNumber = count + 1;
@@ -97,7 +94,7 @@ public class CreateAssetHandler
             InstalledAtUtc = request.InstalledDate,
             State = request.State,
             CategoryId = category.Id,
-            LocationId = locationId,
+            LocationId = location,
             CreatedAtUtc = _dateTimeProvider.UtcNow,
         };
 
