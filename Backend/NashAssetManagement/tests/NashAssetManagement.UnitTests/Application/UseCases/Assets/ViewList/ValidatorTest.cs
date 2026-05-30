@@ -40,7 +40,8 @@ public class ValidatorTests
             null,
             sortBy,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -55,7 +56,8 @@ public class ValidatorTests
             null,
             "invalidField",
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -75,7 +77,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            "Laptop");
+            "Laptop",
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -90,7 +93,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -105,7 +109,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            "     ");
+            "     ",
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -125,7 +130,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            search);
+            search,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -147,7 +153,8 @@ public class ValidatorTests
             null,
             null,
             sortDirection,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -162,7 +169,8 @@ public class ValidatorTests
             null,
             null,
             "invalidDirection",
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -182,7 +190,8 @@ public class ValidatorTests
             ["Available", "Assigned"],
             null,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -197,7 +206,8 @@ public class ValidatorTests
             ["InvalidState"],
             null,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -217,7 +227,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -238,7 +249,8 @@ public class ValidatorTests
             null,
             null,
             null,
-            null);
+            null,
+            false);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -259,6 +271,7 @@ public class ValidatorTests
             null,
             null,
             null,
+            false,
             PageNumber: 0);
 
         var result = await _validator.ValidateAsync(request);
@@ -278,6 +291,7 @@ public class ValidatorTests
             null,
             null,
             null,
+            false,
             PageSize: 100);
 
         var result = await _validator.ValidateAsync(request);

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
@@ -16,18 +17,17 @@ public class HandlerTests
     private readonly Mock<IRepository<Asset, Guid>> _assetRepositoryMock;
     private readonly Mock<IRepository<Category, Guid>> _categoryRepositoryMock;
     private readonly Mock<ICurrentUser> _currentUserMock;
-
     private readonly GetAssetsHandler _handler;
     private readonly GetAssetsValidator _validator;
-
     private readonly Guid _locationId = Guid.NewGuid();
+    private readonly Mock<ILogger<GetAssetsHandler>> _loggerMock;
 
     public HandlerTests()
     {
         _assetRepositoryMock = new Mock<IRepository<Asset, Guid>>();
         _categoryRepositoryMock = new Mock<IRepository<Category, Guid>>();
         _currentUserMock = new Mock<ICurrentUser>();
-
+        _loggerMock = new Mock<ILogger<GetAssetsHandler>>();
         _currentUserMock
             .Setup(x => x.LocationId)
             .Returns(_locationId.ToString());
@@ -43,7 +43,8 @@ public class HandlerTests
         _handler = new GetAssetsHandler(
             _assetRepositoryMock.Object,
             _validator,
-            _currentUserMock.Object);
+            _currentUserMock.Object, 
+            _loggerMock.Object);
     }
 
     // ─── Happy Path ───────────────────────────────────────
@@ -56,7 +57,8 @@ public class HandlerTests
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         var assets = new List<GetAssetsResponse>
         {
@@ -107,7 +109,9 @@ public class HandlerTests
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: "nonexistent");
+            Search: "nonexistent",
+            isCreatedNewAsset: false
+            );
 
         _assetRepositoryMock
             .Setup(x => x.CountAsync(
@@ -140,7 +144,8 @@ public class HandlerTests
             SortBy: null,
             SortDirection: null,
             Search: null,
-            PageNumber: 0);
+            PageNumber: 0,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -154,7 +159,8 @@ public class HandlerTests
             States: ["InvalidState"],
             SortBy: null,
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -168,7 +174,8 @@ public class HandlerTests
             States: null,
             SortBy: "invalidField",
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -182,7 +189,8 @@ public class HandlerTests
             States: null,
             SortBy: null,
             SortDirection: "invalidDirection",
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -196,7 +204,8 @@ public class HandlerTests
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: "     ");
+            Search: "     ",
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -210,7 +219,8 @@ public class HandlerTests
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: new string('A', 101));
+            Search: new string('A', 101),
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -227,7 +237,8 @@ public class HandlerTests
             SortBy: null,
             SortDirection: null,
             Search: null,
-            PageNumber: 0);
+            PageNumber: 0,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -251,7 +262,8 @@ public class HandlerTests
             SortDirection: null,
             Search: null,
             PageNumber: 2,
-            PageSize: 5);
+            PageSize: 5,
+            isCreatedNewAsset: false);
 
         _assetRepositoryMock
             .Setup(x => x.CountAsync(
