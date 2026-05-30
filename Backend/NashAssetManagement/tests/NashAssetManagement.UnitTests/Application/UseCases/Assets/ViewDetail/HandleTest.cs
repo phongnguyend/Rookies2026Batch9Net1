@@ -1,4 +1,3 @@
-using ErrorOr;
 using FluentValidation;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
@@ -80,6 +79,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldReturnNotFound_WhenAssetDoesNotExist()
     {
+        var expectedError = GetAssetDetailErrors.AssetNotFound(_assetId.ToString());
         var request = new GetAssetDetailRequest(_assetId.ToString());
 
         _assetRepositoryMock
@@ -91,8 +91,9 @@ public class HandlerTests
         var result = await _handler.Handle(request, CancellationToken.None);
 
         Assert.True(result.IsError);
-        Assert.Equal(ErrorType.NotFound, result.FirstError.Type);
-        Assert.Equal(GetAssetDetailErrors.NotFoundAssetId.Code,result.FirstError.Code);
+        Assert.Equal(expectedError.Type, result.FirstError.Type);
+        Assert.Equal(expectedError.Code, result.FirstError.Code);
+        Assert.Equal(expectedError.Description, result.FirstError.Description);
     }
 
     [Fact]

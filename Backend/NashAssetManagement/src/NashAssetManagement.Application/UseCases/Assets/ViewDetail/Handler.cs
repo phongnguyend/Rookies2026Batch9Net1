@@ -35,21 +35,18 @@ public class GetAssetDetailHandler
         {
             throw new ValidationException(validatorResult.Errors);
         }
-
-        Guid locationId =  Guid.TryParse(_currentUser.LocationId, out Guid location) ? location:Guid.Empty;
-        Guid AssetCode = Guid.TryParse(request.Id, out Guid AssetCodeGuid) ? AssetCodeGuid:Guid.Empty;
         
-        if (locationId == Guid.Empty)
+        if (!Guid.TryParse(_currentUser.LocationId, out Guid locationId))
         {
             return GetAssetDetailErrors.NotFoundLocation;
         }
-        if (AssetCode == Guid.Empty)
+        if (!Guid.TryParse(request.Id, out Guid assetId))
         {
             return GetAssetDetailErrors.NotFoundAssetId;
         }
 
         var spec = new AssetDetailSpec(
-            AssetCode,
+            assetId,
             locationId);
 
         var asset = await _assetRepository.FirstOrDefaultAsync(
@@ -58,7 +55,7 @@ public class GetAssetDetailHandler
 
         if (asset is null)
         {
-            return GetAssetDetailErrors.NotFoundAssetId;
+            return GetAssetDetailErrors.AssetNotFound(request.Id);
         }
 
         return asset;
