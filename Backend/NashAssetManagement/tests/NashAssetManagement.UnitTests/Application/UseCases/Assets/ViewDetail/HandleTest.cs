@@ -1,4 +1,3 @@
-using ErrorOr;
 using FluentValidation;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
@@ -38,7 +37,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_AssetExists_ShouldReturnAssetDetail()
+    public async Task Handle_ShouldReturnAssetDetail_WhenAssetExists()
     {
         var request = new GetAssetDetailRequest(_assetId.ToString());
 
@@ -78,8 +77,9 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_AssetDoesNotExist_ShouldReturnNotFound()
+    public async Task Handle_ShouldReturnNotFound_WhenAssetDoesNotExist()
     {
+        var expectedError = GetAssetDetailErrors.AssetNotFound(_assetId.ToString());
         var request = new GetAssetDetailRequest(_assetId.ToString());
 
         _assetRepositoryMock
@@ -91,12 +91,14 @@ public class HandlerTests
         var result = await _handler.Handle(request, CancellationToken.None);
 
         Assert.True(result.IsError);
-        Assert.Equal(ErrorType.NotFound, result.FirstError.Type);
-        Assert.Equal(GetAssetDetailErrors.NotFound(_assetId).Code, result.FirstError.Code);
+        Assert.Equal(expectedError.Type, result.FirstError.Type);
+        Assert.Equal(expectedError.Code, result.FirstError.Code);
+        Assert.Equal(expectedError.Description, result.FirstError.Description);
     }
 
     [Fact]
-    public async Task Handle_IdIsEmpty_ShouldThrowValidationException()
+
+    public async Task Handle_ShouldThrowValidationException_WhenIdIsEmpty()
     {
         var request = new GetAssetDetailRequest(string.Empty);
 
@@ -105,7 +107,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task  Handle_RequestIsValid_ShouldCallRepositoryOnce()
+    public async Task Handle_ShouldCallRepository_OnceWhenRequestIsValid()
     {
         var request = new GetAssetDetailRequest(_assetId.ToString());
 
@@ -125,7 +127,7 @@ public class HandlerTests
     }
 
     [Fact]
-    public async Task Handle_ValidationFails_ShouldNotCallRepository()
+    public async Task Handle_ShouldNotCall_RepositoryWhenValidationFails()
     {
         var request = new GetAssetDetailRequest(string.Empty);
 

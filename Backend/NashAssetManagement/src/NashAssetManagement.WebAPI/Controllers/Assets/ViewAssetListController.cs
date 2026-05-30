@@ -42,11 +42,8 @@ public class ViewAssetListController : BaseApiController
             cancellationToken);
 
         return result.Match(
-            assets => Ok(assets),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-                return new ObjectResult(problem) { StatusCode = problem.Status };
-            });
+            asset => Ok(asset),
+            errors => errors.ToProblem()
+        );
     }
 }
