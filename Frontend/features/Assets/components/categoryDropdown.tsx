@@ -128,9 +128,10 @@ export default function CategoryDropdown({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className="relative w-full" >
       {/* Trigger */}
       <button
+      data-testid ="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`btn w-full justify-between ${
