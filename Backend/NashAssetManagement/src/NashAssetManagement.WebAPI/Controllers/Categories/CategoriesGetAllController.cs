@@ -18,9 +18,9 @@ namespace NashAssetManagement.WebAPI.Controllers;
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [Route("api/v{version:apiVersion}/categories")]
-public class CategoriesController : BaseApiController
+public class CategoriesGetAllController : BaseApiController
 {
-    public CategoriesController(ISender sender) : base(sender) { }
+    public CategoriesGetAllController(ISender sender) : base(sender) { }
 
     [HttpGet]
     [SwaggerOperation(summary: "Get category list.",Tags = [ControllerTags.Categories])]
@@ -30,10 +30,7 @@ public class CategoriesController : BaseApiController
 
         return result.Match(
             categories => Ok(categories),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-                return new ObjectResult(problem) { StatusCode = problem.Status };
-            });
+            errors => errors.ToProblem()
+        );
     }
 }

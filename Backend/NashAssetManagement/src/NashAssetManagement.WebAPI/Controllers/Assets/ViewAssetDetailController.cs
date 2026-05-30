@@ -34,14 +34,7 @@ public class ViewAssetDetailController : BaseApiController
 
         return result.Match(
             asset => Ok(asset),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-
-                return new ObjectResult(problem)
-                {
-                    StatusCode = problem.Status
-                };
-            });
+            errors => errors.ToProblem()
+        );
     }
 }
