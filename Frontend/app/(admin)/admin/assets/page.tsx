@@ -18,7 +18,6 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
-import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -59,11 +58,7 @@ function AssetsContent() {
     isLoading: categoriesLoading,
     isError,
   } = useGetCategoriesQuery();
-  useEffect(() => {
-    if (isCreatedNewAsset) {
-      dispatch(setCreatedNewAsset(false));
-    }
-  }, [isCreatedNewAsset, dispatch]);
+
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
     pageSize: 10,

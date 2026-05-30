@@ -67,7 +67,9 @@ export default function CreateAssetPage() {
         state,
         categoryId,
       }).unwrap();
+      //Set state isNewCreatedAsset to true here
       dispatch(setCreatedNewAsset(true))
+
       router.push("/admin/assets");
     } catch (err) {
       const apiError = err as ApiErrorResponse;
