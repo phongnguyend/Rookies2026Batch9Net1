@@ -29,7 +29,7 @@ public class HandlerTests
 
         _currentUserMock
             .Setup(u => u.LocationId)
-            .Returns(_locationId.ToString);
+            .Returns(_locationId.ToString());
 
         _handler = new GetAssetDetailHandler(
             _assetRepositoryMock.Object,
@@ -40,7 +40,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldReturnAssetDetail_WhenAssetExists()
     {
-        var request = new GetAssetDetailRequest(_assetId);
+        var request = new GetAssetDetailRequest(_assetId.ToString());
 
         var expectedResponse = new GetAssetDetailResponse(
             Id: _assetId,
@@ -80,7 +80,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldReturnNotFound_WhenAssetDoesNotExist()
     {
-        var request = new GetAssetDetailRequest(_assetId);
+        var request = new GetAssetDetailRequest(_assetId.ToString());
 
         _assetRepositoryMock
             .Setup(r => r.FirstOrDefaultAsync(
@@ -98,7 +98,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldThrowValidationException_WhenIdIsEmpty()
     {
-        var request = new GetAssetDetailRequest(Guid.Empty);
+        var request = new GetAssetDetailRequest(string.Empty);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -107,7 +107,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldCallRepository_OnceWhenRequestIsValid()
     {
-        var request = new GetAssetDetailRequest(_assetId);
+        var request = new GetAssetDetailRequest(_assetId.ToString());
 
         _assetRepositoryMock
             .Setup(r => r.FirstOrDefaultAsync(
@@ -127,7 +127,7 @@ public class HandlerTests
     [Fact]
     public async Task Handle_ShouldNotCall_RepositoryWhenValidationFails()
     {
-        var request = new GetAssetDetailRequest(Guid.Empty);
+        var request = new GetAssetDetailRequest(string.Empty);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));

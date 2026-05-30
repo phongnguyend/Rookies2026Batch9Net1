@@ -16,7 +16,7 @@ public class GetAssetDetailValidatorTests
     [Fact]
     public async Task Validate_ShouldFail_WhenIdIsEmpty()
     {
-        var request = new GetAssetDetailRequest(Guid.Empty);
+        var request = new GetAssetDetailRequest(String.Empty);
 
         var result = await _validator.ValidateAsync(request);
 
@@ -30,10 +30,24 @@ public class GetAssetDetailValidatorTests
     [Fact]
     public async Task Validate_ShouldPass_WhenIdIsValid()
     {
-        var request = new GetAssetDetailRequest(Guid.NewGuid());
+        var request = new GetAssetDetailRequest("A0000000-0000-0000-0000-000000000001");
 
         var result = await _validator.ValidateAsync(request);
 
         Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public async Task Validate_ShouldFail_WhenIdIsNotGuidFormat()
+    {
+        var request = new GetAssetDetailRequest("asdfewfwef");
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+
+        Assert.Contains(
+            result.Errors,
+            e => e.ErrorMessage == "Asset id must be in Guid Format.");
     }
 }

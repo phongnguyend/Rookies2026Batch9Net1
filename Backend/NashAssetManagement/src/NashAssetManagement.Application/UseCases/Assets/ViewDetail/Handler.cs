@@ -1,4 +1,3 @@
-using System.Data;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
@@ -39,6 +38,7 @@ public class GetAssetDetailHandler
 
         Guid locationId =  Guid.TryParse(_currentUser.LocationId, out Guid location) ? location:Guid.Empty;
         Guid AssetCode = Guid.TryParse(request.Id, out Guid AssetCodeGuid) ? AssetCodeGuid:Guid.Empty;
+        
         if (locationId == Guid.Empty)
         {
             return GetAssetDetailErrors.NotFoundLocation;
