@@ -43,11 +43,18 @@ export const UserAssignmentsDataTable = () => {
   const [createReturnRequest, { isLoading: isReturning }] =
     userAssignmentApi.useUserCreateReturnRequestMutation();
 
+  const [acceptAssignment, { isLoading: isAccepting }] =
+    userAssignmentApi.useUserAcceptAssignmentMutation();
+  const [declineAssignment, { isLoading: isDeclining }] =
+    userAssignmentApi.useUserDeclineAssignmentMutation();
+
   const columns = useMemo(
-    () => createColumns({
-      onAcceptClick: setAcceptingAssignment,
-      onDeclineClick: setDecliningAssignment,
-      onReturnClick: setReturningAssignment }),
+    () =>
+      createColumns({
+        onAcceptClick: setAcceptingAssignment,
+        onDeclineClick: setDecliningAssignment,
+        onReturnClick: setReturningAssignment,
+      }),
     [],
   );
 
@@ -79,11 +86,67 @@ export const UserAssignmentsDataTable = () => {
           testId: "toastSuccess",
         }),
       );
-    } catch {
+    } catch (error) {
       setReturningAssignment(null);
       dispatchAction(
         enqueueToast({
           message: "Failed to create return request. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
+
+  const handleConfirmAcceptAssignment = async () => {
+    if (!acceptingAssignment) return;
+
+    try {
+      await acceptAssignment({
+        assignmentId: acceptingAssignment.id,
+      }).unwrap();
+
+      setAcceptingAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Assignment accepted successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch (error) {
+      setAcceptingAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to accept assignment. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
+
+  const handleConfirmDeclineAssignment = async () => {
+    if (!decliningAssignment) return;
+
+    try {
+      await declineAssignment({
+        assignmentId: decliningAssignment.id,
+      }).unwrap();
+
+      setDecliningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Assignment declined successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch {
+      setDecliningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to decline assignment. Please try again.",
           type: ToastType.Error,
           testId: "toastError",
         }),
@@ -132,8 +195,8 @@ export const UserAssignmentsDataTable = () => {
       <ConfirmModal
         isOpen={!!acceptingAssignment}
         onClose={() => setAcceptingAssignment(null)}
-        onYes={() => console.log("Accepted assignment")}
-        isLoading={false}
+        onYes={handleConfirmAcceptAssignment}
+        isLoading={isAccepting}
         title="Are you sure?"
         body={<p>Do you want to accept this assignment?</p>}
         yesButtonLabel="Accept"
@@ -142,8 +205,8 @@ export const UserAssignmentsDataTable = () => {
       <ConfirmModal
         isOpen={!!decliningAssignment}
         onClose={() => setDecliningAssignment(null)}
-        onYes={() => console.log("Declined assignment")}
-        isLoading={false}
+        onYes={handleConfirmDeclineAssignment}
+        isLoading={isDeclining}
         title="Are you sure?"
         body={<p>Do you want to decline this assignment?</p>}
         yesButtonLabel="Decline"
