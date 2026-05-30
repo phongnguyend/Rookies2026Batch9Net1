@@ -45,7 +45,7 @@ export const userAssignmentApi = baseApiSlice.injectEndpoints({
     userAcceptAssignment: builder.mutation<void, UserAcceptAssignment.Request>({
       query: ({ assignmentId }) => ({
         url: `/v1/user/assignments/${assignmentId}/accept`,
-        method: "PUT",
+        method: "PATCH",
       }),
       invalidatesTags: ["Assignment"],
     }),
@@ -56,7 +56,7 @@ export const userAssignmentApi = baseApiSlice.injectEndpoints({
     >({
       query: ({ assignmentId }) => ({
         url: `/v1/user/assignments/${assignmentId}/decline`,
-        method: "PUT",
+        method: "PATCH",
       }),
       invalidatesTags: ["Assignment"],
     }),

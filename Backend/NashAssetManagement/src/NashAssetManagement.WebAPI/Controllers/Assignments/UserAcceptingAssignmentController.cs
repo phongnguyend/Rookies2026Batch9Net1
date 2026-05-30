@@ -24,7 +24,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize]
-        [HttpPut("{assignmentId}/accept")]
+        [HttpPatch("{assignmentId}/accept")]
         [SwaggerOperation(
             Summary = "Accept asset assigned to user.",
             Description = "Allow a user to accept an assignment that has been assigned to them. Assignment need to be assigned to user and in 'Waiting for acceptance' state. Required user to be authenticated.",
