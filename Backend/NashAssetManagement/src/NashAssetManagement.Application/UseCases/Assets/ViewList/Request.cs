@@ -9,7 +9,8 @@ public record GetAssetsRequest(
     string[]? States,           
     string? SortBy,
     string? SortDirection,
-    string? Search,      
+    string? Search,
+    bool isCreatedNewAsset,      
     int PageNumber = 1,
     int PageSize = 10      
 ) : IRequest<ErrorOr<PagedList<GetAssetsResponse>>>;

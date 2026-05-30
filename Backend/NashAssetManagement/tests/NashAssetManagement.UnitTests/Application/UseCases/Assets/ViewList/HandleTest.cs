@@ -1,9 +1,11 @@
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Assets.ViewList;
+using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 using Xunit;
@@ -15,18 +17,17 @@ public class HandlerTests
     private readonly Mock<IRepository<Asset, Guid>> _assetRepositoryMock;
     private readonly Mock<IRepository<Category, Guid>> _categoryRepositoryMock;
     private readonly Mock<ICurrentUser> _currentUserMock;
-
     private readonly GetAssetsHandler _handler;
     private readonly GetAssetsValidator _validator;
-
     private readonly Guid _locationId = Guid.NewGuid();
+    private readonly Mock<ILogger<GetAssetsHandler>> _loggerMock;
 
     public HandlerTests()
     {
         _assetRepositoryMock = new Mock<IRepository<Asset, Guid>>();
         _categoryRepositoryMock = new Mock<IRepository<Category, Guid>>();
         _currentUserMock = new Mock<ICurrentUser>();
-
+        _loggerMock = new Mock<ILogger<GetAssetsHandler>>();
         _currentUserMock
             .Setup(x => x.LocationId)
             .Returns(_locationId.ToString());
@@ -42,20 +43,22 @@ public class HandlerTests
         _handler = new GetAssetsHandler(
             _assetRepositoryMock.Object,
             _validator,
-            _currentUserMock.Object);
+            _currentUserMock.Object, 
+            _loggerMock.Object);
     }
 
     // ─── Happy Path ───────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_PagedList_When_Assets_Exist()
+    public async Task Handle_AssetsExist_ShouldReturnPagedList()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         var assets = new List<GetAssetsResponse>
         {
@@ -99,14 +102,16 @@ public class HandlerTests
     // ─── Empty Result ────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_Empty_PagedList_When_No_Assets_Found()
+    public async Task Handle_NoAssetsFound_ShouldReturnEmptyPagedList()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: "nonexistent");
+            Search: "nonexistent",
+            isCreatedNewAsset: false
+            );
 
         _assetRepositoryMock
             .Setup(x => x.CountAsync(
@@ -131,7 +136,7 @@ public class HandlerTests
     // ─── Validation ──────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_PageNumber_Is_Invalid()
+    public async Task Handle_PageNumberInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -139,77 +144,83 @@ public class HandlerTests
             SortBy: null,
             SortDirection: null,
             Search: null,
-            PageNumber: 0);
+            PageNumber: 0,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_State_Is_Invalid()
+    public async Task Handle_StateInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: ["InvalidState"],
             SortBy: null,
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_SortBy_Is_Invalid()
+    public async Task Handle_SortByInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: "invalidField",
             SortDirection: null,
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_SortDirection_Is_Invalid()
+    public async Task Handle_SortDirectionInvalid_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: null,
             SortDirection: "invalidDirection",
-            Search: null);
+            Search: null,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Search_Contains_Only_Whitespace()
+    public async Task Handle_SearchContainsOnlyWhitespace_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: "     ");
+            Search: "     ",
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_Should_Throw_ValidationException_When_Search_Exceeds_Max_Length()
+    public async Task Handle_SearchExceedsMaxLength_ShouldThrowValidationException()
     {
         var request = new GetAssetsRequest(
             Categories: null,
             States: null,
             SortBy: null,
             SortDirection: null,
-            Search: new string('A', 101));
+            Search: new string('A', 101),
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -218,7 +229,7 @@ public class HandlerTests
     // ─── Repository Call Protection ──────────────────────
 
     [Fact]
-    public async Task Handle_Should_Not_Call_Repository_When_Validation_Fails()
+    public async Task Handle_ValidationFails_ShouldNotCallRepository()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -226,7 +237,8 @@ public class HandlerTests
             SortBy: null,
             SortDirection: null,
             Search: null,
-            PageNumber: 0);
+            PageNumber: 0,
+            isCreatedNewAsset: false);
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -241,7 +253,7 @@ public class HandlerTests
     // ─── Pagination ──────────────────────────────────────
 
     [Fact]
-    public async Task Handle_Should_Return_Correct_Pagination_Metadata()
+    public async Task  Handle_Pagination_ShouldReturnCorrectMetadata()
     {
         var request = new GetAssetsRequest(
             Categories: null,
@@ -250,7 +262,8 @@ public class HandlerTests
             SortDirection: null,
             Search: null,
             PageNumber: 2,
-            PageSize: 5);
+            PageSize: 5,
+            isCreatedNewAsset: false);
 
         _assetRepositoryMock
             .Setup(x => x.CountAsync(

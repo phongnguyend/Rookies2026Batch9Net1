@@ -4,13 +4,16 @@ import type {
   GetAssetsResponse,
   GetAssetDetailResponse,
   GetCategoriesResponse,
+  CreateAssetRequest,
+  CreateAssetResponse,
+  CreateCategoryRequest,
+  CreateCategoryResponse,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
 
   endpoints: (builder) => ({
-
     getAssets: builder.query<GetAssetsResponse, GetAssetsRequest | void>({
       query: (params) => ({
         url: "v1/assets",
@@ -20,7 +23,8 @@ export const assetsApi = baseApiSlice.injectEndpoints({
           states: params?.states?.join(","),
           search: params?.search,
           sortBy: params?.sortBy,
-          sortDirection: params?.sortDirection,     
+          sortDirection: params?.sortDirection,
+          isCreatedNewAsset: params?.isCreatedNewAsset ?? false,  // ← add this
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },
@@ -28,6 +32,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       providesTags: ["Asset"],
     }),
 
+    // This Api should be moved to separate file, but for now we can keep it here since it's related to assets
     getCategories: builder.query<GetCategoriesResponse, void>({
       query: () => ({
         url: "v1/categories",
@@ -44,12 +49,34 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       providesTags: (_result, _error, id) => [{ type: "Asset", id }],
     }),
 
+    createAsset: builder.mutation<CreateAssetResponse, CreateAssetRequest>({
+      query: (body) => ({
+        url: "v1/assets",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Asset"],
+    }),
+
+    createCategory: builder.mutation<
+      CreateCategoryResponse,
+      CreateCategoryRequest
+    >({
+      query: (body) => ({
+        url: "v1/categories",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Asset"],
+    }),
+
   }),
 });
 
-// ← these are the hooks your page imports
 export const {
   useGetAssetsQuery,
   useGetAssetByIdQuery,
-  useGetCategoriesQuery
+  useGetCategoriesQuery,
+  useCreateAssetMutation,
+  useCreateCategoryMutation,
 } = assetsApi;

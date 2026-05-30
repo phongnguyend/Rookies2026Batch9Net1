@@ -13,7 +13,8 @@ public sealed class GetCategoriesSpec : Specification<Category, GetCategoriesRes
 
         Query.Select(c => new GetCategoriesResponse(
             c.Id,
-            c.CategoryName
+            c.CategoryName,
+            c.Prefix
         ));
     }
 }
