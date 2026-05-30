@@ -29,13 +29,22 @@ public class GetAssetDetailHandler
         GetAssetDetailRequest request,
         CancellationToken cancellationToken = default)
     {
-        await _validator.ValidateAndThrowAsync(
-            request,
-            cancellationToken);
-
-        var locationId = Guid.Parse(_currentUser.LocationId!);
-        var assetId = Guid.Parse(request.Id);
+        var validatorResult = await _validator.ValidateAsync(request,cancellationToken);
+       
+        if (!validatorResult.IsValid)
+        {
+            throw new ValidationException(validatorResult.Errors);
+        }
         
+        if (!Guid.TryParse(_currentUser.LocationId, out Guid locationId))
+        {
+            return GetAssetDetailErrors.NotFoundLocation;
+        }
+        if (!Guid.TryParse(request.Id, out Guid assetId))
+        {
+            return GetAssetDetailErrors.NotFoundAssetId;
+        }
+
         var spec = new AssetDetailSpec(
             assetId,
             locationId);
@@ -46,7 +55,7 @@ public class GetAssetDetailHandler
 
         if (asset is null)
         {
-            return GetAssetDetailErrors.NotFound(assetId);
+            return GetAssetDetailErrors.AssetNotFound(request.Id);
         }
 
         return asset;

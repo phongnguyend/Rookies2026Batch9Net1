@@ -113,8 +113,10 @@ export default function DataTable<T>({
           ) : (
             data.map((row, rowIndex) => (
               <tr
-                key={rowIndex}
-                onClick={() => onRowClick?.(row)}
+                key={(row as any).id ?? rowIndex}
+                onClick={() => {
+                  onRowClick?.(row);
+                }}
                 className={`border-b border-gray-300 ${
                   onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
                 }`}
