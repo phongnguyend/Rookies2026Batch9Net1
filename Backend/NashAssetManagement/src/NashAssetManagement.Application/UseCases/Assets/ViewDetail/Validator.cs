@@ -8,7 +8,7 @@ public class GetAssetDetailValidator : AbstractValidator<GetAssetDetailRequest>
     public GetAssetDetailValidator()
     {
         RuleFor(x => x.Id)
-            .NotEmpty()
+            .NotEmpty().MustBeValidGuid()
             .WithMessage("Asset id is required");
     }
 }

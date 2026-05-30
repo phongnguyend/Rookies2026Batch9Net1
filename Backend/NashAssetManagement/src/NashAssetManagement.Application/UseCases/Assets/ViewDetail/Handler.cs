@@ -38,14 +38,18 @@ public class GetAssetDetailHandler
         }
 
         Guid locationId =  Guid.TryParse(_currentUser.LocationId, out Guid location) ? location:Guid.Empty;
-
+        Guid AssetCode = Guid.TryParse(request.Id, out Guid AssetCodeGuid) ? AssetCodeGuid:Guid.Empty;
         if (locationId == Guid.Empty)
         {
             return GetAssetDetailErrors.NotFoundLocation;
         }
+        if (AssetCode == Guid.Empty)
+        {
+            return GetAssetDetailErrors.NotFoundAssetId;
+        }
 
         var spec = new AssetDetailSpec(
-            request.Id,
+            AssetCode,
             locationId);
 
         var asset = await _assetRepository.FirstOrDefaultAsync(
