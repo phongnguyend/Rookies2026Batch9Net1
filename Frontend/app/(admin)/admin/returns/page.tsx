@@ -326,18 +326,18 @@ export default function ReturnsPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#333]" data-testid="mnuReturning">
-      <div className="flex">
-        <main className="flex-1">
+      <div className="flex min-w-0">
+        <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex gap-5">
+          <div className="mb-6 mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
               <div data-testid="ddlState">
                 <DropdownFilter
                   items={stateFilters}
                   values={selectedStates}
                   placeholder="State"
-                  width="w-[200px]"
+                  width="w-full sm:w-[200px]"
                   getKey={(state) => state.id}
                   getLabel={(state) => state.label}
                   onChange={(values) => {
@@ -364,49 +364,53 @@ export default function ReturnsPage() {
                   });
                 }}
                 placeholder="Returned Date"
-                width="w-[220px]"
+                width="w-full sm:w-[220px]"
                 txtInputTestId="dpReturned"
               />
             </div>
 
-            <SearchInput
-              value={searchInput}
-              placeholder=""
-              width="w-[242px]"
-              onChange={(value) =>
-                setSearchState({ inputValue: value, urlValue: querySearch })
-              }
-              onSearch={(value) => {
-                const nextSearch = value.trim();
-                setSearchState({
-                  inputValue: nextSearch,
-                  urlValue: nextSearch,
-                });
-                // Search changes always restart the list from page 1.
-                updateQueryParams({ page: 1, search: nextSearch });
-              }}
-              txtInputTestId="txtSearch"
-              btnSearchTestId="btnSearch"
-            />
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
+              <SearchInput
+                value={searchInput}
+                placeholder=""
+                width="w-full sm:w-[242px]"
+                onChange={(value) =>
+                  setSearchState({ inputValue: value, urlValue: querySearch })
+                }
+                onSearch={(value) => {
+                  const nextSearch = value.trim();
+                  setSearchState({
+                    inputValue: nextSearch,
+                    urlValue: nextSearch,
+                  });
+                  // Search changes always restart the list from page 1.
+                  updateQueryParams({ page: 1, search: nextSearch });
+                }}
+                txtInputTestId="txtSearch"
+                btnSearchTestId="btnSearch"
+              />
+            </div>
           </div>
 
-          <DataTable<ReturnRequestRow>
-            data={requests}
-            columns={columns}
-            isLoading={isLoading}
-            emptyMessage="No return requests found."
-            sorts={sorts}
-            tableTestId="dgdReturningList"
-            onSortChange={(newSorts) => {
-              const nextSort = newSorts.at(-1);
-              updateQueryParams({
-                page: 1,
-                sortBy: nextSort?.key ?? null,
-                sortDesc:
-                  nextSort?.direction === SortDirection.Desc ? true : null,
-              });
-            }}
-          />
+          <div className="relative">
+            <DataTable<ReturnRequestRow>
+              data={requests}
+              columns={columns}
+              isLoading={isLoading}
+              emptyMessage="No return requests found."
+              sorts={sorts}
+              tableTestId="dgdReturningList"
+              onSortChange={(newSorts) => {
+                const nextSort = newSorts.at(-1);
+                updateQueryParams({
+                  page: 1,
+                  sortBy: nextSort?.key ?? null,
+                  sortDesc:
+                    nextSort?.direction === SortDirection.Desc ? true : null,
+                });
+              }}
+            />
+          </div>
 
           <Pagination
             pageNumber={data?.pageNumber ?? page}
