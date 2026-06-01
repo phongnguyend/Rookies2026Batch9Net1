@@ -105,6 +105,16 @@ function AssetsContent() {
 
   const handleDelete = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
+    dispatch(
+      showModal({
+        title: "Delete Asset",
+        body: `Are you sure you want to delete "${row.name}"?`,
+        yesButtonLabel: "Delete",
+        noButtonLabel: "Cancel",
+        yesActionType: "",
+        yesPayload: row.id,
+      }),
+    );
   };
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
@@ -270,9 +280,7 @@ function AssetsContent() {
             data={displayItems}
             columns={columns}
             isLoading={isLoading}
-            emptyMessage={
-              isError ? "No assets found." : "No assets found after filtering."
-            }
+            emptyMessage="No assets found."
             onRowClick={(row) => setSelectedAssetId(row.id)}
             sort={sort}
             onSortChange={handleSortChange}

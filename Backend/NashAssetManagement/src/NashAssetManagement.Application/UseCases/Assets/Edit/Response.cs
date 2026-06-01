@@ -6,8 +6,9 @@ public record EditAssetResponse(
     Guid Id,
     string AssetCode,
     string AssetName,
-    string Category,
-    string Specificationm,
+    string Specification,
+    DateTime InstalledDate,
     AssetState State,
+    string Category,
     string Location
 );

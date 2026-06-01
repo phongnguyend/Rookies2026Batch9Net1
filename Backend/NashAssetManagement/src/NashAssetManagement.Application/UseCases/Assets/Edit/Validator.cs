@@ -20,7 +20,7 @@ public class EditAssetValidator : AbstractValidator<EditAssetRequest>
             .WithMessage("Installed date cannot be in the future.");
 
         RuleFor(x => x.State)
-            .Must(s => s == AssetState.Available || s == AssetState.NotAvailable)
-            .WithMessage("State must be Available or NotAvailable.");
+            .NotEqual(AssetState.Assigned)
+            .WithMessage("State cannot be Assigned.");
     }
 }

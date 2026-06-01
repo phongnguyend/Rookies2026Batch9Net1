@@ -13,4 +13,9 @@ public static class EditAssetErrors
         code: "AssetEdit.LocationNotFound",
         description: "Location not found. Please enter a valid location."
     );
+
+    public static readonly Error AssetNotFound = Error.NotFound(
+        code: "AssetEdit.AssetNotFound",
+        description: "Asset not found."
+    );
 }
