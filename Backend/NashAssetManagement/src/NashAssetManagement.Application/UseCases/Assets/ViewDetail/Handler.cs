@@ -59,7 +59,7 @@ public class GetAssetDetailHandler
 
         if (asset is null)
         {
-            return GetAssetDetailErrors.AssetNotFound(request.Id);
+            return GetAssetDetailErrors.AssetNotFound(assetId.ToString());
         }
 
         return asset;

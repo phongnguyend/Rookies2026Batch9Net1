@@ -87,7 +87,6 @@ public class CreateAssetHandler
 
         var asset = new Asset
         {
-            Id = Guid.NewGuid(),
             AssetCode = assetCode,
             Name = normalizedRequest.AssetName,
             Specification = normalizedRequest.Specification,

@@ -25,11 +25,11 @@ public class ViewAssetDetailController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(Summary = "View asset details.",Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> GetById(
-        Guid id,
+        string id,
     CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetAssetDetailRequest(id.ToString()),
+            new GetAssetDetailRequest(id),
             cancellationToken);
 
         return result.Match(

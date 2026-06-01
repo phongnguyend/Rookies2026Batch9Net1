@@ -58,7 +58,6 @@ public class CreateCategoryHandler
 
         var category = new Category
         {
-            Id = Guid.NewGuid(),
             CategoryName = request.CategoryName,
             Prefix = request.CategoryPrefix,
         };

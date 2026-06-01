@@ -19,8 +19,6 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
         bool isNewAssetCreated)
     {
         var isDesc = sortDirection?.ToLower() == "desc";
-
-       
         
         Query
             .Where(a => !a.IsDeleted)

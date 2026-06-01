@@ -24,7 +24,7 @@ export const assetsApi = baseApiSlice.injectEndpoints({
           search: params?.search,
           sortBy: params?.sortBy,
           sortDirection: params?.sortDirection,
-          isCreatedNewAsset: params?.isCreatedNewAsset ?? false,  // ← add this
+          isCreatedNewAsset: params?.isCreatedNewAsset ?? false,
           pageNumber: params?.pageNumber ?? 1,
           pageSize: params?.pageSize ?? 10,
         },

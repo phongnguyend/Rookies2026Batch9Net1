@@ -12,10 +12,8 @@ namespace NashAssetManagement.WebAPI.Controllers;
 [ApiVersion(1)]
 [Authorize(Roles = ApplicationRole.Admin)]
 [ProducesResponseType(StatusCodes.Status200OK)]
-[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [Route("api/v{version:apiVersion}/categories")]
 public class CategoriesGetAllController : BaseApiController

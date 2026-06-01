@@ -16,7 +16,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
     private readonly IRepository<Asset, Guid> _assetRepository;
     private readonly GetAssetsValidator _validator;
     private readonly ICurrentUser _currentUser;
-    private readonly ILogger<GetAssetsHandler> _iLogger;
+    private readonly ILogger<GetAssetsHandler> _Logger;
 
     public GetAssetsHandler(
         IRepository<Asset, Guid> assetRepository,
@@ -28,7 +28,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         _assetRepository = assetRepository;
         _validator = validator;
         _currentUser = currentUser;
-        _iLogger = logger;
+        _Logger = logger;
     }
 
     public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
@@ -82,7 +82,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         }
         catch (Exception ex)
         {
-            _iLogger.LogError(ex, "An error occurred while getting the asset.");
+            _Logger.LogError(ex, "An error occurred while getting the asset.");
             return GetAssetsErrors.AssetViewList;
         }
     }

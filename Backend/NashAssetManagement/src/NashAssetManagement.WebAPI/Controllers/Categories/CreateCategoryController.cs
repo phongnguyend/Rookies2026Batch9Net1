@@ -24,6 +24,7 @@ public class CreateCategoryController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(Summary = "Create a new category.", Tags = [ControllerTags.Categories])]
     public async Task<IActionResult> Create(
         [FromBody] CreateCategoryRequest request,

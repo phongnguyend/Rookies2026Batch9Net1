@@ -300,7 +300,7 @@ function AssetsContent() {
 
 export default function AssetsPage() {
   return (
-    <div className="p-4 sm:p-6">
+    <div>
       <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <AssetsContent />
     </div>
