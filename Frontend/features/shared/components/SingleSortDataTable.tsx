@@ -26,6 +26,8 @@ interface DataTableProps<T> {
   // sort
   sorts?: SortItem[];
   onSortChange?: (sorts: SortItem[]) => void;
+  getRowKey?: (row: T, index: number) => React.Key;
+  rowTestId?: (row: T, index: number) => string;
 }
 
 export default function SingleSortDataTable<T>({
@@ -36,6 +38,8 @@ export default function SingleSortDataTable<T>({
   emptyMessage = "No records found.",
   sorts = [],
   onSortChange,
+  getRowKey,
+  rowTestId
 }: DataTableProps<T>) {
   const handleSort = (key: string) => {
     const currentSort = sorts.find((s) => s.key === key);
@@ -62,23 +66,23 @@ export default function SingleSortDataTable<T>({
     return "↕";
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="text-center">
+  //       <span className="loading loading-spinner loading-lg text-primary"></span>
+  //     </div>
+  //   );
+  // }
 
-  if (data.length === 0) {
-    return <p className="py-8 text-center text-gray-500">{emptyMessage}</p>;
-  }
+  // if (data.length === 0) {
+  //   return <p className="py-8 text-center text-gray-500">{emptyMessage}</p>;
+  // }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm table-fixed">
+    <div className="w-full overflow-x-auto rounded border border-gray-200">
+      <table className="w-full min-w-[600px] text-left text-sm table-fixed">
         <thead>
-          <tr className="border-b border-gray-400">
+          <tr className="border-b border-gray-400 bg-gray-50">
             {columns.map((column) => {
               const currentSort = sorts.find((s) => s.key === column.key);
 
@@ -87,19 +91,22 @@ export default function SingleSortDataTable<T>({
                   key={column.key}
                   data-testid={column.headerTestId}
                   onClick={() => column.sortable && handleSort(column.key)}
-                  className={`py-2 font-semibold ${column.className ?? ""} ${
-                    column.sortable
-                      ? "cursor-pointer select-none hover:text-primary"
+                  className={`px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm
+                    ${column.className ?? ""}
+                    ${column.sortable
+                      ? "cursor-pointer select-none hover:text-primary transition-colors"
                       : ""
-                  }`}
+                    }`}
                 >
-                  {column.header}
+                  <div className="inline-flex items-center gap-1">
+                    {column.header}
 
-                  {column.sortable && (
-                    <span className="ml-1 inline-block w-4 text-center">
-                      {getSortIcon(currentSort?.direction)}
-                    </span>
-                  )}
+                    {column.sortable && (
+                      <span className="text-xs">
+                        {getSortIcon(currentSort?.direction)}
+                      </span>
+                    )}
+                  </div>
                 </th>
               );
             })}
@@ -109,32 +116,52 @@ export default function SingleSortDataTable<T>({
         <tbody>
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length} className="py-8 text-center">
+              <td colSpan={columns.length} className="py-8 text-center text-sm">
                 Loading...
+              </td>
+            </tr>
+          ) : data.length === 0 ? (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="py-8 text-center text-gray-500"
+              >
+                {emptyMessage}
               </td>
             </tr>
           ) : (
             data.map((row, rowIndex) => (
               <tr
-                key={rowIndex}
+                key={
+                  getRowKey
+                    ? getRowKey(row, rowIndex)
+                    : rowIndex
+                }
                 onClick={() => onRowClick?.(row)}
-                className={`border-b border-gray-300 ${
-                  onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
-                }`}
+                className={`
+                  border-b border-gray-200
+                  ${onRowClick
+                    ? "cursor-pointer hover:bg-gray-50 transition-colors"
+                    : ""
+                  }
+                `}
+                data-testid={rowTestId?.(row, rowIndex)}   //For assignment detail
               >
                 {columns.map((column) => (
                   <td
-                    key={column.key}
-                    className={`py-2 ${column.className ?? ""}`}
+                    key={String(column.key)}
                     data-testid={
                       typeof column.cellTestId === "function"
                         ? column.cellTestId(row, rowIndex)
                         : column.cellTestId
-                    }
+                    } //For colum value in table
+                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm truncate ${column.className ?? ""}`}
                   >
                     {column.render
                       ? column.render(row, rowIndex)
-                      : (row as Record<string, ReactNode>)[column.key]}
+                      : (row as Record<string, ReactNode>)[
+                      String(column.key)
+                      ]}
                   </td>
                 ))}
               </tr>
