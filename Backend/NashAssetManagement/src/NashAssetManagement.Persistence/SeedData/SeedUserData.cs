@@ -3,50 +3,122 @@
 namespace NashAssetManagement.Persistence.SeedData
 {
     public static class SeedUserData
-    {
-        private static readonly Guid HaNoiId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        private static readonly Guid HcmId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+{
+    private static readonly Guid HaNoiId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+    private static readonly Guid HcmId   = Guid.Parse("22222222-2222-2222-2222-222222222222");
 
-        public static IReadOnlyList<(Guid Id, string UserName, string StaffCode, string FirstName, string LastName, Gender Gender, DateTime Dob, DateTime JoinedDate, Guid LocationId, UserType UserType)> GetData()
-            => new List<(Guid, string, string, string, string, Gender, DateTime, DateTime, Guid, UserType)>
-        {
-            // HA NOI ADMINS
-            (Guid.Parse("10000000-0000-0000-0000-000000000001"), "binhnv",  "SD0001", "Binh",  "Nguyen Van", Gender.Male,   new DateTime(1993, 01, 20), new DateTime(2018, 01, 20), HaNoiId, UserType.Admin),
-            (Guid.Parse("10000000-0000-0000-0000-000000000002"), "huongtt", "SD0002", "Huong", "Tran Thi",   Gender.Female, new DateTime(1994, 03, 15), new DateTime(2019, 04, 10), HaNoiId, UserType.Admin),
-            (Guid.Parse("10000000-0000-0000-0000-000000000003"), "datlq",   "SD0003", "Dat",   "Le Quang",   Gender.Male,   new DateTime(1992, 07, 11), new DateTime(2017, 08, 01), HaNoiId, UserType.Admin),
- 
-            // HA NOI STAFF
-            (Guid.Parse("10000000-0000-0000-0000-000000000004"), "linhpt",  "SD0004", "Linh",  "Pham Thi",    Gender.Female, new DateTime(1998, 02, 18), new DateTime(2021, 03, 10), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000005"), "khanhdm", "SD0005", "Khanh", "Do Minh",     Gender.Male,   new DateTime(1997, 09, 22), new DateTime(2020, 10, 15), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000006"), "maivt",   "SD0006", "Mai",   "Vo Thi",      Gender.Female, new DateTime(1996, 12, 09), new DateTime(2019, 12, 20), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000007"), "tuanba",  "SD0007", "Tuan",  "Bui Anh",     Gender.Male,   new DateTime(1995, 06, 30), new DateTime(2018, 07, 15), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000008"), "ngandt",  "SD0008", "Ngan",  "Dang Thu",    Gender.Female, new DateTime(1999, 08, 14), new DateTime(2022, 01, 05), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000009"), "phonghg", "SD0009", "Phong", "Hoang Gia",   Gender.Male,   new DateTime(1991, 11, 25), new DateTime(2016, 05, 22), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000010"), "vybn",    "SD0010", "Vy",    "Bao Ngo",     Gender.Female, new DateTime(1998, 05, 17), new DateTime(2021, 09, 12), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000011"), "hungpd",  "SD0011", "Hung",  "Phan Duc",    Gender.Male,   new DateTime(1990, 04, 02), new DateTime(2015, 04, 20), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000012"), "thaoln",  "SD0012", "Thao",  "Ly Ngoc",     Gender.Female, new DateTime(1997, 01, 28), new DateTime(2020, 02, 11), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000013"), "quantm",  "SD0013", "Quan",  "Truong Minh", Gender.Male,   new DateTime(1993, 10, 13), new DateTime(2018, 11, 01), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000014"), "yendt",   "SD0014", "Yen",   "Duong Thanh", Gender.Female, new DateTime(1996, 07, 07), new DateTime(2019, 08, 18), HaNoiId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000015"), "namct",   "SD0015", "Nam",   "Cao Tuan",    Gender.Male,   new DateTime(1994, 09, 19), new DateTime(2019, 10, 05), HaNoiId, UserType.Staff),
- 
-            // HCM ADMINS
-            (Guid.Parse("10000000-0000-0000-0000-000000000016"), "annh",    "SD0016", "An",    "Nguyen Hoang", Gender.Male,   new DateTime(1992, 04, 12), new DateTime(2017, 06, 15), HcmId, UserType.Admin),
-            (Guid.Parse("10000000-0000-0000-0000-000000000017"), "trangpn", "SD0017", "Trang", "Pham Ngoc",    Gender.Female, new DateTime(1995, 02, 24), new DateTime(2019, 03, 08), HcmId, UserType.Admin),
-            (Guid.Parse("10000000-0000-0000-0000-000000000018"), "kiettm",  "SD0018", "Kiet",  "Tran Minh",    Gender.Male,   new DateTime(1991, 08, 06), new DateTime(2016, 09, 01), HcmId, UserType.Admin),
- 
-            // HCM STAFF
-            (Guid.Parse("10000000-0000-0000-0000-000000000019"), "lanlt",   "SD0019", "Lan",   "Le Thi",     Gender.Female, new DateTime(1997, 03, 09), new DateTime(2020, 04, 12), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000020"), "hieuvt",  "SD0020", "Hieu",  "Vo Thanh",   Gender.Male,   new DateTime(1996, 12, 21), new DateTime(2020, 01, 17), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000021"), "mydb",    "SD0021", "My",    "Dang Bao",   Gender.Female, new DateTime(1998, 06, 11), new DateTime(2021, 07, 22), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000022"), "ducbg",   "SD0022", "Duc",   "Bui Gia",    Gender.Male,   new DateTime(1993, 05, 28), new DateTime(2018, 06, 30), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000023"), "nhiht",   "SD0023", "Nhi",   "Ho Thi",     Gender.Female, new DateTime(1999, 09, 14), new DateTime(2022, 02, 15), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000024"), "taipa",   "SD0024", "Tai",   "Phan Anh",   Gender.Male,   new DateTime(1990, 01, 03), new DateTime(2015, 03, 10), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000025"), "chaunm",  "SD0025", "Chau",  "Ngo Minh",   Gender.Female, new DateTime(1997, 07, 18), new DateTime(2020, 09, 09), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000026"), "vietlq",  "SD0026", "Viet",  "Ly Quoc",    Gender.Male,   new DateTime(1994, 11, 29), new DateTime(2019, 01, 15), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000027"), "hanhdk",  "SD0027", "Hanh",  "Duong Kim",  Gender.Female, new DateTime(1995, 10, 10), new DateTime(2019, 11, 11), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000028"), "sontd",   "SD0028", "Son",   "Trinh Duc",  Gender.Male,   new DateTime(1992, 02, 16), new DateTime(2017, 03, 18), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000029"), "ngamt",   "SD0029", "Nga",   "Mai Thu",    Gender.Female, new DateTime(1998, 08, 27), new DateTime(2021, 10, 20), HcmId, UserType.Staff),
-            (Guid.Parse("10000000-0000-0000-0000-000000000030"), "longcv",  "SD0030", "Long",  "Cao Van",    Gender.Male,   new DateTime(1993, 12, 05), new DateTime(2018, 12, 01), HcmId, UserType.Staff),
-        };
-    }
+    // (Id, UserName, StaffCode, FirstName, LastName, Gender, Dob, JoinedDate, CreatedDate, LocationId, UserType)
+    public static IReadOnlyList<(Guid Id, string UserName, string StaffCode, string FirstName, string LastName,
+        Gender Gender, DateTime Dob, DateTime JoinedDate, DateTime CreatedDate, Guid LocationId, UserType UserType)> GetData()
+        => new List<(Guid, string, string, string, string, Gender, DateTime, DateTime, DateTime, Guid, UserType)>
+    {
+        // ===================== HA NOI – ADMINS =====================
+        (Guid.Parse("10000000-0000-0000-0000-000000000001"), "binhnv",   "SD0001", "Binh",   "Nguyen Van",  Gender.Male,   new DateTime(1993, 01, 20), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HaNoiId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000002"), "huongtt",  "SD0002", "Huong",  "Tran Thi",    Gender.Female, new DateTime(1994, 03, 15), new DateTime(2026, 01, 18), new DateTime(2026, 01, 12), HaNoiId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000003"), "datlq",    "SD0003", "Dat",    "Le Quang",    Gender.Male,   new DateTime(1992, 07, 11), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HaNoiId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000004"), "minhtv",   "SD0004", "Minh",   "Tran Van",    Gender.Male,   new DateTime(1990, 05, 08), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HaNoiId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000005"), "lanhpt",   "SD0005", "Lanh",   "Pham Thi",    Gender.Female, new DateTime(1988, 09, 22), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HaNoiId, UserType.Admin),
+
+        // ===================== HA NOI – STAFF =====================
+        (Guid.Parse("10000000-0000-0000-0000-000000000006"), "linhpt",   "SD0006", "Linh",   "Pham Thi",    Gender.Female, new DateTime(1998, 02, 18), new DateTime(2026, 01, 10), new DateTime(2026, 01, 05), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000007"), "khanhdm",  "SD0007", "Khanh",  "Do Minh",     Gender.Male,   new DateTime(1997, 09, 22), new DateTime(2026, 01, 11), new DateTime(2026, 01, 06), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000008"), "maivt",    "SD0008", "Mai",    "Vu Thi",      Gender.Female, new DateTime(1996, 12, 09), new DateTime(2026, 01, 12), new DateTime(2026, 01, 07), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000009"), "tuanba",   "SD0009", "Tuan",   "Bui Anh",     Gender.Male,   new DateTime(1995, 06, 30), new DateTime(2026, 01, 13), new DateTime(2026, 01, 08), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000010"), "ngandt",   "SD0010", "Ngan",   "Dinh Thi",    Gender.Female, new DateTime(1999, 08, 14), new DateTime(2026, 01, 14), new DateTime(2026, 01, 09), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000011"), "phonghq",  "SD0011", "Phong",  "Hoang Quoc",  Gender.Male,   new DateTime(1991, 11, 25), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000012"), "vybn",     "SD0012", "Vy",     "Bui Ngoc",    Gender.Female, new DateTime(1998, 05, 17), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000013"), "hungpd",   "SD0013", "Hung",   "Pham Duc",    Gender.Male,   new DateTime(1990, 04, 02), new DateTime(2026, 01, 16), new DateTime(2026, 01, 11), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000014"), "thaoln",   "SD0014", "Thao",   "Le Ngoc",     Gender.Female, new DateTime(1997, 01, 28), new DateTime(2026, 01, 16), new DateTime(2026, 01, 11), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000015"), "quantm",   "SD0015", "Quan",   "Tran Minh",   Gender.Male,   new DateTime(1993, 10, 13), new DateTime(2026, 01, 17), new DateTime(2026, 01, 12), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000016"), "yendt",    "SD0016", "Yen",    "Dang Thi",    Gender.Female, new DateTime(1996, 07, 07), new DateTime(2026, 01, 17), new DateTime(2026, 01, 12), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000017"), "namct",    "SD0017", "Nam",    "Cao Thanh",   Gender.Male,   new DateTime(1994, 09, 19), new DateTime(2026, 01, 18), new DateTime(2026, 01, 13), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000018"), "thanhlt",  "SD0018", "Thanh",  "Le Thi",      Gender.Female, new DateTime(1995, 03, 03), new DateTime(2026, 01, 18), new DateTime(2026, 01, 13), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000019"), "hieunm",   "SD0019", "Hieu",   "Nguyen Minh", Gender.Male,   new DateTime(1996, 12, 21), new DateTime(2026, 01, 19), new DateTime(2026, 01, 14), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000020"), "quynhtt",  "SD0020", "Quynh",  "Tran Thi",    Gender.Female, new DateTime(1998, 06, 11), new DateTime(2026, 01, 19), new DateTime(2026, 01, 14), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000021"), "ducbg",    "SD0021", "Duc",    "Bui Gia",     Gender.Male,   new DateTime(1993, 05, 28), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000022"), "nhiht",    "SD0022", "Nhi",    "Hoang Thi",   Gender.Female, new DateTime(1999, 09, 14), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000023"), "taipa",    "SD0023", "Tai",    "Pham Anh",    Gender.Male,   new DateTime(1990, 01, 03), new DateTime(2026, 01, 21), new DateTime(2026, 01, 16), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000024"), "chaunm",   "SD0024", "Chau",   "Nguyen My",   Gender.Female, new DateTime(1997, 07, 18), new DateTime(2026, 01, 21), new DateTime(2026, 01, 16), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000025"), "vietlq",   "SD0025", "Viet",   "Le Quoc",     Gender.Male,   new DateTime(1994, 11, 29), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000026"), "hanhdk",   "SD0026", "Hanh",   "Do Kim",      Gender.Female, new DateTime(1995, 10, 10), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000027"), "sontd",    "SD0027", "Son",    "Tran Duc",    Gender.Male,   new DateTime(1992, 02, 16), new DateTime(2026, 01, 23), new DateTime(2026, 01, 18), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000028"), "ngamt",    "SD0028", "Ngam",   "Tran My",     Gender.Female, new DateTime(1998, 08, 27), new DateTime(2026, 01, 23), new DateTime(2026, 01, 18), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000029"), "longcv",   "SD0029", "Long",   "Cao Van",     Gender.Male,   new DateTime(1993, 12, 05), new DateTime(2026, 01, 24), new DateTime(2026, 01, 19), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000030"), "tranghn",  "SD0030", "Trang",  "Hoang Ngoc",  Gender.Female, new DateTime(1995, 02, 24), new DateTime(2026, 01, 24), new DateTime(2026, 01, 19), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000031"), "kiethn",   "SD0031", "Kiet",   "Hoang Ngoc",  Gender.Male,   new DateTime(1991, 08, 06), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000032"), "lanlt",    "SD0032", "Lan",    "Le Thi",      Gender.Female, new DateTime(1997, 03, 09), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000033"), "hieuvt",   "SD0033", "Hieu",   "Vu Thanh",    Gender.Male,   new DateTime(1996, 12, 21), new DateTime(2026, 01, 26), new DateTime(2026, 01, 21), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000034"), "mydb",     "SD0034", "My",     "Do Bich",     Gender.Female, new DateTime(1998, 06, 11), new DateTime(2026, 01, 26), new DateTime(2026, 01, 21), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000035"), "anhnt",    "SD0035", "Anh",    "Nguyen Thi",  Gender.Female, new DateTime(1999, 03, 15), new DateTime(2026, 01, 27), new DateTime(2026, 01, 22), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000036"), "bachlt",   "SD0036", "Bach",   "Le Thanh",    Gender.Male,   new DateTime(1994, 07, 22), new DateTime(2026, 01, 27), new DateTime(2026, 01, 22), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000037"), "cuongpv",  "SD0037", "Cuong",  "Pham Van",    Gender.Male,   new DateTime(1993, 10, 09), new DateTime(2026, 01, 28), new DateTime(2026, 01, 23), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000038"), "dieuhm",   "SD0038", "Dieu",   "Hoang My",    Gender.Female, new DateTime(1997, 12, 30), new DateTime(2026, 01, 28), new DateTime(2026, 01, 23), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000039"), "giangnv",  "SD0039", "Giang",  "Nguyen Van",  Gender.Male,   new DateTime(1996, 04, 18), new DateTime(2026, 01, 29), new DateTime(2026, 01, 24), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000040"), "hoangtm",  "SD0040", "Hoang",  "Tran Minh",   Gender.Male,   new DateTime(1995, 09, 07), new DateTime(2026, 01, 29), new DateTime(2026, 01, 24), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000041"), "khanhnt",  "SD0041", "Khanh",  "Nguyen Thi",  Gender.Female, new DateTime(1998, 02, 25), new DateTime(2026, 01, 30), new DateTime(2026, 01, 25), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000042"), "linhnq",   "SD0042", "Linh",   "Nguyen Quynh",Gender.Female, new DateTime(1992, 06, 14), new DateTime(2026, 01, 30), new DateTime(2026, 01, 25), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000043"), "minhdt",   "SD0043", "Minh",   "Dinh Thanh",  Gender.Male,   new DateTime(1996, 11, 01), new DateTime(2026, 01, 31), new DateTime(2026, 01, 26), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000044"), "namhv",    "SD0044", "Nam",    "Hoang Van",   Gender.Male,   new DateTime(1994, 03, 19), new DateTime(2026, 01, 31), new DateTime(2026, 01, 26), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000045"), "oanhtk",   "SD0045", "Oanh",   "Tran Kim",    Gender.Female, new DateTime(1999, 08, 08), new DateTime(2026, 01, 31), new DateTime(2026, 01, 27), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000046"), "phucnm",   "SD0046", "Phuc",   "Nguyen Minh", Gender.Male,   new DateTime(1997, 05, 17), new DateTime(2026, 01, 31), new DateTime(2026, 01, 27), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000047"), "quyenlt",  "SD0047", "Quyen",  "Le Thi",      Gender.Female, new DateTime(1993, 09, 23), new DateTime(2026, 01, 31), new DateTime(2026, 01, 28), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000048"), "sonpv",    "SD0048", "Son",    "Pham Van",    Gender.Male,   new DateTime(1995, 02, 11), new DateTime(2026, 01, 31), new DateTime(2026, 01, 28), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000049"), "thuytk",   "SD0049", "Thuy",   "Tran Kim",    Gender.Female, new DateTime(1998, 07, 04), new DateTime(2026, 01, 31), new DateTime(2026, 01, 29), HaNoiId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000050"), "tungnt",   "SD0050", "Tung",   "Nguyen Thanh",Gender.Male,   new DateTime(1991, 10, 29), new DateTime(2026, 01, 31), new DateTime(2026, 01, 29), HaNoiId, UserType.Staff),
+
+        // ===================== HO CHI MINH – ADMINS =====================
+        (Guid.Parse("10000000-0000-0000-0000-000000000051"), "annh",     "SD0051", "An",     "Nguyen Hoang",Gender.Male,   new DateTime(1992, 04, 12), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HcmId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000052"), "trangpn",  "SD0052", "Trang",  "Pham Ngoc",   Gender.Female, new DateTime(1995, 02, 24), new DateTime(2026, 01, 18), new DateTime(2026, 01, 12), HcmId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000053"), "kiettm",   "SD0053", "Kiet",   "Tran Minh",   Gender.Male,   new DateTime(1991, 08, 06), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HcmId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000054"), "phuonglh", "SD0054", "Phuong", "Le Hoang",    Gender.Female, new DateTime(1989, 03, 14), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HcmId, UserType.Admin),
+        (Guid.Parse("10000000-0000-0000-0000-000000000055"), "tiennd",   "SD0055", "Tien",   "Nguyen Duc",  Gender.Male,   new DateTime(1990, 07, 30), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HcmId, UserType.Admin),
+
+        // ===================== HO CHI MINH – STAFF =====================
+        (Guid.Parse("10000000-0000-0000-0000-000000000056"), "lanlt1",   "SD0056", "Lan",    "Le Thi",      Gender.Female, new DateTime(1997, 03, 09), new DateTime(2026, 01, 10), new DateTime(2026, 01, 05), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000057"), "hieuvt1",  "SD0057", "Hieu",   "Vu Thanh",    Gender.Male,   new DateTime(1996, 12, 21), new DateTime(2026, 01, 11), new DateTime(2026, 01, 06), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000058"), "mydb1",    "SD0058", "My",     "Do Bich",     Gender.Female, new DateTime(1998, 06, 11), new DateTime(2026, 01, 12), new DateTime(2026, 01, 07), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000059"), "ducbg1",   "SD0059", "Duc",    "Bui Gia",     Gender.Male,   new DateTime(1993, 05, 28), new DateTime(2026, 01, 13), new DateTime(2026, 01, 08), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000060"), "nhiht1",   "SD0060", "Nhi",    "Hoang Thi",   Gender.Female, new DateTime(1999, 09, 14), new DateTime(2026, 01, 14), new DateTime(2026, 01, 09), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000061"), "taipa1",   "SD0061", "Tai",    "Pham Anh",    Gender.Male,   new DateTime(1990, 01, 03), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000062"), "chaunm1",  "SD0062", "Chau",   "Nguyen My",   Gender.Female, new DateTime(1997, 07, 18), new DateTime(2026, 01, 15), new DateTime(2026, 01, 10), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000063"), "vietlq1",  "SD0063", "Viet",   "Le Quoc",     Gender.Male,   new DateTime(1994, 11, 29), new DateTime(2026, 01, 16), new DateTime(2026, 01, 11), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000064"), "hanhdk1",  "SD0064", "Hanh",   "Do Kim",      Gender.Female, new DateTime(1995, 10, 10), new DateTime(2026, 01, 16), new DateTime(2026, 01, 11), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000065"), "sontd1",   "SD0065", "Son",    "Tran Duc",    Gender.Male,   new DateTime(1992, 02, 16), new DateTime(2026, 01, 17), new DateTime(2026, 01, 12), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000066"), "ngamt1",   "SD0066", "Ngam",   "Tran My",     Gender.Female, new DateTime(1998, 08, 27), new DateTime(2026, 01, 17), new DateTime(2026, 01, 12), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000067"), "longcv1",  "SD0067", "Long",   "Cao Van",     Gender.Male,   new DateTime(1993, 12, 05), new DateTime(2026, 01, 18), new DateTime(2026, 01, 13), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000068"), "anhlt",    "SD0068", "Anh",    "Le Thi",      Gender.Female, new DateTime(1996, 03, 12), new DateTime(2026, 01, 18), new DateTime(2026, 01, 13), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000069"), "binhnt",   "SD0069", "Binh",   "Nguyen Thanh",Gender.Male,   new DateTime(1999, 07, 25), new DateTime(2026, 01, 19), new DateTime(2026, 01, 14), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000070"), "cuonghv",  "SD0070", "Cuong",  "Hoang Van",   Gender.Male,   new DateTime(1994, 09, 08), new DateTime(2026, 01, 19), new DateTime(2026, 01, 14), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000071"), "danhpm",   "SD0071", "Danh",   "Pham Minh",   Gender.Male,   new DateTime(1997, 02, 17), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000072"), "emynb",    "SD0072", "Emy",    "Nguyen Bich",  Gender.Female, new DateTime(1998, 11, 04), new DateTime(2026, 01, 20), new DateTime(2026, 01, 15), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000073"), "giaolt",   "SD0073", "Giao",   "Le Thi",      Gender.Female, new DateTime(1995, 06, 21), new DateTime(2026, 01, 21), new DateTime(2026, 01, 16), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000074"), "hangtm",   "SD0074", "Hang",   "Tran My",     Gender.Female, new DateTime(1993, 04, 13), new DateTime(2026, 01, 21), new DateTime(2026, 01, 16), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000075"), "kienbt",   "SD0075", "Kien",   "Bui Thanh",   Gender.Male,   new DateTime(1996, 08, 29), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000076"), "liennv",   "SD0076", "Lien",   "Nguyen Van",  Gender.Female, new DateTime(1997, 12, 06), new DateTime(2026, 01, 22), new DateTime(2026, 01, 17), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000077"), "minhpq",   "SD0077", "Minh",   "Pham Quoc",   Gender.Male,   new DateTime(1995, 03, 18), new DateTime(2026, 01, 23), new DateTime(2026, 01, 18), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000078"), "ngoctt",   "SD0078", "Ngoc",   "Tran Thi",    Gender.Female, new DateTime(1998, 10, 07), new DateTime(2026, 01, 23), new DateTime(2026, 01, 18), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000079"), "phatnd",   "SD0079", "Phat",   "Nguyen Duc",  Gender.Male,   new DateTime(1994, 05, 22), new DateTime(2026, 01, 24), new DateTime(2026, 01, 19), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000080"), "quangbv",  "SD0080", "Quang",  "Bui Van",     Gender.Male,   new DateTime(1992, 01, 11), new DateTime(2026, 01, 24), new DateTime(2026, 01, 19), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000081"), "rinhlt",   "SD0081", "Rinh",   "Le Thi",      Gender.Female, new DateTime(1999, 09, 30), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000082"), "sanhnt",   "SD0082", "Sanh",   "Nguyen Thanh",Gender.Male,   new DateTime(1996, 07, 15), new DateTime(2026, 01, 25), new DateTime(2026, 01, 20), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000083"), "thienpm",  "SD0083", "Thien",  "Pham Minh",   Gender.Male,   new DateTime(1993, 02, 24), new DateTime(2026, 01, 26), new DateTime(2026, 01, 21), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000084"), "uynhtt",   "SD0084", "Uynh",   "Tran Thi",    Gender.Female, new DateTime(1997, 11, 09), new DateTime(2026, 01, 26), new DateTime(2026, 01, 21), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000085"), "vanlt",    "SD0085", "Van",    "Le Thi",      Gender.Female, new DateTime(1995, 08, 02), new DateTime(2026, 01, 27), new DateTime(2026, 01, 22), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000086"), "xuanbt",   "SD0086", "Xuan",   "Bui Thi",     Gender.Female, new DateTime(1998, 04, 19), new DateTime(2026, 01, 27), new DateTime(2026, 01, 22), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000087"), "yennth",   "SD0087", "Yen",    "Nguyen Thi Hoa",Gender.Female,new DateTime(1994, 03, 27), new DateTime(2026, 01, 28), new DateTime(2026, 01, 23), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000088"), "anhtv",    "SD0088", "Anh",    "Tran Van",    Gender.Male,   new DateTime(1999, 06, 14), new DateTime(2026, 01, 28), new DateTime(2026, 01, 23), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000089"), "baonv",    "SD0089", "Bao",    "Nguyen Van",  Gender.Male,   new DateTime(1993, 12, 08), new DateTime(2026, 01, 29), new DateTime(2026, 01, 24), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000090"), "camlt",    "SD0090", "Cam",    "Le Thi",      Gender.Female, new DateTime(1996, 05, 31), new DateTime(2026, 01, 29), new DateTime(2026, 01, 24), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000091"), "duynt",    "SD0091", "Duy",    "Nguyen Thanh",Gender.Male,   new DateTime(1997, 09, 16), new DateTime(2026, 01, 30), new DateTime(2026, 01, 25), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000092"), "hanpv",    "SD0092", "Han",    "Pham Van",    Gender.Male,   new DateTime(1995, 02, 23), new DateTime(2026, 01, 30), new DateTime(2026, 01, 25), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000093"), "ingoclt",  "SD0093", "Ngoc",   "Le Thi",      Gender.Female, new DateTime(1998, 08, 12), new DateTime(2026, 01, 31), new DateTime(2026, 01, 26), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000094"), "jasonnt",  "SD0094", "Jason",  "Nguyen Thanh",Gender.Male,   new DateTime(1996, 04, 05), new DateTime(2026, 01, 31), new DateTime(2026, 01, 26), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000095"), "khoavt",   "SD0095", "Khoa",   "Vu Thanh",    Gender.Male,   new DateTime(1993, 11, 19), new DateTime(2026, 01, 31), new DateTime(2026, 01, 27), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000096"), "loctd",    "SD0096", "Loc",    "Tran Duc",    Gender.Male,   new DateTime(1997, 02, 27), new DateTime(2026, 01, 31), new DateTime(2026, 01, 27), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000097"), "manhnt",   "SD0097", "Manh",   "Nguyen Thanh",Gender.Male,   new DateTime(1995, 07, 14), new DateTime(2026, 01, 31), new DateTime(2026, 01, 28), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000098"), "nganpv",   "SD0098", "Ngan",   "Pham Van",    Gender.Female, new DateTime(1999, 10, 03), new DateTime(2026, 01, 31), new DateTime(2026, 01, 28), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000099"), "oanhnm",   "SD0099", "Oanh",   "Nguyen My",   Gender.Female, new DateTime(1994, 03, 21), new DateTime(2026, 01, 31), new DateTime(2026, 01, 29), HcmId, UserType.Staff),
+        (Guid.Parse("10000000-0000-0000-0000-000000000100"), "phonglt",  "SD0100", "Phong",  "Le Thanh",    Gender.Male,   new DateTime(1992, 06, 08), new DateTime(2026, 01, 31), new DateTime(2026, 01, 29), HcmId, UserType.Staff),
+    };
+}
 }

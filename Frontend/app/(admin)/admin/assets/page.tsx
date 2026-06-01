@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { showModal } from "@/features/shared/modal.slice";
 import {
   useGetAssetsQuery,
@@ -39,11 +39,13 @@ function AssetsContent() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedStates, setSelectedStates] = useState<AssetState[]>(default_states);
+  const [selectedStates, setSelectedStates] =
+    useState<AssetState[]>(default_states);
   const [sort, setSort] = useState<SortItem | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [EditDisabledStates] = useState(false);
   const [DeleteDisabledStates] = useState(false);
+  const isCreatedNewAsset = useAppSelector((state)=>state.asset.isCreatedNewAsset);
 
   // ─── Default state check ───────────────────────
   const isDefaultStateSelection =
@@ -51,7 +53,11 @@ function AssetsContent() {
     default_states.every((s) => selectedStates.includes(s));
 
   // ─── API ───────────────────────────────────────
-  const { data: categoriesData, isLoading: categoriesLoading, isError } = useGetCategoriesQuery();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    isError,
+  } = useGetCategoriesQuery();
 
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
@@ -61,14 +67,16 @@ function AssetsContent() {
     search: search || undefined,
     sortBy: sort?.key,
     sortDirection: sort?.direction,
+    isCreatedNewAsset,
   });
 
   const displayItems = data?.items ?? [];
 
-  const categoryOptions = categoriesData?.map((c) => ({
-    key: c.name,
-    label: c.name,
-  })) ?? [];
+  const categoryOptions =
+    categoriesData?.map((c) => ({
+      key: c.name,
+      label: c.name,
+    })) ?? [];
 
   // ─── Handlers ─────────────────────────────────
   const handleStateChange = (values: string[]) => {
@@ -95,14 +103,16 @@ function AssetsContent() {
 
   const handleDelete = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(showModal({
-      title: "Delete Asset",
-      body: `Are you sure you want to delete "${row.name}"?`,
-      yesButtonLabel: "Delete",
-      noButtonLabel: "Cancel",
-      yesActionType: "",
-      yesPayload: row.id,
-    }));
+    dispatch(
+      showModal({
+        title: "Delete Asset",
+        body: `Are you sure you want to delete "${row.name}"?`,
+        yesButtonLabel: "Delete",
+        noButtonLabel: "Cancel",
+        yesActionType: "",
+        yesPayload: row.id,
+      }),
+    );
   };
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
@@ -112,9 +122,24 @@ function AssetsContent() {
 
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
-    { key: "assetCode", header: "Asset Code", sortable: true, testId: "btnSortAssetCode" },
-    { key: "name", header: "Asset Name", sortable: true, testId: "btnSortAssetName" },
-    { key: "category", header: "Category", sortable: true, testId: "btnSortCategory" },
+    {
+      key: "assetCode",
+      header: "Asset Code",
+      sortable: true,
+      testId: "btnSortAssetCode",
+    },
+    {
+      key: "name",
+      header: "Asset Name",
+      sortable: true,
+      testId: "btnSortAssetName",
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      testId: "btnSortCategory",
+    },
     {
       key: "state",
       header: "State",
@@ -128,12 +153,26 @@ function AssetsContent() {
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
-            disabled={EditDisabledStates ? EditDisabledStates : row.state === AssetState.Assigned}
+            disabled={
+              EditDisabledStates
+                ? EditDisabledStates
+                : row.state === AssetState.Assigned
+            }
             data-testid="btnEdit"
             onClick={(e) => handleEdit(row, e)}
             className="btn btn-xs btn-outline"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
               <path d="m15 5 4 4" />
             </svg>
@@ -142,9 +181,23 @@ function AssetsContent() {
             data-testid="btnIconDelete"
             onClick={(e) => handleDelete(row, e)}
             className="btn btn-xs btn-error btn-outline"
-            disabled={DeleteDisabledStates ? DeleteDisabledStates : row.state === AssetState.Assigned}
+            disabled={
+              DeleteDisabledStates
+                ? DeleteDisabledStates
+                : row.state === AssetState.Assigned
+            }
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="12" cy="12" r="10" />
               <path d="m15 9-6 6" />
               <path d="m9 9 6 6" />
@@ -164,7 +217,6 @@ function AssetsContent() {
 
       {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-
         {/* Left group */}
         <div className="flex flex-wrap gap-3">
           <div className="flex-1 min-w-[160px] sm:flex-none">
@@ -178,7 +230,10 @@ function AssetsContent() {
               customLabel={isDefaultStateSelection ? "State" : undefined}
             />
           </div>
-          <div data-testid="ddlCategory" className="flex-1 min-w-[160px] sm:flex-none">
+          <div
+            data-testid="ddlCategory"
+            className="flex-1 min-w-[160px] sm:flex-none"
+          >
             <DropdownFilter
               items={categoryOptions}
               values={selectedCategories}
@@ -218,7 +273,9 @@ function AssetsContent() {
           data={displayItems}
           columns={columns}
           isLoading={isLoading}
-          emptyMessage={isError ? "No assets found." : "No assets found after filtering."}
+          emptyMessage={
+            isError ? "No assets found." : "No assets found after filtering."
+          }
           onRowClick={(row) => setSelectedAssetId(row.id)}
           sort={sort}
           onSortChange={handleSortChange}
@@ -243,7 +300,7 @@ function AssetsContent() {
 
 export default function AssetsPage() {
   return (
-    <div className="p-4 sm:p-6">
+    <div>
       <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <AssetsContent />
     </div>

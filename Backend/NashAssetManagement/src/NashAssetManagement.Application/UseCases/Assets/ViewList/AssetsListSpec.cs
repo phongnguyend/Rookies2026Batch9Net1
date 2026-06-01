@@ -7,10 +7,19 @@ namespace NashAssetManagement.Application.UseCases.Assets.Specification;
 
 public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
 {
-    public AssetListSpec(string[]? categories, AssetState[]? states, string? search, string? sortBy, string? sortDirection, int pageNumber, int pageSize, Guid location)
+    public AssetListSpec(
+        string[]? categories, 
+        AssetState[]? states, 
+        string? search, 
+        string? sortBy, 
+        string? sortDirection, 
+        int pageNumber, 
+        int pageSize, 
+        Guid location, 
+        bool isNewAssetCreated)
     {
         var isDesc = sortDirection?.ToLower() == "desc";
-
+        
         Query
             .Where(a => !a.IsDeleted)
             .Where(a => a.LocationId == location)
@@ -38,7 +47,12 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
                 else Query.OrderBy(a => a.State);
                 break;
             default:
+                if(isNewAssetCreated == true)
+                    Query.OrderByDescending(a => a.CreatedAtUtc);   
+                else
+                    Query.OrderBy(a => a.CreatedAtUtc);
                 break;
+
         }
 
         if (categories is not null && categories.Length > 0)
@@ -60,13 +74,5 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
             a.State,
             a.Location!.Name
         ));
-    }
-}
-
-public sealed class CategoryByNameSpec : Specification<Category>
-{
-    public CategoryByNameSpec(string name)
-    {
-        Query.Where(c => c.CategoryName == name);
     }
 }
