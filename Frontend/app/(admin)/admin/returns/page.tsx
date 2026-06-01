@@ -241,7 +241,7 @@ export default function ReturnsPage() {
     [router, searchParams],
   );
 
-  const { data, isLoading } = useGetReturnRequestsQuery({
+  const { data, isLoading, refetch } = useGetReturnRequestsQuery({
     pageNumber: page,
     pageSize,
     ...(querySearch ? { searchTerm: querySearch } : {}),
@@ -383,6 +383,12 @@ export default function ReturnsPage() {
                     inputValue: nextSearch,
                     urlValue: nextSearch,
                   });
+
+                  if (nextSearch === querySearch && page === 1) {
+                    refetch();
+                    return;
+                  }
+
                   // Search changes always restart the list from page 1.
                   updateQueryParams({ page: 1, search: nextSearch });
                 }}
