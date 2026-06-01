@@ -30,6 +30,12 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
             // Retrieve refresh token from cookie
             Request.Cookies.TryGetValue(Domain.Constants.JwtTokenConstants.CookieRefreshToken, out var refreshToken);
 
+            // Fallback to get refresh token from header, in case cookie not found
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                refreshToken = Request.Headers["X-Refresh-Token"].FirstOrDefault();
+            }
+
             var request = new Request(refreshToken ?? string.Empty);
             var result = await _sender.Send(request, cancellationToken);
             if (result.IsError)
@@ -53,7 +59,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
                 dateTimeProvider.UtcNow.AddMilliseconds(jwtOptions.Value.RefreshTokenExpiryInMilliseconds));
             Response.AppendAuthCookie(refreshTokenCookie);
 
-            return Ok();
+            return Ok(result.Value);
         }
     }
 }

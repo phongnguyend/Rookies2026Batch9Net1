@@ -12,7 +12,7 @@ const loginFormSchema = z.object({
     .string()
     .min(1, "Username is required.")
     .max(100, "Username must not exceed 100 characters.")
-    .regex(/^[a-zA-Z]+$/, "Username must contain only letters.")
+    .regex(/^[a-zA-Z0-9]+$/, "Username must contain only letters and digits.")
     .transform((val) => val.trim()),
   password: z.string().min(1, "Password is required."),
 });

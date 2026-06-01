@@ -56,7 +56,13 @@ export const authSlice = createSlice({
     },
 
     // logout
-    logoutAccount: () => { return { ...initialState, isLoading: false, isAuthenticated: false } }
+    logoutAccount: () => {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+      return { ...initialState, isLoading: false, isAuthenticated: false, error: null };
+    }
   }
 })
 

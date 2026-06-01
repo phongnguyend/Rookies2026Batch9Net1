@@ -11,6 +11,18 @@ export const authApi = baseApiSlice.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          if (data != null && data?.accessToken && data?.refreshToken) {
+            localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
+          }
+        } catch (error) {
+          console.error("Login mutation error storing tokens:", error);
+        }
+      },
     }),
 
     refresh: builder.mutation<Refresh.Response, Refresh.Request>({

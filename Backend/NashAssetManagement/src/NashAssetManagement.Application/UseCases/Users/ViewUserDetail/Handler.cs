@@ -49,7 +49,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserDetail
                 user.UserType.ToString(),
                 user.DateOfBirth,
                 user.Gender.ToString(),
-                user.Location != null ? user.Location.Name : ""
+                user.Location != null ? user.Location.Prefix : ""
             );
         }
     }

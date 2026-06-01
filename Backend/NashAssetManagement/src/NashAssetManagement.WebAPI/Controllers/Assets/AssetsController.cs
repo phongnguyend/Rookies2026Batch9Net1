@@ -45,12 +45,9 @@ public class AssetsController : BaseApiController
             cancellationToken);
 
         return result.Match(
-            assets => Ok(assets),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-                return new ObjectResult(problem) { StatusCode = problem.Status };
-            });
+            asset => Ok(asset),
+            errors => errors.ToProblem()
+        );
     }
 
     [HttpGet("{id:guid}")]
@@ -62,23 +59,16 @@ public class AssetsController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> GetById(
-        Guid id,
+        string? id,
         CancellationToken cancellationToken)
     {
         var result = await _sender.Send(
-            new GetAssetDetailRequest(id.ToString()),
+            new GetAssetDetailRequest(id),
             cancellationToken);
 
         return result.Match(
             asset => Ok(asset),
-            errors =>
-            {
-                var problem = ProblemDetailsMapper.FromErrorOr(errors);
-
-                return new ObjectResult(problem)
-                {
-                    StatusCode = problem.Status
-                };
-            });
+            errors => errors.ToProblem()
+        );
     }
 }

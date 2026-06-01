@@ -14,6 +14,23 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers
         }
 
         [Fact]
+        public void TestValidate_ShouldHaveValidationErrorForSearchTerm_WhenSearchTermIsTooLong()
+        {
+            // Arrange
+            var request = new Request(1, 10, new string('a', 101), null, null, null);
+
+            // Act
+            var result = _validator.TestValidate(request);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.SearchTerm);
+            Assert.Single(result.Errors);
+            var error = result.Errors[0];
+            Assert.Equal(nameof(Request.SearchTerm), error.PropertyName);
+            Assert.Equal("Search term must not exceed 100 characters.", error.ErrorMessage);
+        }
+
+        [Fact]
         public void TestValidate_ShouldHaveValidationErrorForPageNumber_WhenPageNumberIs0()
         {
             // Arrange
@@ -119,7 +136,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers
         public void TestValidate_ShouldNotHaveAnyValidationErrors_WhenRequestIsValid()
         {
             // Arrange
-            var request = new Request(1, 20, "staff", "Admin", "staffCode", false);
+            var request = new Request(1, 10, "staff", "Admin", "staffCode", false);
 
             // Act
             var result = _validator.TestValidate(request);
