@@ -10,13 +10,13 @@ namespace NashAssetManagement.Persistence.SeedData
             new CategoryBuilder()
                 .WithId(Guid.Parse("10000000-0000-0000-0000-000000000001"))
                 .WithName("Laptop")
-                .WithPrefix("LT")
+                .WithPrefix("LA")
                 .Build(),
 
             new CategoryBuilder()
                 .WithId(Guid.Parse("10000000-0000-0000-0000-000000000002"))
                 .WithName("Monitor")
-                .WithPrefix("MN")
+                .WithPrefix("MO")
                 .Build(),
 
             new CategoryBuilder()
@@ -40,7 +40,7 @@ namespace NashAssetManagement.Persistence.SeedData
             new CategoryBuilder()
                 .WithId(Guid.Parse("10000000-0000-0000-0000-000000000006"))
                 .WithName("Battery Monitor")
-                .WithPrefix("BM1")
+                .WithPrefix("BA")
                 .Build(),
 
             new CategoryBuilder()
