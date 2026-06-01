@@ -10,12 +10,11 @@ import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
-import AssignmentTable, { ColumnDef } from "../../../../features/assignments/admin/components/AssignmentTable";
 import { useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
-import SingleSortDataTable from "@/features/shared/components/SingleSortDataTable";
+import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 
 const limit = 10;
 
