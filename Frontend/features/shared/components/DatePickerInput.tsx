@@ -60,6 +60,7 @@ export default function DatePickerInput({
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
 
+  // handle click outside for calendar modal
   useEffect(() => {
     const handleClickOutside = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -133,50 +134,76 @@ export default function DatePickerInput({
     setOpen(false);
   };
 
+  const handleDateValidation = () => {
+    if (!inputValue.trim()) {
+      setError("");
+      return;
+    }
+
+    const parsedDate = parseDate(inputValue);
+
+    if (!parsedDate) {
+      setError("Date must be valid and follow dd/MM/yyyy format");
+
+      dispatch(
+        enqueueToast({
+          message: "Date must be valid and follow dd/MM/yyyy format.",
+          type: ToastType.Error,
+          testId: "txtDateValidationError",
+        }),
+      );
+
+      return;
+    }
+
+    onChange(parsedDate);
+    setCursor(parsedDate);
+    setError("");
+  };
+
   return (
     <div ref={ref} className={`relative ${width}`}>
-      {/* Date Picker Input */}
       <div className="flex h-10 overflow-hidden rounded border border-gray-400 bg-base-100">
-        <input
-          data-testid="txtAssignedDate"
-          value={inputValue}
-          placeholder={placeholder}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setError("");
-          }}
-          onBlur={() => {
-            if (!inputValue.trim()) {
-              onChange(null);
+        {/* Date Picker Input */}
+        <div className="relative flex-1">
+          <input
+            data-testid="txtAssignedDate"
+            value={inputValue}
+            placeholder={placeholder}
+            onChange={(e) => {
+              setInputValue(e.target.value);
               setError("");
-              return;
-            }
+            }}
+            onBlur={handleDateValidation}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleDateValidation();
+              }
+            }}
+            className={`h-full w-full px-3 pr-8 text-sm outline-none ${
+              error ? "text-error" : ""
+            }`}
+          />
 
-            const parsedDate = parseDate(inputValue);
+          {inputValue && (
+            <button
+              type="button"
+              data-testid="btnClearAssignedDate"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setInputValue("");
+                setError("");
+                setCursor(new Date());
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              x
+            </button>
+          )}
+        </div>
 
-            if (!parsedDate) {
-              setError("Date must be valid and follow dd/MM/yyyy format");
-
-              dispatch(
-                enqueueToast({
-                  message: "Date must be valid and follow dd/MM/yyyy format.",
-                  type: ToastType.Error,
-                  testId: "txtDateValidationError",
-                }),
-              );
-
-              return;
-            }
-
-            onChange(parsedDate);
-            setCursor(parsedDate);
-            setError("");
-          }}
-          className={`h-full min-w-0 flex-1 px-3 text-sm outline-none ${
-            error ? "text-error" : ""
-          }`}
-        />
-
+        {/* Button Calendar */}
         <button
           data-testid="btnAssignedDateCalendar"
           type="button"

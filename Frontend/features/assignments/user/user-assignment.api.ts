@@ -37,7 +37,7 @@ export const userAssignmentApi = baseApiSlice.injectEndpoints({
         url: `/v1/user/assignments/${assignmentId}/return-request`,
         method: "POST",
       }),
-      invalidatesTags: ["Assignment"],
+      invalidatesTags: ["Assignment", "Return"],
     }),
   }),
 });

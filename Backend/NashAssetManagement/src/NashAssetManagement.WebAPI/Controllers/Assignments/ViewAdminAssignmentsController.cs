@@ -22,7 +22,10 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [ProducesResponseType(typeof(PagedList<Response>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation(Tags = [ControllerTags.Assignments])]
+        [SwaggerOperation(
+            Summary = "Get admin's assignments",
+            Description = "Allow an admin to view all assignments in his/her location. Assignments will be in state 'Waiting for acceptance', 'Accepted', 'Declined' or 'Returned'.",
+            Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> GetAll([FromQuery] Query query)
         {
             var result = await _sender.Send(query);
