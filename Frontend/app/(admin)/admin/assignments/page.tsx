@@ -13,7 +13,7 @@ import DataTableButtonActions from "@/features/shared/components/DataTableButton
 import AssignmentTable, { ColumnDef } from "../../../../features/assignments/admin/components/AssignmentTable";
 import { useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
-import AssignmentDateTimePicker from "@/features/assignments/admin/components/AssignmentDateTimePicker";
+import DatePickerInput from "@/features/shared/components/DatePickerInput";
 
 const limit = 10;
 
@@ -84,7 +84,6 @@ export default function AssignmentsPage() {
     {
       key: "no",
       header: "No.",
-      className: "w-[40px]",
       render: (_assignment, index) => (page - 1) * limit + index + 1,
     },
     {
@@ -173,11 +172,11 @@ export default function AssignmentsPage() {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
 
           {/* Left group: State + Assigned Date */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div data-testid="ddlState" className="min-w-0">
+          <div className="flex flex-wrap gap-3">
+            <div data-testid="ddlState" className="flex-1 min-w-[160px] sm:flex-none">
               <DropdownFilter
                 items={Object.values(AssignmentState).map((s) => ({
                   key: s,
@@ -198,8 +197,8 @@ export default function AssignmentsPage() {
               />
             </div>
 
-            <div data-testid="dtpAssignedDate" className="min-w-0">
-              <AssignmentDateTimePicker
+            <div data-testid="dtpAssignedDate" className="w-full sm:w-auto">
+              <DatePickerInput
                 value={assignedDate}
                 onChange={(date) =>
                   updateParams({
@@ -218,14 +217,14 @@ export default function AssignmentsPage() {
                   })
                 }
                 placeholder="Assigned Date"
-                width="w-36 sm:w-50"
+                width="w-full"
               />
             </div>
           </div>
 
           {/* Right group: Search + Create button */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="min-w-0">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+            <div className="w-full sm:w-auto">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
@@ -244,36 +243,37 @@ export default function AssignmentsPage() {
             </div>
 
             <button
-              className="rounded bg-primary px-3 sm:px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base shrink-0"
+              className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base"
               data-testid="btnCreateNewAssignment"
             >
-              <span className="sm:hidden">+ New</span>
-              <span className="hidden sm:inline">Create new assignment</span>
+              Create new assignment
             </button>
           </div>
 
         </div>
 
-        <AssignmentTable<Assignment>
-          data={assignments}
-          columns={columns}
-          isLoading={isLoading}
-          emptyMessage="No assignments found."
-          sorts={sorts}
-          onSortChange={(newSorts) => {
-            const sort = newSorts[0];
-            updateParams({
-              sortBy: sort?.key,
-              sortDesc:
-                sort?.direction === SortDirection.Desc ? "true" : undefined,
-              page: "1",
-            });
-          }}
-          onRowClick={(row) => {
-            setSelectedAssignmentId(row.id);
-          }}
-          rowTestId={(_row, index) => `dgdAssignmentRow-${index}`}
-        />
+        <div className="overflow-x-auto">
+          <AssignmentTable<Assignment>
+            data={assignments}
+            columns={columns}
+            isLoading={isLoading}
+            emptyMessage="No assignments found."
+            sorts={sorts}
+            onSortChange={(newSorts) => {
+              const sort = newSorts[0];
+              updateParams({
+                sortBy: sort?.key,
+                sortDesc:
+                  sort?.direction === SortDirection.Desc ? "true" : undefined,
+                page: "1",
+              });
+            }}
+            onRowClick={(row) => {
+              setSelectedAssignmentId(row.id);
+            }}
+            rowTestId={(_row, index) => `dgdAssignmentRow-${index}`}
+          />
+        </div>
 
         {selectedAssignmentId && (
           <AssignmentDetailPopup

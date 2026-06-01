@@ -85,10 +85,10 @@ export default function AssignmentTable<T>({
   };
 
   return (
-    <div className="relative z-0 w-full overflow-x-auto">
-      <table className="w-full text-left text-sm">
+    <div className="w-full overflow-x-auto rounded border border-gray-200">
+      <table className="w-full min-w-[600px] text-left text-sm">
         <thead>
-          <tr className="border-b border-gray-400">
+          <tr className="border-b border-gray-400 bg-gray-50">
             {columns.map((column) => {
               const currentSort = sorts.find(
                 (s) => s.key === column.key
@@ -102,7 +102,7 @@ export default function AssignmentTable<T>({
                     handleSort(String(column.key))
                   }
                   className={`
-                    py-2 font-semibold whitespace-nowrap
+                    px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm
                     ${column.className ?? ""}
                     ${column.sortable
                       ? "cursor-pointer select-none hover:text-primary transition-colors"
@@ -131,7 +131,7 @@ export default function AssignmentTable<T>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="py-8 text-center"
+                className="py-8 text-center text-sm"
               >
                 Loading...
               </td>
@@ -167,7 +167,7 @@ export default function AssignmentTable<T>({
                   <td
                     key={String(column.key)}
                     data-testid={column.ColumnTestId?.(row, rowIndex)} //For colum value in table
-                    className={`py-3 ${column.className ?? ""}`}
+                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${column.className ?? ""}`}
                   >
                     {column.render
                       ? column.render(row, rowIndex)
