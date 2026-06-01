@@ -24,7 +24,10 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation(Tags = [ControllerTags.Assignments])]
+        [SwaggerOperation(
+            Summary = "View admin assignment's detail.",
+            Description = "Allow an admin to view assignment's detailed information. Assignment need to be assigned to user. Required admin to be authenticated.",
+            Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _sender.Send(new Query(id));
