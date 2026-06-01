@@ -16,14 +16,14 @@ public class EditAssetController : BaseApiController
 {
     public EditAssetController(ISender sender) : base(sender) { }
 
-    [HttpPost]
+    [HttpPut]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    [SwaggerOperation(Summary = "Create a new asset.",Tags = [ControllerTags.Assets])]
+    [SwaggerOperation(Summary = "Edit a asset.",Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> Create(
         [FromBody] EditAssetRequest request,
         CancellationToken cancellationToken)

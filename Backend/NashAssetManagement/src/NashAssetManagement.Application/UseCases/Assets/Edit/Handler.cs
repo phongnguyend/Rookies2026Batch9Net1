@@ -52,7 +52,7 @@ public class EditAssetHandler
             throw new ValidationException(validationResult.Errors);
 
         Guid location = Guid.TryParse(_currentUser.LocationId, out Guid locationId) ? locationId : Guid.Empty;
-        Guid AssetId = Guid.TryParse(request.AssetId, out Guid assetid) ? assetid : Guid.Empty;
+        Guid AssetId = Guid.TryParse(request.AssetId, out Guid assetGuid) ? assetGuid : Guid.Empty;
 
         if (location == Guid.Empty)
             return EditAssetErrors.LocationNotFound;
@@ -61,9 +61,12 @@ public class EditAssetHandler
 
         var spec = new AssetByIdSpec(AssetId, location);
         var asset = await _assetRepository.FirstOrDefaultAsync(spec, cancellationToken);
-
+        
         if (asset is null)
             return EditAssetErrors.AssetNotFound;
+        
+        if(asset.State == AssetState.Assigned)
+            return EditAssetErrors.AssetNotEditable;
 
         asset.Name = normalizedRequest.AssetName;
         asset.Specification = normalizedRequest.Specification;

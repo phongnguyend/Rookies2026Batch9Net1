@@ -18,4 +18,9 @@ public static class EditAssetErrors
         code: "AssetEdit.AssetNotFound",
         description: "Asset not found."
     );
+
+    public static readonly Error AssetNotEditable = Error.Conflict(
+        code: "AssetEdit.AssetNotEditable",
+        description: "Asset cannot be edited because it is assigned."
+    );
 }
