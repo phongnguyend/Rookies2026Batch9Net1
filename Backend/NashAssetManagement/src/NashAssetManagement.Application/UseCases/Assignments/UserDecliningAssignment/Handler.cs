@@ -38,6 +38,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.UserDecliningAssi
             if (assignment == null) return Errors.AssignmentNotFoundWithId(request.AssignmentId!);
             if (assignment.State != AssignmentState.WaitingForAcceptance) return Errors.InvalidAssignmentState;
             if (assignment.AssignedToUserId != userId) return Errors.AssignmentNotAssignedToUser;
+            if (assignment.AssignedAtUtc > dateTimeProvider.UtcNow) return Errors.InvalidAssignedDate;
             // Assignment's asset
             if (assignment.Asset == null) return Errors.AssetOfAssignmentNotFound(request.AssignmentId!);
             if (assignment.Asset.State != AssetState.Assigned) return Errors.InvalidAssignmentAssetState;

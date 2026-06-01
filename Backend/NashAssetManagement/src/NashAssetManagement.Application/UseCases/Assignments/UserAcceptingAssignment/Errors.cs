@@ -43,5 +43,10 @@ namespace NashAssetManagement.Application.UseCases.Assignments.UserAcceptingAssi
             Error.Validation(
                 "UserAcceptingAssignment.InvalidAssignmentAssetState",
                 "Asset of assignment must be in 'Assigned' state in order to be accepted.");
+
+        public static Error InvalidAssignedDate =
+            Error.Validation(
+                "UserAcceptingAssignment.InvalidAssignedDate",
+                "User can only accept assignment that have assigned date equal or earlier than current date.");
     }
 }

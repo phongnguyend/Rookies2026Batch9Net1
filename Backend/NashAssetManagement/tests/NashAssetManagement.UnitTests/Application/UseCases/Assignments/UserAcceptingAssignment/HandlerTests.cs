@@ -308,6 +308,39 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.UserAcc
             _mockUow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Fact]
+        public async Task Handle_WhenAssignmentAssignedAtUtcIsInFuture_ShouldReturnInvalidAssignedDateError()
+        {
+            // Arrange
+            var assignmentId = Guid.NewGuid();
+            var request = new Request(AssignmentId: assignmentId.ToString());
+            var userId = Guid.NewGuid();
+            var fakeNow = DateTime.UtcNow;
+
+            SetupValidationSuccess(request);
+            SetupUserAuthenticated(userId);
+
+            _mockDateTime.Setup(d => d.UtcNow).Returns(fakeNow);
+
+            var assignment = new Assignment
+            {
+                State = AssignmentState.WaitingForAcceptance,
+                AssignedToUserId = userId,
+                AssignedAtUtc = fakeNow.AddMinutes(5)
+            };
+
+            _mockRepo
+                .Setup(r => r.FirstOrDefaultAsync(It.IsAny<ISpecification<Assignment>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(assignment);
+
+            // Act
+            ErrorOr<Updated> result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.InvalidAssignedDate, result.FirstError);
+        }
+
         private void SetupValidationSuccess(Request request)
         {
             _mockValidator

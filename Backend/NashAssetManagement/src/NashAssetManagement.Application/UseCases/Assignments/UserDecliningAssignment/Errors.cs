@@ -43,5 +43,10 @@ namespace NashAssetManagement.Application.UseCases.Assignments.UserDecliningAssi
             Error.Validation(
                 "UserDecliningAssignment.InvalidAssignmentAssetState",
                 "Asset of assignment must be in 'Assigned' state in order to be declined.");
+
+        public static Error InvalidAssignedDate =
+            Error.Validation(
+                "UserDecliningAssignment.InvalidAssignedDate",
+                "User can only accept assignment that have assigned date equal or earlier than current date.");
     }
 }
