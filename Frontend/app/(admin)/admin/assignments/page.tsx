@@ -10,10 +10,11 @@ import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
-import AssignmentTable, { ColumnDef } from "../../../../features/assignments/admin/components/AssignmentTable";
 import { useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import { displayAssignmentState } from "@/utils/assignment.utils";
+import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 
 const limit = 10;
 
@@ -71,13 +72,6 @@ export default function AssignmentsPage() {
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
   });
 
-  const formatText = (text: string) => {
-    return text
-      .replace(/([a-z])([A-Z])/g, "$1 $2")
-      .replace(/_/g, " ");
-  };
-
-
   const assignments = data?.items ?? [];
 
   const columns: ColumnDef<Assignment>[] = [
@@ -90,48 +84,45 @@ export default function AssignmentsPage() {
       key: "assetCode",
       header: "Asset Code",
       sortable: true,
-      TitleColumnTestId: "btnSortAssetCode",
-      ColumnTestId: (_row, index) => `colAssetCode-${index}`,
+      headerTestId: "btnSortAssetCode",
+      cellTestId: (_row, index) => `colAssetCode-${index}`,
     },
     {
       key: "assetName",
       header: "Asset Name",
       sortable: true,
-      TitleColumnTestId: "btnSortAssetName",
-      ColumnTestId: (_row, index) => `colAssetName-${index}`,
+      headerTestId: "btnSortAssetName",
+      cellTestId: (_row, index) => `colAssetName-${index}`,
     },
     {
       key: "assignedTo",
       header: "Assigned to",
       sortable: true,
-      TitleColumnTestId: "btnSortAssignedTo",
-      ColumnTestId: (_row, index) => `colAssignedTo-${index}`,
+      headerTestId: "btnSortAssignedTo",
+      cellTestId: (_row, index) => `colAssignedTo-${index}`,
     },
     {
       key: "assignedBy",
       header: "Assigned by",
       sortable: true,
-      TitleColumnTestId: "btnSortAssignedBy",
-      ColumnTestId: (_row, index) => `colAssignedBy-${index}`,
+      headerTestId: "btnSortAssignedBy",
+      cellTestId: (_row, index) => `colAssignedBy-${index}`,
     },
     {
       key: "assignedDate",
       header: "Assigned Date",
       sortable: true,
-      TitleColumnTestId: "btnSortAssignedDate",
-      ColumnTestId: (_row, index) => `colAssignedDate-${index}`,
+      headerTestId: "btnSortAssignedDate",
+      cellTestId: (_row, index) => `colAssignedDate-${index}`,
     },
     {
       key: "state",
       header: "State",
       sortable: true,
-      TitleColumnTestId: "btnSortState",
-      ColumnTestId: (_row, index) => `colState-${index}`,
+      headerTestId: "btnSortState",
+      cellTestId: (_row, index) => `colState-${index}`,
       render: (row) =>
-        row.state
-          .replace(/([a-z])([A-Z])/g, "$1 $2")
-          .toLowerCase()
-          .replace(/^./, (char) => char.toUpperCase()),
+        displayAssignmentState(row.state),
     },
     {
       key: "actions",
@@ -171,12 +162,12 @@ export default function AssignmentsPage() {
         Assignment List
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 mb-8">
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
 
           {/* Left group: State + Assigned Date */}
           <div className="flex flex-wrap gap-3">
-            <div data-testid="ddlState" className="flex-1 min-w-[160px] sm:flex-none">
+            <div data-testid="ddlState" className="w-full sm:w-auto">
               <DropdownFilter
                 items={Object.values(AssignmentState).map((s) => ({
                   key: s,
@@ -253,7 +244,7 @@ export default function AssignmentsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <AssignmentTable<Assignment>
+          <SingleSortDataTable<Assignment>
             data={assignments}
             columns={columns}
             isLoading={isLoading}
