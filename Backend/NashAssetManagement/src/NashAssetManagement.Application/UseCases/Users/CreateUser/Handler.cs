@@ -84,7 +84,7 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
             var username = baseUsername;
             var index = 1;
 
-            // increase index if username exist: tuanttp1
+            // increase index if username exist: tuantt1
             while (await userManager.Users.AnyAsync(x => x.UserName == username, cancellationToken))
             {
                 username = $"{baseUsername}{index}";

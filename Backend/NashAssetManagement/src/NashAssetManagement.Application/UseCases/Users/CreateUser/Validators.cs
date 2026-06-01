@@ -32,12 +32,18 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .Must(dayOfBirth => dayOfBirth.Date >= DateTime.UtcNow.Date.AddYears(-90))
                 .WithMessage("User age must not exceed 90 years.");
 
-            // 18 <= JD <= now
+            // 18 <= JD <= now + 7days && not Sun and Sat
             RuleFor(x => x.JoinedDate)
                 .NotEmpty()
                 .WithMessage("Joined Date is required.")
                 .Must((request, joinedDate) => joinedDate.Date > request.DayOfBirth.Date)
-                .WithMessage("Joined Date must be later than Date of Birth.");
+                .WithMessage("Joined date is not later than Date of Birth. Please select a different date")
+                .Must(dayOfBirth => dayOfBirth.Date <= DateTime.UtcNow.Date.AddDays(7))
+                .WithMessage("Joined date must not exceed a week. Please select a different date")
+                .Must(joinedDate =>
+                    joinedDate.DayOfWeek != DayOfWeek.Saturday &&
+                    joinedDate.DayOfWeek != DayOfWeek.Sunday)
+                .WithMessage("Joined date is Saturday or Sunday. Please select a different date");
 
             RuleFor(x => x.Gender)
                 .IsInEnum()
