@@ -44,3 +44,15 @@ export namespace UserCreateReturnRequest {
     assignmentId: string;
   }
 }
+
+export namespace UserAcceptAssignment {
+  export interface Request {
+    assignmentId: string;
+  }
+}
+
+export namespace UserDeclineAssignment {
+  export interface Request {
+    assignmentId: string;
+  }
+}

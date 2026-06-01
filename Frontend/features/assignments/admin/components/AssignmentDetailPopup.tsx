@@ -1,19 +1,26 @@
 import { useGetAssignmentByIdQuery } from "@/features/assignments/admin/assignments.api";
-import { useEffect } from "react";
+import { displayAssignmentState } from "@/utils/assignment.utils";
+import { ReactNode, useEffect } from "react";
 
 function DetailRow({
   label,
   value,
+  render,
 }: {
   label: string;
   value?: string;
+  render?: (value: string) => ReactNode;
 }) {
   return (
     <div className="grid grid-cols-[140px_1fr] gap-4 py-2 text-sm">
       <div className="text-gray-700">{label}</div>
 
       <div className="text-gray-900 break-words">
-        {value || "-"}
+        {value
+          ? render
+            ? render(value)
+            : value
+          : "-"}
       </div>
     </div>
   );
@@ -124,6 +131,7 @@ export default function AssignmentDetailPopup({
               <DetailRow
                 label="State"
                 value={data.state}
+                render={(value) => displayAssignmentState(value)}
               />
 
               <DetailRow
