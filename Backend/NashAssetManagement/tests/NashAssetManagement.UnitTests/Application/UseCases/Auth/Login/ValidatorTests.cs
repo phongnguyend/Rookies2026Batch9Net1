@@ -49,7 +49,7 @@ public class ValidatorTests
     public async Task Validator_UsernameFormatInvalid_ShouldReturnError()
     {
         // Arrange
-        var request = new Request("duy123", "password123");
+        var request = new Request("duy123@", "password123");
 
         // Act
         var result = await _validator.ValidateAsync(request);
@@ -59,7 +59,7 @@ public class ValidatorTests
 
         Assert.Contains(result.Errors, error =>
             error.PropertyName == nameof(Request.Username) &&
-            error.ErrorMessage == "Username must contain only letters.");
+            error.ErrorMessage == "Username must contain only letters and digits.");
     }
     #endregion
 
