@@ -36,7 +36,7 @@ export default function Pagination({
   const getPaginationItems = (
     currentPage: number,
     totalPages: number,
-    siblingCount = 1
+    siblingCount = 0
   ): (number | "...")[] => {
     const totalVisiblePages = siblingCount * 2 + 5;
 
