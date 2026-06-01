@@ -1,6 +1,7 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
@@ -15,33 +16,45 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
     private readonly IRepository<Asset, Guid> _assetRepository;
     private readonly GetAssetsValidator _validator;
     private readonly ICurrentUser _currentUser;
+    private readonly ILogger<GetAssetsHandler> _logger;
 
     public GetAssetsHandler(
         IRepository<Asset, Guid> assetRepository,
         GetAssetsValidator validator,
-        ICurrentUser currentUser
+        ICurrentUser currentUser,
+        ILogger<GetAssetsHandler> logger
     )
     {
         _assetRepository = assetRepository;
         _validator = validator;
         _currentUser = currentUser;
+        _logger = logger;
     }
 
     public async Task<ErrorOr<PagedList<GetAssetsResponse>>> Handle(
         GetAssetsRequest request,
         CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
 
         var location = Guid.Parse(_currentUser.LocationId!);
         var normalizedSearch = request.Search?.Trim();
 
+        var categoryList = request.Categories?
+                .Split(",", StringSplitOptions.RemoveEmptyEntries);
+
         var stateList = request.States?
+            .Split(",", StringSplitOptions.RemoveEmptyEntries)
             .Select(s => Enum.Parse<AssetState>(s))
             .ToArray();
 
         var countSpec = new AssetCountSpec(
-            request.Categories,
+            categoryList,
             stateList,
             normalizedSearch,
             location);
@@ -56,21 +69,25 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
                 request.PageSize);
 
         var spec = new AssetListSpec(
-            request.Categories,
+            categoryList,
             stateList,
             normalizedSearch,
             request.SortBy,
             request.SortDirection,
             request.PageNumber,
             request.PageSize,
-            location);
+            location,
+            request.isCreatedNewAsset);
 
-        var assets = await _assetRepository.ListAsync(spec, cancellationToken);
-
-        return PagedList.Create(
-            assets,
-            totalCount,
-            request.PageNumber,
-            request.PageSize);
+        try
+        {
+            var assets = await _assetRepository.ListAsync(spec, cancellationToken);
+            return PagedList.Create(assets, totalCount, request.PageNumber, request.PageSize);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the asset.");
+            return GetAssetsErrors.AssetViewList;
+        }
     }
 }

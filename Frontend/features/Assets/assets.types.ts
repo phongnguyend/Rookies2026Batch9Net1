@@ -15,6 +15,7 @@ export interface GetAssetsRequest extends PaginationRequest {
   search?: string;
   sortBy?: string;
   sortDirection?: string;
+  isCreatedNewAsset?: boolean
 }
 
 export interface AssetListItem {
@@ -48,11 +49,38 @@ export interface GetAssetDetailResponse {
   history: AssetHistoryItem[];
 }
 
-
 // ─── Categories ───────────────────────────────────────────
 export interface CategoryItem {
   id: string;
   name: string;
+  prefix: string;
+}
+export interface CreateCategoryRequest {
+  categoryName: string;
+  categoryPrefix: string;
+}
+export interface CreateCategoryResponse {
+  id: string;
+  name: string;
+  prefix: string;
 }
 
 export type GetCategoriesResponse = CategoryItem[];
+
+// ─── Create Assets ───────────────────────────────────────────
+export interface CreateAssetRequest {
+  assetName: string;
+  specification: string;
+  installedDate: string;
+  state: string;
+  categoryId: string;
+}
+
+export interface CreateAssetResponse {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  category: string;
+  state: AssetState;
+  location: string;
+}
