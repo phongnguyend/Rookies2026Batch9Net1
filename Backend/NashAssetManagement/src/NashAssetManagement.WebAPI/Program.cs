@@ -44,12 +44,16 @@ try
         }
     });
 
-    // // Only uncomment if you need SeedData
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Log.Information("Begin seed development data.");
+    Log.Information("Begin database deletion.");
+    await dbContext.Database.EnsureDeletedAsync();
+    Log.Information("Database Deleted successfully.");
+    Log.Information("Begin database migration.");
     await dbContext.Database.MigrateAsync();
+    Log.Information("Database migrated successfully.");
     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
+    Log.Information("Begin seed development data.");
     await seeder.SeedDataAsync(scope.ServiceProvider);
     Log.Information("Seed development data finished successfully.");
 
