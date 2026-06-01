@@ -24,30 +24,10 @@ public class ViewAssetListController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(Summary = "View asset list.", Tags = [ControllerTags.Assets])]
     public async Task<IActionResult> GetAll(
-        [FromQuery] string? categories,
-        [FromQuery] string? states,
-        [FromQuery] string? search,
-        [FromQuery] string? sortBy,
-        [FromQuery] string? sortDirection,
-        [FromQuery] bool isCreatedNewAsset,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
+        [FromQuery] GetAssetsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var categoryList = categories?.Split(",", StringSplitOptions.RemoveEmptyEntries);
-        var stateList = states?.Split(",", StringSplitOptions.RemoveEmptyEntries); // ← no Enum.Parse
-
-        var result = await _sender.Send(
-            new GetAssetsRequest(
-                categoryList,
-                stateList,
-                sortBy,
-                sortDirection,
-                search,
-                isCreatedNewAsset,
-                pageNumber,
-                pageSize),
-                cancellationToken);
+        var result = await _sender.Send(request,cancellationToken);
 
         return result.Match(
             asset => Ok(asset),

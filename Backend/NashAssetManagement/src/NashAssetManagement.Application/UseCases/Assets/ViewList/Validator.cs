@@ -18,7 +18,7 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
         RuleFor(x => x.SortBy)
             .Must(s => s is null || AllowedSortBy.Contains(s.ToLower()))
             .WithMessage($"SortBy must be one of: {string.Join(", ", AllowedSortBy)}.");
-            
+
         RuleFor(x => x.Search)
             .MaximumLength(100)
             .WithMessage("Search must not exceed 100 characters.")
@@ -29,13 +29,25 @@ public class GetAssetsValidator : AbstractValidator<GetAssetsRequest>
             .Must(s => s is null || AllowedSortDirection.Contains(s.ToLower()))
             .WithMessage($"SortDirection must be one of: {string.Join(", ", AllowedSortDirection)}.");
 
-        RuleForEach(x => x.States)
-            .Must(s => Enum.TryParse<AssetState>(s, out _))
-            .WithMessage(s => $"State is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
+        RuleFor(x => x.States)
+            .Must(states => states == null || states
+                .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                .All(s => Enum.TryParse<AssetState>(s, out _)))
+            .WithMessage($"State is invalid. Must be one of: {string.Join(", ", Enum.GetNames<AssetState>())}.");
 
-        RuleForEach(x => x.Categories)
-            .MustAsync(CategoryExistsAsync)
-            .WithMessage((request, categoryName) => $"Category '{categoryName}' does not exist.");
+        RuleFor(x => x.Categories)
+            .MustAsync(async (categories, cancellationToken) =>
+            {
+                if (categories == null) return true;
+                var categoryList = categories.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                foreach (var category in categoryList)
+                {
+                    var exists = await CategoryExistsAsync(category, cancellationToken);
+                    if (!exists) return false;
+                }
+                return true;
+            })
+            .WithMessage(x => $"One or more categories do not exist.");
 
         RuleFor(x => x.PageNumber)
             .GreaterThanOrEqualTo(1)

@@ -187,7 +187,7 @@ public class ValidatorTests
     {
         var request = new GetAssetsRequest(
             null,
-            ["Available", "Assigned"],
+            "Available,Assigned",  // ← comma-separated string
             null,
             null,
             null,
@@ -203,7 +203,7 @@ public class ValidatorTests
     {
         var request = new GetAssetsRequest(
             null,
-            ["InvalidState"],
+            "InvalidState",  
             null,
             null,
             null,
@@ -212,18 +212,17 @@ public class ValidatorTests
         var result = await _validator.ValidateAsync(request);
 
         Assert.False(result.IsValid);
-
         Assert.Contains(result.Errors,
-            x => x.PropertyName == "States[0]");
+            x => x.PropertyName == "States");  
     }
 
-    // ─── Categories ───────────────────────────────────────
+    // ─── Categories ───────────────────────────────────────────
 
     [Fact]
     public async Task Validate_CategoryExists_ShouldPass()
     {
         var request = new GetAssetsRequest(
-            ["Laptop"],
+            "Laptop",  
             null,
             null,
             null,
@@ -245,7 +244,7 @@ public class ValidatorTests
             .ReturnsAsync(false);
 
         var request = new GetAssetsRequest(
-            ["Unicorn"],
+            "Unicorn",  
             null,
             null,
             null,
@@ -255,9 +254,8 @@ public class ValidatorTests
         var result = await _validator.ValidateAsync(request);
 
         Assert.False(result.IsValid);
-
         Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Category 'Unicorn' does not exist.");
+            x => x.ErrorMessage.Contains("do not exist"));  
     }
 
     // ─── Pagination ───────────────────────────────────────

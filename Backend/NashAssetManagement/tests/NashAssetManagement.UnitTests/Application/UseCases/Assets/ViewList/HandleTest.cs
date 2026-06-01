@@ -43,7 +43,7 @@ public class HandlerTests
         _handler = new GetAssetsHandler(
             _assetRepositoryMock.Object,
             _validator,
-            _currentUserMock.Object, 
+            _currentUserMock.Object,
             _loggerMock.Object);
     }
 
@@ -156,11 +156,11 @@ public class HandlerTests
     {
         var request = new GetAssetsRequest(
             Categories: null,
-            States: ["InvalidState"],
+            States: "InvalidState",      
             SortBy: null,
             SortDirection: null,
             Search: null,
-            isCreatedNewAsset: false);
+            isCreatedNewAsset: false);   
 
         await Assert.ThrowsAsync<ValidationException>(
             () => _handler.Handle(request, CancellationToken.None));
@@ -253,7 +253,7 @@ public class HandlerTests
     // ─── Pagination ──────────────────────────────────────
 
     [Fact]
-    public async Task  Handle_Pagination_ShouldReturnCorrectMetadata()
+    public async Task Handle_Pagination_ShouldReturnCorrectMetadata()
     {
         var request = new GetAssetsRequest(
             Categories: null,

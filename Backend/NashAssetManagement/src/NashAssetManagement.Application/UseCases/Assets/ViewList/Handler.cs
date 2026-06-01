@@ -45,12 +45,16 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         var location = Guid.Parse(_currentUser.LocationId!);
         var normalizedSearch = request.Search?.Trim();
 
+        var categoryList = request.Categories?
+                .Split(",", StringSplitOptions.RemoveEmptyEntries);
+
         var stateList = request.States?
+            .Split(",", StringSplitOptions.RemoveEmptyEntries)
             .Select(s => Enum.Parse<AssetState>(s))
             .ToArray();
 
         var countSpec = new AssetCountSpec(
-            request.Categories,
+            categoryList,
             stateList,
             normalizedSearch,
             location);
@@ -65,7 +69,7 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
                 request.PageSize);
 
         var spec = new AssetListSpec(
-            request.Categories,
+            categoryList,
             stateList,
             normalizedSearch,
             request.SortBy,
