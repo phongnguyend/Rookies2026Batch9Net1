@@ -38,5 +38,6 @@ namespace NashAssetManagement.Domain.Entities.Identity
         public ICollection<ReturnRequest> RequestedReturnRequests { get; set; } = [];
         public ICollection<ReturnRequest> AcceptedReturnRequests { get; set; } = [];
         public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+        public ExportReportJob? RequestedExportReportJob { get; set; }
     }
 }
