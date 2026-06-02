@@ -46,12 +46,16 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .WithMessage("Joined date is Saturday or Sunday. Please select a different date");
 
             RuleFor(x => x.Gender)
+                .NotNull()
+                .WithMessage("Gender is required.")
                 .IsInEnum()
-                .WithMessage("Gender is required.");
+                .WithMessage("Gender must be valid. Must be: Male or Female");
 
             RuleFor(x => x.UserType)
+                .NotNull()
+                .WithMessage("Type is required.")
                 .IsInEnum()
-                .WithMessage("Type is required.");
+                .WithMessage("Type must be valid. Must be: Admin or Staff");
         }
     }
 }

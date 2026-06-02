@@ -231,7 +231,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             result.ShouldHaveValidationErrorFor(x => x.Gender);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.Gender)
-                     && x.ErrorMessage == "Gender is required.");
+                     && x.ErrorMessage == "Gender must be valid. Must be: Male or Female");
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             result.ShouldHaveValidationErrorFor(x => x.UserType);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.UserType)
-                     && x.ErrorMessage == "Type is required.");
+                     && x.ErrorMessage == "Type must be valid. Must be: Admin or Staff");
         }
 
         [Fact]
