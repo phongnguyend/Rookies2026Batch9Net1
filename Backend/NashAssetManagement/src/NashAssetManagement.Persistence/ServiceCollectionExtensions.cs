@@ -20,7 +20,10 @@ namespace NashAssetManagement.Persistence
             {
                 // For development
                 options.EnableSensitiveDataLogging(true);
-                options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName));
+                options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName), options =>
+                {
+                    options.CommandTimeout(300);
+                });
             });
             services.AddRepositories();
             services.AddUnitOfWork();
