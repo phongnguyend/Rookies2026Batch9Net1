@@ -31,5 +31,25 @@ namespace NashAssetManagement.Domain.Entities.Core
         public DateTime? UpdatedAtUtc { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAtUtc { get; set; }
+
+        public void Decline(DateTime? declineTimestamp = null)
+        {
+            ArgumentNullException.ThrowIfNull(Asset);
+            if (Asset.State != AssetState.Assigned)
+                throw new InvalidOperationException($"Assignment contains asset with invalid state for declining, asset's state: {Asset.State}");
+            State = AssignmentState.Declined;
+            UpdatedAtUtc = declineTimestamp;
+            // Release asset back for other assignment to use
+            Asset.State = AssetState.Available;
+        }
+
+        public void Accept(DateTime? acceptTimestamp = null)
+        {
+            ArgumentNullException.ThrowIfNull(Asset);
+            if (Asset.State != AssetState.Assigned)
+                throw new InvalidOperationException($"Assignment contains asset with invalid state for accepting, asset's state: {Asset.State}");
+            State = AssignmentState.Accepted;
+            UpdatedAtUtc = acceptTimestamp;
+        }
     }
 }
