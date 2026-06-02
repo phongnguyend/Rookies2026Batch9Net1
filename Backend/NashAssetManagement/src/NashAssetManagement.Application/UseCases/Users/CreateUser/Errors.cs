@@ -15,8 +15,13 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 description: "Create user failed.");
 
         public static readonly Error UnexpectedError =
-            Error.Failure(
+            Error.Unexpected(
                 code: "Users.UnexpectedError",
                 description: "Failed to create user");
+                
+        public static readonly Error RoleNotFound =
+            Error.NotFound(
+                code: "Users.RoleNotFound",
+                description: "Role not found.");
     }
 }

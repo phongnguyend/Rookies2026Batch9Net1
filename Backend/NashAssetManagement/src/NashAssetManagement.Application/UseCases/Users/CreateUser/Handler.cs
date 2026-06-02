@@ -8,6 +8,7 @@ using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.Domain.Entities.Identity;
+using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.Users.CreateUser
 {
@@ -15,7 +16,8 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
         UserManager<User> userManager, 
         ICurrentUser currentUser,
         IValidator<Request> validator,
-        ILogger<Handler> logger
+        ILogger<Handler> logger,
+        RoleManager<Role> roleManager
     )
     : IRequestHandler<Request, ErrorOr<Response>>
     {
@@ -94,6 +96,18 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
             // generate passowrd
             var password = $"{username}@{request.DayOfBirth:ddMMyyyy}";
 
+            // find role
+            var roleId = await roleManager.Roles
+                .Where(x => x.Name == request.UserType.ToString())
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+
+            if (roleId == Guid.Empty)
+            {
+                return Errors.RoleNotFound;
+            }
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -111,7 +125,13 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 CreatedAtUtc = DateTime.UtcNow,
 
                 // IdentityUser required valid email
-                Email = $"{username}@{CompanyConstants.EmailDomain}"
+                Email = $"{username}@{CompanyConstants.EmailDomain}",
+
+                // assign role
+                UserRoles =
+                [
+                    new UserRole{ RoleId = roleId}
+                ]
             };
 
             try

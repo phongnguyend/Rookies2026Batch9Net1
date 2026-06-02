@@ -42,6 +42,29 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             return userManagerMock;
         }
 
+        private static Mock<RoleManager<Role>> CreateRoleManagerMock(List<Role>? roles = null)
+        {
+            var store = new Mock<IRoleStore<Role>>();
+
+            var roleManagerMock = new Mock<RoleManager<Role>>(
+                store.Object,
+                null!,
+                null!,
+                null!,
+                null!);
+
+            if (roles is not null)
+            {
+                var mockRoles = roles.BuildMockDbSet();
+
+                roleManagerMock
+                    .Setup(x => x.Roles)
+                    .Returns(mockRoles.Object);
+            }
+
+            return roleManagerMock;
+        }
+
         private static Mock<ICurrentUser> CreateCurrentUserMock(Guid? userId)
         {
             var currentUserMock = new Mock<ICurrentUser>();
@@ -77,6 +100,25 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             return nextDate;
         }
 
+        private static List<Role> DefaultRoles()
+        {
+            return
+            [
+                new()
+                {
+                    Id = Guid.Parse("20000000-0000-0000-0000-000000000001"),
+                    Name = UserType.Admin.ToString(),
+                    NormalizedName = UserType.Admin.ToString().ToUpperInvariant()
+                },
+                new()
+                {
+                    Id = Guid.Parse("20000000-0000-0000-0000-000000000002"),
+                    Name = UserType.Staff.ToString(),
+                    NormalizedName = UserType.Staff.ToString().ToUpperInvariant()
+                }
+            ];
+        }
+
         [Fact]
         public async Task CreateUserHandler_CurrentUserIdIsNull_ShouldReturnUserNotFound()
         {
@@ -85,12 +127,14 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(null);
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             var handler = new Handler(
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -126,12 +170,14 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(adminId);
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             var handler = new Handler(
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -155,12 +201,14 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(Guid.NewGuid());
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             var handler = new Handler(
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest() with { FirstName = "" };
 
@@ -207,12 +255,14 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                             Code = "CreateUserFailed",
                             Description = "Create user failed"
                         }));
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             var handler = new Handler(
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -252,6 +302,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(adminId);
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             userManagerMock
                 .Setup(x => x.CreateAsync(
@@ -263,7 +314,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -297,6 +349,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(adminId);
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             User? createdUser = null;
             string? createdPassword = null;
@@ -316,7 +369,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -335,6 +389,10 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             Assert.Equal(request.DayOfBirth, createdUser.DateOfBirth);
             Assert.Equal(request.UserType, createdUser.UserType);
             Assert.Equal(request.Gender, createdUser.Gender);
+            Assert.NotEmpty(createdUser.UserRoles);
+            Assert.Contains(
+                createdUser.UserRoles,
+                x => x.RoleId == Guid.Parse("20000000-0000-0000-0000-000000000002"));
             Assert.True(createdUser.IsFirstLogin);
             Assert.Equal($"binhnv@{CompanyConstants.EmailDomain}", createdUser.Email);
 
@@ -385,6 +443,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var currentUserMock = CreateCurrentUserMock(adminId);
             var validator = new Validators();
             var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             User? createdUser = null;
             string? createdPassword = null;
@@ -404,7 +463,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 userManagerMock.Object,
                 currentUserMock.Object,
                 validator,
-                loggerMock.Object);
+                loggerMock.Object,
+                roleManagerMock.Object);
 
             var request = ValidRequest();
 
@@ -419,9 +479,55 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             Assert.Equal("binhnv3", createdUser.UserName);
             Assert.Equal($"binhnv3@{request.DayOfBirth:ddMMyyyy}", createdPassword);
 
+            Assert.NotEmpty(createdUser.UserRoles);
+            Assert.Contains(
+                createdUser.UserRoles,
+                x => x.RoleId == Guid.Parse("20000000-0000-0000-0000-000000000002"));
+
             Assert.Equal("SD0005", result.Value.StaffCode);
             Assert.Equal("binhnv3", result.Value.UserName);
         }
 
+        [Fact]
+        public async Task CreateUserHandler_RoleDoesNotExist_ShouldReturnRoleNotFound()
+        {
+            var adminId = Guid.NewGuid();
+            var locationId = Guid.NewGuid();
+
+            var users = new List<User>
+            {
+                new()
+                {
+                    Id = adminId,
+                    StaffCode = "SD0001",
+                    UserName = "admin",
+                    LocationId = locationId
+                }
+            };
+
+            var userManagerMock = CreateUserManagerMock(users);
+            var currentUserMock = CreateCurrentUserMock(adminId);
+            var validator = new Validators();
+            var loggerMock = new Mock<ILogger<Handler>>();
+            var roleManagerMock = CreateRoleManagerMock([]);
+
+            var handler = new Handler(
+                userManagerMock.Object,
+                currentUserMock.Object,
+                validator,
+                loggerMock.Object,
+                roleManagerMock.Object);
+
+            var request = ValidRequest();
+
+            var result = await handler.Handle(request, CancellationToken.None);
+
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.RoleNotFound.Code, result.FirstError.Code);
+
+            userManagerMock.Verify(
+                x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()),
+                Times.Never);
+        }
     }
 }
