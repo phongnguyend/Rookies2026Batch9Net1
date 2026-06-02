@@ -46,16 +46,17 @@ try
 
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Log.Information("Begin database deletion.");
-    await dbContext.Database.EnsureDeletedAsync();
-    Log.Information("Database Deleted successfully.");
-    Log.Information("Begin database migration.");
+    var dataRemover = scope.ServiceProvider.GetRequiredService<DataResetService>();
+    Log.Information("Begin database migrating.");
     await dbContext.Database.MigrateAsync();
     Log.Information("Database migrated successfully.");
+    Log.Information("Begin removing data.");
+    await dataRemover.ResetDataAsync();
+    Log.Information("Data removed successfully.");
     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
-    Log.Information("Begin seed development data.");
+    Log.Information("Begin seeding development data.");
     await seeder.SeedDataAsync(scope.ServiceProvider);
-    Log.Information("Seed development data finished successfully.");
+    Log.Information("Seed development data successfully.");
 
     app.UseCors();
     app.UseAuthentication();

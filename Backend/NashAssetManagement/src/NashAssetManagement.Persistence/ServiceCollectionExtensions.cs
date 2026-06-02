@@ -20,7 +20,10 @@ namespace NashAssetManagement.Persistence
             {
                 // For development
                 options.EnableSensitiveDataLogging(true);
-                options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName));
+                options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName), options =>
+                {
+                    options.CommandTimeout(300);
+                });
             });
             services.AddRepositories();
             services.AddUnitOfWork();
@@ -47,6 +50,7 @@ namespace NashAssetManagement.Persistence
         private static IServiceCollection AddSeedDevelopmentData(this IServiceCollection services)
         {
             services.AddScoped<NamDevelopmentSeedData>();
+            services.AddScoped<DataResetService>();
             return services;
         }
     }
