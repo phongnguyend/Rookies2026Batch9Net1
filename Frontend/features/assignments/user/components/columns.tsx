@@ -4,6 +4,7 @@ import DataTableButtonActions from "@/features/shared/components/DataTableButton
 import { formatDate } from "@/utils/datetime.utils";
 import { AssignmentState } from "@/lib/api/base.types";
 import { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
+import { Check, RotateCcw, X } from "lucide-react";
 
 export function createColumns(handlers: {
   onAcceptClick: (
@@ -80,6 +81,9 @@ export function createColumns(handlers: {
             onAccept={handlers.onAcceptClick}
             onDecline={handlers.onDeclineClick}
             onReturn={handlers.onReturnClick}
+            acceptIcon={<Check className="text-primary" strokeWidth={3} size={20}/>}
+            declineIcon={<X className="text-black" strokeWidth={3} size={20}/>}
+            returnIcon={<RotateCcw size={20} strokeWidth={3}/>}
           />
         );
       },
