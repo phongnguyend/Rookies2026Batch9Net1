@@ -1,4 +1,4 @@
-﻿namespace NashAssetManagement.WebAPI.Controllers
+namespace NashAssetManagement.WebAPI.Controllers
 {
     public static class ControllerTags
     {
@@ -8,5 +8,6 @@
         public const string Authentication = nameof(Authentication);
         public const string Categories = nameof(Categories);
         public const string Users = nameof(Users);
+        public const string Reports = nameof(Reports);
     }
 }

@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 interface DataTableButtonActionsProps<T> {
   row: T;
   onAccept?: (row: T) => void;
@@ -9,6 +11,9 @@ interface DataTableButtonActionsProps<T> {
   acceptBtnTestId?: string;
   declineBtnTestId?: string;
   returnBtnTestId?: string;
+  acceptIcon?: ReactNode;
+  declineIcon?: ReactNode;
+  returnIcon?: ReactNode;
 }
 
 export default function DataTableButtonActions<T>({
@@ -22,6 +27,9 @@ export default function DataTableButtonActions<T>({
   acceptBtnTestId = "btnAcceptAssignment",
   declineBtnTestId = "btnDeclineAssignment",
   returnBtnTestId = "btnReturnAssignment",
+  acceptIcon = "✓",
+  declineIcon = "⊗",
+  returnIcon = "↻",
 }: DataTableButtonActionsProps<T>) {
   return (
     <div className="flex items-center gap-3">
@@ -37,7 +45,7 @@ export default function DataTableButtonActions<T>({
           className="text-green-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Accept"
         >
-          ✓
+          {acceptIcon}
         </button>
       )}
 
@@ -53,7 +61,7 @@ export default function DataTableButtonActions<T>({
           className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Decline"
         >
-          ⊗
+          {declineIcon}
         </button>
       )}
 
@@ -69,7 +77,7 @@ export default function DataTableButtonActions<T>({
           className="text-blue-600 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
           title="Return"
         >
-          ↻
+          {returnIcon}
         </button>
       )}
     </div>
