@@ -1,5 +1,7 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import {
+  CreateUserRequest,
+  CreateUserResponse,
   GetUserByIdResponse,
   GetUsersRequest,
   GetUsersResponse,
@@ -30,7 +32,21 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+
+    createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
+      query: (body) => ({
+        url: "v1/users",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+
   }),
 });
 
-export const { useGetUsersQuery, useGetUserByIdQuery } = usersApi;
+export const { 
+  useGetUsersQuery, 
+  useGetUserByIdQuery,
+  useCreateUserMutation,
+} = usersApi;

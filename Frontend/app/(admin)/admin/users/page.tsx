@@ -359,9 +359,9 @@ export default function UsersPage() {
                 type="button"
                 data-testid="btnCreateUser"
                 onClick={() => {
-                  // TODO: navigate to create user page, e.g. router.push('/admin/users/create')
+                  router.push('/admin/users/create') // We need a hover nigga!            
                 }}
-                className="rounded bg-primary px-5 py-2 font-semibold text-white"
+                className="rounded bg-primary px-5 py-2 font-semibold text-white transition-colors duration-200 hover:opacity-90"
               >
                 Create new user
               </button>

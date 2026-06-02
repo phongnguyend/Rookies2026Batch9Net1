@@ -5,6 +5,14 @@ export enum UserRoles {
   Staff = "Staff"
 }
 
+export enum Gender {
+  Male = "Male",
+  Female = "Female",
+  NonBinary = "NonBinaryTree",
+  Other = "Order",
+  PreferNotToSay = "PreferNotToSayImFromLGBT"
+}
+
 export interface UserRow {
   id: string;
   staffCode: string;
@@ -41,3 +49,24 @@ export interface GetUsersRequest {
 export interface GetUsersResponse extends PaginationResponse<UserRow> {}
 
 export type GetUserByIdResponse = UserDetail;
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  dayOfBirth: string;
+  joinedDate: string;
+  gender: Gender;
+  userType: UserRoles;
+}
+
+export interface CreateUserResponse {
+  id: string;
+  staffCode: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  joinedDate: string;
+  userType: UserRoles;
+  gender: Gender;
+}
