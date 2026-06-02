@@ -50,6 +50,7 @@ namespace NashAssetManagement.Persistence
         private static IServiceCollection AddSeedDevelopmentData(this IServiceCollection services)
         {
             services.AddScoped<NamDevelopmentSeedData>();
+            services.AddScoped<DataResetService>();
             return services;
         }
     }
