@@ -58,7 +58,6 @@ function AssetsContent() {
   const {
     data: categoriesData,
     isLoading: categoriesLoading,
-    isError,
   } = useGetCategoriesQuery();
 
   const { data, isLoading } = useGetAssetsQuery({
@@ -119,7 +118,7 @@ function AssetsContent() {
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(``); // TODO: update route as needed
+    router.push(`/admin/assets/edit/${row.id}`);
   };
 
   // ─── Columns ───────────────────────────────────

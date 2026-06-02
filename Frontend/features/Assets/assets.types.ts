@@ -84,3 +84,22 @@ export interface CreateAssetResponse {
   state: AssetState;
   location: string;
 }
+
+export interface EditAssetRequest {
+  assetId: string;
+  assetName: string;
+  specification: string;
+  installedDate: string;
+  state: string;
+}
+
+export interface EditAssetResponse {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  specification: string;
+  installedAtUtc: string;
+  state: string;
+  category: string;
+  location: string;
+}

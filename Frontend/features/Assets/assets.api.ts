@@ -8,6 +8,8 @@ import type {
   CreateAssetResponse,
   CreateCategoryRequest,
   CreateCategoryResponse,
+  EditAssetResponse,
+  EditAssetRequest,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
@@ -70,6 +72,19 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       invalidatesTags: ["Asset"],
     }),
 
+
+    editAsset: builder.mutation<
+      EditAssetResponse,
+      EditAssetRequest
+    >({
+      query: (body) => ({
+        url: "v1/assets",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Asset"],
+    }),
+
   }),
 });
 
@@ -79,4 +94,5 @@ export const {
   useGetCategoriesQuery,
   useCreateAssetMutation,
   useCreateCategoryMutation,
+  useEditAssetMutation
 } = assetsApi;
