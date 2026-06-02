@@ -7,8 +7,8 @@ export interface ColumnDef<T> {
   render?: (row: T, index: number) => ReactNode;
   className?: string;
   sortable?: boolean;
-  TitleColumnTestId?: string;
-  ColumnTestId?: (row: T, index: number) => string;
+  headerTestId?: string;
+  cellTestId?: (row: T, index: number) => string;
 }
 
 export interface SortItem {
@@ -86,7 +86,7 @@ export default function AssignmentTable<T>({
 
   return (
     <div className="w-full overflow-x-auto rounded border border-gray-200">
-      <table className="w-full min-w-[600px] text-left text-sm">
+      <table className="w-full min-w-[600px] text-left text-sm table-fixed">
         <thead>
           <tr className="border-b border-gray-400 bg-gray-50">
             {columns.map((column) => {
@@ -109,7 +109,7 @@ export default function AssignmentTable<T>({
                       : ""
                     }
                   `}
-                  data-testid={column.TitleColumnTestId}  //For column header in table
+                  data-testid={column.headerTestId}  //For column header in table
                 >
                   <div className="inline-flex items-center gap-1">
                     {column.header}
@@ -166,8 +166,8 @@ export default function AssignmentTable<T>({
                 {columns.map((column) => (
                   <td
                     key={String(column.key)}
-                    data-testid={column.ColumnTestId?.(row, rowIndex)} //For colum value in table
-                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${column.className ?? ""}`}
+                    data-testid={column.cellTestId?.(row, rowIndex)} //For colum value in table
+                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm truncate ${column.className ?? ""}`}
                   >
                     {column.render
                       ? column.render(row, rowIndex)
