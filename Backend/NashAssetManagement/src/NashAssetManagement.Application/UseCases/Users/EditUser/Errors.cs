@@ -28,5 +28,30 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
             Error.NotFound(
                 "EditUser.NotFound",
                 "User has no location assigned.");
+
+        public static Error AdminNotAllowedToEditOwnType() =>
+            Error.Conflict(
+                "EditUser.Conflict",
+                "Admin is not allowed to edit their own user type.");
+                
+        public static Error InvalidUserType(string userType) =>
+            Error.Validation(
+                "EditUser.InvalidUserType",
+                $"Invalid user type: {userType}");
+
+        public static Error FailedToUpdateUserRole(string userId, string newType) =>
+            Error.Failure(
+                "EditUser.FailedToUpdateUserRole",
+                $"Failed to update user role for user with ID {userId} to {newType}.");
+
+        public static Error FailedToUpdateUser(string userId) =>
+            Error.Failure(
+                "EditUser.FailedToUpdateUser",
+                $"Failed to update user with ID {userId}.");
+
+        public static Error UnexpectedErrorOccurred() =>
+            Error.Failure(
+                "EditUser.UnexpectedErrorOccurred",
+                "An unexpected error occurred while trying to edit user. Please try again.");
     }
 }

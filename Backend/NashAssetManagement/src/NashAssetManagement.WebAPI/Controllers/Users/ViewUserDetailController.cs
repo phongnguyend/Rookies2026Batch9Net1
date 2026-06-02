@@ -23,7 +23,10 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation(Tags = [ControllerTags.Users])]
+        [SwaggerOperation(
+            Tags = [ControllerTags.Users],
+            Summary = "Allow admin to view user detail information."
+        )]
         public async Task<IActionResult> GetDetail(string id)
         {
             var result = await _sender.Send(new Request(id));

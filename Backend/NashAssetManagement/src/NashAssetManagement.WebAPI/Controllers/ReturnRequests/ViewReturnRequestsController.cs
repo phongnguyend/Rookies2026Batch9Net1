@@ -26,7 +26,10 @@ namespace NashAssetManagement.WebAPI.Controllers.ReturnRequests
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation(Tags = [ControllerTags.ReturningRequests])]
+        [SwaggerOperation(
+            Tags = [ControllerTags.ReturningRequests],
+            Summary = "Allow admin to view return requests."
+        )]
         public async Task<IActionResult> ViewReturnRequests(
             [FromQuery] Request request,
             CancellationToken cancellationToken
