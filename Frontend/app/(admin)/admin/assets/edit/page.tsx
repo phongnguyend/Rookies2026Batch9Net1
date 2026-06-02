@@ -66,6 +66,39 @@ export default function EditAssetPage() {
     });
   }
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+
+    const nameRegex = /^[\p{L}\p{N}\s\-_/]+$/u;
+    const specRegex = /^[\p{L}\p{N}\s]+$/u;
+
+    if (!form.assetName.trim()) {
+      errors.assetName = "Asset name is required.";
+    } else if (form.assetName.length > 100) {
+      errors.assetName = "Asset name must not exceed 100 characters.";
+    } else if (!nameRegex.test(form.assetName)) {
+      errors.assetName =
+        "Asset name cannot contain special characters or emojis.";
+    }
+
+    if (!form.specification.trim()) {
+      errors.specification = "Specification is required.";
+    } else if (form.specification.length > 500) {
+      errors.specification = "Specification must not exceed 500 characters.";
+    } else if (!specRegex.test(form.specification)) {
+      errors.specification =
+        "Specification cannot contain special characters or emojis.";
+    }
+
+    if (!form.installedDate) {
+      errors.installedDate = "Installed date is required.";
+    }
+
+    setFieldErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
   const isFormValid =
     form.assetName.trim() !== "" &&
     form.specification.trim() !== "" &&
@@ -87,33 +120,6 @@ export default function EditAssetPage() {
       formatDate(form.installedDate!) !== asset.installedAtUtc.split("T")[0]);
 
   const canSave = isFormValid && isChanged && !isEditing;
-
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-
-    if (!form.assetName.trim()) {
-      errors.assetName = "Asset name is required.";
-    } else if (form.assetName.length > 100) {
-      errors.assetName = "Asset name must not exceed 100 characters.";
-    }
-
-    if (!form.specification.trim()) {
-      errors.specification = "Specification is required.";
-    } else if (form.specification.length > 500) {
-      errors.specification = "Specification must not exceed 500 characters.";
-    }
-
-    if (!form.installedDate) {
-      errors.installedDate = "Installed date is required.";
-    } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-    }
-
-    setFieldErrors(errors);
-
-    return Object.keys(errors).length === 0;
-  };
 
   const handleSave = async () => {
     setServerError(null);
@@ -207,9 +213,9 @@ export default function EditAssetPage() {
               {form.assetName.length}/100
             </span>
           </div>
-          {fieldErrors.specification && (
+          {fieldErrors.assetName && (
             <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.specification}
+              {fieldErrors.assetName}
             </p>
           )}
         </div>
@@ -253,7 +259,8 @@ export default function EditAssetPage() {
 
             <span
               className={
-                form.specification.length === 0 || form.specification.length === 500
+                form.specification.length === 0 ||
+                form.specification.length === 500
                   ? "text-red-500"
                   : "text-gray-500"
               }
