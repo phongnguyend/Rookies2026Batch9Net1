@@ -75,10 +75,17 @@ export default function CategoryDropdown({
       (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase(),
     );
 
+    const categoryNameRegex = /^[A-Za-z ]+$/;
+    const prefixRegex = /^[A-Z]{2}$/;
+
     const toastErrors: string[] = [];
 
     if (!parsedName) {
       toastErrors.push("Category name is required.");
+    } else if (!categoryNameRegex.test(parsedName)) {
+      toastErrors.push(
+        "Category name must contain only Letters in English.",
+      );
     } else if (nameExists) {
       toastErrors.push(
         "Category is already existed. Please enter a different category",
@@ -87,6 +94,8 @@ export default function CategoryDropdown({
 
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
+    } else if (!prefixRegex.test(parsedPrefix)) {
+      toastErrors.push("Prefix must contain exactly 2 English letters.");
     } else if (prefixExists) {
       toastErrors.push(
         "Prefix is already existed. Please enter a different prefix",
@@ -119,8 +128,7 @@ export default function CategoryDropdown({
     } catch {
       dispatch(
         enqueueToast({
-          message:
-            "Category is already existed. Please enter a different category name.",
+          message: "Somethings is wrong please try again.",
           type: ToastType.Error,
         }),
       );
@@ -128,10 +136,10 @@ export default function CategoryDropdown({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full" >
+    <div ref={containerRef} className="relative w-full">
       {/* Trigger */}
       <button
-      data-testid ="ddlCategory"
+        data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`btn w-full justify-between ${

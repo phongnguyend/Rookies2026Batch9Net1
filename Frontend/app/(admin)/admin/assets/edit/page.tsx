@@ -143,7 +143,7 @@ export default function EditAssetPage() {
       router.push("/admin/assets");
     } catch (err) {
       const apiError = err as ApiErrorResponse;
-
+      
       if (apiError?.status === 400 || apiError?.status === 409) {
         setServerError(apiError.detail);
       } else {
