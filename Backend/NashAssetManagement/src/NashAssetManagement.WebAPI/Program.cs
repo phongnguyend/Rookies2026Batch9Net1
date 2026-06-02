@@ -45,7 +45,11 @@ try
     });
 
     using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var dataRemover = scope.ServiceProvider.GetRequiredService<DataResetService>();
+    Log.Information("Begin database migrating.");
+    await dbContext.Database.MigrateAsync();
+    Log.Information("Database migrated successfully.");
     Log.Information("Begin removing data.");
     await dataRemover.ResetDataAsync();
     Log.Information("Data removed successfully.");
