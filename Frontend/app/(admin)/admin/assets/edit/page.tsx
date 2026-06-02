@@ -9,6 +9,7 @@ import {
 import { AssetState } from "@/features/Assets/assets.types";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
+import { setPinnedEditedAsset } from "@/features/Assets/editAssetStore";
 
 const EDITABLE_STATES = [
   {
@@ -79,14 +80,11 @@ export default function EditAssetPage() {
   };
 
   const isChanged =
-  asset &&
-  (
-    form.assetName !== asset.name ||
-    form.specification !== asset.specification ||
-    form.state !== asset.state ||
-    formatDate(form.installedDate!) !==
-      asset.installedAtUtc.split("T")[0]
-  );
+    asset &&
+    (form.assetName !== asset.name ||
+      form.specification !== asset.specification ||
+      form.state !== asset.state ||
+      formatDate(form.installedDate!) !== asset.installedAtUtc.split("T")[0]);
 
   const canSave = isFormValid && isChanged && !isEditing;
 
@@ -125,13 +123,22 @@ export default function EditAssetPage() {
     }
 
     try {
-      await editAsset({
+      const result = await editAsset({
         assetId: assetId!,
         assetName: form.assetName.trim(),
         specification: form.specification.trim(),
         installedDate: formatDate(form.installedDate),
         state: form.state,
       }).unwrap();
+
+      setPinnedEditedAsset({
+        id: result.id,
+        assetCode: result.assetCode,
+        name: result.assetName,
+        category: result.category,
+        state: form.state,
+        location: result.location,
+      });
 
       router.push("/admin/assets");
     } catch (err) {
@@ -190,9 +197,7 @@ export default function EditAssetPage() {
 
             <span
               className={
-                form.assetName.length === 100
-                  ? "text-red-500"
-                  : "text-gray-500"
+                form.assetName.length === 100 ? "text-red-500" : "text-gray-500"
               }
             >
               {form.assetName.length}/100

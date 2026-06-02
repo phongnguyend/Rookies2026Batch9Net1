@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { showModal } from "@/features/shared/modal.slice";
@@ -18,6 +18,10 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+import {
+  getPinnedEditedAsset,
+  clearPinnedEditedAsset,
+} from "@/features/Assets/editAssetStore";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -55,10 +59,8 @@ function AssetsContent() {
     default_states.every((s) => selectedStates.includes(s));
 
   // ─── API ───────────────────────────────────────
-  const {
-    data: categoriesData,
-    isLoading: categoriesLoading,
-  } = useGetCategoriesQuery();
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetCategoriesQuery();
 
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
@@ -71,7 +73,27 @@ function AssetsContent() {
     isCreatedNewAsset,
   });
 
-  const displayItems = data?.items ?? [];
+  // ─── Display Item ───────────────────────────────────────
+  // ─── Read pinned edited asset on mount ─────────
+  const [pinnedEditedAsset] = useState<AssetListItem | null>(() =>
+    getPinnedEditedAsset(),
+  );
+
+  // ─── Clear when user leaves assets page ────────
+  useEffect(() => {
+    return () => {
+      clearPinnedEditedAsset(); // ← clears on unmount (tab switch)
+    };
+  }, []);
+
+  const displayItems = (() => {
+    const items = data?.items ?? [];
+    if (!pinnedEditedAsset || pageNumber !== 1) return items;
+    return [
+      pinnedEditedAsset,
+      ...items.filter((i) => i.id !== pinnedEditedAsset.id),
+    ];
+  })();
 
   const categoryOptions =
     categoriesData?.map((c) => ({

@@ -24,7 +24,7 @@ public class EditAssetController : BaseApiController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [SwaggerOperation(Summary = "Edit a asset.",Tags = [ControllerTags.Assets])]
-    public async Task<IActionResult> Create(
+    public async Task<IActionResult> Edit(
         [FromBody] EditAssetRequest request,
         CancellationToken cancellationToken)
     {
