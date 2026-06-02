@@ -12,10 +12,8 @@ namespace NashAssetManagement.WebAPI.Controllers.Reports;
 [ApiVersion(1)]
 [Authorize(Roles = ApplicationRole.Admin)]
 [Route("api/v{version:apiVersion}/report")]
-public class ReportViewController : BaseApiController
+public class ReportViewController(ISender sender) : BaseApiController(sender)
 {
-    public ReportViewController(ISender sender) : base(sender) { }
-
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -32,7 +30,7 @@ public class ReportViewController : BaseApiController
         var result = await _sender.Send(request, cancellationToken);
 
         return result.Match(
-            response => Ok(response),
+            Ok,
             errors => errors.ToProblem()
         );
     }
