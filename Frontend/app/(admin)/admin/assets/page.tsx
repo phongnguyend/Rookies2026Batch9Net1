@@ -118,7 +118,7 @@ function AssetsContent() {
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/admin/assets/edit/${row.id}`);
+    router.push(`/admin/assets/edit?id=${row.id}`);
   };
 
   // ─── Columns ───────────────────────────────────
