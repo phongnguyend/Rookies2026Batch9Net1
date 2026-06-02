@@ -41,7 +41,7 @@ export default function SearchInput({
       <button
         type="button"
         onClick={() => onSearch?.(value)}
-        className="flex h-full w-10 items-center justify-center border-l border-gray-400 text-gray-600 hover:bg-gray-50"
+        className="flex h-full w-10 items-center justify-center rounded border-l border-gray-400 text-gray-600 hover:bg-gray-50"
         data-testid={btnSearchTestId}
       >
         🔍
