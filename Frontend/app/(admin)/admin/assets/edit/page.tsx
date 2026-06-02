@@ -143,7 +143,7 @@ export default function EditAssetPage() {
       router.push("/admin/assets");
     } catch (err) {
       const apiError = err as ApiErrorResponse;
-      
+
       if (apiError?.status === 400 || apiError?.status === 409) {
         setServerError(apiError.detail);
       } else {
@@ -187,7 +187,9 @@ export default function EditAssetPage() {
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.assetName.length === 100 ? (
+            {form.assetName.length === 0 ? (
+              <span className="text-red-500">Asset Name is required.</span>
+            ) : form.assetName.length === 100 ? (
               <span className="text-orange-500">
                 Maximum characters is 100.
               </span>
@@ -197,7 +199,9 @@ export default function EditAssetPage() {
 
             <span
               className={
-                form.assetName.length === 100 ? "text-red-500" : "text-gray-500"
+                form.assetName.length === 0 || form.assetName.length === 100
+                  ? "text-red-500"
+                  : "text-gray-500"
               }
             >
               {form.assetName.length}/100
@@ -237,7 +241,9 @@ export default function EditAssetPage() {
             className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.specification.length === 500 ? (
+            {form.specification.length === 0 ? (
+              <span className="text-red-500">Specification is required.</span>
+            ) : form.specification.length === 500 ? (
               <span className="text-orange-500">
                 Maximum characters is 500.
               </span>
@@ -247,7 +253,7 @@ export default function EditAssetPage() {
 
             <span
               className={
-                form.specification.length === 500
+                form.specification.length === 0 || form.specification.length === 500
                   ? "text-red-500"
                   : "text-gray-500"
               }
