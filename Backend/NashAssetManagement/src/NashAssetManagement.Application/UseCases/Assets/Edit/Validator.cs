@@ -15,10 +15,6 @@ public class EditAssetValidator : AbstractValidator<EditAssetRequest>
             .NotEmpty().WithMessage("Specification is required.")
             .MaximumLength(500).WithMessage("Specification must not exceed 500 characters.");
 
-        RuleFor(x => x.InstalledDate)
-            .Must(date => date.Date <= DateTime.UtcNow.Date)
-            .WithMessage("Installed date cannot be in the future.");
-
         RuleFor(x => x.State)
             .NotEqual(AssetState.Assigned)
             .WithMessage("State cannot be Assigned.");

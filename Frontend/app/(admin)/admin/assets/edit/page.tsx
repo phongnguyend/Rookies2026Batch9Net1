@@ -110,10 +110,6 @@ export default function EditAssetPage() {
     } else {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
-      if (form.installedDate > today) {
-        errors.installedDate = "Installed date cannot be in the future.";
-      }
     }
 
     setFieldErrors(errors);
