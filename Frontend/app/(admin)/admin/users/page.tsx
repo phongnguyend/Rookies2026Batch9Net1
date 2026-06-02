@@ -275,7 +275,7 @@ export default function UsersPage() {
             testId="btnEditUser"
             onClick={(event) => {
               event.stopPropagation();
-              // Navigate to edit user page for user.id
+              router.push(`/admin/users/edit?userId=${user.id}`);
             }}
           >
             <EditIcon />

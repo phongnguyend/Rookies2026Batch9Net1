@@ -1,6 +1,9 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import {
+  EditUserRequest,
+  EditUserResponse,
   GetUserByIdResponse,
+  GetUserForEditResponse,
   GetUsersRequest,
   GetUsersResponse,
 } from "./users.types";
@@ -30,7 +33,27 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+    getUserForEdit: builder.query<GetUserForEditResponse, string>({
+      query: (id) => ({
+        url: `v1/users/${id}/edit`,
+        method: "GET",
+      }),
+      providesTags: ["Users"],
+    }),
+    editUser: builder.mutation<EditUserResponse, EditUserRequest>({
+      query: ({ userId, ...body }) => ({
+        url: `v1/users/${userId}/edit`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useGetUserByIdQuery } = usersApi;
+export const {
+  useEditUserMutation,
+  useGetUserForEditQuery,
+  useGetUserByIdQuery,
+  useGetUsersQuery,
+} = usersApi;

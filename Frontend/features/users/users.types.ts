@@ -5,6 +5,11 @@ export enum UserRoles {
   Staff = "Staff"
 }
 
+export enum Gender {
+  Male = "Male",
+  Female = "Female"
+}
+
 export interface UserRow {
   id: string;
   staffCode: string;
@@ -41,3 +46,26 @@ export interface GetUsersRequest {
 export interface GetUsersResponse extends PaginationResponse<UserRow> {}
 
 export type GetUserByIdResponse = UserDetail;
+
+export interface GetUserForEditResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  gender: Gender;
+  joinedDate: string;
+  userType: UserRoles;
+  isCurrentUser: boolean;
+}
+
+export interface EditUserRequest {
+  userId: string;
+  dateOfBirth: string;
+  gender: Gender;
+  joinedDate: string;
+  type: UserRoles;
+}
+
+export interface EditUserResponse {
+  id: string;
+}
