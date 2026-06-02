@@ -3,6 +3,7 @@ using ErrorOr;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
+using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.UseCases.Report.View;
 using NashAssetManagement.Domain.Entities.Core;
@@ -15,22 +16,25 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Report.View
     {
         private readonly Mock<IRepository<Category, Guid>> _mockCategoryRepo;
         private readonly Mock<IValidator<Request>> _mockValidator;
+        private readonly Mock<ICurrentUser> _mockUser;
         private readonly Handler _handler;
 
         public HandlerTests()
         {
             _mockCategoryRepo = new Mock<IRepository<Category, Guid>>();
             _mockValidator = new Mock<IValidator<Request>>();
+            _mockUser = new Mock<ICurrentUser>();
 
             _handler = new Handler(
                 _mockCategoryRepo.Object,
-                _mockValidator.Object
+                _mockValidator.Object,
+                _mockUser.Object
             );
         }
 
         [Fact]
         [Trait("UT", "ViewReport")]
-        public async Task Handle_ValidationFails_ShouldThrowValidationException()
+        public async Task Handle_ValidationFails_ThrowValidationException()
         {
             // Arrange
             var request = new Request(10, 0, SortDirection.Asc, SortBy.Category);
@@ -52,6 +56,47 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Report.View
 
         [Fact]
         [Trait("UT", "ViewReport")]
+        public async Task Handle_UnauthorizedUser_ShouldReturnUnauthorizedError()
+        {
+            // Arrange
+            var request = new Request(10, 1, SortDirection.Asc, SortBy.Category);
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.IsAuthenticated).Returns(false);
+
+            // Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.UnauthorizedUser, result.FirstError);
+        }
+
+        [Fact]
+        [Trait("UT", "ViewReport")]
+        public async Task Handle_UnidentifiedUser_ShouldReturnUnidentifiedError()
+        {
+            // Arrange
+            var request = new Request(10, 1, SortDirection.Asc, SortBy.Category);
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.IsAuthenticated).Returns(true);
+            _mockUser.Setup(u => u.UserId).Returns((Guid?)null);
+
+            // Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.UnidentifiedUser, result.FirstError);
+        }
+
+        [Fact]
+        [Trait("UT", "ViewReport")]
         public async Task Handle_ValidRequest_ShouldReturnReportSuccessfully()
         {
             // Arrange
@@ -59,6 +104,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Report.View
             _mockValidator
                 .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.IsAuthenticated).Returns(true);
+            _mockUser.Setup(u => u.UserId).Returns(Guid.NewGuid());
 
             var categoryId = Guid.NewGuid();
             var categories = new List<Category>
