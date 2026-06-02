@@ -5,9 +5,13 @@ namespace NashAssetManagement.Application.UseCases.Report.View
 {
     public sealed class ReportCategorySpecification : Specification<Category>
     {
-        public ReportCategorySpecification()
+        public ReportCategorySpecification(Guid LocationId)
         {
-            Query.Include(c => c.Assets).AsNoTracking().AsSplitQuery();
+            // Only get from the the assets that are in the location of the same Admin
+            Query
+                .Include(c => c.Assets)
+                .Where(c => c.Assets.Any(a => a.LocationId == LocationId))
+                .AsNoTracking().AsSplitQuery();
         }
     }
 }

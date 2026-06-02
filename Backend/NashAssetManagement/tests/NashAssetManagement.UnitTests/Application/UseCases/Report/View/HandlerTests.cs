@@ -101,12 +101,15 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Report.View
         {
             // Arrange
             var request = new Request(10, 1, SortDirection.Asc, SortBy.Category);
+            var locationId = Guid.NewGuid();
+
             _mockValidator
                 .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
             _mockUser.Setup(u => u.IsAuthenticated).Returns(true);
             _mockUser.Setup(u => u.UserId).Returns(Guid.NewGuid());
+            _mockUser.Setup(u => u.LocationId).Returns(locationId.ToString());
 
             var categoryId = Guid.NewGuid();
             var categories = new List<Category>
@@ -118,9 +121,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Report.View
                     Prefix = "LA",
                     Assets = new List<Asset>
                     {
-                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Available },
-                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Assigned },
-                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Recycled }
+                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Available, LocationId = locationId},
+                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Assigned, LocationId = locationId},
+                        new() { Id = Guid.NewGuid(), CategoryId = categoryId, State = AssetState.Recycled, LocationId = locationId}
                     }
                 }
             };
