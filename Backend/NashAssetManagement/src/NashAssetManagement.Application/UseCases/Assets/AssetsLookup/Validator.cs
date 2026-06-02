@@ -3,7 +3,7 @@ using NashAssetManagement.Application.Common.Validators;
 
 namespace NashAssetManagement.Application.UseCases.Assets.AssetsLookup
 {
-    internal class Validator
+    public class Validator
         : AbstractValidator<Request>
     {
         public Validator()
