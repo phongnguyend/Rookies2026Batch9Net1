@@ -15,6 +15,7 @@ import AssignmentDetailPopup from "../../../../features/assignments/admin/compon
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
+import { CircleX, Pencil, RotateCcw } from "lucide-react";
 
 const limit = 10;
 
@@ -150,6 +151,9 @@ export default function AssignmentsPage() {
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeclineAssignment"
             returnBtnTestId="btnReturnAssignment"
+            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3}/>}
+            declineIcon={<CircleX size={20} strokeWidth={3}/>}
+            returnIcon={<RotateCcw size={20} strokeWidth={3}/>}
           />
         );
       },
