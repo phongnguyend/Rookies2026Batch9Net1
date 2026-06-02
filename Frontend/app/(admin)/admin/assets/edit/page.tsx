@@ -24,7 +24,7 @@ const EDITABLE_STATES = [
   {
     value: AssetState.WaitingForRecycling,
     label: "Waiting for recycling",
-    testId: "rdoWaitingForRecycling",
+    testId: "rdoWaiting",
   },
   {
     value: AssetState.Recycled,
@@ -77,6 +77,18 @@ export default function EditAssetPage() {
 
     return `${year}-${month}-${day}`;
   };
+
+  const isChanged =
+  asset &&
+  (
+    form.assetName !== asset.name ||
+    form.specification !== asset.specification ||
+    form.state !== asset.state ||
+    formatDate(form.installedDate!) !==
+      asset.installedAtUtc.split("T")[0]
+  );
+
+  const canSave = isFormValid && isChanged && !isEditing;
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -171,8 +183,29 @@ export default function EditAssetPage() {
             }
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
-          {fieldErrors.assetName && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
+          <div className="mt-1 flex items-center justify-between text-xs">
+            {form.assetName.length === 100 ? (
+              <span className="text-orange-500">
+                Maximum characters is 100.
+              </span>
+            ) : (
+              <span />
+            )}
+
+            <span
+              className={
+                form.assetName.length === 100
+                  ? "text-red-500"
+                  : "text-gray-500"
+              }
+            >
+              {form.assetName.length}/100
+            </span>
+          </div>
+          {fieldErrors.specification && (
+            <p className="mt-1 text-sm text-red-500">
+              {fieldErrors.specification}
+            </p>
           )}
         </div>
 
@@ -202,6 +235,25 @@ export default function EditAssetPage() {
             }
             className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
           />
+          <div className="mt-1 flex items-center justify-between text-xs">
+            {form.specification.length === 500 ? (
+              <span className="text-orange-500">
+                Maximum characters is 500.
+              </span>
+            ) : (
+              <span />
+            )}
+
+            <span
+              className={
+                form.specification.length === 500
+                  ? "text-red-500"
+                  : "text-gray-500"
+              }
+            >
+              {form.specification.length}/500
+            </span>
+          </div>
           {fieldErrors.specification && (
             <p className="mt-1 text-sm text-red-500">
               {fieldErrors.specification}
@@ -267,7 +319,7 @@ export default function EditAssetPage() {
           data-testid="btnSave"
           type="button"
           onClick={handleSave}
-          disabled={!isFormValid || isEditing}
+          disabled={!canSave}
           className="btn btn-primary btn-sm disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isEditing ? "Saving..." : "Save"}

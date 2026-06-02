@@ -291,7 +291,7 @@ function AssetsContent() {
           <Pagination
             pageNumber={data.pageNumber}
             totalPages={data.totalPages}
-            totalCount={displayItems.length}
+            totalCount={data.totalCount}
             pageSize={data.pageSize}
             hasPreviousPage={data.hasPreviousPage}
             hasNextPage={data.hasNextPage}
