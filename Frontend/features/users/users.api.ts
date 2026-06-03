@@ -3,6 +3,7 @@ import {
   GetUserByIdResponse,
   GetUsersRequest,
   GetUsersResponse,
+  LookupUsers,
 } from "./users.types";
 
 export const usersApi = baseApiSlice.injectEndpoints({
@@ -18,7 +19,9 @@ export const usersApi = baseApiSlice.injectEndpoints({
           ...(params.searchTerm ? { searchTerm: params.searchTerm } : {}),
           ...(params.type ? { type: params.type } : {}),
           ...(params.sortBy ? { sortBy: params.sortBy } : {}),
-          ...(params.sortDesc !== undefined ? { sortDesc: params.sortDesc } : {}),
+          ...(params.sortDesc !== undefined
+            ? { sortDesc: params.sortDesc }
+            : {}),
         },
       }),
       providesTags: ["Users"],
@@ -30,7 +33,15 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+
+    lookupUsers: builder.query<LookupUsers.Response, LookupUsers.Request>({
+      query: (params) => ({
+        url: "v1/users/lookup",
+        params,
+      }),
+      providesTags: ["Users"],
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useGetUserByIdQuery } = usersApi;
+export const { useGetUsersQuery, useGetUserByIdQuery, useLookupUsersQuery } = usersApi;
