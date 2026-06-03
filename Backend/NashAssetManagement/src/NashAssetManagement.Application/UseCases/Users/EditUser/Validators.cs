@@ -17,8 +17,13 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
 
             RuleFor(x => x.JoinedDate)
                 .NotEmpty()
-                .Must((request, joinedDate) => joinedDate.Date >= request.DateOfBirth.Date.AddYears(18))
+                .Must((request, joinedDate) => joinedDate.Date > request.DateOfBirth.Date)
                 .WithMessage("Joined date is not later than Date of Birth. Please select a different date");
+
+            RuleFor(x => x.JoinedDate)
+                .NotEmpty()
+                .Must((request, joinedDate) => joinedDate.Date >= request.DateOfBirth.Date.AddYears(18))
+                .WithMessage("User must be at least 18 years old on the joined date. Please select a different date");
 
             RuleFor(x => x.JoinedDate)
                 .NotEmpty()
