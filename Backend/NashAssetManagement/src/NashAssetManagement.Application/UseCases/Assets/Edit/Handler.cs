@@ -67,6 +67,9 @@ public class EditAssetHandler
         
         if(asset.State == AssetState.Assigned)
             return EditAssetErrors.AssetNotEditable;
+        
+        if(asset.IsDeleted == true)
+            return EditAssetErrors.AssetIsSoftDeleted;
 
         asset.Name = normalizedRequest.AssetName;
         asset.Specification = normalizedRequest.Specification;

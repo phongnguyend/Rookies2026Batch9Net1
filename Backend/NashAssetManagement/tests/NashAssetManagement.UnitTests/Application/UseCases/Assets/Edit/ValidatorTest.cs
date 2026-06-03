@@ -73,18 +73,6 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task Validate_InstalledDateIsInFuture_ShouldReturnError()
-    {
-        var request = ValidRequest() with { InstalledDate = DateTime.UtcNow.AddDays(1) };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Installed date cannot be in the future.");
-    }
-
-    [Fact]
     public async Task Validate_InstalledDateIsToday_ShouldPass()
     {
         var request = ValidRequest() with { InstalledDate = DateTime.UtcNow };

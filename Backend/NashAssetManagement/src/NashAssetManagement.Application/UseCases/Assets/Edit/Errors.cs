@@ -23,4 +23,9 @@ public static class EditAssetErrors
         code: "AssetEdit.AssetNotEditable",
         description: "Asset cannot be edited because it is assigned."
     );
+
+    public static readonly Error AssetIsSoftDeleted = Error.Conflict(
+        code: "AssetEdit.AssetIsSoftDeleted",
+        description: "Asset cannot be edited because some one has deleted it."
+    );
 }
