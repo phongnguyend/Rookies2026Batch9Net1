@@ -10,6 +10,8 @@ import { AssetState } from "@/features/Assets/assets.types";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { setPinnedEditedAsset } from "@/features/Assets/editAssetStore";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useAppDispatch } from "@/lib/redux/hooks";
 
 const EDITABLE_STATES = [
   {
@@ -38,7 +40,7 @@ export default function EditAssetPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const assetId = searchParams.get("id");
-
+  const dispatch = useAppDispatch();
   const [serverError, setServerError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -150,10 +152,16 @@ export default function EditAssetPage() {
     } catch (err) {
       const apiError = err as ApiErrorResponse;
 
-      if (apiError?.status === 400 || apiError?.status === 409) {
+      if (apiError?.status === 400) {
         setServerError(apiError.detail);
-      } else {
-        setServerError("Something went wrong. Please try again.");
+      }else if(apiError?.status === 409) {
+        dispatch(
+        enqueueToast({
+          message: `Something went wrong. Please Try Again`,
+          type: ToastType.Error,
+        }),
+      );
+      router.push("/admin/assets");
       }
     }
   };
