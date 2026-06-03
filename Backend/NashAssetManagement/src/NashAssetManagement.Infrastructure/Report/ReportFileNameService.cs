@@ -1,4 +1,5 @@
 using NashAssetManagement.Application.Abstractions.Report;
+using NashAssetManagement.Domain.Constants;
 
 namespace NashAssetManagement.Infrastructure.Report
 {
@@ -8,7 +9,7 @@ namespace NashAssetManagement.Infrastructure.Report
                string locationName,
                string username)
         {
-            return $"{locationName}_{username}_report.xlsx";
+            return Path.Combine(AppCts.TempFolders.TempReportFolders, $"{locationName}_{username}_report.xlsx");
         }
 
         public string GenerateDownloadFileName(
@@ -16,8 +17,7 @@ namespace NashAssetManagement.Infrastructure.Report
             string username,
             DateTime createdAtUtc)
         {
-            return
-                $"{createdAtUtc:yyyy-MM-dd}_{locationName}_{username}_report.xlsx";
+            return $"{createdAtUtc:yyyy-MM-dd}_{locationName}_{username}_report.xlsx";
         }
     }
 }

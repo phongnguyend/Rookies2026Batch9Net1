@@ -17,5 +17,10 @@ namespace NashAssetManagement.Domain.Constants
         {
             public const string Jobs = "Jobs";
         }
+
+        public static class TempFolders
+        {
+            public const string TempReportFolders = "TempReportFolders";
+        }
     }
 }

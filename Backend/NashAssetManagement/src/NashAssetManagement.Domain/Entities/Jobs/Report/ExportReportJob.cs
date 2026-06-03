@@ -2,7 +2,7 @@ using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 
-namespace NashAssetManagement.Domain.Entities.Jobs
+namespace NashAssetManagement.Domain.Entities.Jobs.Report
 {
     public class ExportReportJob : BaseEntity<Guid>, ICompletable
     {

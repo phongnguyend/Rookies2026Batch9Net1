@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Base;
 using NashAssetManagement.Domain.Entities.Core;
-using NashAssetManagement.Domain.Entities.Jobs;
+using NashAssetManagement.Domain.Entities.Jobs.Report;
 using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Domain.Entities.Identity

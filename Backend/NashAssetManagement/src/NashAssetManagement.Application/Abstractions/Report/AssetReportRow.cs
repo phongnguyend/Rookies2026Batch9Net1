@@ -1,7 +1,9 @@
 namespace NashAssetManagement.Application.Abstractions.Report
 {
     public record AssetReportRow(
-        string Category,
+        Guid CategoryId,
+        string CategoryName,
+        int Total = 0,
         int Assigned = 0,
         int Available = 0,
         int NotAvailable = 0,
