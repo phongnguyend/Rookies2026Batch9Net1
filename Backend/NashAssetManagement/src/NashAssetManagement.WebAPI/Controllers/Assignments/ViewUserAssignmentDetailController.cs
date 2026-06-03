@@ -25,7 +25,7 @@ namespace NashAssetManagement.WebAPI.Controllers.Assignments
         [HttpGet("{assignmentId}/detail")]
         [SwaggerOperation(
             Summary = "View user assignment's detail.",
-            Description = "Allow a user's to view their assignment's detailed information. Assignment need to be assigned to user. Required user to be authenticated.",
+            Description = "Allow user to view their assignment's detailed information. Assignment need to be assigned to user. Required user to be authenticated.",
             Tags = [ControllerTags.Assignments])]
         public async Task<IActionResult> ViewUserAssignmentDetail(
             [FromRoute] string? assignmentId,

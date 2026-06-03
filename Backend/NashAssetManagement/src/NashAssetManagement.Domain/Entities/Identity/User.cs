@@ -40,5 +40,7 @@ namespace NashAssetManagement.Domain.Entities.Identity
         public ICollection<ReturnRequest> AcceptedReturnRequests { get; set; } = [];
         public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
         public ExportReportJob? RequestedExportReportJob { get; set; }
+
+        public string GetFullName() => $"{FirstName} {LastName}";
     }
 }
