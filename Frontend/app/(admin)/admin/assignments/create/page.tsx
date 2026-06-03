@@ -7,30 +7,29 @@ import { z } from "zod";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCreateAssignmentMutation } from "@/features/assignments/admin/assignments.api";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useAppDispatch } from "@/lib/redux/hooks";
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 const createAssignmentSchema = z.object({
-  userId: z.string().min(1, "User is required."),
-  assetId: z.string().min(1, "Asset is required."),
+  userId: z.guid({ error: "User ID must be a valid GUID." }),
+  assetId: z.guid({ error: "Asset ID must be a valid GUID." }),
 
   assignedDate: z
-    .date()
-    .nullable()
-    .refine((date) => date != null, {
-      message: "Assigned date is required.",
-    })
+    .date({ error: "Assigned date is required." })
     .refine(
       (date) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        return date! >= today;
+        return date >= today;
       },
-      { message: "Assigned date must be current date or in the future." }
+      { error: "Assigned date must be current date or in the future." }
     ),
 
   note: z
     .string()
-    .max(1000, "Note cannot exceed 1000 characters.")
+    .max(1000, { error: "Note cannot exceed 1000 characters." })
     .optional()
     .or(z.literal("")),
 });
@@ -46,7 +45,6 @@ interface AssignmentFormProps {
   initialAssetName?: string;
   initialAssignedDate?: Date | null;
   initialNote?: string;
-  onSave?: (data: { assignedDate: Date; note: string }) => void;
   onPickUser?: () => void;
   onPickAsset?: () => void;
 }
@@ -60,10 +58,13 @@ export default function CreateAssignment({
   initialAssetName = "",
   initialAssignedDate = new Date(),
   initialNote = "",
-  onSave,
   onPickUser,
   onPickAsset,
 }: AssignmentFormProps) {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [createAssignment, { isLoading }] = useCreateAssignmentMutation();
+
   const {
     control,
     handleSubmit,
@@ -74,12 +75,12 @@ export default function CreateAssignment({
     resolver: zodResolver(
       createAssignmentSchema
     ) as Resolver<CreateAssignmentFormValues>,
-    mode: "onTouched",  //Form sẽ validate khi field bị touch
-    reValidateMode: "onChange", //Form sẽ re-validate khi value thay đổi sau khi đã bị touch
+    mode: "onTouched",
+    reValidateMode: "onChange",
     defaultValues: {
       userId: initialUserId,
       assetId: initialAssetId,
-      assignedDate: initialAssignedDate ?? undefined,
+      assignedDate: initialAssignedDate ?? new Date(),
       note: initialNote,
     },
   });
@@ -87,25 +88,52 @@ export default function CreateAssignment({
   // ─── Sync Id từ parent khi pick xong ──────────────────────────────────────
   useEffect(() => {
     setValue("userId", initialUserId, {
-      shouldValidate: initialUserId !== "", // chỉ validate khi đã có giá trị
+      shouldValidate: initialUserId !== "",
+      shouldTouch: initialUserId !== "",
     });
   }, [initialUserId, setValue]);
 
   useEffect(() => {
     setValue("assetId", initialAssetId, {
-      shouldValidate: initialAssetId !== "", // chỉ validate khi đã có giá trị
+      shouldValidate: initialAssetId !== "",
+      shouldTouch: initialAssetId !== "",
     });
   }, [initialAssetId, setValue]);
 
   // ─── Handle Submit ─────────────────────────────────────────────────────────
-  const onSubmit = (values: CreateAssignmentFormValues) => {
-    onSave?.({
-      assignedDate: values.assignedDate!,
-      note: values.note?.trim() ?? "",
-    });
+  const onSubmit = async (values: CreateAssignmentFormValues) => {
+    try {
+      await createAssignment({
+        userId: values.userId,
+        assetId: values.assetId,
+        assignedDate: values.assignedDate.toISOString().split("T")[0],
+        note: values.note?.trim() || undefined,
+      }).unwrap();
+
+      dispatch(
+        enqueueToast({
+          message: "Assignment created successfully.",
+          type: ToastType.Success,
+        })
+      );
+
+      router.push("/admin/assignments");
+    } catch (err: unknown) {
+      const error = err as { data?: { detail?: string; title?: string }; detail?: string; title?: string };
+      dispatch(
+        enqueueToast({
+          message:
+            error?.data?.detail ||
+            error?.data?.title ||
+            error?.detail ||
+            error?.title ||
+            "Failed to create assignment.",
+          type: ToastType.Error,
+        })
+      );
+    }
   };
 
-  const router = useRouter();
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
@@ -121,33 +149,28 @@ export default function CreateAssignment({
               <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
                 User
               </label>
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  readOnly
-                  value={initialUserName}
-                  onClick={onPickUser}
-                  onBlur={() => trigger("userId")}
-                  className="h-9 w-full cursor-pointer rounded-md border border-gray-300 bg-white px-3 pr-9 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
+              <div className="flex-1">
+                <Controller
+                  control={control}
+                  name="userId"
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      placeholder="enter user id"
+                      className="h-9 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
+                    />
+                  )}
                 />
-                <button
-                  type="button"
-                  onClick={onPickUser}
-                  className="absolute right-0 top-0 flex h-9 w-9 items-center justify-center text-gray-400 hover:text-gray-600"
-                  onBlur={() => trigger("userId")}
-                >
-                  <Search size={16} />
-                </button>
               </div>
             </div>
             {errors.userId && (
               <div className="md:pl-36">
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.userId.message}
-                </p>
+                <p className="mt-1 text-sm text-red-500">{errors.userId.message}</p>
               </div>
             )}
           </div>
+
 
           {/* Asset */}
           <div>
@@ -155,29 +178,24 @@ export default function CreateAssignment({
               <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
                 Asset
               </label>
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  readOnly
-                  value={initialAssetName}
-                  onClick={onPickAsset}
-                  onBlur={() => trigger("assetId")}
-                  className="h-9 w-full cursor-pointer rounded-md border border-gray-300 bg-white px-3 pr-9 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
+              <div className="flex-1">
+                <Controller
+                  control={control}
+                  name="assetId"
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      placeholder="enter asset id"
+                      className="h-9 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
+                    />
+                  )}
                 />
-                <button
-                  type="button"
-                  onClick={onPickAsset}
-                  className="absolute right-0 top-0 flex h-9 w-9 items-center justify-center text-gray-400 hover:text-gray-600"
-                >
-                  <Search size={16} />
-                </button>
               </div>
             </div>
             {errors.assetId && (
               <div className="md:pl-36">
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.assetId.message}
-                </p>
+                <p className="mt-1 text-sm text-red-500">{errors.assetId.message}</p>
               </div>
             )}
           </div>
@@ -253,10 +271,10 @@ export default function CreateAssignment({
           </button>
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isLoading}
             className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Save
+            {isLoading ? "Saving..." : "Save"}
           </button>
         </div>
       </form>
