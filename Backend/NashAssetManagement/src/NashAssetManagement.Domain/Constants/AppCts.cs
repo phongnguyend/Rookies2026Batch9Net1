@@ -12,5 +12,10 @@ namespace NashAssetManagement.Domain.Constants
         {
             public const string ReportExcel = "ReportExcel";
         }
+
+        public static class DbSchema
+        {
+            public const string Jobs = "Jobs";
+        }
     }
 }
