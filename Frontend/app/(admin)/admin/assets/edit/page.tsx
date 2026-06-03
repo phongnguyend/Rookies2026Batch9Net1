@@ -48,6 +48,7 @@ export default function EditAssetPage() {
     skip: !assetId,
   });
 
+
   const [editAsset, { isLoading: isEditing }] = useEditAssetMutation();
 
   const [form, setForm] = useState({
@@ -58,6 +59,7 @@ export default function EditAssetPage() {
     state: AssetState.Available,
   });
 
+  //-- Set data into Fields -----------------------------------------------
   if (asset && !form.initialized) {
     setForm({
       initialized: true,
@@ -76,39 +78,39 @@ export default function EditAssetPage() {
     if (!form.assetName.trim()) {
       errors.assetName = "Asset name is required.";
     } else if (form.assetName.length > 100) {
-      errors.assetName =
-        "Asset name must not exceed 100 characters.";
+      errors.assetName = "Asset name must not exceed 100 characters.";
     } else if (!nameRegex.test(form.assetName)) {
-      errors.assetName =
-        "Asset name contains invalid characters.";
+      errors.assetName = "Asset name contains invalid characters.";
     }
 
     if (!form.specification.trim()) {
-      errors.specification =
-        "Specification is required.";
+      errors.specification = "Specification is required.";
     } else if (form.specification.length > 500) {
-      errors.specification =
-        "Specification must not exceed 500 characters.";
+      errors.specification = "Specification must not exceed 500 characters.";
     } else if (!allowedRegex.test(form.specification)) {
       errors.specification =
         'Specification contains invalid characters, only allow these special characters " , / - | ( ) + .';
     }
 
     if (!form.installedDate) {
-      errors.installedDate =
-        "Installed date is required.";
-  }
+      errors.installedDate = "Installed date is required.";
+    }
 
-  setFieldErrors(errors);
-  return Object.keys(errors).length === 0;
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const isFormValid =
     form.assetName.trim() !== "" &&
     form.specification.trim() !== "" &&
-    form.installedDate !== null;
+    form.installedDate instanceof Date &&
+    !isNaN(form.installedDate.getTime());
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | null) => {
+    if (!date || isNaN(date.getTime())) {
+      return "";
+    }
+
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -123,12 +125,18 @@ export default function EditAssetPage() {
       form.state !== asset.state ||
       formatDate(form.installedDate!) !== asset.installedAtUtc.split("T")[0]);
 
+  //-- Enable Save Button when something is edited ----------------------
   const canSave = isFormValid && isChanged && !isEditing;
 
+  //-- Handle Save -----------------------------------------------
   const handleSave = async () => {
     setServerError(null);
 
-    if (!validateForm() || !form.installedDate) {
+    if (
+      !validateForm() ||
+      !(form.installedDate instanceof Date) ||
+      isNaN(form.installedDate.getTime())
+    ) {
       return;
     }
 
@@ -156,18 +164,27 @@ export default function EditAssetPage() {
 
       if (apiError?.status === 400) {
         setServerError(apiError.detail);
-      }else if(apiError?.status === 409) {
+      } else if (apiError?.status === 404) {
         dispatch(
-        enqueueToast({
-          message: `Something went wrong. Please Try Again`,
-          type: ToastType.Error,
-        }),
-      );
-      router.push("/admin/assets");
+          enqueueToast({
+            message: `Something went wrong. Asset is not found or be deleted.`,
+            type: ToastType.Error,
+          }),
+        );
+        router.push("/admin/assets");
+      } else if (apiError?.status === 409) {
+        dispatch(
+          enqueueToast({
+            message: `Something went wrong. This asset has been assigned`,
+            type: ToastType.Error,
+          }),
+        );
+        router.push("/admin/assets");
       }
     }
   };
 
+  //-- Check Url (Scenario : user parse id of assinged or softdeleted on URL) -------
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -176,6 +193,17 @@ export default function EditAssetPage() {
     );
   }
 
+  if (!asset) {
+    router.replace("/admin/assets");
+    return null;
+  }
+
+  if (asset.state === AssetState.Assigned) {
+    router.replace("/admin/assets");
+    return null;
+  }
+
+  //-- Render -----------------------------------------------
   return (
     <div className="max-w-lg p-6">
       <h1 className="mb-6 text-xl font-bold text-primary">Edit Asset</h1>
@@ -224,9 +252,7 @@ export default function EditAssetPage() {
             </span>
           </div>
           {fieldErrors.assetName && (
-            <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.assetName}
-            </p>
+            <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
           )}
         </div>
 
@@ -289,10 +315,10 @@ export default function EditAssetPage() {
           <DatePickerInput
             value={form.installedDate}
             onChange={(date) => {
-              console.log("Date changed:", date);
               setForm((prev) => ({
                 ...prev,
-                installedDate: date,
+                installedDate:
+                  date instanceof Date && !isNaN(date.getTime()) ? date : null,
               }));
             }}
             placeholder="Select date"

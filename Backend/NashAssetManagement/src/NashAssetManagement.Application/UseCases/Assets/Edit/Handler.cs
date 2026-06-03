@@ -96,7 +96,8 @@ public class EditAssetHandler
             asset.InstalledAtUtc,
             asset.State,
             asset.Category!.CategoryName,
-            asset.Location!.Name
+            asset.Location!.Name,
+            asset.IsDeleted
         );
     }
 }

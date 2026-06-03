@@ -10,5 +10,6 @@ public record EditAssetResponse(
     DateTime InstalledDate,
     AssetState State,
     string Category,
-    string Location
+    string Location,
+    bool IsDeleted
 );

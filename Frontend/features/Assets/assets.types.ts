@@ -46,6 +46,7 @@ export interface GetAssetDetailResponse {
   state: AssetState;
   category: string;
   location: string;
+  isdeleted: boolean;
   history: AssetHistoryItem[];
 }
 
