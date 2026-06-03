@@ -49,7 +49,13 @@ export default function ReportPage() {
     sortDirection: sorts[0]?.direction ?? undefined,
   };
 
-  const { data, isLoading } = useGetReportQuery(queryParams);
+  const { data, isLoading } = useGetReportQuery(queryParams, {
+    pollingInterval: 2000, // auto calling request every 2s
+    refetchOnFocus: true, // if return to report tab, then calling again
+    refetchOnReconnect: true, // if reconnecting after disconnected, then refetch
+    skipPollingIfUnfocused: true, // when on other tab, and comeback to Report tab, then polling is continue, otherwise keep polling in the background if set = false
+  });
+
   const reports = data?.items ?? [];
 
   const handleSortChange = (newSorts: SortItem[]) => {
