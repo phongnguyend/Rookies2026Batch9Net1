@@ -86,6 +86,7 @@ export interface CreateAssetResponse {
   location: string;
 }
 
+// ─── Look up Asset ───────────────────────────────────────────
 export interface LookupAssetsRequest{
   searchTerm?: string;
   sortBy?: string;
@@ -113,7 +114,6 @@ export interface LookupAssetsSummary{
 export interface LookupAssetsResponse extends PaginationResponse<LookupAssetsSummary> {}
 
 // ─── Edit Assets ───────────────────────────────────────────
-
 export interface EditAssetRequest {
   assetId: string;
   assetName: string;
