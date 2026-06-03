@@ -3,7 +3,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   SortItem,
 } from "@/features/shared/components/DataTable";
-import { useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
+import { assignmentApi, useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
 import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
@@ -16,6 +16,9 @@ import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 import { CircleX, Pencil, RotateCcw } from "lucide-react";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useDispatch } from "react-redux";
 
 const limit = 10;
 
@@ -23,6 +26,7 @@ export default function AssignmentsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const dispatchAction = useDispatch();
 
   // Read from Url
   const page = Number(searchParams.get("page")) || 1;
@@ -75,6 +79,7 @@ export default function AssignmentsPage() {
 
   const assignments = data?.items ?? [];
 
+  //Columns
   const columns: ColumnDef<Assignment>[] = [
     {
       key: "no",
@@ -135,6 +140,8 @@ export default function AssignmentsPage() {
         const isAccepted =
           assignment.state === "Accepted";
 
+        const isReturning = assignment.isReturning;
+
         const isFinal =
           assignment.state === "Returned" ||
           assignment.state === "Declined";
@@ -144,21 +151,56 @@ export default function AssignmentsPage() {
             row={assignment}
             disabledAccept={isAccepted || isFinal}
             disabledDecline={isAccepted || isFinal}
-            disabledReturn={isWaiting || isFinal}
+            disabledReturn={isWaiting || isFinal || isReturning}
             onAccept={(row) => console.log("accept", row)}
             onDecline={(row) => console.log("decline", row)}
-            onReturn={(row) => console.log("return", row)}
+            onReturn={(row) => setReturningAssignment(row)} //return request
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeclineAssignment"
             returnBtnTestId="btnReturnAssignment"
-            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3}/>}
-            declineIcon={<CircleX size={20} strokeWidth={3}/>}
-            returnIcon={<RotateCcw size={20} strokeWidth={3}/>}
+            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3} />}
+            declineIcon={<CircleX size={20} strokeWidth={3} />}
+            returnIcon={<RotateCcw size={20} strokeWidth={3} />}
           />
         );
       },
     }
   ];
+
+  //create return request
+  const [createReturnRequest, { isLoading: isReturning }] =
+    assignmentApi.useAdminCreateReturnRequestMutation();
+
+  const [returningAssignment, setReturningAssignment] =
+    useState<Assignment | null>(null);
+
+  const handleConfirmReturn = async () => {
+    if (!returningAssignment) return;
+
+    try {
+      await createReturnRequest({
+        assignmentId: returningAssignment.id,
+      }).unwrap();
+
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Return request created successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch (error) {
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to create return request. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
 
   return (
     <div data-testid="mnuManageAssignment">
@@ -292,6 +334,16 @@ export default function AssignmentsPage() {
           />
         </div>
       </div>
+      <ConfirmModal
+        isOpen={!!returningAssignment}
+        onClose={() => setReturningAssignment(null)}
+        onYes={handleConfirmReturn}
+        isLoading={isReturning}
+        title="Are you sure?"
+        body={<p>Do you want to create a returning request for asset?</p>}
+        yesButtonLabel="Yes"
+        noButtonLabel="No"
+      />
     </div>
   );
 }

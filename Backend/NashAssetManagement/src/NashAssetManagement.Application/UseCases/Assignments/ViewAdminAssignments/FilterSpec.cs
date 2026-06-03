@@ -54,7 +54,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                x.AssignedToUser!.UserName?? "",
                x.AssignedByUser!.UserName?? "",
                x.AssignedAtUtc.ToString("dd/MM/yyyy"),
-               x.State.ToString()));
+               x.State.ToString(),
+               x.IsReturning));
         }
     }
 }

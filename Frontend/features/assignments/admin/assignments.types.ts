@@ -12,6 +12,7 @@ export interface Assignment {
   assignedBy: string;
   assignedDate: string;
   state: string;
+  isReturning: boolean;
 }
 
 export type AssignmentDetails = {
@@ -40,6 +41,10 @@ export interface GetAssignmentsRequest
   sortDirection?: SortDirection;
   assignedDate?: string;
   includeDeleted?: boolean;
+}
+
+export interface AdminCreateReturnRequest {
+  assignmentId: string;
 }
 
 export interface GetAssignmentsResponse extends PaginationResponse<Assignment> { }
