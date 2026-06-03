@@ -24,6 +24,7 @@ export type AssignmentDetails = {
   assignedDate: string;
   state: string;
   note: string;
+  isReturning: boolean;
 };
 
 export enum AssignmentState {

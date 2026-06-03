@@ -138,6 +138,10 @@ export default function AssignmentDetailPopup({
                 label="Note"
                 value={data.note}
               />
+
+              {data.isReturning && (<div className="text-start my-2 text-gray-500">
+                Assignment is currently in returning process
+              </div>)}
             </div>
           ) : (
             <div className="py-8 text-center text-gray-500">
