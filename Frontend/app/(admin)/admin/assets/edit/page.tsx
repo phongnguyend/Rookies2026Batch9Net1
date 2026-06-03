@@ -70,7 +70,6 @@ export default function EditAssetPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-
     const nameRegex = /^[\p{L}\p{N}\s\-_/]+$/u;
     const specRegex = /^[\p{L}\p{N}\s]+$/u;
 
@@ -97,7 +96,6 @@ export default function EditAssetPage() {
     }
 
     setFieldErrors(errors);
-
     return Object.keys(errors).length === 0;
   };
 
@@ -144,7 +142,7 @@ export default function EditAssetPage() {
         assetCode: result.assetCode,
         name: result.assetName,
         category: result.category,
-        state: form.state,
+        state: result.state as AssetState,
         location: result.location,
       });
 
@@ -264,7 +262,6 @@ export default function EditAssetPage() {
             ) : (
               <span />
             )}
-
             <span
               className={
                 form.specification.length === 0 ||
@@ -328,7 +325,6 @@ export default function EditAssetPage() {
                   }
                   className="radio radio-primary radio-sm"
                 />
-
                 {s.label}
               </label>
             ))}
@@ -346,7 +342,6 @@ export default function EditAssetPage() {
         >
           {isEditing ? "Saving..." : "Save"}
         </button>
-
         <button
           data-testid="btnCancel"
           type="button"

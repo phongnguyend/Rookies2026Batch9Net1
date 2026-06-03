@@ -88,11 +88,20 @@ function AssetsContent() {
 
   const displayItems = (() => {
     const items = data?.items ?? [];
-    if (!pinnedEditedAsset || pageNumber !== 1) return items;
-    return [
-      pinnedEditedAsset,
-      ...items.filter((i) => i.id !== pinnedEditedAsset.id),
-    ];
+    if (!pinnedEditedAsset) {
+      return items;
+    }
+    const filteredItems = items.filter(
+      (item) =>
+        item.assetCode !== pinnedEditedAsset.assetCode
+    );
+    if (pageNumber === 1) {
+      return [
+        pinnedEditedAsset,
+        ...filteredItems,
+      ];
+    }
+    return filteredItems;
   })();
 
   const categoryOptions =
