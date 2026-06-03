@@ -12,7 +12,7 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const genderItems = [Gender.Female, Gender.Male];
-const nameRegex = /[a-zA-Z]+(?: [a-zA-Z]+)*/;
+const nameRegex = /^[a-zA-Z]+(?: [a-zA-Z]+)*$/;
 
 // ================= SCHEMA =================
 
@@ -67,14 +67,20 @@ const createUserSchema = z
       .trim()
       .min(1, "First Name is required.")
       .max(100, "First Name must not exceed 100 characters.")
-      .regex(nameRegex, "First Name only allows alphabetic characters and spaces."),
+      .regex(
+        nameRegex,
+        "First Name only allows alphabetic characters and spaces.",
+      ),
 
     lastName: z
       .string()
       .trim()
       .min(1, "Last Name is required.")
       .max(100, "Last Name must not exceed 100 characters.")
-      .regex(nameRegex, "Last Name only allows alphabetic characters and spaces."),
+      .regex(
+        nameRegex,
+        "Last Name only allows alphabetic characters and spaces.",
+      ),
 
     dateOfBirth: z
       .date()
