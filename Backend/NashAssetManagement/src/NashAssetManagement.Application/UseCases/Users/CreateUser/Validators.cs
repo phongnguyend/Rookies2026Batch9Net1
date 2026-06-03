@@ -12,7 +12,7 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .WithMessage("First Name is required.")
                 .MaximumLength(100)
                 .WithMessage("First Name must not exceed 100 characters.")
-                .Matches(@"^[a-zA-Z\s]+$")
+                .Matches(@"^[a-zA-Z]+(?: [a-zA-Z]+)*$")
                 .WithMessage("First Name only allows alphabetic characters and spaces.");
 
             RuleFor(x => x.LastName)
@@ -20,7 +20,7 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .WithMessage("Last Name is required.")
                 .MaximumLength(100)
                 .WithMessage("Last Name must not exceed 100 characters.")
-                .Matches(@"^[a-zA-Z\s]+$")
+                .Matches(@"^[a-zA-Z]+(?: [a-zA-Z]+)*$")
                 .WithMessage("Last Name only allows alphabetic characters and spaces.");
 
             // 18 <= DOB <= 90
@@ -43,7 +43,7 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .Must(joinedDate =>
                     joinedDate.DayOfWeek != DayOfWeek.Saturday &&
                     joinedDate.DayOfWeek != DayOfWeek.Sunday)
-                .WithMessage("Joined date is Saturday or Sunday. Please select a different date");
+                .WithMessage("Joined date must not in Saturday or Sunday. Please select a different date");
 
             RuleFor(x => x.Gender)
                 .NotNull()

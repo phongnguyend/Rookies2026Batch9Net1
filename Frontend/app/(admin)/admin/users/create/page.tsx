@@ -12,7 +12,7 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const genderItems = [Gender.Female, Gender.Male];
-const nameRegex = /^[a-zA-Z\s]+$/;
+const nameRegex = /[a-zA-Z]+(?: [a-zA-Z]+)*/;
 
 // ================= SCHEMA =================
 
@@ -172,17 +172,26 @@ export default function CreateUserPage() {
   const [createUser] = useCreateUserMutation();
   const dispatch = useAppDispatch();
 
+  const formatDateOnly = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
   const onSubmit = async (data: CreateUserFormOutput) => {
     try {
+      console.log(formatDateOnly(data.joinedDate));
       await createUser({
         firstName: data.firstName,
         lastName: data.lastName,
-        dayOfBirth: data.dateOfBirth.toISOString(),
-        joinedDate: data.joinedDate.toISOString(),
+        dayOfBirth: formatDateOnly(data.dateOfBirth),
+        joinedDate: formatDateOnly(data.joinedDate),
         gender: data.gender,
         userType: data.userType,
       }).unwrap();
-
+      
       dispatch(
         enqueueToast({
           message: "User created successfully.",

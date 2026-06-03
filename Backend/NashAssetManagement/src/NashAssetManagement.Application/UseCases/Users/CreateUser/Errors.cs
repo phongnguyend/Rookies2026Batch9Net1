@@ -6,22 +6,22 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
     {
         public static readonly Error UserNotFound =
             Error.NotFound(
-                code: "Users.NotFound",
+                code: "CreateUser.NotFound",
                 description: "User not found.");
                 
         public static readonly Error CreateUserFailed =
             Error.Failure(
-                code: "Users.CreateFailed",
+                code: "CreateUser.CreateFailed",
                 description: "Create user failed.");
 
         public static readonly Error UnexpectedError =
             Error.Unexpected(
-                code: "Users.UnexpectedError",
+                code: "CreateUser.UnexpectedError",
                 description: "Failed to create user");
                 
         public static readonly Error RoleNotFound =
             Error.NotFound(
-                code: "Users.RoleNotFound",
+                code: "CreateUser.RoleNotFound",
                 description: "Role not found.");
     }
 }

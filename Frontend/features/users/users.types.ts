@@ -8,9 +8,6 @@ export enum UserRoles {
 export enum Gender {
   Male = "Male",
   Female = "Female",
-  NonBinary = "NonBinaryTree",
-  Other = "Order",
-  PreferNotToSay = "PreferNotToSayImFromLGBT"
 }
 
 export interface UserRow {

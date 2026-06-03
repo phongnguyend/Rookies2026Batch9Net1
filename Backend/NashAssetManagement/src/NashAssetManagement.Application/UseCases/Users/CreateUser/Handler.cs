@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
-using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.AppNamingFormat;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.Domain.Entities.Identity;
-using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.Users.CreateUser
 {
@@ -17,7 +16,7 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
         ICurrentUser currentUser,
         IValidator<Request> validator,
         ILogger<Handler> logger,
-        RoleManager<Role> roleManager
+        IAppNamingFormat appNamingFormat
     )
     : IRequestHandler<Request, ErrorOr<Response>>
     {
@@ -59,10 +58,8 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 return Errors.UserNotFound;
             }
             
-            var users = userManager.Users;
-
             // generate staff code
-            var maxNumber = users
+            var maxNumber = userManager.Users
                 .Where(x => x.StaffCode.StartsWith(CompanyConstants.StaffCode))
                 .Select(x => x.StaffCode.Substring(2))
                 .AsEnumerable()
@@ -70,43 +67,20 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 .DefaultIfEmpty(0)
                 .Max();
 
-            var staffCode = $"{CompanyConstants.StaffCode}{maxNumber + 1:D4}";
+            var staffCode = appNamingFormat.GetStaffCode(maxNumber + 1);
 
             // generate username
-            var firstNamePart = request.FirstName
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .Last();
+            var baseUsername = appNamingFormat.GetBaseUserName(request.FirstName, request.LastName);
 
-            var lastNameParts = request.LastName
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x[0]);
+            var existingUsernames = await userManager.Users
+                .Where(x => x.UserName != null && x.UserName.StartsWith(baseUsername))
+                .Select(x => x.UserName!)
+                .ToListAsync(cancellationToken);
 
-            // return by tuantt (first name: Phuong Tuan, last name: Trinh Tran)
-            var baseUsername = $"{firstNamePart}{string.Concat(lastNameParts)}".ToLowerInvariant();
-            var username = baseUsername;
-            var index = 1;
-
-            // increase index if username exist: tuantt1
-            while (await userManager.Users.AnyAsync(x => x.UserName == username, cancellationToken))
-            {
-                username = $"{baseUsername}{index}";
-                index++;
-            }
+            var username = appNamingFormat.GetUniqueUserName(baseUsername, existingUsernames);
 
             // generate passowrd
-            var password = $"{username}@{request.DayOfBirth:ddMMyyyy}";
-
-            // find role
-            var roleId = await roleManager.Roles
-                .Where(x => x.Name == request.UserType.ToString())
-                .Select(x => x.Id)
-                .FirstOrDefaultAsync(cancellationToken);
-            
-
-            if (roleId == Guid.Empty)
-            {
-                return Errors.RoleNotFound;
-            }
+            var password = appNamingFormat.GetPassword(username, request.DayOfBirth);
 
             var user = new User
             {
@@ -125,17 +99,12 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
                 CreatedAtUtc = DateTime.UtcNow,
 
                 // IdentityUser required valid email
-                Email = $"{username}@{CompanyConstants.EmailDomain}",
-
-                // assign role
-                UserRoles =
-                [
-                    new UserRole{ RoleId = roleId}
-                ]
+                Email = appNamingFormat.GetEmail(username),
             };
 
             try
             {
+                // add user
                 var createResult = await userManager.CreateAsync(user, password);
 
                 if (!createResult.Succeeded)
@@ -144,6 +113,21 @@ namespace NashAssetManagement.Application.UseCases.Users.CreateUser
 
                     logger.LogError(
                         "Create user failed. Errors: {Errors}",
+                        errorCodes);
+
+                    return Errors.CreateUserFailed;
+                }
+
+                // add role
+                var addRoleResult = await userManager.AddToRoleAsync(user, request.UserType.ToString());
+
+                if (!addRoleResult.Succeeded)
+                {
+                    var errorCodes = string.Join(", ", addRoleResult.Errors.Select(e => e.Code));
+
+                    logger.LogError(
+                        "Assign role failed. User: {UserId}, Errors: {Errors}",
+                        user.Id,
                         errorCodes);
 
                     return Errors.CreateUserFailed;

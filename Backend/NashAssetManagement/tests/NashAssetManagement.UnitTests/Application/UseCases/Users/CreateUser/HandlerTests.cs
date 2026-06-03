@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MockQueryable.Moq;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
+using NashAssetManagement.Application.Abstractions.AppNamingFormat;
 using NashAssetManagement.Application.UseCases.Users.CreateUser;
 using NashAssetManagement.Domain.Constants;
 using NashAssetManagement.Domain.Entities.Identity;
@@ -30,39 +31,21 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 null!,
                 null!);
 
-            if (users is not null)
-            {
-                var mockUsers = users.BuildMockDbSet();
+            var mockUsers = (users ?? []).BuildMockDbSet();
 
-                userManagerMock
-                    .Setup(x => x.Users)
-                    .Returns(mockUsers.Object);
-            }
+            userManagerMock
+                .Setup(x => x.Users)
+                .Returns(mockUsers.Object);
+
+            userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            userManagerMock
+                .Setup(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success);
 
             return userManagerMock;
-        }
-
-        private static Mock<RoleManager<Role>> CreateRoleManagerMock(List<Role>? roles = null)
-        {
-            var store = new Mock<IRoleStore<Role>>();
-
-            var roleManagerMock = new Mock<RoleManager<Role>>(
-                store.Object,
-                null!,
-                null!,
-                null!,
-                null!);
-
-            if (roles is not null)
-            {
-                var mockRoles = roles.BuildMockDbSet();
-
-                roleManagerMock
-                    .Setup(x => x.Roles)
-                    .Returns(mockRoles.Object);
-            }
-
-            return roleManagerMock;
         }
 
         private static Mock<ICurrentUser> CreateCurrentUserMock(Guid? userId)
@@ -74,6 +57,64 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 .Returns(userId);
 
             return currentUserMock;
+        }
+
+        private static Mock<IAppNamingFormat> CreateAppNamingFormatMock()
+        {
+            var mock = new Mock<IAppNamingFormat>();
+
+            mock.Setup(x => x.GetStaffCode(It.IsAny<int>()))
+                .Returns<int>(number => $"{CompanyConstants.StaffCode}{number:0000}");
+
+            mock.Setup(x => x.GetBaseUserName(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns<string, string>((firstName, lastName) =>
+                {
+                    var lastNameParts = lastName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var initials = string.Concat(lastNameParts.Select(x => x[0])).ToLowerInvariant();
+
+                    return $"{firstName.ToLowerInvariant()}{initials}";
+                });
+
+            mock.Setup(x => x.GetUniqueUserName(It.IsAny<string>(), It.IsAny<List<string>>()))
+                .Returns<string, List<string>>((baseUsername, existingUsernames) =>
+                {
+                    if (!existingUsernames.Contains(baseUsername))
+                    {
+                        return baseUsername;
+                    }
+
+                    var index = 1;
+                    while (existingUsernames.Contains($"{baseUsername}{index}"))
+                    {
+                        index++;
+                    }
+
+                    return $"{baseUsername}{index}";
+                });
+
+            mock.Setup(x => x.GetPassword(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Returns<string, DateTime>((username, dob) => $"{username}@{dob:ddMMyyyy}");
+
+            mock.Setup(x => x.GetEmail(It.IsAny<string>()))
+                .Returns<string>(username => $"{username}@{CompanyConstants.EmailDomain}");
+
+            return mock;
+        }
+
+        private static Handler CreateHandler(
+            Mock<UserManager<User>> userManagerMock,
+            Mock<ICurrentUser> currentUserMock,
+            Mock<IAppNamingFormat>? appNamingFormatMock = null)
+        {
+            var validator = new Validators();
+            var loggerMock = new Mock<ILogger<Handler>>();
+
+            return new Handler(
+                userManagerMock.Object,
+                currentUserMock.Object,
+                validator,
+                loggerMock.Object,
+                appNamingFormatMock?.Object ?? CreateAppNamingFormatMock().Object);
         }
 
         private static Request ValidRequest()
@@ -100,41 +141,13 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             return nextDate;
         }
 
-        private static List<Role> DefaultRoles()
-        {
-            return
-            [
-                new()
-                {
-                    Id = Guid.Parse("20000000-0000-0000-0000-000000000001"),
-                    Name = UserType.Admin.ToString(),
-                    NormalizedName = UserType.Admin.ToString().ToUpperInvariant()
-                },
-                new()
-                {
-                    Id = Guid.Parse("20000000-0000-0000-0000-000000000002"),
-                    Name = UserType.Staff.ToString(),
-                    NormalizedName = UserType.Staff.ToString().ToUpperInvariant()
-                }
-            ];
-        }
-
         [Fact]
         public async Task CreateUserHandler_CurrentUserIdIsNull_ShouldReturnUserNotFound()
         {
             // Arrange
-            var userManagerMock = CreateUserManagerMock(new List<User>());
+            var userManagerMock = CreateUserManagerMock();
             var currentUserMock = CreateCurrentUserMock(null);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
-
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
+            var handler = CreateHandler(userManagerMock, currentUserMock);
 
             var request = ValidRequest();
 
@@ -168,16 +181,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
-
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
+            var handler = CreateHandler(userManagerMock, currentUserMock);
 
             var request = ValidRequest();
 
@@ -197,18 +201,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
         public async Task CreateUserHandler_InvalidRequest_ShouldThrowValidationException()
         {
             // Arrange
-            var userManagerMock = CreateUserManagerMock(new List<User>());
+            var userManagerMock = CreateUserManagerMock();
             var currentUserMock = CreateCurrentUserMock(Guid.NewGuid());
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
-
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
+            var handler = CreateHandler(userManagerMock, currentUserMock);
 
             var request = ValidRequest() with { FirstName = "" };
 
@@ -241,29 +236,16 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
 
             userManagerMock
-                .Setup(x => x.CreateAsync(
-                    It.IsAny<User>(),
-                    It.IsAny<string>()))
-                .ReturnsAsync(
-                    IdentityResult.Failed(
-                        new IdentityError
-                        {
-                            Code = "CreateUserFailed",
-                            Description = "Create user failed"
-                        }));
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError
+                {
+                    Code = "CreateUserFailed",
+                    Description = "Create user failed"
+                }));
 
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
-
+            var handler = CreateHandler(userManagerMock, currentUserMock);
             var request = ValidRequest();
 
             // Act
@@ -278,6 +260,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                     It.IsAny<User>(),
                     It.IsAny<string>()),
                 Times.Once);
+            
         }
 
         [Fact]
@@ -300,23 +283,12 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             userManagerMock
-                .Setup(x => x.CreateAsync(
-                    It.IsAny<User>(),
-                    It.IsAny<string>()))
-                .ThrowsAsync(new Exception("Unexpected error"));
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .Throws(new Exception("Unexpected error"));
 
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
-
+            var handler = CreateHandler(userManagerMock, currentUserMock);
             var request = ValidRequest();
 
             // Act
@@ -347,17 +319,12 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             User? createdUser = null;
             string? createdPassword = null;
 
             userManagerMock
-                .Setup(x => x.CreateAsync(
-                    It.IsAny<User>(),
-                    It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
                 .Callback<User, string>((user, password) =>
                 {
                     createdUser = user;
@@ -365,13 +332,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 })
                 .ReturnsAsync(IdentityResult.Success);
 
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
-
+            var handler = CreateHandler(userManagerMock, currentUserMock);
             var request = ValidRequest();
 
             // Act
@@ -383,24 +344,31 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             Assert.NotNull(createdUser);
             Assert.Equal("SD0002", createdUser!.StaffCode);
             Assert.Equal("binhnv", createdUser.UserName);
+            Assert.Equal("BINHNV", createdUser.NormalizedUserName);
             Assert.Equal(locationId, createdUser.LocationId);
             Assert.Equal("Binh", createdUser.FirstName);
             Assert.Equal("Nguyen Van", createdUser.LastName);
             Assert.Equal(request.DayOfBirth, createdUser.DateOfBirth);
             Assert.Equal(request.UserType, createdUser.UserType);
             Assert.Equal(request.Gender, createdUser.Gender);
-            Assert.NotEmpty(createdUser.UserRoles);
-            Assert.Contains(
-                createdUser.UserRoles,
-                x => x.RoleId == Guid.Parse("20000000-0000-0000-0000-000000000002"));
             Assert.True(createdUser.IsFirstLogin);
             Assert.Equal($"binhnv@{CompanyConstants.EmailDomain}", createdUser.Email);
 
             Assert.Equal($"binhnv@{request.DayOfBirth:ddMMyyyy}", createdPassword);
 
+            userManagerMock.Verify(
+                x => x.AddToRoleAsync(
+                    It.Is<User>(u => u == createdUser),
+                    request.UserType.ToString()),
+                Times.Once);
+
             Assert.Equal(createdUser.Id, result.Value.Id);
             Assert.Equal("SD0002", result.Value.StaffCode);
             Assert.Equal("binhnv", result.Value.UserName);
+            Assert.Equal("Binh", result.Value.FirstName);
+            Assert.Equal("Nguyen Van", result.Value.LastName);
+            Assert.Equal(UserType.Staff.ToString(), result.Value.UserType);
+            Assert.Equal(Gender.Male.ToString(), result.Value.Gender);
         }
 
         [Fact]
@@ -441,17 +409,12 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock(DefaultRoles());
 
             User? createdUser = null;
             string? createdPassword = null;
 
             userManagerMock
-                .Setup(x => x.CreateAsync(
-                    It.IsAny<User>(),
-                    It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
                 .Callback<User, string>((user, password) =>
                 {
                     createdUser = user;
@@ -459,14 +422,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
                 })
                 .ReturnsAsync(IdentityResult.Success);
 
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
-
+            var handler = CreateHandler(userManagerMock, currentUserMock);
             var request = ValidRequest();
+
 
             // Act
             var result = await handler.Handle(request, CancellationToken.None);
@@ -479,17 +437,18 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             Assert.Equal("binhnv3", createdUser.UserName);
             Assert.Equal($"binhnv3@{request.DayOfBirth:ddMMyyyy}", createdPassword);
 
-            Assert.NotEmpty(createdUser.UserRoles);
-            Assert.Contains(
-                createdUser.UserRoles,
-                x => x.RoleId == Guid.Parse("20000000-0000-0000-0000-000000000002"));
+            userManagerMock.Verify(
+                x => x.AddToRoleAsync(
+                    It.Is<User>(u => u == createdUser),
+                    request.UserType.ToString()),
+                Times.Once);
 
             Assert.Equal("SD0005", result.Value.StaffCode);
             Assert.Equal("binhnv3", result.Value.UserName);
         }
-
+        
         [Fact]
-        public async Task CreateUserHandler_RoleDoesNotExist_ShouldReturnRoleNotFound()
+        public async Task CreateUserHandler_NameHasLeadingAndTrailingSpaces_ShouldTrimBeforeCreateUser()
         {
             var adminId = Guid.NewGuid();
             var locationId = Guid.NewGuid();
@@ -507,27 +466,32 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
 
             var userManagerMock = CreateUserManagerMock(users);
             var currentUserMock = CreateCurrentUserMock(adminId);
-            var validator = new Validators();
-            var loggerMock = new Mock<ILogger<Handler>>();
-            var roleManagerMock = CreateRoleManagerMock([]);
 
-            var handler = new Handler(
-                userManagerMock.Object,
-                currentUserMock.Object,
-                validator,
-                loggerMock.Object,
-                roleManagerMock.Object);
+            User? createdUser = null;
 
-            var request = ValidRequest();
+            userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .Callback<User, string>((user, _) => createdUser = user)
+                .ReturnsAsync(IdentityResult.Success);
+
+            var handler = CreateHandler(userManagerMock, currentUserMock);
+
+            var request = ValidRequest() with
+            {
+                FirstName = "  Binh  ",
+                LastName = "  Nguyen Van  "
+            };
 
             var result = await handler.Handle(request, CancellationToken.None);
 
-            Assert.True(result.IsError);
-            Assert.Equal(Errors.RoleNotFound.Code, result.FirstError.Code);
+            Assert.False(result.IsError);
 
-            userManagerMock.Verify(
-                x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()),
-                Times.Never);
+            Assert.NotNull(createdUser);
+            Assert.Equal("Binh", createdUser!.FirstName);
+            Assert.Equal("Nguyen Van", createdUser.LastName);
+
+            Assert.Equal("Binh", result.Value.FirstName);
+            Assert.Equal("Nguyen Van", result.Value.LastName);
         }
     }
 }

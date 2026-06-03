@@ -200,7 +200,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             result.ShouldHaveValidationErrorFor(x => x.JoinedDate);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
-                     && x.ErrorMessage == "Joined date is Saturday or Sunday. Please select a different date");
+                     && x.ErrorMessage == "Joined date must not in Saturday or Sunday. Please select a different date");
         }
 
         [Fact]
@@ -219,7 +219,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             result.ShouldHaveValidationErrorFor(x => x.JoinedDate);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
-                     && x.ErrorMessage == "Joined date is Saturday or Sunday. Please select a different date");
+                    && x.ErrorMessage == "Joined date must not in Saturday or Sunday. Please select a different date");
         }
 
         [Fact]
@@ -256,6 +256,66 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
             var result = _validator.TestValidate(request);
 
             result.ShouldNotHaveAnyValidationErrors();
+        }
+    
+        [Theory]
+        [InlineData(" Binh")]
+        [InlineData("Binh ")]
+        [InlineData("Binh  Huy")]
+        [InlineData(" Binh Huy ")]
+        public void CreateUserValidator_FirstNameHasInvalidSpaces_ShouldReturnErrors(string firstName)
+        {
+            var request = ValidRequest() with { FirstName = firstName };
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldHaveValidationErrorFor(x => x.FirstName);
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.FirstName)
+                    && x.ErrorMessage == "First Name only allows alphabetic characters and spaces.");
+        }
+
+        [Theory]
+        [InlineData("Nguyen  Van")]
+        [InlineData(" Nguyen Van")]
+        [InlineData("Nguyen Van ")]
+        [InlineData(" Nguyen  Van ")]
+        public void CreateUserValidator_LastNameHasInvalidSpaces_ShouldReturnErrors(string lastName)
+        {
+            var request = ValidRequest() with { LastName = lastName };
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldHaveValidationErrorFor(x => x.LastName);
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.LastName)
+                    && x.ErrorMessage == "Last Name only allows alphabetic characters and spaces.");
+        }
+
+        [Theory]
+        [InlineData("Binh")]
+        [InlineData("Binh Huy")]
+        [InlineData("Nguyen Vu Truong Huy")]
+        public void CreateUserValidator_FirstNameHasValidSpaces_ShouldNotReturnErrors(string firstName)
+        {
+            var request = ValidRequest() with { FirstName = firstName };
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.FirstName);
+        }
+
+        [Theory]
+        [InlineData("Nguyen")]
+        [InlineData("Nguyen Van")]
+        [InlineData("Nguyen Vu Truong")]
+        public void CreateUserValidator_LastNameHasValidSpaces_ShouldNotReturnErrors(string lastName)
+        {
+            var request = ValidRequest() with { LastName = lastName };
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldNotHaveValidationErrorFor(x => x.LastName);
         }
     }
 }
