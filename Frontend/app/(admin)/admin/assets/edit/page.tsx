@@ -70,33 +70,37 @@ export default function EditAssetPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    const nameRegex = /^[\p{L}\p{N}\s\-_/]+$/u;
-    const specRegex = /^[\p{L}\p{N}\s]+$/u;
+    const nameRegex = /^[\p{L}\p{N}\s]+$/u;
+    const allowedRegex =/^[\p{L}\p{N}\s,\/\-\|\(\)\+]+$/u;
 
-    if (!form.assetName.trim()) {
-      errors.assetName = "Asset name is required.";
-    } else if (form.assetName.length > 100) {
-      errors.assetName = "Asset name must not exceed 100 characters.";
-    } else if (!nameRegex.test(form.assetName)) {
-      errors.assetName =
-        "Asset name cannot contain special characters or emojis.";
-    }
+  if (!form.assetName.trim()) {
+    errors.assetName = "Asset name is required.";
+  } else if (form.assetName.length > 100) {
+    errors.assetName =
+      "Asset name must not exceed 100 characters.";
+  } else if (!nameRegex.test(form.assetName)) {
+    errors.assetName =
+      "Asset name contains invalid characters.";
+  }
 
-    if (!form.specification.trim()) {
-      errors.specification = "Specification is required.";
-    } else if (form.specification.length > 500) {
-      errors.specification = "Specification must not exceed 500 characters.";
-    } else if (!specRegex.test(form.specification)) {
-      errors.specification =
-        "Specification cannot contain special characters or emojis.";
-    }
+  if (!form.specification.trim()) {
+    errors.specification =
+      "Specification is required.";
+  } else if (form.specification.length > 500) {
+    errors.specification =
+      "Specification must not exceed 500 characters.";
+  } else if (!allowedRegex.test(form.specification)) {
+    errors.specification =
+      "Specification contains invalid characters.";
+  }
 
-    if (!form.installedDate) {
-      errors.installedDate = "Installed date is required.";
-    }
+  if (!form.installedDate) {
+    errors.installedDate =
+      "Installed date is required.";
+  }
 
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
+  setFieldErrors(errors);
+  return Object.keys(errors).length === 0;
   };
 
   const isFormValid =
