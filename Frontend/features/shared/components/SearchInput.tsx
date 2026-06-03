@@ -1,5 +1,7 @@
 "use client";
 
+import { ReactNode } from "react";
+
 interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -8,6 +10,7 @@ interface SearchInputProps {
   width?: string;
   txtInputTestId?: string;
   btnSearchTestId?: string;
+  searchIcon?: ReactNode;
 }
 
 export default function SearchInput({
@@ -18,6 +21,7 @@ export default function SearchInput({
   width = "w-full sm:w-60",
   txtInputTestId = "txtSearch",
   btnSearchTestId = "btnSearch",
+  searchIcon = "🔍"
 }: SearchInputProps) {
   return (
     <div
@@ -34,17 +38,17 @@ export default function SearchInput({
             onSearch?.(value);
           }
         }}
-        className="h-full flex-1 px-3 text-sm outline-none"
+        className="h-full flex-1 text-sm outline-none pl-3"
         data-testid={txtInputTestId}
       />
 
       <button
         type="button"
         onClick={() => onSearch?.(value)}
-        className="flex h-full w-10 items-center justify-center rounded border-l border-gray-400 text-gray-600 hover:bg-gray-50"
+        className="flex h-full aspect-square shrink-0 items-center justify-center rounded border-l border-gray-400 text-gray-600 hover:bg-gray-50 hover:cursor-pointer"
         data-testid={btnSearchTestId}
       >
-        🔍
+        {searchIcon}
       </button>
     </div>
   );

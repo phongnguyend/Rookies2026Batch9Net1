@@ -84,3 +84,30 @@ export interface CreateAssetResponse {
   state: AssetState;
   location: string;
 }
+
+export interface LookupAssetsRequest{
+  searchTerm?: string;
+  sortBy?: string;
+  sortDesc?: boolean;
+  pageSize?: number;
+  pageNumber?: number;
+}
+
+export interface LookupAssetsWithAssignedRequest{
+  searchTerm?: string;
+  sortBy?: string;
+  sortDesc?: boolean;
+  pageSize?: number;
+  pageNumber?: number;
+  assignedAssetId?: string;
+}
+
+
+export interface LookupAssetsSummary{
+  id: string;
+  assetCode: string;
+  assetName: string;
+  category: string;
+}
+
+export interface LookupAssetsResponse extends PaginationResponse<LookupAssetsSummary> {}
