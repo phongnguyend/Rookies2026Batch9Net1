@@ -137,6 +137,7 @@ export default function DatePickerInput({
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
       setError("");
+      onChange(null);
       return;
     }
 
@@ -181,9 +182,8 @@ export default function DatePickerInput({
                 handleDateValidation();
               }
             }}
-            className={`h-full w-full px-3 pr-8 text-sm outline-none ${
-              error ? "text-error" : ""
-            }`}
+            className={`h-full w-full px-3 pr-8 text-sm outline-none ${error ? "text-error" : ""
+              }`}
           />
 
           {inputValue && (
@@ -195,6 +195,7 @@ export default function DatePickerInput({
                 setInputValue("");
                 setError("");
                 setCursor(new Date());
+                onChange(null);
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >

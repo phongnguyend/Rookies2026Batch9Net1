@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NashAssetManagement.Application\NashAssetManagement.Application.csproj" />
     <ProjectReference Include="..\..\src\NashAssetManagement.Domain\NashAssetManagement.Domain.csproj" />
+    <ProjectReference Include="..\..\src\NashAssetManagement.Persistence\NashAssetManagement.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
