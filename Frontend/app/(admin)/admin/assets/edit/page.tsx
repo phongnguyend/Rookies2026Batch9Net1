@@ -80,7 +80,7 @@ export default function EditAssetPage() {
     } else if (form.assetName.length > 100) {
       errors.assetName = "Asset name must not exceed 100 characters.";
     } else if (!allowedRegex.test(form.assetName)) {
-      errors.specification =
+      errors.assetName =
         'Asset name must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
     }
 
