@@ -5,6 +5,7 @@ import {
   GetUserByIdResponse,
   GetUsersRequest,
   GetUsersResponse,
+  LookupUsers,
 } from "./users.types";
 
 export const usersApi = baseApiSlice.injectEndpoints({
@@ -20,7 +21,9 @@ export const usersApi = baseApiSlice.injectEndpoints({
           ...(params.searchTerm ? { searchTerm: params.searchTerm } : {}),
           ...(params.type ? { type: params.type } : {}),
           ...(params.sortBy ? { sortBy: params.sortBy } : {}),
-          ...(params.sortDesc !== undefined ? { sortDesc: params.sortDesc } : {}),
+          ...(params.sortDesc !== undefined
+            ? { sortDesc: params.sortDesc }
+            : {}),
         },
       }),
       providesTags: ["Users"],
@@ -32,7 +35,7 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
-
+    
     createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
       query: (body) => ({
         url: "v1/users",
@@ -41,7 +44,14 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
-
+    
+    lookupUsers: builder.query<LookupUsers.Response, LookupUsers.Request>({
+      query: (params) => ({
+        url: "v1/users/lookup",
+        params,
+      }),
+      providesTags: ["Users"],
+    }),
   }),
 });
 
@@ -49,4 +59,5 @@ export const {
   useGetUsersQuery, 
   useGetUserByIdQuery,
   useCreateUserMutation,
+  useLookupUsersQuery
 } = usersApi;
