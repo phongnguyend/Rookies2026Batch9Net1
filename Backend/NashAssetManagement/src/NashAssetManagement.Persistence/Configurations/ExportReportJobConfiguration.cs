@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Entities.Jobs;
 
 namespace NashAssetManagement.Persistence.Configurations
 {

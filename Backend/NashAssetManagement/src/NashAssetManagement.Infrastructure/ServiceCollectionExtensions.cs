@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NashAssetManagement.Infrastructure.AppIdentity;
+using NashAssetManagement.Infrastructure.BackgroundJobs;
 using NashAssetManagement.Infrastructure.Cookie;
 using NashAssetManagement.Infrastructure.DateTimes;
 using NashAssetManagement.Infrastructure.Jwt;
@@ -19,6 +20,7 @@ namespace NashAssetManagement.Infrastructure
             services.AddJwtTokenProvider();
             services.AddCookieService();
             services.AddReportServices();
+            services.AddHangFireServices(configuration);
 
             return services;
         }

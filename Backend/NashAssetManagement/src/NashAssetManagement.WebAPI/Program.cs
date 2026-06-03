@@ -7,6 +7,8 @@ using NashAssetManagement.WebAPI;
 using Serilog;
 using NashAssetManagement.WebAPI.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Hangfire;
+using NashAssetManagement.WebAPI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +58,11 @@ try
     app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangFireAdminDashboardFilter()]
+    });
 
     app.MapControllers();
 
