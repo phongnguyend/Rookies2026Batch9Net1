@@ -9,8 +9,10 @@ import RadioGroup from "@/features/shared/components/RadioGroup";
 import { useCreateUserMutation } from "@/features/users/users.api";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const genderItems = [Gender.Female, Gender.Male];
+const nameRegex = /^[a-zA-Z\s]+$/;
 
 // ================= SCHEMA =================
 
@@ -44,11 +46,11 @@ const isOver90 = (date: Date) => {
   return normalizeDate(date) < minDob;
 };
 
-const isJoinedDateOverOneWeek = (date: Date) => {
+const isJoinedDateOverOneMonth = (date: Date) => {
   const today = getToday();
 
   const maxJoinedDate = new Date(today);
-  maxJoinedDate.setDate(maxJoinedDate.getDate() + 7);
+  maxJoinedDate.setMonth(maxJoinedDate.getMonth() + 1);
 
   return normalizeDate(date) > maxJoinedDate;
 };
@@ -60,9 +62,19 @@ const isWeekend = (date: Date) => {
 
 const createUserSchema = z
   .object({
-    firstName: z.string().trim().min(1, "First Name is required."),
+    firstName: z
+      .string()
+      .trim()
+      .min(1, "First Name is required.")
+      .max(100, "First Name must not exceed 100 characters.")
+      .regex(nameRegex, "First Name only allows alphabetic characters and spaces."),
 
-    lastName: z.string().trim().min(1, "Last Name is required."),
+    lastName: z
+      .string()
+      .trim()
+      .min(1, "Last Name is required.")
+      .max(100, "Last Name must not exceed 100 characters.")
+      .regex(nameRegex, "Last Name only allows alphabetic characters and spaces."),
 
     dateOfBirth: z
       .date()
@@ -87,9 +99,9 @@ const createUserSchema = z
       .refine((value): value is Date => value !== null, {
         message: "Joined Date is required.",
       })
-      .refine((value) => !isJoinedDateOverOneWeek(value), {
+      .refine((value) => !isJoinedDateOverOneMonth(value), {
         message:
-          "Joined date must not exceed a week. Please select a different date",
+          "Joined date must not exceed a month. Please select a different date",
       })
       .refine((value) => !isWeekend(value), {
         message:
@@ -155,6 +167,8 @@ export default function CreateUserPage() {
   const joinedDateValue = watch("joinedDate");
   const userTypeValue = watch("userType");
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [createUser] = useCreateUserMutation();
   const dispatch = useAppDispatch();
 
@@ -175,8 +189,9 @@ export default function CreateUserPage() {
           type: ToastType.Success,
           testId: "txtCreateUserSuccess",
         }),
-      );
-
+      );  
+      
+      router.push("/admin/users?sortBy=createdDate&sortDesc=true&pageNumber=1");
       reset();
     } catch (err: any) {
       console.log(err);
@@ -323,7 +338,7 @@ export default function CreateUserPage() {
 
         <div className="flex-1">
           <select
-            value={userTypeValue ?? ""}
+            value={userTypeValue}
             onChange={(e) =>
               setValue("userType", e.target.value as UserRoles, {
                 shouldValidate: true,
@@ -331,11 +346,10 @@ export default function CreateUserPage() {
                 shouldTouch: true,
               })
             }
-            className="select select-bordered w-full"
+            className="select select-bordered w-full bg-white"
           >
-            <option value="" disabled></option>
-            <option value={UserRoles.Admin}>Admin</option>
             <option value={UserRoles.Staff}>Staff</option>
+            <option value={UserRoles.Admin}>Admin</option>
           </select>
 
           {errors.userType && (
@@ -347,12 +361,25 @@ export default function CreateUserPage() {
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-4 pt-4">
-        <button type="submit" disabled={!isValid || isSubmitting}>
+      <div className="flex justify-end gap-3 pt-6">
+        <button
+          type="submit"
+          disabled={!isValid || isSubmitting}
+          className="btn btn-primary min-w-24 text-white"
+        >
           Save
         </button>
 
-        <button type="button" className="btn btn-outline">
+        <button
+          type="button"
+          className="btn btn-outline btn-neutral min-w-24"
+          onClick={() => 
+            router.push(
+              searchParams.get("returnUrl") 
+              ?? "/admin/users"
+            )
+          }
+        >
           Cancel
         </button>
       </div>

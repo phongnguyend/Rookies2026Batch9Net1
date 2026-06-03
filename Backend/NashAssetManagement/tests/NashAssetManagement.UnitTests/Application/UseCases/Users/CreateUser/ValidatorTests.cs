@@ -168,19 +168,20 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.CreateUser
         }
 
         [Fact]
-        public void CreateUserValidator_JoinedDateExceedsOneWeek_ShouldReturnErrors()
+        public void CreateUserValidator_JoinedDateExceedsOneMonth_ShouldReturnErrors()
         {
             var request = ValidRequest() with
             {
-                JoinedDate = DateTime.UtcNow.Date.AddDays(8)
+                JoinedDate = DateTime.UtcNow.Date.AddMonths(1).AddDays(1)
             };
 
             var result = _validator.TestValidate(request);
 
             result.ShouldHaveValidationErrorFor(x => x.JoinedDate);
+
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
-                     && x.ErrorMessage == "Joined date must not exceed a week. Please select a different date");
+                    && x.ErrorMessage == "Joined date must not exceed one month. Please select a different date");
         }
 
         [Fact]
