@@ -8,6 +8,9 @@ import type {
   CreateAssetResponse,
   CreateCategoryRequest,
   CreateCategoryResponse,
+  LookupAssetsRequest,
+  LookupAssetsResponse,
+  LookupAssetsWithAssignedRequest,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
@@ -70,6 +73,21 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       invalidatesTags: ["Asset"],
     }),
 
+    lookupAssets: builder.query<LookupAssetsResponse, LookupAssetsRequest>({
+      query: (params) => ({
+        url: "v1/assets/lookup",
+        params,
+      }),
+      providesTags: ["Asset"],
+    }),
+
+    lookupAssetsWithAssigned: builder.query<LookupAssetsResponse, LookupAssetsWithAssignedRequest>({
+      query: (params) => ({
+        url: "v1/assets/lookup-with-assigned",
+        params,
+      }),
+      providesTags: ["Asset"],
+    }),
   }),
 });
 
@@ -79,4 +97,6 @@ export const {
   useGetCategoriesQuery,
   useCreateAssetMutation,
   useCreateCategoryMutation,
+  useLookupAssetsQuery,
+  useLookupAssetsWithAssignedQuery
 } = assetsApi;
