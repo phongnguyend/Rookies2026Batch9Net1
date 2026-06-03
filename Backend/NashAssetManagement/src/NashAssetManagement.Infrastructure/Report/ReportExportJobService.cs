@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Abstractions.File;
 using NashAssetManagement.Application.Abstractions.Report;
 using NashAssetManagement.Application.UseCases.Report.Export;
@@ -16,6 +17,7 @@ namespace NashAssetManagement.Infrastructure.Report
         IRepository<ExportReportJob, Guid> exportRepository,
         IRepository<Category, Guid> categoryRepository,
         IRepository<Location, Guid> locationRepository,
+        IDateTimeProvider dateTimeProvider,
         IUnitOfWork uow,
         IReportFileNameService fileNameService,
         [FromKeyedServices(AppCts.Services.ReportExcel)] IExcelGenerator excelReportGenerator,
@@ -106,7 +108,7 @@ namespace NashAssetManagement.Infrastructure.Report
 
                 exportJob.FilePath = excelFileName;
                 exportJob.Status = ExportReportJobStatus.ReadyToDownload;
-                exportJob.CompletedAtUtc = DateTime.UtcNow;
+                exportJob.CompletedAtUtc = dateTimeProvider.UtcNow;
 
                 await uow.SaveChangesAsync(cancellationToken);
             }
