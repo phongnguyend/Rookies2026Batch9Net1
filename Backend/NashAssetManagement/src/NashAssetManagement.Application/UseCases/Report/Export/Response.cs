@@ -1,4 +1,4 @@
 namespace NashAssetManagement.Application.UseCases.Report.Export
 {
-    public sealed record Response(Domain.Enums.ExportReportJobStatus status);
+    public sealed record Response(Domain.Enums.ExportReportJobStatus Status);
 }

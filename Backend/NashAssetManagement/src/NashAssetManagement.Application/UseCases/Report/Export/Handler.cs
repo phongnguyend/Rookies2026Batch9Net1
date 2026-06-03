@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Abstractions.Report;
 using NashAssetManagement.Domain.Entities.Jobs.Report;
 using NashAssetManagement.Domain.Enums;
@@ -17,7 +18,8 @@ namespace NashAssetManagement.Application.UseCases.Report.Export
         IUnitOfWork uow,
         ILogger<Handler> logger,
         IValidator<Request> validator,
-        IBackgroundJobClient backgroundJobClient
+        IBackgroundJobClient backgroundJobClient,
+        IDateTimeProvider dateTimeProvider
     ) : IRequestHandler<Request, ErrorOr<Response>>
     {
         public async Task<ErrorOr<Response>> Handle(Request orgReq, CancellationToken cancellationToken)
@@ -37,15 +39,24 @@ namespace NashAssetManagement.Application.UseCases.Report.Export
             var existingReport = await exportReportRepository.FirstOrDefaultAsync(new ExportReportJobByAdminSpecification(userId), cancellationToken);
             if (existingReport != null)
             {
-                logger.LogInformation("User {UserId} attempted to create a new export report while an existing report is still being processed or waiting for download.", userId);
-                return Errors.ReportAlreadyExists;
+                if (existingReport.Status == ExportReportJobStatus.Failed)
+                {
+                    // delete old job if it failed
+                    exportReportRepository.Delete(existingReport);
+                    await uow.SaveChangesAsync(cancellationToken);
+                }
+                else
+                {
+                    logger.LogInformation("User {UserId} attempted to create a new export report while an existing report is still being processed or waiting for download.", userId);
+                    return Errors.ReportAlreadyExists;
+                }
             }
 
             var exportReportJob = new ExportReportJob
             {
                 RequestedByAdminId = userId,
                 Status = ExportReportJobStatus.Processing,
-                CreatedAtUtc = DateTime.UtcNow,
+                CreatedAtUtc = dateTimeProvider.UtcNow,
             };
 
             try
@@ -60,7 +71,7 @@ namespace NashAssetManagement.Application.UseCases.Report.Export
                     userName,
                     orgReq.SortBy ?? ExportReportSortBy.Category,
                     orgReq.SortDirection ?? ExportReportSortDirection.Asc,
-                    cancellationToken
+                    CancellationToken.None // does not tie with the HTTP request lifecycle
                 ));
 
                 return new Response(exportReportJob.Status);

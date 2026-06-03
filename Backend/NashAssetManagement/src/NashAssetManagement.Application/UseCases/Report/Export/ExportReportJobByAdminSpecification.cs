@@ -8,7 +8,9 @@ namespace NashAssetManagement.Application.UseCases.Report.Export
         public ExportReportJobByAdminSpecification(Guid adminId)
         {
             Query
-                .Where(x => x.RequestedByAdminId == adminId);
+                .Where(x => x.RequestedByAdminId == adminId)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .AsNoTracking();
         }
     }
 }
