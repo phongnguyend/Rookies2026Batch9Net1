@@ -63,6 +63,7 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 user.Gender = request.Gender;
                 user.JoinedAtUtc = request.JoinedDate;
                 user.UserType = request.Type;
+                user.UpdatedAtUtc = DateTime.UtcNow;
 
                 var updateResult =await userManager.UpdateAsync(user);
 

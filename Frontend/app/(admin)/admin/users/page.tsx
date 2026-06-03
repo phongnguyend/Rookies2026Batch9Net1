@@ -4,6 +4,7 @@ import {
   type MouseEvent,
   type ReactNode,
   useCallback,
+  useEffect,
   useState,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -124,6 +125,13 @@ export default function UsersPage() {
     (type): type is UserRoles =>
       type === UserRoles.Admin || type === UserRoles.Staff,
   );
+  const [useTemporaryUpdatedSort, setUseTemporaryUpdatedSort] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc";
+  });
   const sorts: SortItem[] = sortByParam
     ? [
         {
@@ -211,14 +219,18 @@ export default function UsersPage() {
     // Backend currently accepts a single type value. When both roles are
     // selected, the dropdown normalizes to "All", so no type filter is sent.
     ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
-    sortBy: sorts[0]?.key ?? defaultSort.key,
-    ...(sorts[0]?.direction === SortDirection.Desc ? { sortDesc: true } : {}),
+    sortBy: useTemporaryUpdatedSort ? "updatedDate" : (sorts[0]?.key ?? defaultSort.key),
+    ...(useTemporaryUpdatedSort || sorts[0]?.direction === SortDirection.Desc
+      ? { sortDesc: true }
+      : {}),
   };
 
   const { data, isLoading } = useGetUsersQuery(queryParams);
   const users = data?.items ?? [];
 
   const handleSortChange = (newSorts: SortItem[]) => {
+    setUseTemporaryUpdatedSort(false);
+
     if (newSorts.length === 0) {
       updateQueryParams({ page: 1, sortBy: null, sortDesc: null });
       return;
@@ -231,6 +243,12 @@ export default function UsersPage() {
       sortDesc: firstSort.direction === SortDirection.Desc,
     });
   };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc") {
+      sessionStorage.removeItem("usersTemporarySort");
+    }
+  }, []);
 
   const columns: ColumnDef<UserRow>[] = [
     {

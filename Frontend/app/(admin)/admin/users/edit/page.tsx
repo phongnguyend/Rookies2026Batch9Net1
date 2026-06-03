@@ -264,6 +264,8 @@ function EditUserForm({
         type: selectedType,
       }).unwrap();
 
+      sessionStorage.setItem("usersTemporarySort", "updatedDateDesc");
+
       dispatch(
         enqueueToast({
           message: "User updated successfully.",
