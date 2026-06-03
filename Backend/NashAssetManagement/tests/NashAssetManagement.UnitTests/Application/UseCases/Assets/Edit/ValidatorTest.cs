@@ -39,7 +39,10 @@ public class ValidatorTests
     [Fact]
     public async Task Validate_AssetNameExceedsMaxLength_ShouldReturnError()
     {
-        var request = ValidRequest() with { AssetName = new string('A', 101) };
+        var request = ValidRequest() with
+        {
+            AssetName = new string('A', 101)
+        };
 
         var result = await _validator.ValidateAsync(request);
 
@@ -48,10 +51,50 @@ public class ValidatorTests
             x => x.ErrorMessage == "Asset name must not exceed 100 characters.");
     }
 
+    [Theory]
+    [InlineData("Laptop@Dell")]
+    [InlineData("Laptop😀")]
+    [InlineData("12345")]
+    [InlineData("+++")]
+    public async Task Validate_AssetNameInvalidCharacters_ShouldReturnError(string name)
+    {
+        var request = ValidRequest() with
+        {
+            AssetName = name
+        };
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors,
+            x => x.ErrorMessage == "Asset name can only contain letters, numbers and spaces.");
+    }
+
+    [Theory]
+    [InlineData("Laptop Dell")]
+    [InlineData("Laptop-Dell")]
+    [InlineData("Laptop+Dell")]
+    [InlineData("Laptop 123")]
+    public async Task Validate_AssetNameAllowedCharacters_ShouldPass(string name)
+    {
+        var request = ValidRequest() with
+        {
+            AssetName = name
+        };
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.True(result.IsValid);
+    }
+
+
     [Fact]
     public async Task Validate_SpecificationIsEmpty_ShouldReturnError()
     {
-        var request = ValidRequest() with { Specification = "" };
+        var request = ValidRequest() with
+        {
+            Specification = ""
+        };
 
         var result = await _validator.ValidateAsync(request);
 
@@ -60,10 +103,14 @@ public class ValidatorTests
             x => x.ErrorMessage == "Specification is required.");
     }
 
+
     [Fact]
     public async Task Validate_SpecificationExceedsMaxLength_ShouldReturnError()
     {
-        var request = ValidRequest() with { Specification = new string('A', 501) };
+        var request = ValidRequest() with
+        {
+            Specification = new string('A', 501)
+        };
 
         var result = await _validator.ValidateAsync(request);
 
@@ -72,37 +119,92 @@ public class ValidatorTests
             x => x.ErrorMessage == "Specification must not exceed 500 characters.");
     }
 
-    [Fact]
-    public async Task Validate_InstalledDateIsToday_ShouldPass()
+
+    [Theory]
+    [InlineData("24\" FHD IPS, 1920x1080, 60Hz")]
+    [InlineData("Wireless, 2.4GHz USB Receiver")]
+    [InlineData("Core i7-12700 + RAM 16GB")]
+    [InlineData("h + +")]
+    [InlineData("test+test")]
+    [InlineData("h 1")]
+    public async Task Validate_SpecificationAllowedCharacters_ShouldPass(string specification)
     {
-        var request = ValidRequest() with { InstalledDate = DateTime.UtcNow };
+        var request = ValidRequest() with
+        {
+            Specification = specification
+        };
 
         var result = await _validator.ValidateAsync(request);
 
         Assert.True(result.IsValid);
     }
 
-    [Fact]
-    public async Task Validate_InstalledDateIsInPast_ShouldPass()
+
+    [Theory]
+    [InlineData("😀")]
+    [InlineData("123 456")]
+    [InlineData("++++ ++++")]
+    [InlineData("test@abc")]
+    public async Task Validate_SpecificationInvalidCharacters_ShouldReturnError(string specification)
     {
-        var request = ValidRequest() with { InstalledDate = DateTime.UtcNow.AddYears(-1) };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.True(result.IsValid);
-    }
-
-    [Fact]
-    public async Task Validate_StateIsAssigned_ShouldReturnError()
-    {
-        var request = ValidRequest() with { State = AssetState.Assigned };
+        var request = ValidRequest() with
+        {
+            Specification = specification
+        };
 
         var result = await _validator.ValidateAsync(request);
 
         Assert.False(result.IsValid);
+
+        Assert.Contains(result.Errors,
+            x => x.ErrorMessage == "Specification contains invalid characters.");
+    }
+
+
+    [Fact]
+    public async Task Validate_InstalledDateIsToday_ShouldPass()
+    {
+        var request = ValidRequest() with
+        {
+            InstalledDate = DateTime.UtcNow
+        };
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.True(result.IsValid);
+    }
+
+
+    [Fact]
+    public async Task Validate_InstalledDateIsInPast_ShouldPass()
+    {
+        var request = ValidRequest() with
+        {
+            InstalledDate = DateTime.UtcNow.AddYears(-1)
+        };
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.True(result.IsValid);
+    }
+
+
+    [Fact]
+    public async Task Validate_StateIsAssigned_ShouldReturnError()
+    {
+        var request = ValidRequest() with
+        {
+            State = AssetState.Assigned
+        };
+
+        var result = await _validator.ValidateAsync(request);
+
+        Assert.False(result.IsValid);
+
         Assert.Contains(result.Errors,
             x => x.ErrorMessage == "State cannot be Assigned.");
     }
+
 
     [Theory]
     [InlineData(AssetState.Available)]
@@ -111,7 +213,10 @@ public class ValidatorTests
     [InlineData(AssetState.Recycled)]
     public async Task Validate_StateIsNotAssigned_ShouldPass(AssetState state)
     {
-        var request = ValidRequest() with { State = state };
+        var request = ValidRequest() with
+        {
+            State = state
+        };
 
         var result = await _validator.ValidateAsync(request);
 

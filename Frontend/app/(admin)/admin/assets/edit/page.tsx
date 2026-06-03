@@ -72,15 +72,16 @@ export default function EditAssetPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    const nameRegex = /^[\p{L}\p{N}\s]+$/u;
-    const allowedRegex = /^[\p{L}\p{N}\s,\/\-\|\(\)\+"]+$/u;
+
+    const allowedRegex = /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u;
 
     if (!form.assetName.trim()) {
       errors.assetName = "Asset name is required.";
     } else if (form.assetName.length > 100) {
       errors.assetName = "Asset name must not exceed 100 characters.";
-    } else if (!nameRegex.test(form.assetName)) {
-      errors.assetName = "Asset name contains invalid characters.";
+    } else if (!allowedRegex.test(form.assetName)) {
+      errors.specification =
+        'Asset name must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.specification.trim()) {
@@ -89,7 +90,7 @@ export default function EditAssetPage() {
       errors.specification = "Specification must not exceed 500 characters.";
     } else if (!allowedRegex.test(form.specification)) {
       errors.specification =
-        'Specification contains invalid characters, only allow these special characters " , / - | ( ) + .';
+        'Specification must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.installedDate) {
@@ -231,9 +232,7 @@ export default function EditAssetPage() {
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.assetName.length === 0 ? (
-              <span className="text-red-500">Asset Name is required.</span>
-            ) : form.assetName.length === 100 ? (
+            {form.assetName.length === 100 ? (
               <span className="text-orange-500">
                 Maximum characters is 100.
               </span>
@@ -283,9 +282,7 @@ export default function EditAssetPage() {
             className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.specification.length === 0 ? (
-              <span className="text-red-500">Specification is required.</span>
-            ) : form.specification.length === 500 ? (
+            {form.specification.length === 500 ? (
               <span className="text-orange-500">
                 Maximum characters is 500.
               </span>

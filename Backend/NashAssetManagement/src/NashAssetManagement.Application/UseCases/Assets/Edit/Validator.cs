@@ -5,12 +5,7 @@ namespace NashAssetManagement.Application.UseCases.Assets.Edit;
 
 public class EditAssetValidator : AbstractValidator<EditAssetRequest>
 {
-    private const string AssetNamePattern =
-        @"^[\p{L}\p{N}\s]+$";
-
-    private const string SpecificationPattern =
-        @"^[\p{L}\p{N}\s,\/\-\|\(\)\+""']+$";
-
+    private const string allowPattern = @"^(?=.*[\p{L}])[\p{L}\p{N}""\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}""\/\-\|\(\)\+\.,]+)*$";
     public EditAssetValidator()
     {
         RuleFor(x => x.AssetName)
@@ -18,7 +13,7 @@ public class EditAssetValidator : AbstractValidator<EditAssetRequest>
             .WithMessage("Asset name is required.")
             .MaximumLength(100)
             .WithMessage("Asset name must not exceed 100 characters.")
-            .Matches(AssetNamePattern)
+            .Matches(allowPattern)
             .WithMessage(
                 "Asset name can only contain letters, numbers and spaces."
             );
@@ -28,7 +23,7 @@ public class EditAssetValidator : AbstractValidator<EditAssetRequest>
             .WithMessage("Specification is required.")
             .MaximumLength(500)
             .WithMessage("Specification must not exceed 500 characters.")
-            .Matches(SpecificationPattern)
+            .Matches(allowPattern)
             .WithMessage(
                 "Specification contains invalid characters."
             );
