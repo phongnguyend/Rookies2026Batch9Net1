@@ -46,7 +46,7 @@ namespace NashAssetManagement.Application.UseCases.Report.View
                 NotAvailable: category.Assets.Count(a => a.State == AssetState.NotAvailable),
                 WaitingForRecycling: category.Assets.Count(a => a.State == AssetState.WaitingForRecycling),
                 Recycled: category.Assets.Count(a => a.State == AssetState.Recycled)
-            ));
+            )).OrderBy(r => r.CategoryName);
 
             reportRows = request.SortBy switch
             {
