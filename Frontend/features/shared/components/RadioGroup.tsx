@@ -6,6 +6,7 @@ interface RadioGroupProps<T> {
   value: string;
   getKey: (item: T) => string;
   getLabel: (item: T) => string;
+  getTestId?: (item: T) => string;
   onChange: (value: string) => void;
   name: string;
 }
@@ -16,6 +17,7 @@ export default function RadioGroup<T>({
   value,
   getKey,
   getLabel,
+  getTestId,
   onChange,
   name,
 }: RadioGroupProps<T>) {
@@ -33,6 +35,7 @@ export default function RadioGroup<T>({
               className="label cursor-pointer gap-2"
             >
               <input
+                data-testid={getTestId?.(item)}
                 type="radio"
                 name={name}
                 value={itemKey}

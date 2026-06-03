@@ -221,6 +221,7 @@ export default function CreateUserPage() {
         <div className="flex-1">
           <input
             {...register("firstName")}
+            data-testid="txtUserFirstName"
             className="input input-bordered w-full"
           />
 
@@ -239,6 +240,7 @@ export default function CreateUserPage() {
         <div className="flex-1">
           <input
             {...register("lastName")}
+            data-testid="txtUserLastName"
             className="input input-bordered w-full"
           />
 
@@ -268,7 +270,7 @@ export default function CreateUserPage() {
             }}
             placeholder=""
             width="w-full"
-            txtInputTestId="txtDateOfBirth"
+            txtInputTestId="dtpUserDateOfBirth"
           />
 
           {errors.dateOfBirth && (
@@ -286,9 +288,13 @@ export default function CreateUserPage() {
         <RadioGroup
           items={genderItems}
           name="gender"
+          data-testid="ddlUserType"
           value={genderValue}
           getKey={(item) => item}
           getLabel={(item) => item}
+          getTestId={(item) =>
+            item === Gender.Male ? "rdoUserMale" : "rdoUserFemale"
+          }
           onChange={(value) => {
             setValue("gender", value as Gender, {
               shouldValidate: true,
@@ -321,7 +327,7 @@ export default function CreateUserPage() {
             }}
             placeholder=""
             width="w-full"
-            txtInputTestId="txtJoinedDate"
+            txtInputTestId="dtpUserJoinedDate"
           />
 
           {errors.joinedDate && (
@@ -338,6 +344,7 @@ export default function CreateUserPage() {
 
         <div className="flex-1">
           <select
+            data-testid="ddlUserType"
             value={userTypeValue}
             onChange={(e) =>
               setValue("userType", e.target.value as UserRoles, {
@@ -364,6 +371,7 @@ export default function CreateUserPage() {
       <div className="flex justify-end gap-3 pt-6">
         <button
           type="submit"
+          data-testid="btnSaveUser"
           disabled={!isValid || isSubmitting}
           className="btn btn-primary min-w-24 text-white"
         >
@@ -372,6 +380,7 @@ export default function CreateUserPage() {
 
         <button
           type="button"
+          data-testid="btnCancelUser"
           className="btn btn-outline btn-neutral min-w-24"
           onClick={() => 
             router.push(
