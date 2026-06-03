@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NashAssetManagement.Infrastructure.AppIdentity;
 using NashAssetManagement.Infrastructure.BackgroundJobs;
+using NashAssetManagement.Infrastructure.AppNamingFormat;
 using NashAssetManagement.Infrastructure.Cookie;
 using NashAssetManagement.Infrastructure.DateTimes;
 using NashAssetManagement.Infrastructure.Jwt;
@@ -21,6 +22,7 @@ namespace NashAssetManagement.Infrastructure
             services.AddCookieService();
             services.AddReportServices();
             services.AddHangFireServices(configuration);
+            services.AddAppNamingFormatServices();
 
             return services;
         }
