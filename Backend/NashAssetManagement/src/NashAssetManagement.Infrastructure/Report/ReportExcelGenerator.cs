@@ -2,15 +2,14 @@ using System.Reflection;
 using ClosedXML.Excel;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.File;
-using NashAssetManagement.Application.Abstractions.Report;
 
 namespace NashAssetManagement.Infrastructure.Report
 {
-    public sealed class AssetReportExcelGenerator(
-        ILogger<AssetReportExcelGenerator> logger
-    ) : IExcelGenerator<AssetReportRow>
+    public sealed class ReportExcelGenerator(
+        ILogger<ReportExcelGenerator> logger
+    ) : IExcelGenerator
     {
-        public byte[] Generate(IReadOnlyList<AssetReportRow> rows, string sheetName = "Sheet1")
+        public byte[] Generate<AssetReportRow>(IReadOnlyList<AssetReportRow> rows, string sheetName = "Sheet1")
         {
             if (rows == null || rows.Count == 0 || string.IsNullOrEmpty(sheetName))
             {
@@ -60,6 +59,5 @@ namespace NashAssetManagement.Infrastructure.Report
             workbook.SaveAs(stream);
             return stream.ToArray();
         }
-
     }
 }

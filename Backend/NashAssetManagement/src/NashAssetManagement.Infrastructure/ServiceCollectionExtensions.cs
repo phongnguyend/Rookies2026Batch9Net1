@@ -4,6 +4,7 @@ using NashAssetManagement.Infrastructure.AppIdentity;
 using NashAssetManagement.Infrastructure.Cookie;
 using NashAssetManagement.Infrastructure.DateTimes;
 using NashAssetManagement.Infrastructure.Jwt;
+using NashAssetManagement.Infrastructure.Report;
 
 namespace NashAssetManagement.Infrastructure
 {
@@ -17,6 +18,7 @@ namespace NashAssetManagement.Infrastructure
             services.AddAppIdentityServices();
             services.AddJwtTokenProvider();
             services.AddCookieService();
+            services.AddReportServices();
 
             return services;
         }

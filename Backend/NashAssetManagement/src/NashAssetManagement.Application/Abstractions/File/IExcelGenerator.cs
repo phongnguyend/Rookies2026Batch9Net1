@@ -1,7 +1,7 @@
 namespace NashAssetManagement.Application.Abstractions.File
 {
-    public interface IExcelGenerator<T>
+    public interface IExcelGenerator
     {
-        byte[] Generate(IReadOnlyList<T> rows, string sheetName = "Sheet1");
+        byte[] Generate<T>(IReadOnlyList<T> rows, string sheetName = "Sheet1");
     }
 }
