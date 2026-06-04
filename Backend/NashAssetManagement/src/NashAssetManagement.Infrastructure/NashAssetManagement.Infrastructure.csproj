@@ -1,8 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+      <PackageReference Include="ClosedXML" />
+      <PackageReference Include="Hangfire.AspNetCore" />
+      <PackageReference Include="Hangfire.Core" />
+      <PackageReference Include="Hangfire.SqlServer" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
       <PackageReference Include="System.Security.Cryptography.Xml" />
+      <PackageReference Include="Newtonsoft.Json"/>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\NashAssetManagement.Application\NashAssetManagement.Application.csproj" />

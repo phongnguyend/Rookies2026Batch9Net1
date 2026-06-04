@@ -1,5 +1,5 @@
 import { baseApiSlice } from "@/lib/api/base.api";
-import { ViewReport } from "./report.types";
+import { ViewReport, Export, CurrentDownload, Cancel } from "./report.types";
 
 export const reportApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -18,7 +18,35 @@ export const reportApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Report"],
     }),
+    getExportStatus: builder.query<CurrentDownload.Response, void>({
+      query: () => ({
+        url: "v1/report/export",
+        method: "GET",
+      }),
+    }),
+    startExport: builder.mutation<Export.Response, Export.Request>({
+      query: (params) => ({
+        url: "v1/report/export",
+        method: "POST",
+        params: {
+          sortBy: params?.sortBy,
+          sortDirection: params?.sortDirection,
+        },
+      }),
+    }),
+    cancelExport: builder.mutation<Cancel.Response, void>({
+      query: () => ({
+        url: "v1/report/export",
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetReportQuery, useLazyGetReportQuery } = reportApi;
+export const {
+  useGetReportQuery,
+  useLazyGetReportQuery,
+  useGetExportStatusQuery,
+  useStartExportMutation,
+  useCancelExportMutation,
+} = reportApi;

@@ -19,8 +19,8 @@ export const authApi = baseApiSlice.injectEndpoints({
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
           }
-        } catch (error) {
-          console.error("Login mutation error storing tokens:", error);
+        } catch {
+          console.error("Unauthorized to access. Please try again!");
         }
       },
     }),
