@@ -80,7 +80,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
         {
             // Arrange
             var request = new Request(
-                UserId: invalidId,
+                UserId: invalidId!,
                 AssetId: Guid.NewGuid().ToString(),
                 AssignedDate: DateTime.Today,
                 Note: null);
@@ -141,7 +141,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             // Arrange
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
-                AssetId: invalidId,
+                AssetId: invalidId!,
                 AssignedDate: DateTime.Today,
                 Note: null);
 

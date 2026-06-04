@@ -37,7 +37,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
         {
             _userManagerMock = new Mock<UserManager<User>>(
                 Mock.Of<IUserStore<User>>(),
-                null, null, null, null, null, null, null, null);
+                null!, null!, null!, null!, null!, null!, null!, null!);
 
             _dateTimeProviderMock
                 .Setup(x => x.UtcNow)
