@@ -136,6 +136,7 @@ export default function DatePickerInput({
 
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
+
       setError("");
       return;
     }
@@ -167,12 +168,13 @@ export default function DatePickerInput({
         {/* Date Picker Input */}
         <div className="relative flex-1">
           <input
-            data-testid="txtAssignedDate"
+            data-testid={txtInputTestId}
             value={inputValue}
             placeholder={placeholder}
             onChange={(e) => {
               setInputValue(e.target.value);
               setError("");
+              onChange(null);
             }}
             onBlur={handleDateValidation}
             onKeyDown={(e) => {
