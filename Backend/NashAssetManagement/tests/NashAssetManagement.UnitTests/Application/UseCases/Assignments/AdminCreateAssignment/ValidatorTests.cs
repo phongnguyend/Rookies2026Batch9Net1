@@ -1,4 +1,6 @@
 ﻿using FluentValidation.TestHelper;
+using Moq;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssignment;
 using Xunit;
 
@@ -7,10 +9,16 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
     public class ValidatorTests
     {
         private readonly Validator _validator;
+        private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
+        private readonly DateTime _utcNow = DateTime.UtcNow;
 
         public ValidatorTests()
         {
-            _validator = new Validator();
+            _dateTimeProviderMock
+                .Setup(x => x.UtcNow)
+                .Returns(_utcNow);
+
+            _validator = new Validator(_dateTimeProviderMock.Object);
         }
 
         // -------------------------------------------------------------------------
@@ -24,7 +32,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: "Valid note");
 
             // Act
@@ -41,7 +49,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -62,7 +70,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -82,7 +90,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: invalidId!,
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -100,7 +108,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: "not-a-valid-guid",
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -122,7 +130,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -142,7 +150,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: invalidId!,
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -160,7 +168,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: "not-a-valid-guid",
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -182,7 +190,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: new string('a', 1000));
 
             // Act
@@ -199,7 +207,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: new string('a', 1001));
 
             // Act
@@ -221,7 +229,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today,
+                AssignedDate: _utcNow.Date,
                 Note: null);
 
             // Act
@@ -238,7 +246,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today.AddDays(7),
+                AssignedDate: _utcNow.Date.AddDays(7),
                 Note: null);
 
             // Act
@@ -255,7 +263,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             var request = new Request(
                 UserId: Guid.NewGuid().ToString(),
                 AssetId: Guid.NewGuid().ToString(),
-                AssignedDate: DateTime.Today.AddDays(-1),
+                AssignedDate: _utcNow.Date.AddDays(-1),
                 Note: null);
 
             // Act
@@ -264,6 +272,24 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             // Assert
             result.ShouldHaveValidationErrorFor(x => x.AssignedDate)
                   .WithErrorMessage("Assigned date must be current date or in the future.");
+        }
+
+        [Fact]
+        public void Validate_ShouldHaveValidationError_WhenAssignedDateIsEmpty()
+        {
+            // Arrange
+            var request = new Request(
+                UserId: Guid.NewGuid().ToString(),
+                AssetId: Guid.NewGuid().ToString(),
+                AssignedDate: default,
+                Note: null);
+
+            // Act
+            var result = _validator.TestValidate(request);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.AssignedDate)
+                  .WithErrorMessage("Assigned date is required.");
         }
     }
 }

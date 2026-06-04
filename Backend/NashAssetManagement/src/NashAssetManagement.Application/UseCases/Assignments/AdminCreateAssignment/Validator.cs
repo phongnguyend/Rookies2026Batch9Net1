@@ -1,11 +1,12 @@
 ﻿using FluentValidation;
+using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Common.Validators;
 
 namespace NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssignment
 {
     public class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        public Validator(IDateTimeProvider dateTimeProvider)
         {
             RuleFor(x => x.UserId)
                 .MustBeValidGuid();
@@ -18,7 +19,9 @@ namespace NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssign
                 .WithMessage("Note cannot exceed 1000 characters.");
 
             RuleFor(x => x.AssignedDate)
-                .GreaterThanOrEqualTo(_ => DateTime.Today)
+                .NotEmpty()
+                .WithMessage("Assigned date is required.")
+                .GreaterThanOrEqualTo(_ => dateTimeProvider.UtcNow.Date)
                 .WithMessage("Assigned date must be current date or in the future.");
         }
     }
