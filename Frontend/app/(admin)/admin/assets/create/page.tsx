@@ -8,10 +8,17 @@ import {
 } from "@/features/Assets/assets.api";
 import { AssetState } from "@/features/Assets/assets.types";
 import CategoryDropdown from "@/features/Assets/components/categoryDropdown";
-import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import DatePickerInput from "@/features/Assets/components/assetDatePicker";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
+
+const EMOJI_REGEX = /\p{Extended_Pictographic}/gu
+const normalizeText = (value: string) =>
+  stripEmoji(value)
+    .replace(/\s+/g, " ")
+    .trim();
+const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "")
 
 export default function CreateAssetPage() {
   const router = useRouter();
@@ -36,11 +43,10 @@ export default function CreateAssetPage() {
     assetName.trim() !== "" &&
     categoryId !== "" &&
     specification.trim() !== "" &&
-    installedDate !== null; // ← check null not empty string
+    installedDate !== null;
 
   // ─── Handle category selection ─────────────────────
   const handleCategoryChange = (id: string, name: string) => {
-    // ← accept id + name
     setCategoryId(id);
     setCategoryName(name);
   };
@@ -61,8 +67,8 @@ export default function CreateAssetPage() {
 
     try {
       await createAsset({
-        assetName: assetName.trim(),
-        specification: specification.trim(),
+        assetName: normalizeText(assetName),
+        specification: normalizeText(specification),
         installedDate: formatDate(installedDate!),
         state,
         categoryId,
@@ -85,27 +91,27 @@ export default function CreateAssetPage() {
   const validateForm = () => {
     const errors: Record<string, string> = {};
 
-    if (!assetName.trim()) {
+    const normalizedName = normalizeText(assetName);
+    const normalizedSpec = normalizeText(specification);
+
+    if (!normalizedName) {
       errors.assetName = "Asset name is required.";
-    } else if (assetName.length > 100) {
+    } else if (normalizedName.length > 100) {
       errors.assetName = "Asset name must not exceed 100 characters.";
     }
 
-    if (!categoryId.trim()) {
-      errors.categoryName = "Category name is required.";
+    if (!normalizedSpec) {
+      errors.specification = "Specification is required.";
+    } else if (normalizedSpec.length > 500) {
+      errors.specification = "Specification must not exceed 500 characters.";
     }
 
-    if (!specification.trim()) {
-      errors.specification = "Specification is required.";
-    } else if (specification.length > 500) {
-      errors.specification = "Specification must not exceed 500 characters.";
+    if (!categoryId.trim()) {
+      errors.categoryId = "Category is required.";
     }
 
     if (!installedDate) {
       errors.installedDate = "Installed date is required.";
-    } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
     }
 
     setFieldErrors(errors);
@@ -115,7 +121,7 @@ export default function CreateAssetPage() {
 
   // ─── Render ───────────────────────────────────────
   return (
-    <div className="p-6 max-w-lg">
+    <div className="max-w-lg">
       <h1 className="text-primary font-bold text-xl mb-6">Create New Asset</h1>
 
       {serverError && (
@@ -126,108 +132,149 @@ export default function CreateAssetPage() {
 
       <div className="space-y-4">
         {/* Name */}
-        <div className="flex-1">
-          Name
-          <input
-            maxLength={100}
-            data-testid="txtName"
-            type="text"
-            value={assetName}
-            onChange={(e) => setAssetName(e.target.value)}
-            className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
-          />
-          <div className="mt-1 flex items-center justify-between text-xs">
-            {assetName.length === 100 ? (
-              <span className="text-orange-500">
-                Maximum characters is 100.
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
+          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
+            Name
+          </label>
+          <div className="flex-1">
+            <input
+              maxLength={100}
+              data-testid="txtName"
+              type="text"
+              value={assetName}
+              onChange={(e) => {
+                setAssetName(stripEmoji(e.target.value));
+              }}
+              className="
+            h-9
+            w-full
+            rounded
+            border
+            border-gray-400
+            px-3
+            text-sm
+            outline-none
+            focus:border-primary
+          "
+            />
+            <div className="mt-1 flex justify-between text-xs">
+              {assetName.length === 100 ? (
+                <span className="text-orange-500">
+                  Maximum characters is 100.
+                </span>
+              ) : (
+                <span />
+              )}
+              <span
+                className={
+                  assetName.length === 100 ? "text-red-500" : "text-gray-500"
+                }
+              >
+                {assetName.length}/100
               </span>
-            ) : (
-              <span />
+            </div>
+            {fieldErrors.assetName && (
+              <p className="mt-1 text-sm text-red-500">
+                {fieldErrors.assetName}
+              </p>
             )}
-
-            <span
-              className={
-                assetName.length === 100 ? "text-red-500" : "text-gray-500"
-              }
-            >
-              {assetName.length}/100
-            </span>
           </div>
-          {fieldErrors.assetName && (
-            <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
-          )}
         </div>
 
         {/* Category */}
-        <div className="flex-1">
-          Category
-          <CategoryDropdown
-            categories={categoriesData ?? []}
-            isLoading={categoriesLoading}
-            value={categoryName}
-            onChange={handleCategoryChange}
-          />
-          {fieldErrors.categoryId && (
-            <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.categoryId}
-            </p>
-          )}
-        </div>
-
-        {/* Specification */}
-        <div className="flex-1">
-          Specification
-          <textarea
-            data-testid="txaSpecification"
-            maxLength={500}
-            value={specification}
-            onChange={(e) => setSpecification(e.target.value)}
-            rows={4}
-            className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
-          />
-          <div className="mt-1 flex items-center justify-between text-xs">
-            {specification.length === 500 ? (
-              <span className="text-orange-500">
-                Maximum characters is 500.
-              </span>
-            ) : (
-              <span />
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
+          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
+            Category
+          </label>
+          <div className="flex-1">
+            <CategoryDropdown
+              categories={categoriesData ?? []}
+              isLoading={categoriesLoading}
+              value={categoryName}
+              onChange={handleCategoryChange}
+            />
+            {fieldErrors.categoryId && (
+              <p className="mt-1 text-sm text-red-500">
+                {fieldErrors.categoryId}
+              </p>
             )}
-
-            <span
-              className={
-                specification.length === 500 ? "text-red-500" : "text-gray-500"
-              }
-            >
-              {specification.length}/500
-            </span>
           </div>
-          {fieldErrors.specification && (
-            <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.specification}
-            </p>
-          )}
         </div>
-
+        {/* Specification */}
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
+          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
+            Specification
+          </label>
+          <div className="flex-1">
+            <textarea
+              data-testid="txaSpecification"
+              maxLength={500}
+              value={specification}
+              onChange={(e) => {
+                setSpecification(stripEmoji(e.target.value));
+              }}
+              rows={4}
+              className="
+            w-full
+            resize-none
+            rounded
+            border
+            border-gray-400
+            px-3
+            py-2
+            text-sm
+            outline-none
+            focus:border-primary
+          "
+            />
+            <div className="mt-1 flex justify-between text-xs">
+              {specification.length === 500 ? (
+                <span className="text-orange-500">
+                  Maximum characters is 500.
+                </span>
+              ) : (
+                <span />
+              )}
+              <span
+                className={
+                  specification.length === 500
+                    ? "text-red-500"
+                    : "text-gray-500"
+                }
+              >
+                {specification.length}/500
+              </span>
+            </div>
+            {fieldErrors.specification && (
+              <p className="mt-1 text-sm text-red-500">
+                {fieldErrors.specification}
+              </p>
+            )}
+          </div>
+        </div>
         {/* Installed Date */}
-        <div className="flex-1" data-testid="dtpInstalledDate">
-          Installed Date
-          <DatePickerInput
-            value={installedDate}
-            onChange={(date) => setInstalledDate(date)}
-            placeholder="Select date"
-            width="w-full"
-          />
-          {fieldErrors.installedDate && (
-            <p className="mt-1 text-sm text-red-500">
-              {fieldErrors.installedDate}
-            </p>
-          )}
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
+          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
+            Installed Date
+          </label>
+          <div className="flex-1">
+            <DatePickerInput
+              value={installedDate}
+              onChange={(date) => setInstalledDate(date)}
+              placeholder="Select date"
+              width="w-full"
+            />
+            {fieldErrors.installedDate && (
+              <p className="mt-1 text-sm text-red-500">
+                {fieldErrors.installedDate}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* State */}
-        <div className="flex items-start gap-4">
-          <label className="w-36 pt-2 text-sm font-medium text-gray-700 shrink-0">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
+          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
             State
           </label>
           <div className="flex flex-col gap-2 pt-2">
@@ -236,7 +283,6 @@ export default function CreateAssetPage() {
                 data-testid="rdoAvailable"
                 type="radio"
                 name="state"
-                value={AssetState.Available}
                 checked={state === AssetState.Available}
                 onChange={() => setState(AssetState.Available)}
                 className="radio radio-primary radio-sm"
@@ -248,7 +294,6 @@ export default function CreateAssetPage() {
                 data-testid="rdoNotAvailable"
                 type="radio"
                 name="state"
-                value={AssetState.NotAvailable}
                 checked={state === AssetState.NotAvailable}
                 onChange={() => setState(AssetState.NotAvailable)}
                 className="radio radio-primary radio-sm"
@@ -258,24 +303,27 @@ export default function CreateAssetPage() {
           </div>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="mt-8 flex items-center justify-end gap-3">
+      <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button
           data-testid="btnSave"
           type="button"
           onClick={handleSave}
           disabled={!isFormValid || isCreating}
-          className="btn btn-primary btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="
+        btn
+        btn-primary
+        btn-sm
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+      "
         >
           {isCreating ? "Saving..." : "Save"}
         </button>
-
         <button
           data-testid="btnCancel"
           type="button"
           onClick={() => router.push("/admin/assets")}
-          className="btn btn-sm btn-outline"
+          className="btn btn-outline btn-sm"
         >
           Cancel
         </button>

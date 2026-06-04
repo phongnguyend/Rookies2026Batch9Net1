@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import DeleteAssetModal from "@/features/Assets/components/assetDeleteModel";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import DeleteAssetModal from '@/features/Assets/components/assetDeleteModel';
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from "@/features/Assets/assets.api";
-import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
-import Pagination from "@/features/shared/components/Pagination";
-import SearchInput from "@/features/shared/components/SearchInput";
-import DropdownFilter from "@/features/shared/components/DropdownFilter";
-import AssetDetailModal from "@/features/Assets/components/assetDetailModal";
+} from '@/features/Assets/assets.api';
+import { AssetState, type AssetListItem } from '@/features/Assets/assets.types';
+import Pagination from '@/features/shared/components/Pagination';
+import SearchInput from '@/features/shared/components/SearchInput';
+import DropdownFilter from '@/features/shared/components/DropdownFilter';
+import AssetDetailModal from '@/features/Assets/components/assetDetailModal';
 import DataTable, {
   ColumnDef,
   SortItem,
-} from "@/features/Assets/components/assetDataTable";
-import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+} from '@/features/Assets/components/assetDataTable';
+import DropdownStateFilter from '@/features/Assets/components/stateDropdown';
 import {
   getPinnedEditedAsset,
   clearPinnedEditedAsset,
-} from "@/features/Assets/editAssetStore";
+} from '@/features/Assets/editAssetStore';
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -40,8 +40,8 @@ function AssetsContent() {
 
   // ─── All state via useState ────────────────────
   const [pageNumber, setPageNumber] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] =
     useState<AssetState[]>(default_states);
@@ -142,38 +142,38 @@ function AssetsContent() {
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
     {
-      key: "assetCode",
-      header: "Asset Code",
+      key: 'assetCode',
+      header: 'Asset Code',
       sortable: true,
-      testId: "btnSortAssetCode",
-      className: "w-32",
+      testId: 'btnSortAssetCode',
+      className: 'w-32',
     },
     {
-      key: "name",
-      header: "Asset Name",
+      key: 'name',
+      header: 'Asset Name',
       sortable: true,
-      testId: "btnSortAssetName",
-      className: "w-64",
+      testId: 'btnSortAssetName',
+      className: 'w-64',
       render: (row) => <div className="truncate">{row.name}</div>,
     },
     {
-      key: "category",
-      header: "Category",
+      key: 'category',
+      header: 'Category',
       sortable: true,
-      testId: "btnSortCategory",
-      className: "w-40",
+      testId: 'btnSortCategory',
+      className: 'w-40',
     },
     {
-      key: "state",
-      header: "State",
+      key: 'state',
+      header: 'State',
       sortable: true,
-      testId: "btnSortState",
-      className: "w-32",
+      testId: 'btnSortState',
+      className: 'w-32',
     },
     {
-      key: "",
-      header: "Actions",
-      className: "w-28",
+      key: '',
+      header: 'Actions',
+      className: 'w-28',
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
@@ -248,7 +248,7 @@ function AssetsContent() {
       />
       <DeleteAssetModal
         assetId={deleteTarget?.id ?? null}
-        assetName={deleteTarget?.name ?? ""}
+        assetName={deleteTarget?.name ?? ''}
         hasHistory={deleteTarget?.hasHistory ?? false}
         onClose={() => setDeleteTarget(null)}
       />
@@ -265,7 +265,7 @@ function AssetsContent() {
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleStateChange}
-                customLabel={isDefaultStateSelection ? "State" : undefined}
+                customLabel={isDefaultStateSelection ? 'State' : undefined}
               />
             </div>
             <div
@@ -275,7 +275,7 @@ function AssetsContent() {
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-                placeholder={categoriesLoading ? "Loading..." : "Category"}
+                placeholder={categoriesLoading ? 'Loading...' : 'Category'}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
@@ -297,7 +297,7 @@ function AssetsContent() {
             </div>
             <button
               data-testid="btnCreateAsset"
-              onClick={() => router.push("/admin/assets/create")}
+              onClick={() => router.push('/admin/assets/create')}
               className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
             >
               + Create New Asset
