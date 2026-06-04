@@ -111,21 +111,19 @@ export default function EditAssetPage() {
     !isNaN(form.installedDate.getTime())
 
   const formatDate = (date: Date | null) => {
-    if (!date || isNaN(date.getTime())) return ""
-
-    const day = String(date.getDate()).padStart(2, "0")
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-
-    return `${day}/${month}/${date.getFullYear()}`
-  }
+    if (!date || isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;  // ← YYYY-MM-DD not DD/MM/YYYY
+  };
 
   const isChanged =
     asset &&
     (form.assetName !== asset.name ||
       form.specification !== asset.specification ||
       form.state !== asset.state ||
-      formatDate(form.installedDate!) !==
-        new Date(asset.installedAtUtc).toLocaleDateString("en-GB"))
+      formatDate(form.installedDate) !== asset.installedAtUtc.split("T")[0]);
 
   //-- Enable Save Button when something is edited ----------------------
   const canSave = isFormValid && isChanged && !isEditing
