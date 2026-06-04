@@ -142,6 +142,7 @@ export default function UsersPage() {
         },
       ]
     : [defaultSort];
+  const displayedSorts = useTemporaryUpdatedSort ? [] : sorts;
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -393,7 +394,7 @@ export default function UsersPage() {
             <DataTable
               data={users}
               columns={columns}
-              sorts={sorts}
+              sorts={displayedSorts}
               onSortChange={handleSortChange}
               onRowClick={(user) => setSelectedUserId(user.id)}
               isLoading={isLoading}
