@@ -71,7 +71,7 @@ export default function DataTable<T>({
 
   return (
     <div className="w-full overflow-x-auto rounded border border-gray-200">
-      <table className="w-full min-w-[600px] text-left text-sm">
+      <table className="w-full min-w-[600px] table-fixed text-left text-sm">
         {/* ← min-w ensures scroll on mobile */}
         <thead>
           <tr className="border-b border-gray-400 bg-gray-50">
@@ -86,10 +86,12 @@ export default function DataTable<T>({
                     : ""
                 }`}
               >
-                {column.header}
-                {column.sortable && (
-                  <span className="ml-1">{getSortIcon(column.key)}</span>
-                )}
+                <div className="inline-flex items-center gap-1">
+                  {column.header}
+                  {column.sortable && (
+                    <span className="text-xs">{getSortIcon(column.key)}</span>
+                  )}
+                </div>
               </th>
             ))}
           </tr>
@@ -117,8 +119,8 @@ export default function DataTable<T>({
                 onClick={() => {
                   onRowClick?.(row);
                 }}
-                className={`border-b border-gray-300 ${
-                  onRowClick ? "cursor-pointer hover:bg-gray-50" : ""
+                className={`border-b border-gray-200 ${
+                  onRowClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""
                 }`}
               >
                 {columns.map((column) => (

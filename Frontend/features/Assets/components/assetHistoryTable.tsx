@@ -11,15 +11,15 @@ interface AssetHistoryTableProps {
 
 export default function AssetHistoryTable({ items }: AssetHistoryTableProps) {
   return (
-    <div className="mt-4 flex gap-4 items-start">
+    <div className="mt-4 flex flex-col md:flex-row gap-4 items-start">
       {/* Left side */}
       <div className="min-w-[100px]">
         <p className="font-semibold text-gray-700">History</p>
       </div>
 
       {/* Right side */}
-      <div className="flex-1" data-testid="tblAssetHistory">
-        <table className="w-full text-sm">
+      <div className="flex-1 w-full overflow-x-auto" data-testid="tblAssetHistory">
+        <table className="min-w-[600px] w-full text-xs">
           <thead>
             <tr className="border-b border-gray-300">
               <th className="text-left py-2 font-semibold text-gray-600">

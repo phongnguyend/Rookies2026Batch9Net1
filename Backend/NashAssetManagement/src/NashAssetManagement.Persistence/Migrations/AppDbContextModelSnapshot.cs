@@ -193,6 +193,38 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.ToTable("Categories", "Core");
                 });
 
+            modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.ExportReportJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilePath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("RequestedByAdminId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestedByAdminId")
+                        .IsUnique();
+
+                    b.ToTable("ExportReportJobs", "Core");
+                });
+
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.Location", b =>
                 {
                     b.Property<Guid>("Id")
@@ -574,6 +606,17 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.Navigation("AssignedToUser");
                 });
 
+            modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.ExportReportJob", b =>
+                {
+                    b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "RequestedByAdmin")
+                        .WithOne("RequestedExportReportJob")
+                        .HasForeignKey("NashAssetManagement.Domain.Entities.Core.ExportReportJob", "RequestedByAdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestedByAdmin");
+                });
+
             modelBuilder.Entity("NashAssetManagement.Domain.Entities.Core.ReturnRequest", b =>
                 {
                     b.HasOne("NashAssetManagement.Domain.Entities.Identity.User", "AcceptedByUser")
@@ -702,6 +745,8 @@ namespace NashAssetManagement.Persistence.Migrations
                     b.Navigation("ReceivedAssignments");
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("RequestedExportReportJob");
 
                     b.Navigation("RequestedReturnRequests");
 

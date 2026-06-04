@@ -7,7 +7,7 @@ export enum UserRoles {
 
 export enum Gender {
   Male = "Male",
-  Female = "Female"
+  Female = "Female",
 }
 
 export interface UserRow {
@@ -68,4 +68,44 @@ export interface EditUserRequest {
 
 export interface EditUserResponse {
   id: string;
+}
+export namespace LookupUsers{
+  export interface Request {
+    searchTerm?: string;
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageSize?: number;
+    pageNumber?: number;
+  }
+
+  export interface LookupUsersSummary {
+    id: string;
+    staffCode: string;
+    fullName: string;
+    type: string;
+  }
+
+  export interface Response extends PaginationResponse<LookupUsersSummary> {}
+}
+
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  dayOfBirth: string;
+  joinedDate: string;
+  gender: Gender;
+  userType: UserRoles;
+}
+
+export interface CreateUserResponse {
+  id: string;
+  staffCode: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  joinedDate: string;
+  userType: UserRoles;
+  gender: Gender;
 }
