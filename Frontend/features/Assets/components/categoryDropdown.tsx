@@ -76,7 +76,7 @@ export default function CategoryDropdown({
     );
 
     const categoryNameRegex = /^[A-Za-z ]+$/;
-    const prefixRegex = /^[A-Z]$/;
+    const prefixRegex = /^[A-Z]{2}$/;
 
     const toastErrors: string[] = [];
 
@@ -84,7 +84,7 @@ export default function CategoryDropdown({
       toastErrors.push("Category name is required.");
     } else if (!categoryNameRegex.test(parsedName)) {
       toastErrors.push(
-        "Category name must contain only Letters in English.",
+        "Category name must contain 2 Letters in English.",
       );
     } else if (nameExists) {
       toastErrors.push(
