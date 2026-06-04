@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   useGetAssetByIdQuery,
@@ -36,6 +36,12 @@ const EDITABLE_STATES = [
   },
 ];
 
+const EMOJI_REGEX = /\p{Extended_Pictographic}/gu;
+const allowedRegex =
+  /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u;
+const normalize = (value: string) => stripEmoji(value);
+const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "");
+
 export default function EditAssetPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,7 +54,6 @@ export default function EditAssetPage() {
     skip: !assetId,
   });
 
-
   const [editAsset, { isLoading: isEditing }] = useEditAssetMutation();
 
   const [form, setForm] = useState({
@@ -60,20 +65,21 @@ export default function EditAssetPage() {
   });
 
   //-- Set data into Fields -----------------------------------------------
-  if (asset && !form.initialized) {
+  useEffect(() => {
+    if (!asset || form.initialized) return;
     setForm({
       initialized: true,
-      assetName: asset.name,
-      specification: asset.specification,
-      installedDate: new Date(asset.installedAtUtc),
+      assetName: stripEmoji(asset.name ?? ""),
+      specification: stripEmoji(asset.specification ?? ""),
+      installedDate: asset.installedAtUtc
+        ? new Date(asset.installedAtUtc)
+        : null,
       state: asset.state,
     });
-  }
+  }, [asset, form.initialized]);
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-
-    const allowedRegex = /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u;
 
     if (!form.assetName.trim()) {
       errors.assetName = "Asset name is required.";
@@ -115,7 +121,6 @@ export default function EditAssetPage() {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-
     return `${year}-${month}-${day}`;
   };
 
@@ -144,8 +149,8 @@ export default function EditAssetPage() {
     try {
       const result = await editAsset({
         assetId: assetId!,
-        assetName: form.assetName.trim(),
-        specification: form.specification.trim(),
+        assetName: stripEmoji(form.assetName).trim(),
+        specification: stripEmoji(form.specification).trim(),
         installedDate: formatDate(form.installedDate),
         state: form.state,
       }).unwrap();
@@ -226,13 +231,13 @@ export default function EditAssetPage() {
             onChange={(e) =>
               setForm((prev) => ({
                 ...prev,
-                assetName: e.target.value,
+                assetName: stripEmoji(e.target.value),
               }))
             }
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.assetName.length === 100 ? (
+            {normalize(form.assetName).length === 100 ? (
               <span className="text-orange-500">
                 Maximum characters is 100.
               </span>
@@ -242,12 +247,13 @@ export default function EditAssetPage() {
 
             <span
               className={
-                form.assetName.length === 0 || form.assetName.length === 100
+                normalize(form.assetName).length === 0 ||
+                normalize(form.assetName).length === 100
                   ? "text-red-500"
                   : "text-gray-500"
               }
             >
-              {form.assetName.length}/100
+              {normalize(form.assetName).length}/100
             </span>
           </div>
           {fieldErrors.assetName && (
@@ -276,13 +282,13 @@ export default function EditAssetPage() {
             onChange={(e) =>
               setForm((prev) => ({
                 ...prev,
-                specification: e.target.value,
+                specification: stripEmoji(e.target.value),
               }))
             }
             className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
           />
           <div className="mt-1 flex items-center justify-between text-xs">
-            {form.specification.length === 500 ? (
+            {normalize(form.specification).length === 500 ? (
               <span className="text-orange-500">
                 Maximum characters is 500.
               </span>
@@ -291,13 +297,13 @@ export default function EditAssetPage() {
             )}
             <span
               className={
-                form.specification.length === 0 ||
-                form.specification.length === 500
+                normalize(form.specification).length === 0 ||
+                normalize(form.specification).length === 500
                   ? "text-red-500"
                   : "text-gray-500"
               }
             >
-              {form.specification.length}/500
+              {normalize(form.specification).length}/500
             </span>
           </div>
           {fieldErrors.specification && (

@@ -76,7 +76,7 @@ export default function CategoryDropdown({
     );
 
     const categoryNameRegex = /^[A-Za-z ]+$/;
-    const prefixRegex = /^[A-Z]$/;
+    const prefixRegex = /^[A-Z]{1,2}$/;
 
     const toastErrors: string[] = [];
 
