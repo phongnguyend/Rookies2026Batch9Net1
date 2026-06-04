@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useGetAssetByIdQuery,
   useEditAssetMutation,
-} from "@/features/Assets/assets.api"
-import { AssetState } from "@/features/Assets/assets.types"
-import DatePickerInput from "@/features/Assets/components/assetDatePicker"
-import type { ApiErrorResponse } from "@/lib/api/base.types"
-import { setPinnedEditedAsset } from "@/features/Assets/editAssetStore"
-import { enqueueToast, ToastType } from "@/features/shared/toast.slice"
-import { useAppDispatch } from "@/lib/redux/hooks"
+} from "@/features/Assets/assets.api";
+import { AssetState } from "@/features/Assets/assets.types";
+import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import type { ApiErrorResponse } from "@/lib/api/base.types";
+import { setPinnedEditedAsset } from "@/features/Assets/editAssetStore";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useAppDispatch } from "@/lib/redux/hooks";
 
 const EDITABLE_STATES = [
   {
@@ -34,37 +34,37 @@ const EDITABLE_STATES = [
     label: "Recycled",
     testId: "rdoRecycled",
   },
-]
+];
 
-const EMOJI_REGEX = /\p{Extended_Pictographic}/gu
+const EMOJI_REGEX = /\p{Extended_Pictographic}/gu;
 const allowedRegex =
-  /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u
-const normalize = (value: string) => stripEmoji(value)
-const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "")
+  /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u;
+const normalize = (value: string) => stripEmoji(value);
+const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "");
 
 export default function EditAssetPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const assetId = searchParams.get("id")
-  const dispatch = useAppDispatch()
-  const [serverError, setServerError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const assetId = searchParams.get("id");
+  const dispatch = useAppDispatch();
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { data: asset, isLoading } = useGetAssetByIdQuery(assetId ?? "", {
     skip: !assetId,
-  })
+  });
 
-  const [editAsset, { isLoading: isEditing }] = useEditAssetMutation()
+  const [editAsset, { isLoading: isEditing }] = useEditAssetMutation();
 
   const [form, setForm] = useState({
     assetName: "",
     specification: "",
     installedDate: null as Date | null,
     state: AssetState.Available,
-  })
+  });
 
   //-- Set data into Fields -----------------------------------------------
   useEffect(() => {
-    if (!asset) return
+    if (!asset) return;
     setForm({
       assetName: stripEmoji(asset.name ?? ""),
       specification: stripEmoji(asset.specification ?? ""),
@@ -72,50 +72,50 @@ export default function EditAssetPage() {
         ? new Date(asset.installedAtUtc)
         : null,
       state: asset.state,
-    })
-  }, [asset])
+    });
+  }, [asset]);
 
   const validateForm = () => {
-    const errors: Record<string, string> = {}
+    const errors: Record<string, string> = {};
 
     if (!form.assetName.trim()) {
-      errors.assetName = "Asset name is required."
+      errors.assetName = "Asset name is required.";
     } else if (form.assetName.length > 100) {
-      errors.assetName = "Asset name must not exceed 100 characters."
+      errors.assetName = "Asset name must not exceed 100 characters.";
     } else if (!allowedRegex.test(form.assetName)) {
       errors.assetName =
-        'Asset name must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,'
+        'Asset name must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.specification.trim()) {
-      errors.specification = "Specification is required."
+      errors.specification = "Specification is required.";
     } else if (form.specification.length > 500) {
-      errors.specification = "Specification must not exceed 500 characters."
+      errors.specification = "Specification must not exceed 500 characters.";
     } else if (!allowedRegex.test(form.specification)) {
       errors.specification =
-        'Specification must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,'
+        'Specification must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.installedDate) {
-      errors.installedDate = "Installed date is required."
+      errors.installedDate = "Installed date is required.";
     }
 
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
-  }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const isFormValid =
     form.assetName.trim() !== "" &&
     form.specification.trim() !== "" &&
     form.installedDate instanceof Date &&
-    !isNaN(form.installedDate.getTime())
+    !isNaN(form.installedDate.getTime());
 
   const formatDate = (date: Date | null) => {
     if (!date || isNaN(date.getTime())) return "";
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;  // ← YYYY-MM-DD not DD/MM/YYYY
+    return `${year}-${month}-${day}`; // ← YYYY-MM-DD not DD/MM/YYYY
   };
 
   const isChanged =
@@ -126,18 +126,18 @@ export default function EditAssetPage() {
       formatDate(form.installedDate) !== asset.installedAtUtc.split("T")[0]);
 
   //-- Enable Save Button when something is edited ----------------------
-  const canSave = isFormValid && isChanged && !isEditing
+  const canSave = isFormValid && isChanged && !isEditing;
 
   //-- Handle Save -----------------------------------------------
   const handleSave = async () => {
-    setServerError(null)
+    setServerError(null);
 
     if (
       !validateForm() ||
       !(form.installedDate instanceof Date) ||
       isNaN(form.installedDate.getTime())
     ) {
-      return
+      return;
     }
 
     try {
@@ -147,7 +147,7 @@ export default function EditAssetPage() {
         specification: stripEmoji(form.specification).trim(),
         installedDate: formatDate(form.installedDate),
         state: form.state,
-      }).unwrap()
+      }).unwrap();
 
       setPinnedEditedAsset({
         id: result.id,
@@ -157,33 +157,33 @@ export default function EditAssetPage() {
         state: result.state as AssetState,
         location: result.location,
         hasHistory: result.hasHistory,
-      })
+      });
 
-      router.push("/admin/assets")
+      router.push("/admin/assets");
     } catch (err) {
-      const apiError = err as ApiErrorResponse
+      const apiError = err as ApiErrorResponse;
 
       if (apiError?.status === 400) {
-        setServerError(apiError.detail)
+        setServerError(apiError.detail);
       } else if (apiError?.status === 404) {
         dispatch(
           enqueueToast({
             message: `Something went wrong. Asset is not found or be deleted.`,
             type: ToastType.Error,
           }),
-        )
-        router.push("/admin/assets")
+        );
+        router.push("/admin/assets");
       } else if (apiError?.status === 409) {
         dispatch(
           enqueueToast({
             message: `Something went wrong. This asset has been assigned`,
             type: ToastType.Error,
           }),
-        )
-        router.push("/admin/assets")
+        );
+        router.push("/admin/assets");
       }
     }
-  }
+  };
 
   //-- Check Url (Scenario : user parse id of assinged or softdeleted on URL) -------
   if (isLoading) {
@@ -191,17 +191,17 @@ export default function EditAssetPage() {
       <div className="flex justify-center py-8">
         <span className="loading loading-spinner loading-md" />
       </div>
-    )
+    );
   }
 
   if (!asset) {
-    router.replace("/admin/assets")
-    return null
+    router.replace("/admin/assets");
+    return null;
   }
 
   if (asset.state === AssetState.Assigned) {
-    router.replace("/admin/assets")
-    return null
+    router.replace("/admin/assets");
+    return null;
   }
 
   //-- Render -----------------------------------------------
@@ -328,6 +328,7 @@ export default function EditAssetPage() {
           </label>
           <div className="flex-1">
             <DatePickerInput
+              key={form.installedDate?.toISOString() ?? "empty"}
               value={form.installedDate}
               onChange={(date) => {
                 setForm((prev) => ({
@@ -336,7 +337,7 @@ export default function EditAssetPage() {
                     date instanceof Date && !isNaN(date.getTime())
                       ? date
                       : null,
-                }))
+                }));
               }}
               placeholder="Select date"
               width="w-full"
@@ -399,5 +400,5 @@ export default function EditAssetPage() {
         </button>
       </div>
     </div>
-  )
+  );
 }

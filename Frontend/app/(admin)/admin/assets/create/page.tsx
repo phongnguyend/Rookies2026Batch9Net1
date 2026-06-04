@@ -8,7 +8,7 @@ import {
 } from "@/features/Assets/assets.api";
 import { AssetState } from "@/features/Assets/assets.types";
 import CategoryDropdown from "@/features/Assets/components/categoryDropdown";
-import DatePickerInput from "@/features/Assets/components/assetDatePicker";
+import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
