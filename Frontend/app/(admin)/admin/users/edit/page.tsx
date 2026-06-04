@@ -8,7 +8,7 @@ import {
   type SetStateAction,
   useState,
 } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import RadioGroup from "@/features/users/components/RadioGroup";
@@ -241,8 +241,8 @@ const getEditUserValidationErrors = ({
 };
 
 export default function EditUserPage() {
-  const params = useParams<{ id: string }>();
-  const userId = params.id;
+  const searchParams = useSearchParams();
+  const userId = searchParams.get("id") ?? "";
 
   const { data: user, isLoading } = useGetUserForEditQuery(userId, {
     skip: !userId,
