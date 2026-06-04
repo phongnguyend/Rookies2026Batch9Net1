@@ -41,14 +41,14 @@ export const APP_LABELS: Record<
 };
 
 export const APP_SIDEBAR_ADMIN_ITEMS = [
-  { label: "Home", href: APP_ROUTES.ADMIN_HOME },
-  { label: "Manage User", href: APP_ROUTES.ADMIN_USERS },
-  { label: "Manage Asset", href: APP_ROUTES.ADMIN_ASSETS },
-  { label: "Manage Assignment", href: APP_ROUTES.ADMIN_ASSIGNMENTS },
-  { label: "Request for Returning", href: APP_ROUTES.ADMIN_RETURNS },
-  { label: "Report", href: APP_ROUTES.ADMIN_REPORT },
+  { label: "Home", href: APP_ROUTES.ADMIN_HOME, dataTestId: "mnuHome" },
+  { label: "Manage User", href: APP_ROUTES.ADMIN_USERS, dataTestId: "mnuManageUser" },
+  { label: "Manage Asset", href: APP_ROUTES.ADMIN_ASSETS, dataTestId: "mnuManageAsset" },
+  { label: "Manage Assignment", href: APP_ROUTES.ADMIN_ASSIGNMENTS, dataTestId: "mnuManageAssignment" },
+  { label: "Request for Returning", href: APP_ROUTES.ADMIN_RETURNS, dataTestId: "mnuRequestForReturning" },
+  { label: "Report", href: APP_ROUTES.ADMIN_REPORT, dataTestId: "mnuReport" },
 ];
 
 export const APP_SIDEBAR_STAFF_ITEMS = [
-  { label: "Home", href: APP_ROUTES.STAFF_HOME },
+  { label: "Home", href: APP_ROUTES.STAFF_HOME, dataTestId: "mnuHome" },
 ];
