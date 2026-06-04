@@ -44,8 +44,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                     break;
 
                 case "state":
-                    if (isDesc) Query.OrderByDescending(x => x.State);
-                    else Query.OrderBy(x => x.State);
+                    if (isDesc) Query.OrderByDescending(x => x.State).ThenByDescending(x => x.CreatedAtUtc);
+                    else Query.OrderBy(x => x.State).ThenByDescending(x => x.CreatedAtUtc);
                     break;
 
                 default:

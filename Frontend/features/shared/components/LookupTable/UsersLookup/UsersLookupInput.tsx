@@ -71,7 +71,7 @@ const UsersLookupInput = ({
             onClick={handleClose}
           >
             <div
-              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[90vh]"
+              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[100vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <UsersLookupTable

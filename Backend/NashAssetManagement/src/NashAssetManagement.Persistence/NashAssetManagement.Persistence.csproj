@@ -9,5 +9,6 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
       <PackageReference Include="System.Security.Cryptography.Xml" />
+      <PackageReference Include="Newtonsoft.Json"/>
     </ItemGroup>
 </Project>
