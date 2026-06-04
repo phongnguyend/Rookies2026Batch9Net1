@@ -38,7 +38,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.ViewAdm
             new User { LocationId = locationId ?? Guid.NewGuid(), IsDeleted = false };
 
         private static Response CreateResponse(string assetCode = "AS001") =>
-            new Response(Guid.NewGuid(), assetCode, "Laptop", "userA", "admin", "01/01/2024", "Accepted");
+            new Response(Guid.NewGuid(), assetCode, "Laptop", "userA", "admin", "01/01/2024", "Accepted", false);
 
         private static Handler CreateHandler(
             Mock<IRepository<Assignment, Guid>> repo,
