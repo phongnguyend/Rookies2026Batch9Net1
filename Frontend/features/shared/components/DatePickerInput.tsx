@@ -4,14 +4,24 @@ import { Month } from "@/lib/api/base.types";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useMemo, useRef, useState, useEffect } from "react";
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface DatePickerInputProps {
-  value: Date | null;
+  value: Date | null | undefined;
   onChange: (date: Date | null) => void;
   onBlur?: () => void;
   placeholder?: string;
   width?: string;
   txtInputTestId?: string;
+  canClearValue?: boolean;
+  error?: string;
+  showToast?: boolean;
 }
 
 const MONTHS = Object.values(Month);
@@ -48,13 +58,16 @@ export default function DatePickerInput({
   placeholder = "Assigned Date",
   width = "w-full sm:w-64",
   txtInputTestId = "txtDatePicker",
+  canClearValue = true,
+  showToast = true,
+  error,
 }: DatePickerInputProps) {
   const today = new Date();
 
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(value ?? today);
 
-  const [error, setError] = useState("");
+  const [inputError, setInputError] = useState("");
   const dispatch = useAppDispatch();
 
   const ref = useRef<HTMLDivElement>(null);
@@ -71,7 +84,8 @@ export default function DatePickerInput({
     };
 
     document.addEventListener("pointerdown", handleClickOutside);
-    return () => document.removeEventListener("pointerdown", handleClickOutside);
+    return () =>
+      document.removeEventListener("pointerdown", handleClickOutside);
   }, []);
 
   const formatDate = (date: Date | null) => {
@@ -83,7 +97,14 @@ export default function DatePickerInput({
     return `${day}/${monthValue}/${date.getFullYear()}`;
   };
 
-  const [inputValue, setInputValue] = useState(formatDate(value));
+  const [inputValue, setInputValue] = useState(formatDate(value!));
+  useEffect(() => {
+    setInputValue(formatDate(value!));
+
+    if (value) {
+      setCursor(value);
+    }
+  }, [value]);
 
   const isSameDay = (a: Date, b: Date | null) =>
     !!b &&
@@ -112,7 +133,7 @@ export default function DatePickerInput({
       });
     }
 
-    while (result.length < 35) {
+    while (result.length < 42) {
       const lastDate = result[result.length - 1].date;
 
       result.push({
@@ -132,43 +153,45 @@ export default function DatePickerInput({
     onChange(date);
     setInputValue(formatDate(date));
     setCursor(date);
-    setError("");
+    setInputError("");
     setOpen(false);
   };
 
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
-
-      setError("");
-      onChange(null);
+      setInputError("");
       return;
     }
 
     const parsedDate = parseDate(inputValue);
 
     if (!parsedDate) {
-      setError("Date must be valid and follow dd/MM/yyyy format");
-
-      dispatch(
-        enqueueToast({
-          message: "Date must be valid and follow dd/MM/yyyy format.",
-          type: ToastType.Error,
-          testId: "txtDateValidationError",
-        }),
-      );
+      setInputError("Date must be valid and follow dd/MM/yyyy format");
+      if (showToast) {
+        dispatch(
+          enqueueToast({
+            message: "Date must be valid and follow dd/MM/yyyy format.",
+            type: ToastType.Error,
+            testId: "txtDateValidationError",
+          }),
+        );
+      }
 
       return;
     }
 
     onChange(parsedDate);
     setCursor(parsedDate);
-    setError("");
-    onBlur?.();
+    setInputError("");
   };
 
   return (
     <div ref={ref} className={`relative ${width}`}>
-      <div className="flex h-10 overflow-hidden rounded border border-gray-400 bg-base-100">
+      <div
+        className={`flex h-10 overflow-hidden rounded border bg-base-100 ${
+          error || inputError ? "border-error" : "border-gray-400"
+        }`}
+      >
         {/* Date Picker Input */}
         <div className="relative flex-1">
           <input
@@ -177,8 +200,7 @@ export default function DatePickerInput({
             placeholder={placeholder}
             onChange={(e) => {
               setInputValue(e.target.value);
-              setError("");
-              onChange(null);
+              setInputError("");
             }}
             onBlur={handleDateValidation}
             onKeyDown={(e) => {
@@ -187,19 +209,21 @@ export default function DatePickerInput({
                 handleDateValidation();
               }
             }}
-            className={`h-full w-full px-3 pr-8 text-sm outline-none ${error ? "text-error" : ""
-              }`}
+            className={`h-full w-full px-3 pr-8 text-sm outline-none ${
+              inputError ? "text-error" : ""
+            }`}
           />
 
-          {inputValue && (
+          {inputValue && canClearValue && (
             <button
               type="button"
               data-testid="btnClearAssignedDate"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 setInputValue("");
-                setError("");
+                setInputError("");
                 setCursor(new Date());
+                onChange(null);
                 onChange(null);
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -216,12 +240,15 @@ export default function DatePickerInput({
           onClick={() => setOpen((prev) => !prev)}
           className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300"
         >
-          📅
+          {<Calendar size={20} />}
         </button>
       </div>
+      {(inputError || error) && !showToast && (
+        <p className="mt-1 text-sm text-error">{inputError || error}</p>
+      )}
 
       {open && (
-        <div className="absolute left-0 top-[38px] z-50 w-[320px] overflow-hidden rounded-sm border border-gray-400 bg-base-100 shadow">
+        <div className="absolute left-0 top-9.5 z-50 w-[320px] overflow-hidden rounded-sm border border-gray-400 bg-base-100 shadow">
           {/* Year and Month Navigator */}
           <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-base-200 px-4">
             <div className="flex gap-2">
@@ -229,18 +256,18 @@ export default function DatePickerInput({
                 data-testid="btnPreviousYear"
                 type="button"
                 onClick={() => setCursor(new Date(year - 1, month, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
               >
-                «
+                {<ChevronsLeft size={20} />}
               </button>
 
               <button
                 data-testid="btnPreviousMonth"
                 type="button"
                 onClick={() => setCursor(new Date(year, month - 1, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
               >
-                ‹
+                {<ChevronLeft size={20} />}
               </button>
             </div>
 
@@ -253,18 +280,18 @@ export default function DatePickerInput({
                 data-testid="btnNextMonth"
                 type="button"
                 onClick={() => setCursor(new Date(year, month + 1, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
               >
-                ›
+                {<ChevronRight size={20} />}
               </button>
 
               <button
                 data-testid="btnNextYear"
                 type="button"
                 onClick={() => setCursor(new Date(year + 1, month, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500"
+                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
               >
-                »
+                {<ChevronsRight size={20} />}
               </button>
             </div>
           </div>
@@ -277,7 +304,7 @@ export default function DatePickerInput({
 
           <div className="grid grid-cols-7 px-4 pb-4 text-center">
             {days.map(({ date, inMonth }, index) => {
-              const selected = isSameDay(date, value);
+              const selected = isSameDay(date, value!);
               const currentDay = isSameDay(date, today);
 
               return (
@@ -306,3 +333,4 @@ export default function DatePickerInput({
     </div>
   );
 }
+
