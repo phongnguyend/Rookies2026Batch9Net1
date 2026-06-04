@@ -9,7 +9,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
         public Specification(Guid returnRequestId)
         {
             Query.Where(x => x.Id == returnRequestId)
-                .Include(x => x.Assignment)
+                .Include(x => x.Assignment!)
                 .ThenInclude(x => x.Asset);
         }
     }

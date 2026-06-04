@@ -21,9 +21,6 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
     {
         public async Task<ErrorOr<Updated>> Handle(Request orgRequest, CancellationToken cancellationToken)
         {
-            // pre-cleanning
-            var returnRequestId = Guid.Parse(orgRequest.ReturnRequestId!);
-
             // validation
             var validationResult = await validator.ValidateAsync(orgRequest, cancellationToken);
 
@@ -31,6 +28,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
             {
                 throw new ValidationException(validationResult.Errors);
             }
+            
+            // parse 
+            var returnRequestId = Guid.Parse(orgRequest.ReturnRequestId!);
 
             // check current user
             if(currentUser is null || currentUser.UserId is null)
