@@ -76,7 +76,7 @@ export default function CategoryDropdown({
     );
 
     const categoryNameRegex = /^[A-Za-z ]+$/;
-    const prefixRegex = /^[A-Z]$/;
+    const prefixRegex = /^[A-Z]{2}$/;
 
     const toastErrors: string[] = [];
 
@@ -84,7 +84,7 @@ export default function CategoryDropdown({
       toastErrors.push("Category name is required.");
     } else if (!categoryNameRegex.test(parsedName)) {
       toastErrors.push(
-        "Category name must contain only Letters in English.",
+        "Category name must contain Letters in English.",
       );
     } else if (nameExists) {
       toastErrors.push(
@@ -95,7 +95,7 @@ export default function CategoryDropdown({
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
     } else if (!prefixRegex.test(parsedPrefix)) {
-      toastErrors.push("Prefix must contain English letters.");
+      toastErrors.push("Prefix must contain 2 English letters.");
     } else if (prefixExists) {
       toastErrors.push(
         "Prefix is already existed. Please enter a different prefix",
