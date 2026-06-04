@@ -64,13 +64,14 @@ try
         Directory.CreateDirectory(tempReportsPath);
     }
 
+    app.UseCors();
+
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(tempReportsPath),
         RequestPath = $"/{AppCts.TempFolders.TempReportFolders}"
     });
 
-    app.UseCors();
     app.UseAuthentication();
     app.UseAuthorization();
 
