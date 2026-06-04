@@ -37,10 +37,29 @@ const genderOptions = [
 type FieldErrors = Partial<Record<"dateOfBirth" | "gender" | "joinedDate" | "type", string>>;
 type RequiredDateField = "dateOfBirth" | "joinedDate";
 
-const requiredDateMessages = {
-  dateOfBirth: "Date of Birth is required.",
-  joinedDate: "Joined Date is required.",
+const editUserValidationMessages = {
+  dateOfBirthRequired: "'Date Of Birth' must not be empty.",
+  dateOfBirthUnder18: "User is under 18. Please select a different date",
+  dateOfBirthInFuture:
+    "Date of birth cannot be in the future. Please select a different date",
+  joinedDateRequired: "'Joined Date' must not be empty.",
+  joinedDateNotLaterThanDateOfBirth:
+    "Joined date is not later than Date of Birth. Please select a different date",
+  joinedDateUnder18:
+    "User must be at least 18 years old on the joined date. Please select a different date",
+  joinedDateWeekend:
+    "Joined date is Saturday or Sunday. Please select a different date",
+  invalidGender: "Invalid gender. Please select a valid gender",
+  invalidType: "Invalid type. Please select a valid type",
 };
+
+const requiredDateMessages = {
+  dateOfBirth: editUserValidationMessages.dateOfBirthRequired,
+  joinedDate: editUserValidationMessages.joinedDateRequired,
+};
+
+const validGenderValues = new Set<string>(Object.values(Gender));
+const validUserTypeValues = new Set<string>(Object.values(UserRoles));
 
 const serverFieldMap: Record<string, keyof FieldErrors> = {
   dateofbirth: "dateOfBirth",
@@ -150,6 +169,77 @@ function getDateInputValue(container: HTMLDivElement) {
   return container.querySelector("input")?.value.trim() ?? "";
 }
 
+const formatDateInputValue = (date: Date | null) => {
+  if (!date) {
+    return "";
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${day}/${month}/${date.getFullYear()}`;
+};
+
+const toDateOnly = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const addYears = (date: Date, years: number) => {
+  const next = toDateOnly(date);
+  next.setFullYear(next.getFullYear() + years);
+
+  if (next.getMonth() !== date.getMonth()) {
+    next.setDate(0);
+  }
+
+  return next;
+};
+
+const getEditUserValidationErrors = ({
+  dateOfBirth,
+  gender,
+  joinedDate,
+  type,
+}: {
+  dateOfBirth: Date | null;
+  gender: Gender;
+  joinedDate: Date | null;
+  type: UserRoles;
+}): FieldErrors => {
+  const errors: FieldErrors = {};
+  const today = toDateOnly(new Date());
+  const dateOfBirthOnly = dateOfBirth ? toDateOnly(dateOfBirth) : null;
+  const joinedDateOnly = joinedDate ? toDateOnly(joinedDate) : null;
+
+  if (!dateOfBirthOnly) {
+    errors.dateOfBirth = editUserValidationMessages.dateOfBirthRequired;
+  } else if (dateOfBirthOnly > today) {
+    errors.dateOfBirth = editUserValidationMessages.dateOfBirthInFuture;
+  } else if (dateOfBirthOnly > addYears(today, -18)) {
+    errors.dateOfBirth = editUserValidationMessages.dateOfBirthUnder18;
+  }
+
+  if (!joinedDateOnly) {
+    errors.joinedDate = editUserValidationMessages.joinedDateRequired;
+  } else if (dateOfBirthOnly && joinedDateOnly <= dateOfBirthOnly) {
+    errors.joinedDate =
+      editUserValidationMessages.joinedDateNotLaterThanDateOfBirth;
+  } else if (dateOfBirthOnly && joinedDateOnly < addYears(dateOfBirthOnly, 18)) {
+    errors.joinedDate = editUserValidationMessages.joinedDateUnder18;
+  } else if (joinedDateOnly.getDay() === 0 || joinedDateOnly.getDay() === 6) {
+    errors.joinedDate = editUserValidationMessages.joinedDateWeekend;
+  }
+
+  if (!validGenderValues.has(gender)) {
+    errors.gender = editUserValidationMessages.invalidGender;
+  }
+
+  if (!validUserTypeValues.has(type)) {
+    errors.type = editUserValidationMessages.invalidType;
+  }
+
+  return errors;
+};
+
 export default function EditUserPage() {
   const params = useParams<{ id: string }>();
   const userId = params.id;
@@ -201,6 +291,12 @@ function EditUserForm({
   );
   const [selectedGender, setSelectedGender] = useState<Gender>(user.gender);
   const [selectedType, setSelectedType] = useState<UserRoles>(user.userType);
+  const [dateInputValues, setDateInputValues] = useState<
+    Record<RequiredDateField, string>
+  >({
+    dateOfBirth: formatDateInputValue(utcDateToLocalDate(user.dateOfBirth)),
+    joinedDate: formatDateInputValue(utcDateToLocalDate(user.joinedDate)),
+  });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const redirectToUsers = () => {
@@ -208,10 +304,18 @@ function EditUserForm({
   };
 
   const syncEmptyDateField = (
+    field: RequiredDateField,
     setValue: Dispatch<SetStateAction<Date | null>>,
     container: HTMLDivElement,
   ) => {
-    if (!getDateInputValue(container)) {
+    const inputValue = getDateInputValue(container);
+
+    setDateInputValues((current) => ({
+      ...current,
+      [field]: inputValue,
+    }));
+
+    if (!inputValue) {
       setValue(null);
     }
   };
@@ -228,11 +332,17 @@ function EditUserForm({
       return;
     }
 
-    const isEmpty = !getDateInputValue(event.currentTarget);
+    const inputValue = getDateInputValue(event.currentTarget);
+    const isEmpty = !inputValue;
 
     if (isEmpty) {
       setValue(null);
     }
+
+    setDateInputValues((current) => ({
+      ...current,
+      [field]: inputValue,
+    }));
 
     setFieldErrors((current) => ({
       ...current,
@@ -240,18 +350,45 @@ function EditUserForm({
     }));
   };
 
-  const isSaveDisabled = isSaving || !dateOfBirth || !joinedDate;
+  const validationErrors = getEditUserValidationErrors({
+    dateOfBirth,
+    gender: selectedGender,
+    joinedDate,
+    type: selectedType,
+  });
+  const isSaveDisabled =
+    isSaving || Object.keys(validationErrors).length > 0;
+  const getDisplayedDateError = (field: RequiredDateField) => {
+    const fieldError = fieldErrors[field];
+
+    if (
+      dateInputValues[field] &&
+      (fieldError === requiredDateMessages[field] ||
+        validationErrors[field] === requiredDateMessages[field])
+    ) {
+      return undefined;
+    }
+
+    return validationErrors[field] ?? fieldError;
+  };
+  const displayedFieldErrors: FieldErrors = {
+    ...fieldErrors,
+    ...validationErrors,
+    dateOfBirth: getDisplayedDateError("dateOfBirth"),
+    joinedDate: getDisplayedDateError("joinedDate"),
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      return;
+    }
+
     setFieldErrors({});
 
     if (!dateOfBirth || !joinedDate) {
-      setFieldErrors((current) => ({
-        ...current,
-        dateOfBirth: dateOfBirth ? undefined : requiredDateMessages.dateOfBirth,
-        joinedDate: joinedDate ? undefined : requiredDateMessages.joinedDate,
-      }));
       return;
     }
 
@@ -312,16 +449,16 @@ function EditUserForm({
         />
       </FormFieldRow>
 
-      <FormFieldRow label="Date of Birth" error={fieldErrors.dateOfBirth}>
+      <FormFieldRow label="Date of Birth" error={displayedFieldErrors.dateOfBirth}>
         <div
           onInputCapture={(event) => {
-            syncEmptyDateField(setDateOfBirth, event.currentTarget);
+            syncEmptyDateField("dateOfBirth", setDateOfBirth, event.currentTarget);
           }}
           onClickCapture={(event) => {
             const container = event.currentTarget;
 
             window.setTimeout(() => {
-              syncEmptyDateField(setDateOfBirth, container);
+              syncEmptyDateField("dateOfBirth", setDateOfBirth, container);
             });
           }}
           onBlurCapture={(event) => {
@@ -332,6 +469,10 @@ function EditUserForm({
             value={dateOfBirth}
             onChange={(value) => {
               setDateOfBirth(value);
+              setDateInputValues((current) => ({
+                ...current,
+                dateOfBirth: formatDateInputValue(value),
+              }));
               setFieldErrors((current) => ({ ...current, dateOfBirth: undefined }));
             }}
             placeholder="Date of Birth"
@@ -341,7 +482,7 @@ function EditUserForm({
         </div>
       </FormFieldRow>
 
-      <FormFieldRow label="Gender" error={fieldErrors.gender}>
+      <FormFieldRow label="Gender" error={displayedFieldErrors.gender}>
         <RadioGroup
           name="gender"
           items={genderOptions}
@@ -355,16 +496,16 @@ function EditUserForm({
         />
       </FormFieldRow>
 
-      <FormFieldRow label="Joined Date" error={fieldErrors.joinedDate}>
+      <FormFieldRow label="Joined Date" error={displayedFieldErrors.joinedDate}>
         <div
           onInputCapture={(event) => {
-            syncEmptyDateField(setJoinedDate, event.currentTarget);
+            syncEmptyDateField("joinedDate", setJoinedDate, event.currentTarget);
           }}
           onClickCapture={(event) => {
             const container = event.currentTarget;
 
             window.setTimeout(() => {
-              syncEmptyDateField(setJoinedDate, container);
+              syncEmptyDateField("joinedDate", setJoinedDate, container);
             });
           }}
           onBlurCapture={(event) => {
@@ -375,6 +516,10 @@ function EditUserForm({
             value={joinedDate}
             onChange={(value) => {
               setJoinedDate(value);
+              setDateInputValues((current) => ({
+                ...current,
+                joinedDate: formatDateInputValue(value),
+              }));
               setFieldErrors((current) => ({ ...current, joinedDate: undefined }));
             }}
             placeholder="Joined Date"
@@ -384,7 +529,7 @@ function EditUserForm({
         </div>
       </FormFieldRow>
 
-      <FormFieldRow label="Type" error={fieldErrors.type}>
+      <FormFieldRow label="Type" error={displayedFieldErrors.type}>
         <UserTypeDropdown
           value={selectedType}
           onChange={(value) => {
