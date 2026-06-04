@@ -97,7 +97,7 @@ export const assignmentApi =
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Assignment"],
+        invalidatesTags: ["Assignment", "Asset"],
       }),
 
     }),

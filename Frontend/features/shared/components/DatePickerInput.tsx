@@ -8,6 +8,7 @@ import { useMemo, useRef, useState, useEffect } from "react";
 interface DatePickerInputProps {
   value: Date | null;
   onChange: (date: Date | null) => void;
+  onBlur?: () => void;
   placeholder?: string;
   width?: string;
   txtInputTestId?: string;
@@ -43,6 +44,7 @@ const parseDate = (input: string): Date | null => {
 export default function DatePickerInput({
   value,
   onChange,
+  onBlur,
   placeholder = "Assigned Date",
   width = "w-full sm:w-64",
   txtInputTestId = "txtDatePicker",
@@ -161,6 +163,7 @@ export default function DatePickerInput({
     onChange(parsedDate);
     setCursor(parsedDate);
     setError("");
+    onBlur?.();
   };
 
   return (

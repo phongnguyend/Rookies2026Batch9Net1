@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState } from "react";
 import { Resolver, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
-import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreateAssignmentMutation } from "@/features/assignments/admin/assignments.api";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
+import { LookupUsers } from "@/features/users/users.types";
+import { LookupAssetsSummary } from "@/features/Assets/assets.types";
+import UsersLookupInput from "@/features/shared/components/LookupTable/UsersLookup/UsersLookupInput";
+import AssetsLookupInput from "@/features/shared/components/LookupTable/AssetsLookup/AssetsLookupInput";
 
 // ─── Zod Schema ───────────────────────────────────────────────────────────────
 const createAssignmentSchema = z.object({
@@ -40,36 +43,29 @@ type CreateAssignmentFormValues = z.infer<typeof createAssignmentSchema>;
 interface AssignmentFormProps {
   title?: string;
   initialUserId?: string;
-  initialUserName?: string;
   initialAssetId?: string;
-  initialAssetName?: string;
   initialAssignedDate?: Date | null;
   initialNote?: string;
-  onPickUser?: () => void;
-  onPickAsset?: () => void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CreateAssignment({
   title = "Create New Assignment",
   initialUserId = "",
-  initialUserName = "",
   initialAssetId = "",
-  initialAssetName = "",
   initialAssignedDate = new Date(),
   initialNote = "",
-  onPickUser,
-  onPickAsset,
 }: AssignmentFormProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [createAssignment, { isLoading }] = useCreateAssignmentMutation();
+  const [user, setUser] = useState<LookupUsers.LookupUsersSummary | null>(null);
+  const [asset, setAsset] = useState<LookupAssetsSummary | null>(null);
 
   const {
     control,
     handleSubmit,
     setValue,
-    trigger,
     formState: { errors, isValid },
   } = useForm<CreateAssignmentFormValues>({
     resolver: zodResolver(
@@ -85,28 +81,13 @@ export default function CreateAssignment({
     },
   });
 
-  // ─── Sync Id từ parent khi pick xong ──────────────────────────────────────
-  useEffect(() => {
-    setValue("userId", initialUserId, {
-      shouldValidate: initialUserId !== "",
-      shouldTouch: initialUserId !== "",
-    });
-  }, [initialUserId, setValue]);
-
-  useEffect(() => {
-    setValue("assetId", initialAssetId, {
-      shouldValidate: initialAssetId !== "",
-      shouldTouch: initialAssetId !== "",
-    });
-  }, [initialAssetId, setValue]);
-
   // ─── Handle Submit ─────────────────────────────────────────────────────────
   const onSubmit = async (values: CreateAssignmentFormValues) => {
     try {
       await createAssignment({
         userId: values.userId,
         assetId: values.assetId,
-        assignedDate: values.assignedDate.toISOString().split("T")[0],
+        assignedDate: `${values.assignedDate.getFullYear()}-${String(values.assignedDate.getMonth() + 1).padStart(2, "0")}-${String(values.assignedDate.getDate()).padStart(2, "0")}`,
         note: values.note?.trim() || undefined,
       }).unwrap();
 
@@ -134,7 +115,6 @@ export default function CreateAssignment({
     }
   };
 
-
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="w-full max-w-xl rounded-lg bg-white p-4 sm:p-6 md:p-8">
@@ -144,61 +124,26 @@ export default function CreateAssignment({
         <div className="space-y-5">
 
           {/* User */}
-          <div>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-              <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
-                User
-              </label>
-              <div className="flex-1">
-                <Controller
-                  control={control}
-                  name="userId"
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="text"
-                      placeholder="enter user id"
-                      className="h-9 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            {errors.userId && (
-              <div className="md:pl-36">
-                <p className="mt-1 text-sm text-red-500">{errors.userId.message}</p>
-              </div>
-            )}
-          </div>
-
+          <UsersLookupInput
+            value={user}
+            onChange={(selected) => {
+              setUser(selected);
+              setValue("userId", selected?.id ?? "", {
+                shouldValidate: true,
+                shouldTouch: true,
+              });
+            }} />
 
           {/* Asset */}
-          <div>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-              <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
-                Asset
-              </label>
-              <div className="flex-1">
-                <Controller
-                  control={control}
-                  name="assetId"
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      type="text"
-                      placeholder="enter asset id"
-                      className="h-9 w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            {errors.assetId && (
-              <div className="md:pl-36">
-                <p className="mt-1 text-sm text-red-500">{errors.assetId.message}</p>
-              </div>
-            )}
-          </div>
+          <AssetsLookupInput
+            value={asset}
+            onChange={(selected) => {
+              setAsset(selected);
+              setValue("assetId", selected?.id ?? "", {
+                shouldValidate: true,
+                shouldTouch: true,
+              });
+            }} />
 
           {/* Assigned Date */}
           <div>
@@ -213,7 +158,10 @@ export default function CreateAssignment({
                   render={({ field }) => (
                     <DatePickerInput
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        field.onBlur(); // ← trigger touch
+                      }}
                       placeholder="Select date"
                       width="w-full"
                     />
@@ -243,7 +191,8 @@ export default function CreateAssignment({
                   <textarea
                     {...field}
                     rows={4}
-                    maxLength={1000}
+                    maxLength={2000}
+                    data-testid="txtNote"
                     className="w-full flex-1 resize-none rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
                   />
                 )}

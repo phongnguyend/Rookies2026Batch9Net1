@@ -8,8 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssign
         public AssetSpec(Guid assetId)
         {
             Query.Where(x => x.Id == assetId
-            && x.IsDeleted == false)
-                 .AsNoTracking();
+            && x.IsDeleted == false);
 
         }
     }

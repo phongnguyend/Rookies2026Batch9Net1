@@ -67,7 +67,6 @@ namespace NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssign
             try
             {
                 await repoAssignment.AddAsync(assignment, cancellationToken);
-                repoAsset.UpdateDetached(asset);
                 await uow.SaveChangesAsync(cancellationToken);
                 return Result.Created;
             }
