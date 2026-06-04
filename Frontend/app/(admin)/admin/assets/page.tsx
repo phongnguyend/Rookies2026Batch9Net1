@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { showModal } from "@/features/shared/modal.slice";
@@ -18,6 +18,10 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+import {
+  getPinnedEditedAsset,
+  clearPinnedEditedAsset,
+} from "@/features/Assets/editAssetStore";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -45,7 +49,9 @@ function AssetsContent() {
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [EditDisabledStates] = useState(false);
   const [DeleteDisabledStates] = useState(false);
-  const isCreatedNewAsset = useAppSelector((state)=>state.asset.isCreatedNewAsset);
+  const isCreatedNewAsset = useAppSelector(
+    (state) => state.asset.isCreatedNewAsset,
+  );
 
   // ─── Default state check ───────────────────────
   const isDefaultStateSelection =
@@ -53,11 +59,8 @@ function AssetsContent() {
     default_states.every((s) => selectedStates.includes(s));
 
   // ─── API ───────────────────────────────────────
-  const {
-    data: categoriesData,
-    isLoading: categoriesLoading,
-    isError,
-  } = useGetCategoriesQuery();
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetCategoriesQuery();
 
   const { data, isLoading } = useGetAssetsQuery({
     pageNumber,
@@ -70,7 +73,36 @@ function AssetsContent() {
     isCreatedNewAsset,
   });
 
-  const displayItems = data?.items ?? [];
+  // ─── Display Item ───────────────────────────────────────
+  // ─── Read pinned edited asset on mount ─────────
+  const [pinnedEditedAsset] = useState<AssetListItem | null>(() =>
+    getPinnedEditedAsset(),
+  );
+
+  // ─── Clear when user leaves assets page ────────
+  useEffect(() => {
+    return () => {
+      clearPinnedEditedAsset(); // ← clears on unmount (tab switch)
+    };
+  }, []);
+
+  const displayItems = (() => {
+    const items = data?.items ?? [];
+    if (!pinnedEditedAsset) {
+      return items;
+    }
+    const filteredItems = items.filter(
+      (item) =>
+        item.assetCode !== pinnedEditedAsset.assetCode
+    );
+    if (pageNumber === 1) {
+      return [
+        pinnedEditedAsset,
+        ...filteredItems,
+      ];
+    }
+    return filteredItems;
+  })();
 
   const categoryOptions =
     categoriesData?.map((c) => ({
@@ -117,7 +149,7 @@ function AssetsContent() {
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(``); // TODO: update route as needed
+    router.push(`/admin/assets/edit?id=${row.id}`);
   };
 
   // ─── Columns ───────────────────────────────────
@@ -127,29 +159,34 @@ function AssetsContent() {
       header: "Asset Code",
       sortable: true,
       testId: "btnSortAssetCode",
+      className: "w-32",
     },
     {
       key: "name",
       header: "Asset Name",
       sortable: true,
       testId: "btnSortAssetName",
+      className: "w-64",
+      render: (row) => <div className="truncate">{row.name}</div>,
     },
     {
       key: "category",
       header: "Category",
       sortable: true,
       testId: "btnSortCategory",
+      className: "w-40",
     },
     {
       key: "state",
       header: "State",
       sortable: true,
       testId: "btnSortState",
-      render: (row) => <span className="badge badge-outline">{row.state}</span>,
+      className: "w-32",
     },
     {
       key: "",
       header: "Actions",
+      className: "w-28",
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
@@ -214,86 +251,85 @@ function AssetsContent() {
         assetId={selectedAssetId}
         onClose={() => setSelectedAssetId(null)}
       />
-
-      {/* Filters */}
-      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-        {/* Left group */}
-        <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[160px] sm:flex-none">
-            <DropdownStateFilter
-              items={state_options}
-              values={selectedStates}
-              defaultValue={default_states}
-              getKey={(item) => item.key}
-              getLabel={(item) => item.label}
-              onChange={handleStateChange}
-              customLabel={isDefaultStateSelection ? "State" : undefined}
-            />
+      <div className="pb-4 md:pb-12">
+        {/* Filters */}
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+          {/* Left group */}
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[160px] sm:flex-none">
+              <DropdownStateFilter
+                items={state_options}
+                values={selectedStates}
+                defaultValue={default_states}
+                getKey={(item) => item.key}
+                getLabel={(item) => item.label}
+                onChange={handleStateChange}
+                customLabel={isDefaultStateSelection ? "State" : undefined}
+              />
+            </div>
+            <div
+              data-testid="ddlCategory"
+              className="flex-1 min-w-[160px] sm:flex-none"
+            >
+              <DropdownFilter
+                items={categoryOptions}
+                values={selectedCategories}
+                placeholder={categoriesLoading ? "Loading..." : "Category"}
+                getKey={(item) => item.key}
+                getLabel={(item) => item.label}
+                onChange={handleCategoryChange}
+                allLabel="All Categories"
+              />
+            </div>
           </div>
-          <div
-            data-testid="ddlCategory"
-            className="flex-1 min-w-[160px] sm:flex-none"
-          >
-            <DropdownFilter
-              items={categoryOptions}
-              values={selectedCategories}
-              placeholder={categoriesLoading ? "Loading..." : "Category"}
-              getKey={(item) => item.key}
-              getLabel={(item) => item.label}
-              onChange={handleCategoryChange}
-              allLabel="All Categories"
-            />
+
+          {/* Right group */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+            <div data-testid="txtSearch" className="w-full sm:w-60">
+              <SearchInput
+                value={searchInput}
+                onChange={setSearchInput}
+                onSearch={handleSearch}
+                placeholder="Search ..."
+                width="w-full"
+              />
+            </div>
+            <button
+              data-testid="btnCreateAsset"
+              onClick={() => router.push("/admin/assets/create")}
+              className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
+            >
+              + Create New Asset
+            </button>
           </div>
         </div>
 
-        {/* Right group */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
-          <div data-testid="txtSearch" className="w-full sm:w-60">
-            <SearchInput
-              value={searchInput}
-              onChange={setSearchInput}
-              onSearch={handleSearch}
-              placeholder="Search by asset code or name..."
-              width="w-full"
-            />
-          </div>
-          <button
-            data-testid="btnCreateAsset"
-            onClick={() => router.push("/admin/assets/create")}
-            className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
-          >
-            + Create New Asset
-          </button>
+        {/* Table */}
+        <div data-testid="dgdAsset">
+          <DataTable<AssetListItem>
+            data={displayItems}
+            columns={columns}
+            isLoading={isLoading}
+            emptyMessage="No assets found."
+            onRowClick={(row) => setSelectedAssetId(row.id)}
+            sort={sort}
+            onSortChange={handleSortChange}
+          />
         </div>
-      </div>
 
-      {/* Table */}
-      <div data-testid="dgdAsset">
-        <DataTable<AssetListItem>
-          data={displayItems}
-          columns={columns}
-          isLoading={isLoading}
-          emptyMessage={
-            isError ? "No assets found." : "No assets found after filtering."
-          }
-          onRowClick={(row) => setSelectedAssetId(row.id)}
-          sort={sort}
-          onSortChange={handleSortChange}
-        />
+        {/* Pagination */}
+        {data && (
+          <Pagination
+            pageNumber={data.pageNumber}
+            totalPages={data.totalPages}
+            totalCount={data.totalCount}
+            pageSize={data.pageSize}
+            hasPreviousPage={data.hasPreviousPage}
+            hasNextPage={data.hasNextPage}
+            onPageChange={setPageNumber}
+          />
+        )}
       </div>
-
-      {/* Pagination */}
-      {data && (
-        <Pagination
-          pageNumber={data.pageNumber}
-          totalPages={data.totalPages}
-          totalCount={displayItems.length}
-          pageSize={data.pageSize}
-          hasPreviousPage={data.hasPreviousPage}
-          hasNextPage={data.hasNextPage}
-          onPageChange={setPageNumber}
-        />
-      )}
     </>
   );
 }

@@ -46,6 +46,7 @@ export interface GetAssetDetailResponse {
   state: AssetState;
   category: string;
   location: string;
+  isdeleted: boolean;
   history: AssetHistoryItem[];
 }
 
@@ -85,6 +86,7 @@ export interface CreateAssetResponse {
   location: string;
 }
 
+// ─── Look up Asset ───────────────────────────────────────────
 export interface LookupAssetsRequest{
   searchTerm?: string;
   sortBy?: string;
@@ -102,7 +104,6 @@ export interface LookupAssetsWithAssignedRequest{
   assignedAssetId?: string;
 }
 
-
 export interface LookupAssetsSummary{
   id: string;
   assetCode: string;
@@ -111,3 +112,23 @@ export interface LookupAssetsSummary{
 }
 
 export interface LookupAssetsResponse extends PaginationResponse<LookupAssetsSummary> {}
+
+// ─── Edit Assets ───────────────────────────────────────────
+export interface EditAssetRequest {
+  assetId: string;
+  assetName: string;
+  specification: string;
+  installedDate: string;
+  state: string;
+}
+
+export interface EditAssetResponse {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  specification: string;
+  installedAtUtc: string;
+  state: string;
+  category: string;
+  location: string;
+}

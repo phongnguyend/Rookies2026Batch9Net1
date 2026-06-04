@@ -68,7 +68,7 @@ export default function CreateAssetPage() {
         categoryId,
       }).unwrap();
       //Set state isNewCreatedAsset to true here
-      dispatch(setCreatedNewAsset(true))
+      dispatch(setCreatedNewAsset(true));
 
       router.push("/admin/assets");
     } catch (err) {
@@ -106,10 +106,6 @@ export default function CreateAssetPage() {
     } else {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
-      if (installedDate > today) {
-        errors.installedDate = "Installed date cannot be in the future.";
-      }
     }
 
     setFieldErrors(errors);
@@ -140,6 +136,23 @@ export default function CreateAssetPage() {
             onChange={(e) => setAssetName(e.target.value)}
             className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
           />
+          <div className="mt-1 flex items-center justify-between text-xs">
+            {assetName.length === 100 ? (
+              <span className="text-orange-500">
+                Maximum characters is 100.
+              </span>
+            ) : (
+              <span />
+            )}
+
+            <span
+              className={
+                assetName.length === 100 ? "text-red-500" : "text-gray-500"
+              }
+            >
+              {assetName.length}/100
+            </span>
+          </div>
           {fieldErrors.assetName && (
             <p className="mt-1 text-sm text-red-500">{fieldErrors.assetName}</p>
           )}
@@ -172,6 +185,23 @@ export default function CreateAssetPage() {
             rows={4}
             className="w-full rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary resize-none"
           />
+          <div className="mt-1 flex items-center justify-between text-xs">
+            {specification.length === 500 ? (
+              <span className="text-orange-500">
+                Maximum characters is 500.
+              </span>
+            ) : (
+              <span />
+            )}
+
+            <span
+              className={
+                specification.length === 500 ? "text-red-500" : "text-gray-500"
+              }
+            >
+              {specification.length}/500
+            </span>
+          </div>
           {fieldErrors.specification && (
             <p className="mt-1 text-sm text-red-500">
               {fieldErrors.specification}
@@ -253,4 +283,3 @@ export default function CreateAssetPage() {
     </div>
   );
 }
-

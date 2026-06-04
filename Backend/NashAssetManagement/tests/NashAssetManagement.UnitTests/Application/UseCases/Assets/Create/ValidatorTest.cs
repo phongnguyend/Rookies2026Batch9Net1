@@ -69,21 +69,6 @@ public class ValidatorTests
     }
 
     [Fact]
-    public async Task CreateAssetValidator_InstalledDate_IsFuture_ShouldReturnError()
-    {
-        var request = CreateValidRequest() with
-        {
-            InstalledDate = DateTime.UtcNow.AddDays(1)
-        };
-
-        var result = await _validator.ValidateAsync(request);
-
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors,
-            x => x.ErrorMessage == "Installed date cannot be in the future.");
-    }
-
-    [Fact]
     public async Task CreateAssetValidator_State_IsInvalid_ShouldReturnError()
     {
         var request = CreateValidRequest() with
