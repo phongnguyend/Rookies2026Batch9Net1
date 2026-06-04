@@ -136,6 +136,7 @@ export default function DatePickerInput({
 
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
+
       setError("");
       return;
     }
@@ -173,6 +174,7 @@ export default function DatePickerInput({
             onChange={(e) => {
               setInputValue(e.target.value);
               setError("");
+              onChange(null);
             }}
             onBlur={handleDateValidation}
             onKeyDown={(e) => {

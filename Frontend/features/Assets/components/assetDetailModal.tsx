@@ -55,7 +55,7 @@ export default function AssetDetailModal({
     <dialog ref={dialogRef} className="modal" onClose={onClose}>
       <div className="modal-box max-w-3xl" data-testid="dlgDetailedAssetInfo">
         {/* Header */}
-        <div className="bg-primary text-white -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
+        <div className="bg-gray-100 text-red-500 -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-bold text-lg">
             Detailed Asset Information
           </h3>
@@ -63,7 +63,7 @@ export default function AssetDetailModal({
           <button
             data-testid="btnExit"
             onClick={handleClose}
-            className="text-white/80 hover:text-white hover:cursor-pointer"
+            className="flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
           >
             ✕
           </button>
