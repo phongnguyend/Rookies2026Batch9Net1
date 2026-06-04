@@ -7,8 +7,25 @@ import SingleSortDataTable, {
 } from "@/features/shared/components/SingleSortDataTable";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
-import { useGetReportQuery } from "@/features/report/report.api";
-import { ViewReport } from "@/features/report/report.types";
+import {
+  useGetReportQuery,
+  useGetExportStatusQuery,
+  useStartExportMutation,
+  useCancelExportMutation,
+} from "@/features/report/report.api";
+import {
+  ExportReportJobStatus,
+  ExportReportSortBy,
+  ViewReport,
+} from "@/features/report/report.types";
+import { ENV_CONFIGS } from "@/lib/config/env";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import {
+  setDownloading,
+  setHasNotifiedReady,
+} from "@/features/report/report.slice";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 
 const defaultSort: SortItem = {
   key: "categoryName",
@@ -16,24 +33,24 @@ const defaultSort: SortItem = {
 };
 
 // Map frontend column keys to backend SortBy enums
-const mapTableKeyToBackendSortBy = (key: string): ViewReport.SortBy => {
+const mapTableKeyToBackendSortBy = (key: string): ExportReportSortBy => {
   switch (key) {
     case "categoryName":
-      return ViewReport.SortBy.Category;
+      return ExportReportSortBy.Category;
     case "total":
-      return ViewReport.SortBy.Total;
+      return ExportReportSortBy.Total;
     case "assigned":
-      return ViewReport.SortBy.Assigned;
+      return ExportReportSortBy.Assigned;
     case "available":
-      return ViewReport.SortBy.Available;
+      return ExportReportSortBy.Available;
     case "notAvailable":
-      return ViewReport.SortBy.NotAvailable;
+      return ExportReportSortBy.NotAvailable;
     case "waitingForRecycling":
-      return ViewReport.SortBy.WaitingForRecycling;
+      return ExportReportSortBy.WaitingForRecycling;
     case "recycled":
-      return ViewReport.SortBy.Recycled;
+      return ExportReportSortBy.Recycled;
     default:
-      return ViewReport.SortBy.Category;
+      return ExportReportSortBy.Category;
   }
 };
 
@@ -41,6 +58,9 @@ export default function ReportPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pageSize] = useState<number>(10);
   const [sorts, setSorts] = useState<SortItem[]>([defaultSort]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { isDownloading } = useAppSelector((state) => state.reportSlice);
+  const dispatch = useAppDispatch();
 
   const queryParams: ViewReport.Request = {
     pageNumber: pageNumber,
@@ -56,15 +76,118 @@ export default function ReportPage() {
     skipPollingIfUnfocused: true, // when on other tab, and comeback to Report tab, then polling is continue, otherwise keep polling in the background if set = false
   });
 
+  const { data: statusData, refetch: refetchStatus } = useGetExportStatusQuery(
+    undefined,
+    {
+      pollingInterval: 2000,
+      refetchOnFocus: true,
+      refetchOnReconnect: true,
+      skipPollingIfUnfocused: true,
+    },
+  );
+
+  const [startExport, { isLoading: isStartDownloading }] =
+    useStartExportMutation();
+  const [cancelExport, { isLoading: isCanceling }] = useCancelExportMutation();
+
   const reports = data?.items ?? [];
+  const jobStatus = statusData?.status;
+  const downloadUrl = statusData?.downloadUrl;
 
   const handleSortChange = (newSorts: SortItem[]) => {
     setSorts(newSorts);
     setPageNumber(1); // Reset to page 1 on sorting change
   };
 
-  const handleExport = () => {
-    console.log("export");
+  // State Machine logic for button label and disabled state using RTK Query and data states directly
+  const btnText =
+    jobStatus === ExportReportJobStatus.Processing
+      ? "Generating..."
+      : jobStatus === ExportReportJobStatus.ReadyToDownload
+        ? "Ready to Download"
+        : "Export";
+
+  const isBtnDisabled =
+    reports.length === 0 ||
+    jobStatus === ExportReportJobStatus.Processing ||
+    isStartDownloading ||
+    isCanceling ||
+    isDownloading;
+
+  const handleExport = async () => {
+    if (jobStatus === ExportReportJobStatus.ReadyToDownload) {
+      setIsModalOpen(true);
+    } else {
+      try {
+        dispatch(setHasNotifiedReady(false));
+        await startExport({
+          sortBy: queryParams.sortBy,
+          sortDirection: queryParams.sortDirection,
+        }).unwrap();
+        refetchStatus();
+      } catch (err) {
+        console.error("Failed to start export:", err);
+      }
+    }
+  };
+
+  const handleDownload = async () => {
+    if (downloadUrl) {
+      const fullUrl = `${ENV_CONFIGS.apiUrl}${downloadUrl}`;
+      try {
+        dispatch(setDownloading(true));
+        const response = await fetch(fullUrl);
+        if (!response.ok) throw new Error("Failed to download file");
+        const blob = await response.blob();
+
+        const filename =
+          downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1) ||
+          "report.xlsx";
+
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+
+        dispatch(
+          enqueueToast({
+            message: "Report downloaded successfully",
+            type: ToastType.Success,
+          }),
+        );
+        dispatch(setHasNotifiedReady(false));
+
+        // Remove the file excel after download successfully
+        await cancelExport().unwrap();
+        refetchStatus();
+      } catch (err) {
+        console.error("Failed to download report:", err);
+        dispatch(
+          enqueueToast({
+            message: "Failed to download report",
+            type: ToastType.Error,
+          }),
+        );
+      } finally {
+        dispatch(setDownloading(false));
+        setIsModalOpen(false);
+      }
+    }
+  };
+
+  const handleCancelReport = async () => {
+    try {
+      dispatch(setHasNotifiedReady(false));
+      await cancelExport().unwrap();
+      setIsModalOpen(false);
+      refetchStatus();
+    } catch (err) {
+      console.error("Failed to cancel export:", err);
+    }
   };
 
   const columns: ColumnDef<ViewReport.ReportRow>[] = [
@@ -133,11 +256,11 @@ export default function ReportPage() {
             <button
               type="button"
               onClick={handleExport}
-              disabled={isLoading || reports.length === 0}
+              disabled={isBtnDisabled}
               data-testid="btnExport"
-              className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.97] transition-all duration-150"
             >
-              Export
+              {btnText}
             </button>
           </div>
         </div>
@@ -169,6 +292,18 @@ export default function ReportPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onYes={handleDownload}
+        onNo={handleCancelReport}
+        title="Your report is ready for downloading"
+        body="Would you like to download the report or cancel it?"
+        yesButtonLabel="Download File"
+        noButtonLabel="Cancel Report"
+        isLoading={isCanceling || isDownloading}
+      />
     </div>
   );
 }

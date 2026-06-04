@@ -15,6 +15,10 @@ import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess, completeLoading } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
+import { useGetExportStatusQuery } from "@/features/report/report.api";
+import { ExportReportJobStatus } from "@/features/report/report.types";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { setHasNotifiedReady } from "@/features/report/report.slice";
 
 export default function RootLayout({
   children,
@@ -74,6 +78,41 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       dispatch(completeLoading());
     }
   }, [profile, isAuthenticated, isError, dispatch, hasToken]);
+
+  // Export Report
+  const { hasNotifiedReady } = useAppSelector((state) => state.reportSlice);
+  const { data: exportStatus } = useGetExportStatusQuery(undefined, {
+    pollingInterval: 2000,
+    skip: !isAuthenticated || user?.role !== UserRoles.Admin,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+    skipPollingIfUnfocused: true,
+  });
+
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== UserRoles.Admin) {
+      return;
+    }
+
+    if (
+      exportStatus?.status === ExportReportJobStatus.ReadyToDownload &&
+      !hasNotifiedReady
+    ) {
+      dispatch(
+        enqueueToast({
+          message: "Report is ready to download",
+          type: ToastType.Success,
+        }),
+      );
+      dispatch(setHasNotifiedReady(true));
+    }
+  }, [
+    exportStatus?.status,
+    hasNotifiedReady,
+    isAuthenticated,
+    user?.role,
+    dispatch,
+  ]);
 
   return (
     <RouteGuard>
