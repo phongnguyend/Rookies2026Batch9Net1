@@ -210,7 +210,7 @@ const EditAssignmentPage = () => {
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
               type="submit"
-              disabled={!isValid || isLoading}
+              disabled={!isValid || isLoading || isEditLoading}
               className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? "Saving..." : "Save"}
