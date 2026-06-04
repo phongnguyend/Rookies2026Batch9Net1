@@ -5,6 +5,11 @@ export enum UserRoles {
   Staff = "Staff"
 }
 
+export enum Gender {
+  Male = "Male",
+  Female = "Female",
+}
+
 export interface UserRow {
   id: string;
   staffCode: string;
@@ -59,4 +64,26 @@ export namespace LookupUsers{
   }
 
   export interface Response extends PaginationResponse<LookupUsersSummary> {}
+}
+
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  dayOfBirth: string;
+  joinedDate: string;
+  gender: Gender;
+  userType: UserRoles;
+}
+
+export interface CreateUserResponse {
+  id: string;
+  staffCode: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  joinedDate: string;
+  userType: UserRoles;
+  gender: Gender;
 }

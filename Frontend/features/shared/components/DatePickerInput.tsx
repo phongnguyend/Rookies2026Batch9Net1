@@ -168,7 +168,7 @@ export default function DatePickerInput({
         {/* Date Picker Input */}
         <div className="relative flex-1">
           <input
-            data-testid="txtAssignedDate"
+            data-testid={txtInputTestId}
             value={inputValue}
             placeholder={placeholder}
             onChange={(e) => {

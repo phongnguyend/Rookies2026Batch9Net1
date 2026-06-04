@@ -1,5 +1,7 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import {
+  CreateUserRequest,
+  CreateUserResponse,
   GetUserByIdResponse,
   GetUsersRequest,
   GetUsersResponse,
@@ -33,7 +35,16 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
-
+    
+    createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
+      query: (body) => ({
+        url: "v1/users",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+    
     lookupUsers: builder.query<LookupUsers.Response, LookupUsers.Request>({
       query: (params) => ({
         url: "v1/users/lookup",
@@ -44,4 +55,9 @@ export const usersApi = baseApiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUsersQuery, useGetUserByIdQuery, useLookupUsersQuery } = usersApi;
+export const { 
+  useGetUsersQuery, 
+  useGetUserByIdQuery,
+  useCreateUserMutation,
+  useLookupUsersQuery
+} = usersApi;

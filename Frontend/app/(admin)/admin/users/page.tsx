@@ -6,7 +6,7 @@ import {
   useCallback,
   useState,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import DataTable, {
   type ColumnDef,
   type SortItem,
@@ -110,6 +110,7 @@ function DisableIcon() {
 export default function UsersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const pageParam = Number(searchParams.get("page") ?? "1");
   const queryPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
@@ -302,6 +303,8 @@ export default function UsersPage() {
     },
   ];
 
+  const currentUrl = `${pathname}?${searchParams.toString()}`;
+
   return (
     <div className="min-h-screen bg-white text-[#333]" data-testid="tabManagerUser">
       <div className="flex min-w-0">
@@ -358,10 +361,10 @@ export default function UsersPage() {
               <button
                 type="button"
                 data-testid="btnCreateUser"
-                onClick={() => {
-                  // TODO: navigate to create user page, e.g. router.push('/admin/users/create')
-                }}
-                className="rounded bg-primary px-5 py-2 font-semibold text-white"
+                onClick={() => 
+                  router.push(`/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`)
+                }
+                className="rounded bg-primary px-5 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
               >
                 Create new user
               </button>
