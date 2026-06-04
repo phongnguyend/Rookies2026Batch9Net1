@@ -42,4 +42,11 @@ export interface GetAssignmentsRequest
   includeDeleted?: boolean;
 }
 
+export interface CreateAssignmentRequest {
+  userId: string;
+  assetId: string;
+  assignedDate: string;
+  note?: string;
+}
+
 export interface GetAssignmentsResponse extends PaginationResponse<Assignment> { }

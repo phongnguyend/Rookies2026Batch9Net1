@@ -1,6 +1,7 @@
 import { SortDirection } from "@/lib/api/base.types";
 import {
   AssignmentDetails,
+  CreateAssignmentRequest,
   GetAssignmentsRequest,
   GetAssignmentsResponse,
 } from "./assignments.types";
@@ -90,10 +91,20 @@ export const assignmentApi =
         ],
       }),
 
+      createAssignment: builder.mutation<void, CreateAssignmentRequest>({
+        query: (body) => ({
+          url: "v1/admin/assignments",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: ["Assignment", "Asset"],
+      }),
+
     }),
   });
 
 export const {
   useGetAllAssignmentsQuery,
-  useGetAssignmentByIdQuery
+  useGetAssignmentByIdQuery,
+  useCreateAssignmentMutation,
 } = assignmentApi;
