@@ -471,10 +471,12 @@ function EditUserForm({
             value={dateOfBirth}
             onChange={(value) => {
               setDateOfBirth(value);
-              setDateInputValues((current) => ({
-                ...current,
-                dateOfBirth: formatDateInputValue(value),
-              }));
+              if (value) {
+                setDateInputValues((current) => ({
+                  ...current,
+                  dateOfBirth: formatDateInputValue(value),
+                }));
+              }
               setFieldErrors((current) => ({ ...current, dateOfBirth: undefined }));
             }}
             placeholder="Date of Birth"
@@ -521,10 +523,12 @@ function EditUserForm({
             value={joinedDate}
             onChange={(value) => {
               setJoinedDate(value);
-              setDateInputValues((current) => ({
-                ...current,
-                joinedDate: formatDateInputValue(value),
-              }));
+              if (value) {
+                setDateInputValues((current) => ({
+                  ...current,
+                  joinedDate: formatDateInputValue(value),
+                }));
+              }
               setFieldErrors((current) => ({ ...current, joinedDate: undefined }));
             }}
             placeholder="Joined Date"
