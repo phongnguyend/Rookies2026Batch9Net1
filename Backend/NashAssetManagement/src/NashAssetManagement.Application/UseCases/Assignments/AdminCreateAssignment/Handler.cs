@@ -72,7 +72,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.AdminCreateAssign
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Failed to create assignment with Id '{assignment.Id}', request initialized by user '{userId}', staff Id '{staff.Id}', asset Id '{asset.Id}'");
+                logger.LogError(ex, "Failed to create return request for assignment with Id '{AssignmentId}', request initialized by user '{UserId}'", assignment.Id, userId);
                 return Errors.UnexpectedErrorOccurred;
             }
         }
