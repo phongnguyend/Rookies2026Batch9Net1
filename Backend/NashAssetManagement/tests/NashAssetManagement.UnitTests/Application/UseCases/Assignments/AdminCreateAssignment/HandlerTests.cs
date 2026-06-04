@@ -375,25 +375,26 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.AdminCr
             // Assert
             Assert.False(result.IsError);
 
+            // Verify assignment được tạo đúng
             _assignmentRepoMock.Verify(
                 x => x.AddAsync(
                     It.Is<Assignment>(a =>
                         a.AssignedByUserId == _adminId &&
                         a.AssignedToUserId == _staffId &&
                         a.AssetId == _assetId &&
+                        a.AssignedAtUtc == request.AssignedDate && 
+                        a.Note == request.Note &&                  
                         a.State == AssignmentState.WaitingForAcceptance &&
                         a.IsReturning == false &&
                         a.CreatedAtUtc == _utcNow),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
 
-            _assetRepoMock.Verify(
-                x => x.UpdateDetached(
-                    It.Is<Asset>(a =>
-                        a.Id == _assetId &&
-                        a.State == AssetState.Assigned)),
-                Times.Once);
+            // Verify asset state được update đúng
+            Assert.Equal(AssetState.Assigned, asset.State);         
+            Assert.Equal(_utcNow, asset.UpdatedAtUtc);              
 
+            // Verify save được gọi đúng 1 lần
             _unitOfWorkMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
                 Times.Once);
