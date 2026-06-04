@@ -7,17 +7,10 @@ namespace NashAssetManagement.Infrastructure.Report
     {
         public string GenerateStorageFileName(
                string locationName,
-               string username)
+               string username,
+               DateTime createdAtUtc)
         {
-            return Path.Combine(AppCts.TempFolders.TempReportFolders, $"{locationName}_{username}_report.xlsx");
-        }
-
-        public string GenerateDownloadFileName(
-            string locationName,
-            string username,
-            DateTime createdAtUtc)
-        {
-            return $"{createdAtUtc:yyyy-MM-dd}_{locationName}_{username}_report.xlsx";
+            return Path.Combine(AppCts.TempFolders.TempReportFolders, $"{createdAtUtc:yyyy-MM-dd}_{locationName}_{username}_report.xlsx");
         }
     }
 }

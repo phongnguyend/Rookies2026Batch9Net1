@@ -9,6 +9,8 @@ using NashAssetManagement.WebAPI.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using NashAssetManagement.WebAPI.Filters;
+using NashAssetManagement.Domain.Constants;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,19 @@ try
     var seeder = scope.ServiceProvider.GetRequiredService<NamDevelopmentSeedData>();
     await seeder.SeedDataAsync(scope.ServiceProvider);
     Log.Information("Seed development data finished successfully.");
+
+    // Setup folder for storing temp report files
+    var tempReportsPath = Path.Combine(Directory.GetCurrentDirectory(), AppCts.TempFolders.TempReportFolders);
+    if (!Directory.Exists(tempReportsPath))
+    {
+        Directory.CreateDirectory(tempReportsPath);
+    }
+
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(tempReportsPath),
+        RequestPath = $"/{AppCts.TempFolders.TempReportFolders}"
+    });
 
     app.UseCors();
     app.UseAuthentication();

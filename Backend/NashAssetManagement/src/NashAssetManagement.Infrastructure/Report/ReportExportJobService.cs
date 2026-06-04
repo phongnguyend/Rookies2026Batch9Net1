@@ -90,14 +90,6 @@ namespace NashAssetManagement.Infrastructure.Report
                     throw new InvalidOperationException($"Location not found for export excel.");
                 }
 
-                var excelFileName = fileNameService.GenerateStorageFileName(location.Name, userName);
-
-                // Create temp directiory to store the excel file
-                var absolutePathToStore = Path.Combine(Directory.GetCurrentDirectory(), excelFileName);
-                Directory.CreateDirectory(Path.GetDirectoryName(absolutePathToStore)!);
-
-                await File.WriteAllBytesAsync(absolutePathToStore, excelBytes, cancellationToken);
-
                 // Update the status of export if success
                 var exportJob = await exportRepository.GetQueryableSet().Where(e => e.Id == exportReportJobId).FirstOrDefaultAsync(cancellationToken);
                 if (exportJob == null)
@@ -106,6 +98,15 @@ namespace NashAssetManagement.Infrastructure.Report
                     throw new InvalidOperationException($"Export report job {exportReportJobId} not found");
                 }
 
+                var excelFileName = fileNameService.GenerateStorageFileName(location.Name, userName, exportJob.CreatedAtUtc);
+
+                // Create temp directiory to store the excel file
+                var absolutePathToStore = Path.Combine(Directory.GetCurrentDirectory(), excelFileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(absolutePathToStore)!);
+
+                await File.WriteAllBytesAsync(absolutePathToStore, excelBytes, cancellationToken);
+
+                // Update job info in db
                 exportJob.FilePath = excelFileName;
                 exportJob.Status = ExportReportJobStatus.ReadyToDownload;
                 exportJob.CompletedAtUtc = dateTimeProvider.UtcNow;
