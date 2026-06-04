@@ -111,6 +111,11 @@ export default function AssignmentDetailPopup({
               <DetailRow
                 label="Specification"
                 value={data.specification}
+                render={(value) => (
+                  <div className="max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-1">
+                    {value}
+                  </div>
+                )}
               />
 
               <DetailRow
@@ -137,6 +142,11 @@ export default function AssignmentDetailPopup({
               <DetailRow
                 label="Note"
                 value={data.note}
+                render={(value) => (
+                  <div className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words">
+                    {value}
+                  </div>
+                )}
               />
             </div>
           ) : (
