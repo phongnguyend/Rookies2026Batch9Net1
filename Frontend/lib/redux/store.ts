@@ -5,6 +5,7 @@ import { toastSlice } from "@/features/shared/toast.slice";
 import { modalSlice } from "@/features/shared/modal.slice";
 import { authSlice } from "@/features/auth/auth.slice";
 import assetReducer from "@/features/Assets/assets.slice"
+import { reportSlice } from "@/features/report/report.slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -15,6 +16,7 @@ export const makeStore = () => {
       modalSlice: modalSlice.reducer,
       authSlice: authSlice.reducer,
       asset: assetReducer,
+      reportSlice: reportSlice.reducer
     },
 
     middleware: (getDefaultMiddleware) =>
