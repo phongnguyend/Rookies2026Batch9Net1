@@ -15,6 +15,11 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 .Must(dob => dob.Date <= DateTime.Today.AddYears(-18))
                 .WithMessage("User is under 18. Please select a different date");
 
+            RuleFor(x => x.DateOfBirth)
+                .NotEmpty()
+                .Must(dob => dob.Date > DateTime.Today)
+                .WithMessage("Date of birth cannot be in the future. Please select a different date");
+
             RuleFor(x => x.JoinedDate)
                 .NotEmpty()
                 .Must((request, joinedDate) => joinedDate.Date > request.DateOfBirth.Date)
