@@ -184,7 +184,7 @@ export default function AssignmentsPage() {
             disabledDecline={isAccepted || isFinal}
             disabledReturn={isWaiting || isFinal}
             onAccept={(row) => {
-              router.push(`/admin/assignments/${row.id}/edit`);
+              router.push(`/admin/assignments/edit?id=${row.id}`);
             }}
             onDecline={(row) => console.log("decline", row)}
             onReturn={(row) => console.log("return", row)}

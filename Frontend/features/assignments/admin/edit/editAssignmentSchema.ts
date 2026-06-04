@@ -6,12 +6,14 @@ export const editAssignmentSchema = z.object({
   assetId: z.guid({ error: "Asset ID must be a valid GUID." }),
 
   assignedDate: z
-    .date({
-      error: "Assigned date is required",
+    .date()
+    .nullable()
+    .refine((date) => date !== null, {
+      error: "Assigned date is required.",
     })
     .refine(
       (date) => {
-        if (!(date instanceof Date)) return true;
+        if (!date) return true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return date >= today;
@@ -26,4 +28,5 @@ export const editAssignmentSchema = z.object({
     .or(z.literal("")),
 });
 
-export type EditAssignmentFormValues = z.infer<typeof editAssignmentSchema>;
+export type EditAssignmentFormValues =
+  z.input<typeof editAssignmentSchema>;

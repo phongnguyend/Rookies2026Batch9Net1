@@ -18,16 +18,17 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { LookupUsers } from "@/features/users/users.types";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const EditAssignmentPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const { data, isLoading, isError } = useGetEditingAssignmentQuery(
-    { assignmentId: id },
+    { assignmentId: id ?? "" },
     { skip: !id },
   );
   const [user, setUser] = useState<LookupUsers.LookupUsersSummary | null>(null);
@@ -40,12 +41,14 @@ const EditAssignmentPage = () => {
     defaultValues: {
       userId: "",
       assetId: "",
-      assignedDate: undefined,
+      assignedDate: null,
       note: "",
     },
     mode: "onTouched",
     reValidateMode: "onChange",
   });
+
+  console.log("assignedDate:", form.watch("assignedDate"));
 
   useEffect(() => {
     if (data) {
@@ -65,19 +68,20 @@ const EditAssignmentPage = () => {
     handleSubmit,
     setValue,
     formState: { errors, isValid },
+    watch
   } = form;
 
   const onSubmit = async (data: EditAssignmentFormValues) => {
     try {
       const assignedDateUtc = new Date(
         Date.UTC(
-          data.assignedDate.getFullYear(),
-          data.assignedDate.getMonth(),
-          data.assignedDate.getDate(),
+          data.assignedDate!.getFullYear(),
+          data.assignedDate!.getMonth(),
+          data.assignedDate!.getDate(),
         ),
       );
       const updatedAssignment = await editAssignment({
-        assignmentId: id,
+        assignmentId: id ?? "",
         payload: {
           userId: data.userId,
           assetId: data.assetId,
@@ -117,12 +121,35 @@ const EditAssignmentPage = () => {
     }
   };
 
-  if (!data) {
+  if (!id) {
+    return (
+      <div className="w-full max-w-xl rounded-lg bg-white p-4 sm:p-6 md:p-8">
+        <h2 className="mb-8 text-xl font-bold text-red-600">Edit Assignment</h2>
+        <p className="text-gray-600">Assignment ID is missing.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (isError || !data) {
-    return <div>Error</div>;
+  if (isError) {
+    return (
+      <div className="w-full max-w-xl rounded-lg bg-white p-8">
+        <h2 className="mb-4 text-xl font-bold text-red-600">Edit Assignment</h2>
+        <p className="text-red-500">Failed to load assignment.</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="w-full max-w-xl rounded-lg bg-white p-8">
+        <h2 className="mb-4 text-xl font-bold text-red-600">Edit Assignment</h2>
+        <p className="text-gray-600">Assignment not found.</p>
+      </div>
+    );
   }
 
   return (
@@ -133,6 +160,7 @@ const EditAssignmentPage = () => {
           <UsersLookupInput
             value={user}
             onChange={(selectedUser) => {
+              console.log(form.watch("assignedDate"));
               setUser(selectedUser);
               setValue("userId", selectedUser?.id ?? "", {
                 shouldValidate: true,
@@ -164,10 +192,12 @@ const EditAssignmentPage = () => {
                   render={({ field, fieldState }) => (
                     <DatePickerInput
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={(date) =>{
+                        field.onChange(date)
+                        field.onBlur()
+                      }}
                       placeholder="Select date"
                       width="w-full"
-                      canClearValue={false}
                       showToast={false}
                       error={fieldState.error?.message}
                     />

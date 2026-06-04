@@ -159,6 +159,7 @@ export default function DatePickerInput({
 
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
+      onChange(null);
       setInputError("");
       return;
     }
