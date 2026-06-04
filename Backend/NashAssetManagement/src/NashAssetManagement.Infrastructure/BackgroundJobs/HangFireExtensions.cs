@@ -33,6 +33,8 @@ namespace NashAssetManagement.Infrastructure.BackgroundJobs
             services.AddHangfireServer(options =>
             {
                 options.WorkerCount = 2; // 2 threads are enough for this flow 
+                options.ServerTimeout = TimeSpan.FromMinutes(2); // long how before a server is considered dead
+                options.ServerCheckInterval = TimeSpan.FromSeconds(30); // next cycle to check if server dead or not
             });
 
             return services;

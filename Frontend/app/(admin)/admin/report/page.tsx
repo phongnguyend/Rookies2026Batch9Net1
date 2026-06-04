@@ -60,6 +60,7 @@ export default function ReportPage() {
   const [sorts, setSorts] = useState<SortItem[]>([defaultSort]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { isDownloading } = useAppSelector((state) => state.reportSlice);
+  const { isAuthenticated } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
   const queryParams: ViewReport.Request = {
@@ -74,15 +75,17 @@ export default function ReportPage() {
     refetchOnFocus: true, // if return to report tab, then calling again
     refetchOnReconnect: true, // if reconnecting after disconnected, then refetch
     skipPollingIfUnfocused: true, // when on other tab, and comeback to Report tab, then polling is continue, otherwise keep polling in the background if set = false
+    skip: !isAuthenticated, // if not authenticated, skip long polling the request
   });
 
   const { data: statusData, refetch: refetchStatus } = useGetExportStatusQuery(
     undefined,
     {
-      pollingInterval: 2000,
+      pollingInterval: 3000,
       refetchOnFocus: true,
       refetchOnReconnect: true,
       skipPollingIfUnfocused: true,
+      skip: !isAuthenticated, // if not authenticated, skip long polling the request
     },
   );
 
@@ -159,11 +162,10 @@ export default function ReportPage() {
             type: ToastType.Success,
           }),
         );
-        dispatch(setHasNotifiedReady(false));
 
         // Remove the file excel after download successfully
         await cancelExport().unwrap();
-        refetchStatus();
+        refetchStatus(); // refetch the status of the export button when cancel export
       } catch (err) {
         console.error("Failed to download report:", err);
         dispatch(
@@ -181,10 +183,17 @@ export default function ReportPage() {
 
   const handleCancelReport = async () => {
     try {
-      dispatch(setHasNotifiedReady(false));
       await cancelExport().unwrap();
       setIsModalOpen(false);
       refetchStatus();
+
+      // dispatch the toast for cancelling
+      dispatch(
+        enqueueToast({
+          message: "Cancel the download file",
+          type: ToastType.Error,
+        }),
+      );
     } catch (err) {
       console.error("Failed to cancel export:", err);
     }

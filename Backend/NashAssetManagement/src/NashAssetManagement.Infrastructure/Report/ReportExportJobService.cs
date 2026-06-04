@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Hangfire;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.Abstractions.File;
@@ -23,10 +24,23 @@ namespace NashAssetManagement.Infrastructure.Report
         [FromKeyedServices(AppCts.Services.ReportExcel)] IExcelGenerator excelReportGenerator,
         ILogger<ReportExportJobService> logger) : IReportExportJobService
     {
-        public async Task CreateJobAsync(Guid exportReportJobId, Guid locationId, string userName, ExportReportSortBy exportReportSortBy, ExportReportSortDirection exportReportSortDirection, CancellationToken cancellationToken)
+        // if job failed, stop default retry from Hangfire 10 times
+        [AutomaticRetry(Attempts = 0)]
+        public async Task CreateJobAsync(
+            Guid exportReportJobId, Guid locationId, string userName, ExportReportSortBy exportReportSortBy, ExportReportSortDirection exportReportSortDirection, CancellationToken cancellationToken)
         {
             try
             {
+                ExportReportJob? exportJob = await exportRepository.GetQueryableSet()
+                                        .Where(e => e.Id == exportReportJobId)
+                                        .FirstOrDefaultAsync(cancellationToken);
+
+                if (exportJob == null)
+                {
+                    logger.LogWarning("Export report job {JobId} not found. Aborting job.", exportReportJobId);
+                    return;
+                }
+
                 // Implement data for storing data in excel file
                 var categories = await categoryRepository.ListAsync(new ReportCategorySpecification(locationId), cancellationToken);
 
@@ -90,17 +104,17 @@ namespace NashAssetManagement.Infrastructure.Report
                     throw new InvalidOperationException($"Location not found for export excel.");
                 }
 
-                // Update the status of export if success
-                var exportJob = await exportRepository.GetQueryableSet().Where(e => e.Id == exportReportJobId).FirstOrDefaultAsync(cancellationToken);
+                // Fetch the job again before writing the file to make sure it wasn't cancelled/deleted while generating
+                exportJob = await exportRepository.GetQueryableSet().Where(e => e.Id == exportReportJobId).FirstOrDefaultAsync(cancellationToken);
                 if (exportJob == null)
                 {
-                    // currently throw error and mark the job as Failed, not notify user
-                    throw new InvalidOperationException($"Export report job {exportReportJobId} not found");
+                    logger.LogWarning("Export report job {JobId} was cancelled/deleted during excel generation. Aborting.", exportReportJobId);
+                    return;
                 }
 
                 var excelFileName = fileNameService.GenerateStorageFileName(location.Name, userName, exportJob.CreatedAtUtc);
 
-                // Create temp directiory to store the excel file
+                // Create temp directory to store the excel file
                 var absolutePathToStore = Path.Combine(Directory.GetCurrentDirectory(), excelFileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(absolutePathToStore)!);
 
@@ -118,13 +132,15 @@ namespace NashAssetManagement.Infrastructure.Report
                 logger.LogError(ex, "Failed to generate report {JobId}", exportReportJobId);
                 var exportJob = await exportRepository.GetQueryableSet()
                                     .Where(e => e.Id == exportReportJobId)
-                                    .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+                                    .FirstOrDefaultAsync(CancellationToken.None);
 
                 if (exportJob != null)
                 {
                     exportJob.Status = ExportReportJobStatus.Failed;
                     await uow.SaveChangesAsync(CancellationToken.None);
                 }
+
+                throw; // Rethrow exception to mark the job as Failed in Hangfire
             }
         }
     }
