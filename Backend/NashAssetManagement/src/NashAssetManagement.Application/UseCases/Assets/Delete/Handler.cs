@@ -58,7 +58,7 @@ public class DeleteAssetHandler
         if (AssetId == Guid.Empty)
             return DeleteAssetErrors.AssetNotFound;
 
-        var spec = new AssetByIdSpec(AssetId, location);
+        var spec = new DeleteAssetSpec(AssetId, location);
         var asset = await _assetRepository.FirstOrDefaultAsync(spec, cancellationToken);
         
         if (asset is null)
@@ -76,12 +76,13 @@ public class DeleteAssetHandler
         try
         {
             asset.DeletedAtUtc = _dateTimeProvider.UtcNow;
-            _assetRepository.Delete(asset);
+            asset.IsDeleted = true;
+            _assetRepository.UpdateDetached(asset);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while editing the asset.");
+            _logger.LogError(ex, "An error occurred while Deleting the asset.");
             return DeleteAssetErrors.AssetDeleteFailed;
         }
 
