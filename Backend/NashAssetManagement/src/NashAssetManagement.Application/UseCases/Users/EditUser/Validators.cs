@@ -11,18 +11,18 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 .MustBeValidGuid();
 
             RuleFor(x => x.DateOfBirth)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty()
+                .WithMessage("'Date Of Birth' must not be empty.")
                 .Must(dob => dob.Date <= DateTime.Today)
-                .WithMessage("Date of birth cannot be in the future. Please select a different date");
-
-            RuleFor(x => x.DateOfBirth)
-                .NotEmpty()
+                .WithMessage("Date of birth cannot be in the future. Please select a different date")
                 .Must(dob => dob.Date <= DateTime.Today.AddYears(-18))
                 .WithMessage("User is under 18. Please select a different date");
 
             RuleFor(x => x.JoinedDate)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
+                .WithMessage("'Joined Date' must not be empty.")
                 .Must((request, joinedDate) => joinedDate.Date > request.DateOfBirth.Date)
                 .WithMessage("Joined date is not later than Date of Birth. Please select a different date")
                 .Must((request, joinedDate) => joinedDate.Date >= request.DateOfBirth.Date.AddYears(18))
