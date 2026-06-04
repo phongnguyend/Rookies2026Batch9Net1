@@ -61,6 +61,7 @@ export default function DeleteAssetModal({
                   Cannot Delete Asset
                 </h3>
                 <button
+                  data-testid="btnCloseDisablePopup"
                   onClick={onClose}
                   className="text-red-600 hover:text-red-800"
                 >
@@ -91,6 +92,7 @@ export default function DeleteAssetModal({
                   If the asset is not able to be used anymore, please update its
                   state in{" "}
                   <button
+                    data-testid="lnkEditAssetPage"
                     onClick={() => {
                       onClose();
                       router.push(`/admin/assets/edit?id=${assetId}`);
@@ -119,6 +121,7 @@ export default function DeleteAssetModal({
               {/* Footer */}
               <div className="px-10 pb-6 flex gap-4">
                 <button
+                  data-testid="btnDelete"
                   onClick={handleDelete}
                   disabled={isLoading}
                   className="
@@ -136,6 +139,7 @@ export default function DeleteAssetModal({
                   {isLoading ? "Deleting..." : "Delete"}
                 </button>
                 <button
+                  data-testid="btnCancel"
                   onClick={onClose}
                   disabled={isLoading}
                   className="
