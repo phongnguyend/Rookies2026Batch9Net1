@@ -8,6 +8,7 @@ import { loginSuccess, loginFailure } from "@/features/auth/auth.slice";
 import { UserRoles } from "@/features/users/users.types";
 import { useState } from "react";
 import { Login } from "@/features/auth/auth.types";
+import { startUserSessionHub } from "@/features/auth/user-session.signalr";
 
 export default function HomePage() {
   // Queries and hooks
@@ -39,6 +40,7 @@ export default function HomePage() {
           locationName: profile.locationName,
         }),
       );
+      await startUserSessionHub(dispatch);
     } catch (err: any) {
       // console.error("Login failed error object:", err);
 

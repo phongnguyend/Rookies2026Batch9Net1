@@ -357,7 +357,7 @@ export default function UsersPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
-                placeholder=""
+                placeholder="Search..."
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
                 }

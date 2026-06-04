@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.Realtime;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.Domain.Entities.Auth;
 using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 
@@ -15,7 +17,9 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
         UserManager<User> userManager,
         ICurrentUser currentUser,
         IValidator<Request> validator,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IRepository<RefreshToken, Guid> refreshTokenRepository,
+        IUserSessionNotifier userSessionNotifier
     )
     : IRequestHandler<Request, ErrorOr<Response>>
     {
@@ -48,6 +52,8 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 user.Id.ToString().Equals(currentUser.UserId.ToString()))
                 return Errors.AdminNotAllowedToEditOwnType();
 
+            var userTypeChanged = user.UserType != request.Type;
+
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
@@ -65,6 +71,20 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 user.UserType = request.Type;
                 user.UpdatedAtUtc = DateTime.UtcNow;
 
+                if (userTypeChanged)
+                {
+                    var activeRefreshTokens = await refreshTokenRepository
+                        .GetQueryableSet()
+                        .Where(x => x.UserId == user.Id && !x.IsRevoked && x.ExpiresAtUtc > DateTime.UtcNow)
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var token in activeRefreshTokens)
+                    {
+                        token.IsRevoked = true;
+                        token.RevokedAtUtc = DateTime.UtcNow;
+                    }
+                }
+
                 var updateResult =await userManager.UpdateAsync(user);
 
                 if (!updateResult.Succeeded)
@@ -74,6 +94,14 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 }
                     
                 await unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                if (userTypeChanged)
+                {
+                    await userSessionNotifier.ForceLogoutAsync(
+                        user.Id,
+                        "Your user type was updated. Please sign in again.",
+                        cancellationToken);
+                }
 
                 return new Response(user.Id);
             }

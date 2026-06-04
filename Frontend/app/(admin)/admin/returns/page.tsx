@@ -372,7 +372,7 @@ export default function ReturnsPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
-                placeholder=""
+                placeholder="Search..."
                 width="w-full sm:w-[242px]"
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
