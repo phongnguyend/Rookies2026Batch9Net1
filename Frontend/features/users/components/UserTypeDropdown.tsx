@@ -13,6 +13,7 @@ interface UserTypeDropdownProps {
   onChange: (value: UserRoles) => void;
   disabled?: boolean;
   width?: string;
+  testId?: string;
 }
 
 export default function UserTypeDropdown({
@@ -20,6 +21,7 @@ export default function UserTypeDropdown({
   onChange,
   disabled = false,
   width = "w-[265px]",
+  testId,
 }: UserTypeDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -41,6 +43,7 @@ export default function UserTypeDropdown({
     <div ref={ref} className={`relative ${width}`}>
       <button
         type="button"
+        data-testid={testId}
         disabled={disabled}
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex h-[33px] w-full items-center justify-between rounded border border-gray-400 bg-white px-3 text-left text-sm text-gray-700 outline-none transition hover:border-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"

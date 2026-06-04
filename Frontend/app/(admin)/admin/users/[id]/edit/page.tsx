@@ -434,6 +434,7 @@ function EditUserForm({
       <FormFieldRow label="First Name">
         <input
           type="text"
+          data-testid="txtEditFirstName"
           disabled
           value={user.firstName}
           className="h-[33px] w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
@@ -443,6 +444,7 @@ function EditUserForm({
       <FormFieldRow label="Last Name">
         <input
           type="text"
+          data-testid="txtEditLastName"
           disabled
           value={user.lastName}
           className="h-[33px] w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
@@ -477,7 +479,7 @@ function EditUserForm({
             }}
             placeholder="Date of Birth"
             width="w-full"
-            txtInputTestId="txtDateOfBirth"
+            txtInputTestId="dtpEditDateOfBirth"
           />
         </div>
       </FormFieldRow>
@@ -489,6 +491,9 @@ function EditUserForm({
           value={selectedGender}
           getKey={(item) => item.value}
           getLabel={(item) => item.label}
+          getTestId={(item) =>
+            item.value === Gender.Male ? "rdoEditMale" : "rdoEditFemale"
+          }
           onChange={(value) => {
             setSelectedGender(value as Gender);
             setFieldErrors((current) => ({ ...current, gender: undefined }));
@@ -524,7 +529,7 @@ function EditUserForm({
             }}
             placeholder="Joined Date"
             width="w-full"
-            txtInputTestId="txtJoinedDate"
+            txtInputTestId="dtpEditJoinedDate"
           />
         </div>
       </FormFieldRow>
@@ -538,12 +543,14 @@ function EditUserForm({
           }}
           disabled={user.isCurrentUser}
           width="w-full"
+          testId="ddlEditUserType"
         />
       </FormFieldRow>
 
       <div className="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end sm:gap-7">
         <button
           type="submit"
+          data-testid="btnSaveEditUser"
           disabled={isSaveDisabled}
           className="h-[35px] w-full rounded bg-primary px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
@@ -552,6 +559,7 @@ function EditUserForm({
 
         <button
           type="button"
+          data-testid="btnCancelEditUser"
           onClick={redirectToUsers}
           className="h-[35px] w-full rounded border border-gray-400 bg-white px-4 text-sm text-gray-600 transition hover:bg-gray-50 sm:w-auto"
         >

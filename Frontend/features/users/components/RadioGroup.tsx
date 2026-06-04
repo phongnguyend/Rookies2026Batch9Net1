@@ -6,6 +6,7 @@ interface RadioGroupProps<T> {
   value: string;
   getKey: (item: T) => string;
   getLabel: (item: T) => string;
+  getTestId?: (item: T) => string | undefined;
   onChange: (value: string) => void;
   name: string;
 }
@@ -16,6 +17,7 @@ export default function RadioGroup<T>({
   value,
   getKey,
   getLabel,
+  getTestId,
   onChange,
   name,
 }: RadioGroupProps<T>) {
@@ -37,6 +39,7 @@ export default function RadioGroup<T>({
                 type="radio"
                 name={name}
                 value={itemKey}
+                data-testid={getTestId?.(item)}
                 checked={value === itemKey}
                 onChange={() => onChange(itemKey)}
                 className="radio radio-error radio-xs"
