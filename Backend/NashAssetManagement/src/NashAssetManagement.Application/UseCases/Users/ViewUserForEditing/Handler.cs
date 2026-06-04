@@ -26,6 +26,10 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserForEditing
             if (currentUser.LocationId == null)
                 return Errors.UserHasNoLocation();
 
+            var validationResults = await validator.ValidateAsync(request, cancellationToken);
+            if (!validationResults.IsValid)
+                throw new ValidationException(validationResults.Errors);
+
             // Find user by id
             var user = await userManager.FindByIdAsync(request.UserId!);
             if (user == null)
