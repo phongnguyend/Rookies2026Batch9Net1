@@ -25,6 +25,7 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
             .Where(a => a.LocationId == location)
             .Include(a => a.Category)
             .Include(a => a.Location)
+            .Include(a => a.Assignments)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
 
@@ -72,7 +73,8 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
             a.Name,
             a.Category!.CategoryName,
             a.State,
-            a.Location!.Name
+            a.Location!.Name,
+            a.Assignments.Any()
         ));
     }
 }

@@ -11,5 +11,6 @@ public record EditAssetResponse(
     AssetState State,
     string Category,
     string Location,
+    bool hasHistory,
     bool IsDeleted
 );

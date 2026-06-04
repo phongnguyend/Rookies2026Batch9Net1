@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { showModal } from "@/features/shared/modal.slice";
+import DeleteAssetModal from "@/features/Assets/components/assetDeleteModel";
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
@@ -52,6 +52,11 @@ function AssetsContent() {
   const isCreatedNewAsset = useAppSelector(
     (state) => state.asset.isCreatedNewAsset,
   );
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+    hasHistory: boolean;
+  } | null>(null);
 
   // ─── Default state check ───────────────────────
   const isDefaultStateSelection =
@@ -92,14 +97,10 @@ function AssetsContent() {
       return items;
     }
     const filteredItems = items.filter(
-      (item) =>
-        item.assetCode !== pinnedEditedAsset.assetCode
+      (item) => item.assetCode !== pinnedEditedAsset.assetCode,
     );
     if (pageNumber === 1) {
-      return [
-        pinnedEditedAsset,
-        ...filteredItems,
-      ];
+      return [pinnedEditedAsset, ...filteredItems];
     }
     return filteredItems;
   })();
@@ -131,20 +132,6 @@ function AssetsContent() {
   const handleSortChange = (newSort: SortItem | null) => {
     setSort(newSort);
     setPageNumber(1);
-  };
-
-  const handleDelete = (row: AssetListItem, e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch(
-      showModal({
-        title: "Delete Asset",
-        body: `Are you sure you want to delete "${row.name}"?`,
-        yesButtonLabel: "Delete",
-        noButtonLabel: "Cancel",
-        yesActionType: "",
-        yesPayload: row.id,
-      }),
-    );
   };
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
@@ -216,7 +203,15 @@ function AssetsContent() {
           </button>
           <button
             data-testid="btnIconDelete"
-            onClick={(e) => handleDelete(row, e)}
+            onClick={(e) => {
+              e.stopPropagation();
+
+              setDeleteTarget({
+                id: row.id,
+                name: row.name,
+                hasHistory: row.hasHistory,
+              });
+            }}
             className="btn btn-xs btn-error btn-outline"
             disabled={
               DeleteDisabledStates
@@ -250,6 +245,12 @@ function AssetsContent() {
       <AssetDetailModal
         assetId={selectedAssetId}
         onClose={() => setSelectedAssetId(null)}
+      />
+      <DeleteAssetModal
+        assetId={deleteTarget?.id ?? null}
+        assetName={deleteTarget?.name ?? ""}
+        hasHistory={deleteTarget?.hasHistory ?? false}
+        onClose={() => setDeleteTarget(null)}
       />
       <div className="pb-4 md:pb-12">
         {/* Filters */}

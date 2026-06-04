@@ -97,6 +97,7 @@ public class EditAssetHandler
             asset.State,
             asset.Category!.CategoryName,
             asset.Location!.Name,
+            asset.Assignments.Any(),
             asset.IsDeleted
         );
     }

@@ -162,6 +162,7 @@ export default function EditAssetPage() {
         category: result.category,
         state: result.state as AssetState,
         location: result.location,
+        hasHistory: result.hasHistory
       });
 
       router.push("/admin/assets");
