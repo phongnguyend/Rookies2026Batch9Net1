@@ -126,6 +126,17 @@ const createUserSchema = z
     const dob = normalizeDate(data.dateOfBirth);
     const joinedDate = normalizeDate(data.joinedDate);
 
+    if (joinedDate <= dob) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["joinedDate"],
+        message:
+          "Joined date must be later than Date of Birth. Please select a different date",
+      });
+
+      return;
+    }
+
     const minJoinedDateByAge = new Date(dob);
     minJoinedDateByAge.setFullYear(dob.getFullYear() + 18);
 
@@ -134,7 +145,7 @@ const createUserSchema = z
         code: z.ZodIssueCode.custom,
         path: ["joinedDate"],
         message:
-          "User is under 18 at joined date. Please select a different date",
+          "User must be at least 18 years old at the Joined Date",
       });
     }
   });
