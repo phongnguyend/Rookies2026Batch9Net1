@@ -264,7 +264,6 @@ export default function UsersPage() {
           <UserActionButton
             title="Disable"
             testId="btnDisableUser"
-            disabled={!user.canBeDisabled}
             className="text-red-400"
             onClick={() => {
               // Disable user logic goes here
