@@ -13,7 +13,7 @@
         <PackageReference Include="Serilog.Enrichers.Process" />
         <PackageReference Include="Swashbuckle.AspNetCore" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
-        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="Newtonsoft.Json" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\NashAssetManagement.Application\NashAssetManagement.Application.csproj" />

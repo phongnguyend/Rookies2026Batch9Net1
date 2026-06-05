@@ -115,7 +115,8 @@ namespace NashAssetManagement.Infrastructure.Report
                 var excelFileName = fileNameService.GenerateStorageFileName(location.Name, userName, exportJob.CreatedAtUtc);
 
                 // Create temp directory to store the excel file
-                var absolutePathToStore = Path.Combine(Directory.GetCurrentDirectory(), excelFileName);
+                var rootPath = Environment.GetEnvironmentVariable("HOME") ?? AppDomain.CurrentDomain.BaseDirectory;
+                var absolutePathToStore = Path.Combine(rootPath, excelFileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(absolutePathToStore)!);
 
                 await File.WriteAllBytesAsync(absolutePathToStore, excelBytes, cancellationToken);
