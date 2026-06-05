@@ -115,12 +115,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
                 u.UserName ?? "",
                 u.JoinedAtUtc,
                 u.UserType.ToString()
-            )
-            {
-                CanBeDisabled = !u.ReceivedAssignments.Any(a =>
-                    a.State == AssignmentState.WaitingForAcceptance ||
-                    a.State == AssignmentState.Accepted)
-            })
+            ))
             .ToListAsync(cancellationToken);
             return new PagedList<Response>(users, totalItems, cleanedRequest.PageNumber!.Value, cleanedRequest.PageSize!.Value);
         }

@@ -31,3 +31,7 @@ export interface GetReturnRequestsRequest extends PaginationRequest {
 
 export interface GetReturnRequestsResponse
   extends PaginationResponse<ReturnRequestRow> {}
+
+export interface CompleteReturnRequestRequest {
+  returnRequestId: string;
+}

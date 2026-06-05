@@ -11,7 +11,7 @@ import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DatePickerInput from "@/features/returns/components/DatePickerInput";
-import { useGetReturnRequestsQuery } from "@/features/returns/returns.api";
+import { returnsApi, useGetReturnRequestsQuery } from "@/features/returns/returns.api";
 import {
   ReturnRequestState,
   type ReturnRequestRow,
@@ -19,6 +19,9 @@ import {
 import { SortDirection } from "@/lib/api/base.types";
 import { formatDate } from "@/utils/datetime.utils";
 import { Check, X } from "lucide-react";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { useDispatch } from "react-redux";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
@@ -109,7 +112,13 @@ function getStateLabel(state: string) {
   return state;
 }
 
-function RequestActions({ row }: { row: ReturnRequestRow }) {
+function RequestActions({
+  row,
+  onCompleteClick,
+}: {
+  row: ReturnRequestRow;
+  onCompleteClick: (row: ReturnRequestRow) => void;
+}) {
   const isWaiting = row.state === ReturnRequestState.WaitingForReturning;
 
   return (
@@ -117,9 +126,7 @@ function RequestActions({ row }: { row: ReturnRequestRow }) {
       row={row}
       disabledAccept={!isWaiting}
       disabledDecline={!isWaiting}
-      onAccept={() => {
-        // Complete return request logic goes here
-      }}
+      onAccept={() => onCompleteClick(row)}
       onDecline={() => {
         // Cancel return request logic goes here
       }}
@@ -311,9 +318,52 @@ export default function ReturnsPage() {
       key: "actions",
       header: "",
       className: "w-[74px]",
-      render: (request) => <RequestActions row={request} />,
+      render: (request) => (
+        <RequestActions
+          row={request}
+          onCompleteClick={setCompletingRequest}
+        />
+      ),
     },
   ];
+
+  const dispatchAction = useDispatch();
+
+  const [completeReturnRequest, { isLoading: isCompleting }] =
+    returnsApi.useCompleteReturnRequestMutation();
+
+  const [completingRequest, setCompletingRequest] =
+    useState<ReturnRequestRow | null>(null);
+
+  const handleConfirmComplete = async () => {
+    if (!completingRequest) return;
+
+    try {
+      await completeReturnRequest({
+        returnRequestId: completingRequest.id,
+      }).unwrap();
+
+      setCompletingRequest(null);
+
+      dispatchAction(
+        enqueueToast({
+          message: "Returning request completed successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch (error) {
+      setCompletingRequest(null);
+
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to complete returning request. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-[#333]" data-testid="mnuReturning">
@@ -416,6 +466,25 @@ export default function ReturnsPage() {
             hasPreviousPage={data?.hasPreviousPage ?? false}
             hasNextPage={data?.hasNextPage ?? false}
             onPageChange={(nextPage) => updateQueryParams({ page: nextPage })}
+          />
+
+          {/* Complete Return Request Modal */}
+          <ConfirmModal
+            isOpen={!!completingRequest}
+            onClose={() => setCompletingRequest(null)}
+            onYes={handleConfirmComplete}
+            isLoading={isCompleting}
+            title="Are you sure?"
+            body={
+              <p data-testid="txtCompleteRequestMessage">
+                Do you want to mark this returning request as completed?
+              </p>
+            }
+            yesButtonLabel="Yes"
+            noButtonLabel="No"
+            modalTestId="CompleteReturningRequestModal"
+            confirmBtnTestId="btnConfirmCompleteRequest"
+            cancelBtnTestId="btnCancelCompleteRequest"
           />
         </main>
       </div>
