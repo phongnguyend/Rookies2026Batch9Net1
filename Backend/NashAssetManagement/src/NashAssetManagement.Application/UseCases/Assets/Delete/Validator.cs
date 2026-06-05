@@ -9,6 +9,6 @@ public class DeleteAssetValidator : AbstractValidator<DeleteAssetRequest>
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Asset id is required")
-            .MustBeValidGuid().WithMessage("Asset id must be in Guid Format.");
+            .MustBeValidGuid();
     }
 }

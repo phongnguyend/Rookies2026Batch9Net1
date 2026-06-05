@@ -51,14 +51,14 @@ public class DeleteAssetHandler
             throw new ValidationException(validationResult.Errors);
 
         Guid location = Guid.TryParse(_currentUser.LocationId, out Guid locationId) ? locationId : Guid.Empty;
-        Guid AssetId = Guid.TryParse(request.Id, out Guid assetGuid) ? assetGuid : Guid.Empty;
+        Guid assetId = Guid.TryParse(request.Id, out Guid assetGuid) ? assetGuid : Guid.Empty;
 
         if (location == Guid.Empty)
             return DeleteAssetErrors.LocationNotFound;
-        if (AssetId == Guid.Empty)
+        if (assetId == Guid.Empty)
             return DeleteAssetErrors.AssetNotFound;
 
-        var spec = new DeleteAssetSpec(AssetId, location);
+        var spec = new DeleteAssetSpec(assetId, location);
         var asset = await _assetRepository.FirstOrDefaultAsync(spec, cancellationToken);
         
         if (asset is null)

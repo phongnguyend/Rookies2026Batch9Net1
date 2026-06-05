@@ -11,7 +11,7 @@ public static class DeleteAssetErrors
 
     public static readonly Error LocationNotFound = Error.NotFound(
         code: "AssetDelete.LocationNotFound",
-        description: "Location not found. Please enter a valid location."
+        description: "Location not found."
     );
 
     public static readonly Error AssetNotFound = Error.NotFound(
@@ -31,6 +31,6 @@ public static class DeleteAssetErrors
 
     public static readonly Error AssetHasHistory = Error.Conflict(
         code: "AssetDelete.AssetHasHistory",
-        description: "Asset has history. Asset has history can not soft deleted."
+        description: "Asset has history. Asset has history can not be deleted."
     );
 }

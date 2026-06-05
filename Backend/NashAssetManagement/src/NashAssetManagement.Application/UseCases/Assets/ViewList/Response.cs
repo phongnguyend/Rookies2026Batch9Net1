@@ -9,5 +9,5 @@ public record GetAssetsResponse(
     string Category,
     AssetState State,
     string Location,
-    bool hasHistory
+    bool HasHistory
 );
