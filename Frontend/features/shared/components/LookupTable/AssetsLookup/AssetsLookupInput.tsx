@@ -2,7 +2,7 @@
 
 import { LookupAssetsSummary } from "@/features/Assets/assets.types";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AssetsLookupTable } from "./AssetsLookupTable";
 
 export interface AssetsLookupInputProps {
@@ -41,13 +41,24 @@ const AssetsLookupInput = ({
     setPendingAsset(null);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   return (
     <div className="relative">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
           Asset
         </label>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div
             role="button"
             tabIndex={0}
@@ -57,7 +68,7 @@ const AssetsLookupInput = ({
           >
             {/* Input display is driven by value prop only, never pendingAsset */}
             {value ? (
-              <span className="text-neutral-800">{value.assetName}</span>
+              <span className="text-neutral-800 break-all">{value.assetName}</span>
             ) : (
               <span className="text-gray-400">{placeholder}</span>
             )}

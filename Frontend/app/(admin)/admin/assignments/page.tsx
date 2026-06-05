@@ -216,9 +216,7 @@ export default function AssignmentsPage() {
 
   return (
     <div data-testid="mnuManageAssignment">
-      <div className="text-lg font-bold text-primary mb-2">
-        Assignment List
-      </div>
+      <h1 className="text-primary font-bold text-xl mb-6">Assignment List</h1>
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
 
@@ -291,7 +289,7 @@ export default function AssignmentsPage() {
           </div>
 
           <button
-            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base"
+            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
             data-testid="btnCreateNewAssignment"
             onClick={() => router.push("/admin/assignments/create")}
           >

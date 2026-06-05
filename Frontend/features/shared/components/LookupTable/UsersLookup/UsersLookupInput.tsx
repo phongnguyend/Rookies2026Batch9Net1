@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UsersLookupTable } from "./UsersLookupTable";
 import { LookupUsers } from "@/features/users/users.types";
 import { Search } from "lucide-react";
@@ -39,6 +39,17 @@ const UsersLookupInput = ({
     // discard dialog selection, input stays unchanged
     setPendingUser(null);
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   return (
     <div className="relative">
