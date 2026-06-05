@@ -91,6 +91,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
                 // update assignment [Returned]
                 returnRequest.Assignment.State = AssignmentState.Returned;
                 returnRequest.Assignment.IsReturning = false;
+                returnRequest.Assignment.UpdatedAtUtc = dateTimeProvider.UtcNow.Date;
 
                 // update asset state [Available]
                 returnRequest.Assignment.Asset.State = AssetState.Available;
