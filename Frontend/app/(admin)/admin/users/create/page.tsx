@@ -154,7 +154,7 @@ export default function CreateUserPage() {
     trigger,
     handleSubmit,
     reset,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting, touchedFields },
   } = useForm<CreateUserFormInput, unknown, CreateUserFormOutput>({
     resolver: zodResolver(createUserSchema),
     mode: "onChange",
@@ -172,6 +172,14 @@ export default function CreateUserPage() {
   const dateOfBirthValue = watch("dateOfBirth");
   const joinedDateValue = watch("joinedDate");
   const userTypeValue = watch("userType");
+
+  const dateOfBirthError = touchedFields.dateOfBirth
+    ? errors.dateOfBirth?.message
+    : undefined;
+
+  const joinedDateError = touchedFields.joinedDate
+    ? errors.joinedDate?.message
+    : undefined;
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -281,20 +289,16 @@ export default function CreateUserPage() {
                 shouldTouch: true,
               });
 
-              void trigger(["dateOfBirth", "joinedDate"]);
+              if (touchedFields.joinedDate) {
+                void trigger(["dateOfBirth", "joinedDate"]);
+              }
             }}
             placeholder=""
             width="w-full"
             txtInputTestId="dtpUserDateOfBirth"
-            error={errors.dateOfBirth?.message}
+            error={dateOfBirthError}
             showToast={false}
           />
-
-          {errors.dateOfBirth && (
-            <p className="mt-1 text-sm text-error">
-              {errors.dateOfBirth.message}
-            </p>
-          )}
         </div>
       </div>
 
@@ -340,18 +344,16 @@ export default function CreateUserPage() {
                 shouldTouch: true,
               });
 
-              void trigger(["dateOfBirth", "joinedDate"]);
+              if (touchedFields.dateOfBirth) {
+                void trigger(["dateOfBirth", "joinedDate"]);
+              }
             }}
+            error={joinedDateError}
+            showToast={false}
             placeholder=""
             width="w-full"
             txtInputTestId="dtpUserJoinedDate"
           />
-
-          {errors.joinedDate && (
-            <p className="mt-1 text-sm text-error">
-              {errors.joinedDate.message}
-            </p>
-          )}
         </div>
       </div>
 
