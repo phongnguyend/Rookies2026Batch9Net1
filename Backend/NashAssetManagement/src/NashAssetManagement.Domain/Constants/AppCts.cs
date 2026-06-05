@@ -20,7 +20,7 @@ namespace NashAssetManagement.Domain.Constants
 
         public static class TempFolders
         {
-            public const string TempReportFolders = "TempReportFolders";
+            public const string TempReportFolders = "ReportsTemp";
         }
     }
 }

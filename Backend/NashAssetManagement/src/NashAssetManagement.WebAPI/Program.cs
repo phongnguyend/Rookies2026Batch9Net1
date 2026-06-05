@@ -66,7 +66,8 @@ try
     Log.Information("Seed development data finished successfully.");
 
     // Setup folder for storing temp report files
-    var tempReportsPath = Path.Combine(Directory.GetCurrentDirectory(), AppCts.TempFolders.TempReportFolders);
+    var rootPath = Environment.GetEnvironmentVariable("HOME") ?? AppDomain.CurrentDomain.BaseDirectory;
+    var tempReportsPath = Path.Combine(rootPath, AppCts.TempFolders.TempReportFolders);
     if (!Directory.Exists(tempReportsPath))
     {
         Directory.CreateDirectory(tempReportsPath);
