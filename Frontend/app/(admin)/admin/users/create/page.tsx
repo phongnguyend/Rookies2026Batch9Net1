@@ -274,7 +274,7 @@ export default function CreateUserPage() {
         <div className="flex-1">
           <DatePickerInput
             value={dateOfBirthValue}
-            onChange={(date) => {
+            onChange={(date) => { 
               setValue("dateOfBirth", date, {
                 shouldValidate: true,
                 shouldDirty: true,
@@ -286,6 +286,8 @@ export default function CreateUserPage() {
             placeholder=""
             width="w-full"
             txtInputTestId="dtpUserDateOfBirth"
+            error={errors.dateOfBirth?.message}
+            showToast={false}
           />
 
           {errors.dateOfBirth && (
