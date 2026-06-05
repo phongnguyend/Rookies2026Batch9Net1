@@ -1,8 +1,11 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import {
+  EditUserRequest,
+  EditUserResponse,
   CreateUserRequest,
   CreateUserResponse,
   GetUserByIdResponse,
+  GetUserForEditResponse,
   GetUsersRequest,
   GetUsersResponse,
   LookupUsers,
@@ -35,7 +38,7 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
-    
+
     createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
       query: (body) => ({
         url: "v1/users",
@@ -44,7 +47,7 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
-    
+
     lookupUsers: builder.query<LookupUsers.Response, LookupUsers.Request>({
       query: (params) => ({
         url: "v1/users/lookup",
@@ -52,12 +55,31 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+
+    getUserForEdit: builder.query<GetUserForEditResponse, string>({
+      query: (id) => ({
+        url: `v1/users/${id}/edit`,
+        method: "GET",
+      }),
+      providesTags: ["Users"],
+    }),
+
+    editUser: builder.mutation<EditUserResponse, EditUserRequest>({
+      query: ({ userId, ...body }) => ({
+        url: `v1/users/${userId}/edit`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Users"],
+    }),
   }),
 });
 
-export const { 
-  useGetUsersQuery, 
+export const {
+  useGetUsersQuery,
   useGetUserByIdQuery,
   useCreateUserMutation,
-  useLookupUsersQuery
+  useLookupUsersQuery,
+  useEditUserMutation,
+  useGetUserForEditQuery
 } = usersApi;

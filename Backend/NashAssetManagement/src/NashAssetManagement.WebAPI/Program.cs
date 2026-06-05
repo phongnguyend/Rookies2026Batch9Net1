@@ -7,6 +7,10 @@ using NashAssetManagement.WebAPI;
 using Serilog;
 using NashAssetManagement.WebAPI.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using NashAssetManagement.Application.Abstractions.Realtime;
+using NashAssetManagement.WebAPI.Hubs;
+using NashAssetManagement.WebAPI.Realtime;
 using Hangfire;
 using NashAssetManagement.WebAPI.Filters;
 using NashAssetManagement.Domain.Constants;
@@ -28,6 +32,10 @@ try
         .AddPersistenceServices(builder.Configuration)
         .AddInfrastructureServices(builder.Configuration)
         .AddApiServices(builder.Configuration);
+
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+    builder.Services.AddScoped<IUserSessionNotifier, UserSessionNotifier>();
 
     var app = builder.Build();
 
@@ -58,7 +66,8 @@ try
     Log.Information("Seed development data finished successfully.");
 
     // Setup folder for storing temp report files
-    var tempReportsPath = Path.Combine(Directory.GetCurrentDirectory(), AppCts.TempFolders.TempReportFolders);
+    var rootPath = Environment.GetEnvironmentVariable("HOME") ?? AppDomain.CurrentDomain.BaseDirectory;
+    var tempReportsPath = Path.Combine(rootPath, AppCts.TempFolders.TempReportFolders);
     if (!Directory.Exists(tempReportsPath))
     {
         Directory.CreateDirectory(tempReportsPath);
@@ -81,6 +90,7 @@ try
     });
 
     app.MapControllers();
+    app.MapHub<UserSessionHub>("/hubs/user-session");
 
     app.Run();
 }

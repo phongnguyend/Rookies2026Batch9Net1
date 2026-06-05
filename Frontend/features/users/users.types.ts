@@ -47,6 +47,30 @@ export interface GetUsersResponse extends PaginationResponse<UserRow> {}
 
 export type GetUserByIdResponse = UserDetail;
 
+export interface GetUserForEditResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  gender: Gender;
+  joinedDate: string;
+  userType: UserRoles;
+  isCurrentUser: boolean;
+  concurrencyStamp: string;
+}
+
+export interface EditUserRequest {
+  userId: string;
+  dateOfBirth: string;
+  gender: Gender;
+  joinedDate: string;
+  type: UserRoles;
+  concurrencyStamp: string;
+}
+
+export interface EditUserResponse {
+  id: string;
+}
 export namespace LookupUsers{
   export interface Request {
     searchTerm?: string;

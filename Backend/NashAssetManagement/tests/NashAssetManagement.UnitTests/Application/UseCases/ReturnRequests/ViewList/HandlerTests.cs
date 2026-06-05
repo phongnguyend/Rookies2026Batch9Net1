@@ -134,6 +134,48 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
         }
 
         [Fact]
+        public async Task Handle_ShouldExcludeCancelledReturnRequests_WhenViewingList()
+        {
+            // Arrange
+            var request = new Request(null, null, null, null, null, 10, 1);
+            ISpecification<ReturnRequest>? countSpec = null;
+            ISpecification<ReturnRequest, Response>? listSpec = null;
+
+            _mockValidator
+                .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            _mockUser.Setup(u => u.UserId).Returns(CurrentUserId);
+            _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+            _mockRepo
+                .Setup(r => r.CountAsync(It.IsAny<ISpecification<ReturnRequest>>(), It.IsAny<CancellationToken>()))
+                .Callback<ISpecification<ReturnRequest>, CancellationToken>((spec, _) => countSpec = spec)
+                .ReturnsAsync(0);
+            _mockRepo
+                .Setup(r => r.ListAsync(It.IsAny<ISpecification<ReturnRequest, Response>>(), It.IsAny<CancellationToken>()))
+                .Callback<ISpecification<ReturnRequest, Response>, CancellationToken>((spec, _) => listSpec = spec)
+                .ReturnsAsync([]);
+
+            var waitingRequest = CreateReturnRequest(ReturnRequestState.WaitingForReturning);
+            var completedRequest = CreateReturnRequest(ReturnRequestState.Completed);
+            var cancelledRequest = CreateReturnRequest(ReturnRequestState.Cancelled);
+
+            // Act
+            var result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.False(result.IsError);
+            Assert.NotNull(countSpec);
+            Assert.NotNull(listSpec);
+            Assert.True(MatchesFilters(countSpec, waitingRequest));
+            Assert.True(MatchesFilters(countSpec, completedRequest));
+            Assert.False(MatchesFilters(countSpec, cancelledRequest));
+            Assert.True(MatchesFilters(listSpec, waitingRequest));
+            Assert.True(MatchesFilters(listSpec, completedRequest));
+            Assert.False(MatchesFilters(listSpec, cancelledRequest));
+        }
+
+        [Fact]
         public async Task Handle_ShouldUseDefaultPaging_WhenPageNumberAndPageSizeAreNull()
         {
             // Arrange
@@ -264,6 +306,28 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.View
                     null,
                     ReturnRequestState.WaitingForReturning.ToString())
             ];
+        }
+
+        private static ReturnRequest CreateReturnRequest(ReturnRequestState state)
+        {
+            return new ReturnRequest
+            {
+                State = state,
+                Assignment = new Assignment
+                {
+                    Asset = new Asset
+                    {
+                        LocationId = Guid.Parse(LocationId),
+                        AssetCode = "LA000001",
+                        Name = "Laptop"
+                    }
+                }
+            };
+        }
+
+        private static bool MatchesFilters(ISpecification<ReturnRequest> spec, ReturnRequest request)
+        {
+            return spec.WhereExpressions.All(expression => expression.Filter.Compile()(request));
         }
     }
 }
