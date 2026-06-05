@@ -16,6 +16,9 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                  .AsNoTracking()
                  .AsSplitQuery();
 
+            var allowedStates = new[] { AssignmentState.Accepted, AssignmentState.WaitingForAcceptance };
+            Query.Where(x => allowedStates.Contains(x.State));
+
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var search = $"%{searchTerm.ToLower()}%";

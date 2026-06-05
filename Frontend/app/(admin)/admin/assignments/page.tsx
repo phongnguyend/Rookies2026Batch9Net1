@@ -3,7 +3,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   SortItem,
 } from "@/features/shared/components/DataTable";
-import { assignmentApi, useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
+import { useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
 import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
@@ -19,6 +19,7 @@ import { CircleX, Pencil, RotateCcw } from "lucide-react";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useDispatch } from "react-redux";
+import { returnsApi } from "@/features/returns/returns.api";
 
 const limit = 10;
 
@@ -32,7 +33,10 @@ export default function AssignmentsPage() {
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
   const [searchInput, setSearchInput] = useState(search);
-  const states = searchParams.getAll("state");
+  const allowedStates = [AssignmentState.Accepted, AssignmentState.WaitingForAcceptance];
+  const states = searchParams.getAll("state").filter((s) =>
+    allowedStates.includes(s as AssignmentState)
+  );
   const assignedDateParam = searchParams.get("assignedDate");
   const assignedDate = assignedDateParam ? new Date(assignedDateParam) : null;
   const sortBy = searchParams.get("sortBy") || undefined;
@@ -177,7 +181,7 @@ export default function AssignmentsPage() {
 
   //create return request
   const [createReturnRequest, { isLoading: isReturning }] =
-    assignmentApi.useAdminCreateReturnRequestMutation();
+    returnsApi.useAdminCreateReturnRequestMutation();
 
   const [returningAssignment, setReturningAssignment] =
     useState<Assignment | null>(null);
@@ -224,7 +228,7 @@ export default function AssignmentsPage() {
             <DropdownFilter
               items={Object.values(AssignmentState).map((s) => ({
                 key: s,
-                label: s,
+                label: displayAssignmentState(s),
               }))}
               values={states}
               placeholder="State"

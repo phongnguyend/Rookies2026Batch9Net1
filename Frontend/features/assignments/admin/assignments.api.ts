@@ -1,6 +1,5 @@
 import { SortDirection } from "@/lib/api/base.types";
 import {
-  AdminCreateReturnRequest,
   AssignmentDetails,
   CreateAssignmentRequest,
   GetAssignmentsRequest,
@@ -92,17 +91,6 @@ export const assignmentApi =
         ],
       }),
 
-      adminCreateReturnRequest: builder.mutation<
-        void,
-        AdminCreateReturnRequest
-      >({
-        query: ({ assignmentId }) => ({
-          url: `/v1/admin/assignments/${assignmentId}/return-request`,
-          method: "POST",
-        }),
-        invalidatesTags: ["Assignment", "Return"],
-      }),
-
       createAssignment: builder.mutation<void, CreateAssignmentRequest>({
         query: (body) => ({
           url: "v1/admin/assignments",
@@ -117,6 +105,5 @@ export const assignmentApi =
 export const {
   useGetAllAssignmentsQuery,
   useGetAssignmentByIdQuery,
-  useAdminCreateReturnRequestMutation,
   useCreateAssignmentMutation,
 } = assignmentApi;

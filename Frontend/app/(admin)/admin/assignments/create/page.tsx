@@ -214,14 +214,14 @@ export default function CreateAssignment({
           <button
             type="button"
             onClick={() => router.push("/admin/assignments")}
-            className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!isValid || isLoading}
-            className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             {isLoading ? "Saving..." : "Save"}
           </button>

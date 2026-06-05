@@ -4,6 +4,7 @@ import {
   type GetReturnRequestsRequest,
   type GetReturnRequestsResponse,
 } from "./returns.types";
+import { AdminCreateReturnRequest } from "../assignments/admin/assignments.types";
 
 export const returnsApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -50,7 +51,21 @@ export const returnsApi = baseApiSlice.injectEndpoints({
 
       providesTags: ["Return"],
     }),
+
+    adminCreateReturnRequest: builder.mutation<
+      void,
+      AdminCreateReturnRequest
+    >({
+      query: ({ assignmentId }) => ({
+        url: `/v1/admin/assignments/${assignmentId}/return-request`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Assignment", "Return"],
+    }),
   }),
 });
 
-export const { useGetReturnRequestsQuery } = returnsApi;
+export const {
+  useGetReturnRequestsQuery,
+  useAdminCreateReturnRequestMutation
+} = returnsApi;

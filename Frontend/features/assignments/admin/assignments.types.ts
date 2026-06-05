@@ -30,8 +30,6 @@ export type AssignmentDetails = {
 export enum AssignmentState {
   WaitingForAcceptance = "WaitingForAcceptance",
   Accepted = "Accepted",
-  Declined = "Declined",
-  Returned = "Returned",
 }
 
 export interface GetAssignmentsRequest
