@@ -60,6 +60,10 @@ const isWeekend = (date: Date) => {
   return day === 0 || day === 6;
 };
 
+const isFutureDate = (date: Date) => {
+  return normalizeDate(date) > getToday();
+};
+
 const createUserSchema = z
   .object({
     firstName: z
@@ -85,8 +89,11 @@ const createUserSchema = z
     dateOfBirth: z
       .date()
       .nullable()
-      .refine((value): value is Date => value !== null, {
+      .refine((value): value is Date => value !== null, { 
         message: "Date of Birth is required.",
+      })
+      .refine((value) => !isFutureDate(value), {
+        message: "Date of Birth cannot be in the future",
       })
       .refine((value) => !isUnder18(value), {
         message: "User is under 18. Please select a different date.",
