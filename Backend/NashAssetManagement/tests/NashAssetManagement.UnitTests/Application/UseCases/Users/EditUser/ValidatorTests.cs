@@ -66,6 +66,21 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.EditUser
         }
 
         [Fact]
+        public void TestValidate_ShouldHaveValidationErrorForDateOfBirth_WhenUserAgeExceeds90Years()
+        {
+            var request = CreateValidRequest(
+                dateOfBirth: DateTime.Today.AddYears(-91),
+                joinedDate: DateTime.Today.AddYears(-70));
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldHaveValidationErrorFor(x => x.DateOfBirth);
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.DateOfBirth)
+                     && x.ErrorMessage == "User age must not exceed 90 years.");
+        }
+
+        [Fact]
         public void TestValidate_ShouldHaveValidationErrorForJoinedDate_WhenJoinedDateIsNotLaterThanDateOfBirth()
         {
             var dateOfBirth = new DateTime(2000, 1, 3);
