@@ -2,10 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import DataTable, {
+import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
+import SingleSortDataTable, {
   type ColumnDef,
   type SortItem,
-} from "@/features/returns/components/DataTable";
+} from "@/features/shared/components/SingleSortDataTable";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
@@ -17,6 +18,7 @@ import {
 } from "@/features/returns/returns.types";
 import { SortDirection } from "@/lib/api/base.types";
 import { formatDate } from "@/utils/datetime.utils";
+import { Check, X } from "lucide-react";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
@@ -27,8 +29,7 @@ const defaultSort: SortItem = {
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
-  { id: ReturnRequestState.WaitingForReturning, label: "Waiting for returning" },
-  { id: ReturnRequestState.Cancelled, label: "Cancelled" }
+  { id: ReturnRequestState.WaitingForReturning, label: "Waiting for returning" }
 ];
 
 function parseDateParam(value: string | null) {
@@ -110,33 +111,23 @@ function getStateLabel(state: string) {
 
 function RequestActions({ row }: { row: ReturnRequestRow }) {
   const isWaiting = row.state === ReturnRequestState.WaitingForReturning;
-  const disabledClass = "cursor-not-allowed opacity-35";
-  const enabledClass =
-    "cursor-pointer transition hover:scale-125 hover:text-primary";
 
   return (
-    <div className="flex items-center justify-center gap-4 text-xl font-bold leading-none">
-      <button
-        type="button"
-        disabled={!isWaiting}
-        aria-label="Completed"
-        title="Completed"
-        className={`text-primary ${isWaiting ? enabledClass : disabledClass}`}
-        data-testid="btnAccept"
-      >
-        ✓
-      </button>
-      <button
-        type="button"
-        disabled={!isWaiting}
-        aria-label="Cancelled"
-        title="Cancelled"
-        className={`text-black ${isWaiting ? enabledClass : disabledClass}`}
-        data-testid="btnDecline"
-      >
-        ×
-      </button>
-    </div>
+    <DataTableButtonActions
+      row={row}
+      disabledAccept={!isWaiting}
+      disabledDecline={!isWaiting}
+      onAccept={() => {
+        // Complete return request logic goes here
+      }}
+      onDecline={() => {
+        // Cancel return request logic goes here
+      }}
+      acceptBtnTestId="btnAccept"
+      declineBtnTestId="btnDecline"
+      acceptIcon={<Check className="text-primary" strokeWidth={3} size={20} />}
+      declineIcon={<X className="text-black" strokeWidth={3} size={20} />}
+    />
   );
 }
 
@@ -372,7 +363,7 @@ export default function ReturnsPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
-                placeholder=""
+                placeholder="Search..."
                 width="w-full sm:w-[242px]"
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
@@ -399,13 +390,12 @@ export default function ReturnsPage() {
           </div>
 
           <div className="relative">
-            <DataTable<ReturnRequestRow>
+            <SingleSortDataTable<ReturnRequestRow>
               data={requests}
               columns={columns}
               isLoading={isLoading}
               emptyMessage="No return requests found."
               sorts={sorts}
-              tableTestId="dgdReturningList"
               onSortChange={(newSorts) => {
                 const nextSort = newSorts.at(-1);
                 updateQueryParams({

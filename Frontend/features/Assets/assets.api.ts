@@ -13,6 +13,7 @@ import type {
   LookupAssetsWithAssignedRequest,
   EditAssetResponse,
   EditAssetRequest,
+  DeleteAssetResponse,
 } from "./assets.types";
 
 export const assetsApi = baseApiSlice.injectEndpoints({
@@ -103,6 +104,20 @@ export const assetsApi = baseApiSlice.injectEndpoints({
       invalidatesTags: ["Asset"],
     }),
 
+    deleteAsset: builder.mutation<
+      DeleteAssetResponse,
+      { id: string }
+    >({
+      query: ({ id }) => ({
+        url: "v1/assets",
+        method: "DELETE",
+        body: {
+          id,
+        },
+      }),
+      invalidatesTags: ["Asset"],
+    }),
+
   }),
 });
 
@@ -114,5 +129,6 @@ export const {
   useCreateCategoryMutation,
   useLookupAssetsQuery,
   useLookupAssetsWithAssignedQuery,
-  useEditAssetMutation
+  useEditAssetMutation,
+  useDeleteAssetMutation
 } = assetsApi;

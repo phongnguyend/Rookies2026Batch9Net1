@@ -68,7 +68,8 @@ public class HandlerTests
                 "Laptop Dell XPS",
                 "Laptop",
                 AssetState.Available,
-                "Ho Chi Minh"),
+                "Ho Chi Minh",
+                true),
 
             new(
                 Guid.NewGuid(),
@@ -76,7 +77,8 @@ public class HandlerTests
                 "Monitor LG 27",
                 "Monitor",
                 AssetState.Available,
-                "Ho Chi Minh"),
+                "Ho Chi Minh",
+                true),
         };
 
         _assetRepositoryMock

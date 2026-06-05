@@ -15,6 +15,7 @@ import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess, completeLoading } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
+import { startUserSessionHub } from "@/features/auth/user-session.signalr";
 import { useGetExportStatusQuery } from "@/features/report/report.api";
 import { ExportReportJobStatus } from "@/features/report/report.types";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
@@ -74,6 +75,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           locationName: profile.locationName,
         }),
       );
+      void startUserSessionHub(dispatch);
     } else if (isError && !isAuthenticated) {
       dispatch(completeLoading());
     }
@@ -116,37 +118,39 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <RouteGuard>
-      {isAuthenticated ? (
-        <>
-          {/* Navbar */}
-          <NavBar />
+      <>
+        {isAuthenticated ? (
+          <>
+            {/* Navbar */}
+            <NavBar />
 
-          {/* Main Layout */}
-          <div className="drawer md:drawer-open relative px-8 pt-12">
-            <DrawerCheckbox />
-            <FloatingDrawerButton />
+            {/* Main Layout */}
+            <div className="drawer md:drawer-open relative px-8 pt-12">
+              <DrawerCheckbox />
+              <FloatingDrawerButton />
 
-            {/* Left Content */}
-            <div className="drawer-content md:pl-15 md:pt-15">
-              <main>{children}</main>
+              {/* Left Content */}
+              <div className="drawer-content md:pl-15 md:pt-15">
+                <main>{children}</main>
+              </div>
+
+              {/* Drawer Sidebar */}
+              <div className="drawer-side">
+                <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+
+                <Drawer role={user?.role as UserRoles} />
+              </div>
             </div>
 
-            {/* Drawer Sidebar */}
-            <div className="drawer-side">
-              <label htmlFor="admin-drawer" className="drawer-overlay"></label>
-
-              <Drawer role={user?.role as UserRoles} />
-            </div>
-          </div>
-
-          {/* Utility Components */}
-          <ToastContainer />
-          <GlobalModalContainer />
-          <FirstChangePasswordModal isOpen={user?.isFirstLogin === true} />
-        </>
-      ) : (
-        children
-      )}
+            {/* Utility Components */}
+            <GlobalModalContainer />
+            <FirstChangePasswordModal isOpen={user?.isFirstLogin === true} />
+          </>
+        ) : (
+          children
+        )}
+        <ToastContainer />
+      </>
     </RouteGuard>
   );
 }

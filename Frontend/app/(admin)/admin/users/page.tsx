@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  type MouseEvent,
   type ReactNode,
   useCallback,
+  useEffect,
   useState,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import DataTable, {
+import SingleSortDataTable, {
   type ColumnDef,
   type SortItem,
-} from "@/features/users/components/DataTable";
+} from "@/features/shared/components/SingleSortDataTable";
 import DropdownFilter from "@/features/users/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
@@ -23,6 +23,7 @@ import {
   type UserRow,
 } from "@/features/users/users.types";
 import { formatDate } from "@/utils/datetime.utils";
+import { CircleX, Pencil } from "lucide-react";
 
 const typeFilters = [
   { id: UserRoles.Admin, label: "Admin" },
@@ -35,75 +36,35 @@ const defaultSort: SortItem = {
   direction: SortDirection.Asc,
 };
 
-function ActionIconButton({
-  label,
-  children,
-  className = "text-slate-700 hover:text-primary",
-  disabled = false,
+function UserActionButton({
+  title,
   testId,
+  disabled = false,
+  className,
+  children,
   onClick,
 }: {
-  label: string;
-  children: ReactNode;
-  className?: string;
+  title: string;
+  testId: string;
   disabled?: boolean;
-  testId?: string;
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  className: string;
+  children: ReactNode;
+  onClick: () => void;
 }) {
   return (
-    <span className="group relative inline-flex h-8 w-8 items-center justify-center">
-      <button
-        type="button"
-        aria-label={label}
-        disabled={disabled}
-        onClick={onClick}
-        className={`inline-flex h-8 w-8 items-center justify-center bg-transparent p-0 shadow-none outline-none transition disabled:cursor-not-allowed disabled:opacity-35 ${className}`}
-        data-testid={testId}
-      >
-        {children}
-      </button>
-      <span className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-neutral px-2 py-1 text-xs font-medium text-neutral-content opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-        {label}
-      </span>
-    </span>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      data-testid={testId}
+      className={`${className} cursor-pointer disabled:cursor-not-allowed disabled:opacity-30`}
+      title={title}
     >
-      <path d="M14.75 4.25 19.75 9.25" />
-      <path d="M18.25 2.75a2.12 2.12 0 0 1 3 3L8.5 18.5 3.75 20.25 5.5 15.5 18.25 2.75Z" />
-      <path d="M5.5 15.5 8.5 18.5" />
-    </svg>
-  );
-}
-
-function DisableIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="h-5 w-5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="8" />
-      <path d="M9 9 15 15" />
-      <path d="M15 9 9 15" />
-    </svg>
+      {children}
+    </button>
   );
 }
 
@@ -125,15 +86,23 @@ export default function UsersPage() {
     (type): type is UserRoles =>
       type === UserRoles.Admin || type === UserRoles.Staff,
   );
+  const [useTemporaryUpdatedSort, setUseTemporaryUpdatedSort] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc";
+  });
   const sorts: SortItem[] = sortByParam
     ? [
-        {
-          key: sortByParam,
-          direction:
-            sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: sortByParam,
+        direction:
+          sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [defaultSort];
+  const displayedSorts = useTemporaryUpdatedSort ? [] : sorts;
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -212,14 +181,18 @@ export default function UsersPage() {
     // Backend currently accepts a single type value. When both roles are
     // selected, the dropdown normalizes to "All", so no type filter is sent.
     ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
-    sortBy: sorts[0]?.key ?? defaultSort.key,
-    ...(sorts[0]?.direction === SortDirection.Desc ? { sortDesc: true } : {}),
+    sortBy: useTemporaryUpdatedSort ? "updatedDate" : (sorts[0]?.key ?? defaultSort.key),
+    ...(useTemporaryUpdatedSort || sorts[0]?.direction === SortDirection.Desc
+      ? { sortDesc: true }
+      : {}),
   };
 
   const { data, isLoading } = useGetUsersQuery(queryParams);
   const users = data?.items ?? [];
 
   const handleSortChange = (newSorts: SortItem[]) => {
+    setUseTemporaryUpdatedSort(false);
+
     if (newSorts.length === 0) {
       updateQueryParams({ page: 1, sortBy: null, sortDesc: null });
       return;
@@ -232,6 +205,12 @@ export default function UsersPage() {
       sortDesc: firstSort.direction === SortDirection.Desc,
     });
   };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc") {
+      sessionStorage.removeItem("usersTemporarySort");
+    }
+  }, []);
 
   const columns: ColumnDef<UserRow>[] = [
     {
@@ -268,36 +247,31 @@ export default function UsersPage() {
     {
       key: "actions",
       header: "",
-      className: "w-[72px] text-left",
+      className: "w-[96px] text-left",
       render: (user) => (
-        <div className="flex justify-start gap-2">
-          <ActionIconButton
-            label="Edit"
+        <div className="flex items-center gap-3">
+          <UserActionButton
+            title="Edit"
             testId="btnEditUser"
-            onClick={(event) => {
-              event.stopPropagation();
-              // Navigate to edit user page for user.id
+            className="text-green-600"
+            onClick={() => {
+              router.push(`/admin/users/edit?id=${encodeURIComponent(user.id)}`);
             }}
           >
-            <EditIcon />
-          </ActionIconButton>
+            <Pencil className="text-gray-500" size={20} strokeWidth={3} />
+          </UserActionButton>
 
-          <ActionIconButton
-            label="Disable"
-            className="text-red-700 hover:text-red-800"
-            disabled={!user.canBeDisabled}
+          <UserActionButton
+            title="Disable"
             testId="btnDisableUser"
-            onClick={(event) => {
-              event.stopPropagation();
-              if (!user.canBeDisabled) {
-                return;
-              }
-
+            disabled={!user.canBeDisabled}
+            className="text-red-400"
+            onClick={() => {
               // Disable user logic goes here
             }}
           >
-            <DisableIcon />
-          </ActionIconButton>
+            <CircleX size={20} strokeWidth={3} />
+          </UserActionButton>
         </div>
       ),
     },
@@ -342,7 +316,7 @@ export default function UsersPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
               <SearchInput
                 value={searchInput}
-                placeholder=""
+                placeholder="Search..."
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
                 }
@@ -361,7 +335,7 @@ export default function UsersPage() {
               <button
                 type="button"
                 data-testid="btnCreateUser"
-                onClick={() => 
+                onClick={() =>
                   router.push(`/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`)
                 }
                 className="rounded bg-primary px-5 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
@@ -372,16 +346,17 @@ export default function UsersPage() {
           </div>
 
           <div className="relative">
-            <DataTable
-              data={users}
-              columns={columns}
-              sorts={sorts}
-              onSortChange={handleSortChange}
-              onRowClick={(user) => setSelectedUserId(user.id)}
-              isLoading={isLoading}
-              emptyMessage="No users found."
-              tableTestId="dgdUserList"
-            />
+            <div data-testid="dgdUserList">
+              <SingleSortDataTable
+                data={users}
+                columns={columns}
+                sorts={displayedSorts}
+                onSortChange={handleSortChange}
+                onRowClick={(user) => setSelectedUserId(user.id)}
+                isLoading={isLoading}
+                emptyMessage="No users found."
+              />
+            </div>
 
             <UserDetailModal
               userId={selectedUserId}

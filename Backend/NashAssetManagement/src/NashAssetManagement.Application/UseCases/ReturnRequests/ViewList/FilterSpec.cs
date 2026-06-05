@@ -1,5 +1,6 @@
 using Ardalis.Specification;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
 {
@@ -10,6 +11,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         {
             // Same location with current admin
             Query.Where(x => x.Assignment!.Asset!.LocationId.ToString().Equals(locationId));
+            Query.Where(x => x.State != ReturnRequestState.Cancelled);
 
             // Search
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))

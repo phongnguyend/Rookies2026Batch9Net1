@@ -25,6 +25,7 @@ export interface AssetListItem {
   category: string;
   state: AssetState;
   location: string;
+  hasHistory: boolean;
 }
 
 export type GetAssetsResponse = PaginationResponse<AssetListItem>;
@@ -131,4 +132,13 @@ export interface EditAssetResponse {
   state: string;
   category: string;
   location: string;
+  hasHistory: boolean;
+}
+// ─── Delete Assets ───────────────────────────────────────────
+export interface DeleteAssetResponse {
+  id: string;
+  assetCode: string;
+  assetName: string;
+  isDeleted: boolean;
+  deletedTime?: string | null;
 }
