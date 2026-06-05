@@ -21,7 +21,9 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 .Must(dob => dob.Date <= DateTime.Today)
                 .WithMessage("Date of birth cannot be in the future. Please select a different date")
                 .Must(dob => dob.Date <= DateTime.Today.AddYears(-18))
-                .WithMessage("User is under 18. Please select a different date");
+                .WithMessage("User is under 18. Please select a different date")
+                .Must(dob => dob.Date >= DateTime.Today.AddYears(-90))
+                .WithMessage("User age must not exceed 90 years.");
 
             RuleFor(x => x.JoinedDate)
                 .Cascade(CascadeMode.Stop)
