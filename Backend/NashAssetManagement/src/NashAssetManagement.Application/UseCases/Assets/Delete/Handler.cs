@@ -9,25 +9,25 @@ using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 
-namespace NashAssetManagement.Application.UseCases.Assets.Edit;
+namespace NashAssetManagement.Application.UseCases.Assets.Delete;
 
-public class EditAssetHandler
-    : IRequestHandler<EditAssetRequest, ErrorOr<EditAssetResponse>>
+public class DeleteAssetHandler
+    : IRequestHandler<DeleteAssetRequest, ErrorOr<DeleteAssetResponse>>
 {
     private readonly IRepository<Asset, Guid> _assetRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly EditAssetValidator _validator;
+    private readonly DeleteAssetValidator _validator;
     private readonly ICurrentUser _currentUser;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<EditAssetHandler> _logger;
+    private readonly ILogger<DeleteAssetHandler> _logger;
 
-    public EditAssetHandler(
+    public DeleteAssetHandler(
         IRepository<Asset, Guid> assetRepository,
         IUnitOfWork unitOfWork,
-        EditAssetValidator validator,
+        DeleteAssetValidator validator,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider,
-        ILogger<EditAssetHandler> logger)
+        ILogger<DeleteAssetHandler> logger)
     {
         _assetRepository = assetRepository;
         _unitOfWork = unitOfWork;
@@ -37,14 +37,13 @@ public class EditAssetHandler
         _logger = logger;
     }
 
-    public async Task<ErrorOr<EditAssetResponse>> Handle(
-        EditAssetRequest request,
+    public async Task<ErrorOr<DeleteAssetResponse>> Handle(
+        DeleteAssetRequest request,
         CancellationToken cancellationToken)
     {
         var normalizedRequest = request with
         {
-            AssetName = request.AssetName.Trim(),
-            Specification = request.Specification.Trim()
+            Id = request.Id.Trim(),
         };
 
         var validationResult = await _validator.ValidateAsync(normalizedRequest, cancellationToken);
@@ -52,53 +51,47 @@ public class EditAssetHandler
             throw new ValidationException(validationResult.Errors);
 
         Guid location = Guid.TryParse(_currentUser.LocationId, out Guid locationId) ? locationId : Guid.Empty;
-        Guid AssetId = Guid.TryParse(request.AssetId, out Guid assetGuid) ? assetGuid : Guid.Empty;
+        Guid assetId = Guid.TryParse(request.Id, out Guid assetGuid) ? assetGuid : Guid.Empty;
 
         if (location == Guid.Empty)
-            return EditAssetErrors.LocationNotFound;
-        if (AssetId == Guid.Empty)
-            return EditAssetErrors.AssetNotFound;
+            return DeleteAssetErrors.LocationNotFound;
+        if (assetId == Guid.Empty)
+            return DeleteAssetErrors.AssetNotFound;
 
-        var spec = new AssetByIdSpec(AssetId, location);
+        var spec = new DeleteAssetSpec(assetId, location);
         var asset = await _assetRepository.FirstOrDefaultAsync(spec, cancellationToken);
         
         if (asset is null)
-            return EditAssetErrors.AssetNotFound;
+            return DeleteAssetErrors.AssetNotFound;
         
         if(asset.State == AssetState.Assigned)
-            return EditAssetErrors.AssetNotEditable;
+            return DeleteAssetErrors.AssetIsAssigned;
         
         if(asset.IsDeleted == true)
-            return EditAssetErrors.AssetIsSoftDeleted;
+            return DeleteAssetErrors.AssetIsDeleted;
 
-        asset.Name = normalizedRequest.AssetName;
-        asset.Specification = normalizedRequest.Specification;
-        asset.InstalledAtUtc = normalizedRequest.InstalledDate;
-        asset.State = normalizedRequest.State;
-        asset.UpdatedAtUtc = _dateTimeProvider.UtcNow;
+        if(asset.Assignments.Any())
+            return DeleteAssetErrors.AssetHasHistory;
 
         try
         {
+            asset.DeletedAtUtc = _dateTimeProvider.UtcNow;
+            asset.IsDeleted = true;
             _assetRepository.UpdateDetached(asset);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while editing the asset.");
-            return EditAssetErrors.AssetEditFailed;
+            _logger.LogError(ex, "An error occurred while Deleting the asset.");
+            return DeleteAssetErrors.AssetDeleteFailed;
         }
 
-        return new EditAssetResponse(
+        return new DeleteAssetResponse(
             asset.Id,
             asset.AssetCode,
             asset.Name,
-            asset.Specification,
-            asset.InstalledAtUtc,
-            asset.State,
-            asset.Category!.CategoryName,
-            asset.Location!.Name,
-            asset.Assignments.Any(),
-            asset.IsDeleted
+            asset.IsDeleted,
+            asset.DeletedAtUtc
         );
     }
 }
