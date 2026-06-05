@@ -47,7 +47,8 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserForEditing
                 user.Gender.ToString(),
                 user.JoinedAtUtc,
                 user.UserType.ToString(),
-                user.Id.ToString().Equals(currentUser.UserId.ToString())
+                user.Id.ToString().Equals(currentUser.UserId.ToString()),
+                user.ConcurrencyStamp ?? string.Empty
             );
 
             return response;

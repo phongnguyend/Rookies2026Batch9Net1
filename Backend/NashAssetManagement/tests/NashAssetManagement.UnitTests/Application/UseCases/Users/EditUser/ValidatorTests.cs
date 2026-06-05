@@ -23,6 +23,19 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.EditUser
         }
 
         [Fact]
+        public void TestValidate_ShouldHaveValidationErrorForConcurrencyStamp_WhenConcurrencyStampIsEmpty()
+        {
+            var request = CreateValidRequest(concurrencyStamp: "");
+
+            var result = _validator.TestValidate(request);
+
+            result.ShouldHaveValidationErrorFor(x => x.ConcurrencyStamp);
+            Assert.Contains(result.Errors,
+                x => x.PropertyName == nameof(Request.ConcurrencyStamp)
+                     && x.ErrorMessage == "Concurrency stamp is required.");
+        }
+
+        [Fact]
         public void TestValidate_ShouldHaveValidationErrorForDateOfBirth_WhenDateOfBirthIsInFuture()
         {
             var request = CreateValidRequest(
@@ -142,14 +155,16 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.EditUser
             DateTime? dateOfBirth = null,
             Gender gender = Gender.Male,
             DateTime? joinedDate = null,
-            UserType type = UserType.Staff)
+            UserType type = UserType.Staff,
+            string? concurrencyStamp = "concurrency-stamp")
         {
             return new Request(
                 userId,
                 dateOfBirth ?? new DateTime(2000, 1, 3),
                 gender,
                 joinedDate ?? new DateTime(2020, 1, 6),
-                type);
+                type,
+                concurrencyStamp);
         }
     }
 }

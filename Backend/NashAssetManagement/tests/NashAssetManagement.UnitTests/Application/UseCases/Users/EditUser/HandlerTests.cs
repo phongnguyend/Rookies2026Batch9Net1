@@ -20,6 +20,7 @@ public class HandlerTests
     private static readonly Guid ExistingUserId = Guid.Parse("36c29308-4d9c-4e1b-9baf-a5dc11f26001");
     private static readonly Guid CurrentUserId = Guid.Parse("f76435a1-6f00-4a43-8c7e-dd6b95730268");
     private static readonly Guid LocationId = Guid.Parse("a3b7ef5a-bce7-401f-bbe3-94c2f7bf0b94");
+    private const string ConcurrencyStamp = "concurrency-stamp";
 
     private readonly Mock<UserManager<User>> _userManager;
     private readonly Mock<ICurrentUser> _currentUser;
@@ -151,6 +152,31 @@ public class HandlerTests
     }
 
     [Fact]
+    public async Task Handle_ShouldReturnLocationMustHaveAtLeastOneAdminError_WhenDowngradingOnlyAdmin()
+    {
+        var request = CreateValidRequest(type: UserType.Staff);
+        var user = CreateUser(userType: UserType.Admin);
+
+        SetupCurrentUser(CurrentUserId, LocationId.ToString());
+        SetupValidValidation();
+        _userManager.Setup(x => x.FindByIdAsync(request.UserId!)).ReturnsAsync(user);
+        _userManager
+            .Setup(x => x.Users)
+            .Returns(new List<User>
+            {
+                user,
+                CreateUser(id: Guid.NewGuid(), userType: UserType.Staff)
+            }.AsAsyncQueryable());
+
+        var result = await _handler.Handle(request, CancellationToken.None);
+
+        Assert.True(result.IsError);
+        Assert.Equal(Errors.LocationMustHaveAtLeastOneAdmin(), result.FirstError);
+        _unitOfWork.Verify(x => x.BeginTransactionAsync(It.IsAny<CancellationToken>()), Times.Never);
+        _userManager.Verify(x => x.UpdateAsync(It.IsAny<User>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Handle_ShouldUpdateUserWithoutForceLogout_WhenUserTypeDoesNotChange()
     {
         var request = CreateValidRequest(type: UserType.Staff);
@@ -250,18 +276,19 @@ public class HandlerTests
         _currentUser.Setup(x => x.LocationId).Returns(locationId);
     }
 
-    private static User CreateUser(Guid? locationId = null, UserType userType = UserType.Staff)
+    private static User CreateUser(Guid? id = null, Guid? locationId = null, UserType userType = UserType.Staff)
     {
         return new User
         {
-            Id = ExistingUserId,
+            Id = id ?? ExistingUserId,
             FirstName = "John",
             LastName = "Smith",
             DateOfBirth = new DateTime(2000, 1, 3),
             Gender = Gender.Male,
             JoinedAtUtc = new DateTime(2020, 1, 6),
             UserType = userType,
-            LocationId = locationId ?? LocationId
+            LocationId = locationId ?? LocationId,
+            ConcurrencyStamp = ConcurrencyStamp
         };
     }
 
@@ -270,13 +297,15 @@ public class HandlerTests
         DateTime? dateOfBirth = null,
         Gender gender = Gender.Male,
         DateTime? joinedDate = null,
-        UserType type = UserType.Staff)
+        UserType type = UserType.Staff,
+        string? concurrencyStamp = ConcurrencyStamp)
     {
         return new Request(
             userId,
             dateOfBirth ?? new DateTime(2000, 1, 3),
             gender,
             joinedDate ?? new DateTime(2020, 1, 6),
-            type);
+            type,
+            concurrencyStamp);
     }
 }

@@ -33,6 +33,16 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
             Error.Conflict(
                 "EditUser.Conflict",
                 "Admin is not allowed to edit their own user type.");
+
+        public static Error UserWasModified() =>
+            Error.Conflict(
+                "EditUser.ConcurrencyConflict",
+                "This user was updated by someone else. Please reload and try again.");
+
+        public static Error LocationMustHaveAtLeastOneAdmin() =>
+            Error.Conflict(
+                "EditUser.LocationMustHaveAtLeastOneAdmin",
+                "Location must have at least one admin.");
                 
         public static Error InvalidUserType(string userType) =>
             Error.Validation(

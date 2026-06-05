@@ -56,6 +56,7 @@ export interface GetUserForEditResponse {
   joinedDate: string;
   userType: UserRoles;
   isCurrentUser: boolean;
+  concurrencyStamp: string;
 }
 
 export interface EditUserRequest {
@@ -64,6 +65,7 @@ export interface EditUserRequest {
   gender: Gender;
   joinedDate: string;
   type: UserRoles;
+  concurrencyStamp: string;
 }
 
 export interface EditUserResponse {

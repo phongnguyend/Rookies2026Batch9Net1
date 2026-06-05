@@ -10,6 +10,10 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
             RuleFor(x => x.UserId)
                 .MustBeValidGuid();
 
+            RuleFor(x => x.ConcurrencyStamp)
+                .NotEmpty()
+                .WithMessage("Concurrency stamp is required.");
+
             RuleFor(x => x.DateOfBirth)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()

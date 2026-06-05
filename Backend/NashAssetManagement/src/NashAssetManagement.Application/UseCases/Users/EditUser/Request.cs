@@ -9,7 +9,8 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
         DateTime DateOfBirth,
         Gender Gender,
         DateTime JoinedDate,
-        UserType Type
+        UserType Type,
+        string? ConcurrencyStamp
     )
     : IRequest<ErrorOr<Response>>;
 }

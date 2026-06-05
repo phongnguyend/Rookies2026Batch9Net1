@@ -52,18 +52,30 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 user.Id.ToString().Equals(currentUser.UserId.ToString()))
                 return Errors.AdminNotAllowedToEditOwnType();
 
+            if (!string.Equals(user.ConcurrencyStamp, request.ConcurrencyStamp, StringComparison.Ordinal))
+                return Errors.UserWasModified();
+
             var userTypeChanged = user.UserType != request.Type;
+            var isDowngradingAdmin = user.UserType == UserType.Admin &&
+                request.Type == UserType.Staff;
+
+            if (isDowngradingAdmin)
+            {
+                var hasAnotherAdmin = await userManager.Users.AnyAsync(x =>
+                    x.Id != user.Id &&
+                    x.LocationId == user.LocationId &&
+                    x.UserType == UserType.Admin &&
+                    !x.IsDeleted,
+                    cancellationToken);
+
+                if (!hasAnotherAdmin)
+                    return Errors.LocationMustHaveAtLeastOneAdmin();
+            }
 
             await unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                // Update user role
-                var updateRoleResult = await UpdateUserRole(user, request.Type);
-
-                if (updateRoleResult.IsError)
-                    return updateRoleResult.Errors;
-
                 // Update user
                 user.DateOfBirth = request.DateOfBirth;
                 user.Gender = request.Gender;
@@ -85,12 +97,27 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                     }
                 }
 
-                var updateResult =await userManager.UpdateAsync(user);
+                var updateResult = await userManager.UpdateAsync(user);
 
                 if (!updateResult.Succeeded)
                 {
                     await unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    if (updateResult.Errors.Any(error => error.Code == nameof(IdentityErrorDescriber.ConcurrencyFailure)))
+                        return Errors.UserWasModified();
+
                     return Errors.FailedToUpdateUser(user.Id.ToString());
+                }
+
+                if (userTypeChanged)
+                {
+                    // Update user role after the concurrency-checked user update succeeds.
+                    var updateRoleResult = await UpdateUserRole(user, request.Type);
+
+                    if (updateRoleResult.IsError)
+                    {
+                        await unitOfWork.RollbackTransactionAsync(cancellationToken);
+                        return updateRoleResult.Errors;
+                    }
                 }
                     
                 await unitOfWork.CommitTransactionAsync(cancellationToken);

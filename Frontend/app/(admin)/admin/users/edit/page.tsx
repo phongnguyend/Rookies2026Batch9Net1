@@ -399,6 +399,7 @@ function EditUserForm({
         gender: selectedGender,
         joinedDate: localDateToUtcIso(joinedDate),
         type: selectedType,
+        concurrencyStamp: user.concurrencyStamp,
       }).unwrap();
 
       sessionStorage.setItem("usersTemporarySort", "updatedDateDesc");
@@ -411,12 +412,25 @@ function EditUserForm({
       );
       redirectToUsers();
     } catch (error) {
-      if (isApiErrorResponse(error) && error.status === 400) {
-        const validationErrors = getValidationErrors(error);
-
-        if (Object.keys(validationErrors).length > 0) {
-          setFieldErrors(validationErrors);
+      if (isApiErrorResponse(error)) {
+        if (error.status === 409) {
+          dispatch(
+            enqueueToast({
+              message:
+                "This user was updated by someone else. Please reload and try again.",
+              type: ToastType.Error,
+            }),
+          );
           return;
+        }
+
+        if (error.status === 400) {
+          const validationErrors = getValidationErrors(error);
+
+          if (Object.keys(validationErrors).length > 0) {
+            setFieldErrors(validationErrors);
+            return;
+          }
         }
       }
 

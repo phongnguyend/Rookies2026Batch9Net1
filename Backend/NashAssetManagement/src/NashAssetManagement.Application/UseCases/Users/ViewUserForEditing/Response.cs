@@ -13,6 +13,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserForEditing
         string Gender,
         DateTime JoinedDate,
         string UserType,
-        bool IsCurrentUser
+        bool IsCurrentUser,
+        string ConcurrencyStamp
     );
 }
