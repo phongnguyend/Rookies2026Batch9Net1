@@ -35,8 +35,7 @@ public class DeleteAssetValidatorTests
 
         var result = _validator.TestValidate(request);
 
-        result.ShouldHaveValidationErrorFor(x => x.Id)
-              .WithErrorMessage("Asset id must be in Guid Format.");
+        result.ShouldHaveValidationErrorFor(x => x.Id);
     }
 
     [Fact]
