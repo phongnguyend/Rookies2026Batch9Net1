@@ -57,6 +57,7 @@ const EditAssignmentPage = () => {
         assignedDate: new Date(data.assignedDate),
         note: data.note ?? "",
       });
+      form.trigger("assignedDate");
       setUser(data.user);
       setAsset(data.asset);
     }
