@@ -95,12 +95,12 @@ export default function UsersPage() {
   });
   const sorts: SortItem[] = sortByParam
     ? [
-        {
-          key: sortByParam,
-          direction:
-            sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: sortByParam,
+        direction:
+          sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [defaultSort];
   const displayedSorts = useTemporaryUpdatedSort ? [] : sorts;
 
@@ -335,7 +335,7 @@ export default function UsersPage() {
               <button
                 type="button"
                 data-testid="btnCreateUser"
-                onClick={() => 
+                onClick={() =>
                   router.push(`/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`)
                 }
                 className="rounded bg-primary px-5 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
@@ -346,15 +346,17 @@ export default function UsersPage() {
           </div>
 
           <div className="relative">
-            <SingleSortDataTable
-              data={users}
-              columns={columns}
-              sorts={displayedSorts}
-              onSortChange={handleSortChange}
-              onRowClick={(user) => setSelectedUserId(user.id)}
-              isLoading={isLoading}
-              emptyMessage="No users found."
-            />
+            <div data-testid="dgdUserList">
+              <SingleSortDataTable
+                data={users}
+                columns={columns}
+                sorts={displayedSorts}
+                onSortChange={handleSortChange}
+                onRowClick={(user) => setSelectedUserId(user.id)}
+                isLoading={isLoading}
+                emptyMessage="No users found."
+              />
+            </div>
 
             <UserDetailModal
               userId={selectedUserId}

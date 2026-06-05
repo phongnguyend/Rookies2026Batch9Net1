@@ -37,7 +37,7 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUserForEditing
 
             // Check current admin with user have same location
             if (!currentUser.LocationId!.Equals(user.LocationId.ToString()))
-                return Errors.UserHasDifferentLocation(request.UserId!);
+                return Errors.UserHasDifferentLocation();
 
             var response = new Response(
                 user.Id,

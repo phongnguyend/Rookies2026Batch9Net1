@@ -117,7 +117,10 @@ public class HandlerTests
         var result = await _handler.Handle(request, CancellationToken.None);
 
         Assert.True(result.IsError);
-        Assert.Equal(Errors.UserHasDifferentLocation(request.UserId!), result.FirstError);
+        Assert.Equal(Errors.UserHasDifferentLocation(), result.FirstError);
+        Assert.Equal(
+            "You are not allowed to edit the information of users in a different location.",
+            result.FirstError.Description);
     }
 
     [Fact]
