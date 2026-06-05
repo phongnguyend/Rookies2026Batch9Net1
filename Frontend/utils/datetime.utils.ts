@@ -14,3 +14,22 @@ export function formatDateTime(utc: string) {
     })
   );
 }
+
+export function utcDateToLocalDate(utc: string | null) {
+  if (!utc) return null;
+
+  const date = new Date(utc);
+  return new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+  );
+}
+
+export function localDateToUtcIso(date: Date | null) {
+  if (!date) return "";
+
+  return new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  ).toISOString();
+}

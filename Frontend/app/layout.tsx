@@ -15,6 +15,7 @@ import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { useGetMeQuery } from "@/features/auth/auth.api";
 import { loginSuccess, completeLoading } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
+import { startUserSessionHub } from "@/features/auth/user-session.signalr";
 import { useGetExportStatusQuery } from "@/features/report/report.api";
 import { ExportReportJobStatus } from "@/features/report/report.types";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
@@ -74,6 +75,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           locationName: profile.locationName,
         }),
       );
+      void startUserSessionHub(dispatch);
     } else if (isError && !isAuthenticated) {
       dispatch(completeLoading());
     }

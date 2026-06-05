@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import ConfirmModal from "../Modal/ConfirmModal";
 import { useLogoutMutation } from "@/features/auth/auth.api";
 import { logoutAccount } from "@/features/auth/auth.slice";
+import { stopUserSessionHub } from "@/features/auth/user-session.signalr";
 
 export default function NavbarProfile() {
   const { user, isLoading } = useAppSelector((state) => state.authSlice);
@@ -29,6 +30,7 @@ export default function NavbarProfile() {
     } catch (error) {
       console.error("Logout API failed:", error);
     } finally {
+      await stopUserSessionHub();
       dispatch(logoutAccount());
       setIsLogoutConfirmOpen(false);
       window.location.replace("/");
