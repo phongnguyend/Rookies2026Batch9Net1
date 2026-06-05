@@ -8,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCreateRet
     {
         public Spec(Guid assignmentId)
         {
-            Query.Where(x => x.Id == assignmentId)
+            Query.Where(x => x.Id == assignmentId && x.IsDeleted == false)
                 .Include(x => x.ReturnRequests)
                 .Include(x => x.Asset);
         }
