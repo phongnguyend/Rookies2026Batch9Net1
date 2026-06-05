@@ -7,5 +7,20 @@ namespace NashAssetManagement.Domain.Constants
             public const int PageSize = 10;
             public const int PageIndex = 1;
         }
+
+        public static class Services
+        {
+            public const string ReportExcel = "ReportExcel";
+        }
+
+        public static class DbSchema
+        {
+            public const string Jobs = "Jobs";
+        }
+
+        public static class TempFolders
+        {
+            public const string TempReportFolders = "ReportsTemp";
+        }
     }
 }

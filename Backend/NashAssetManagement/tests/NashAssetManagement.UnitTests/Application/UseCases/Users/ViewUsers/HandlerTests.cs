@@ -5,6 +5,8 @@ using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.UseCases.Users.ViewUsers;
 using NashAssetManagement.Domain.Entities.Identity;
+using NashAssetManagement.Domain.Enums;
+using NashAssetManagement.UnitTests.TestHelpers;
 using Xunit;
 
 namespace NashAssetManagement.UnitTests.Application.UseCases.Users.ViewUsers;
@@ -95,5 +97,58 @@ public class HandlerTests
         // Assert
         Assert.True(result.IsError);
         Assert.Equal(Errors.UserHasNoLocation(), result.FirstError);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldExcludeDeletedUsers_WhenViewingUsers()
+    {
+        // Arrange
+        var request = new Request(1, 10, null, null, null, null);
+        var activeUser = CreateUser(
+            id: Guid.Parse("4abf5324-2f18-4b84-bc2a-30ecb2de9017"),
+            staffCode: "SD0001",
+            isDeleted: false);
+        var deletedUser = CreateUser(
+            id: Guid.Parse("0e703d6f-e57d-4376-b4d6-d3927c6e8389"),
+            staffCode: "SD0002",
+            isDeleted: true);
+
+        _mockUser.Setup(u => u.UserId).Returns(Guid.NewGuid());
+        _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+        _mockUserManager
+            .Setup(x => x.Users)
+            .Returns(new List<User> { activeUser, deletedUser }.AsAsyncQueryable());
+
+        // Act
+        var result = await _handler.Handle(request, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.Single(result.Value.Items);
+        Assert.Equal(activeUser.Id, result.Value.Items[0].Id);
+        Assert.Equal(1, result.Value.TotalCount);
+    }
+
+    private static User CreateUser(
+        Guid id,
+        string staffCode,
+        bool isDeleted,
+        Guid? locationId = null)
+    {
+        return new User
+        {
+            Id = id,
+            StaffCode = staffCode,
+            FirstName = "Test",
+            LastName = "User",
+            UserName = staffCode,
+            JoinedAtUtc = new DateTime(2020, 1, 6),
+            UserType = UserType.Staff,
+            LocationId = locationId ?? Guid.Parse(LocationId),
+            IsDeleted = isDeleted
+        };
     }
 }

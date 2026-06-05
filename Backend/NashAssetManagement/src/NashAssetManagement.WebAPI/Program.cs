@@ -7,6 +7,14 @@ using NashAssetManagement.WebAPI;
 using Serilog;
 using NashAssetManagement.WebAPI.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using NashAssetManagement.Application.Abstractions.Realtime;
+using NashAssetManagement.WebAPI.Hubs;
+using NashAssetManagement.WebAPI.Realtime;
+using Hangfire;
+using NashAssetManagement.WebAPI.Filters;
+using NashAssetManagement.Domain.Constants;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +32,10 @@ try
         .AddPersistenceServices(builder.Configuration)
         .AddInfrastructureServices(builder.Configuration)
         .AddApiServices(builder.Configuration);
+
+    builder.Services.AddSignalR();
+    builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+    builder.Services.AddScoped<IUserSessionNotifier, UserSessionNotifier>();
 
     var app = builder.Build();
 
@@ -53,11 +65,32 @@ try
     await seeder.SeedDataAsync(scope.ServiceProvider);
     Log.Information("Seed development data finished successfully.");
 
+    // Setup folder for storing temp report files
+    var rootPath = Environment.GetEnvironmentVariable("HOME") ?? AppDomain.CurrentDomain.BaseDirectory;
+    var tempReportsPath = Path.Combine(rootPath, AppCts.TempFolders.TempReportFolders);
+    if (!Directory.Exists(tempReportsPath))
+    {
+        Directory.CreateDirectory(tempReportsPath);
+    }
+
     app.UseCors();
+
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(tempReportsPath),
+        RequestPath = $"/{AppCts.TempFolders.TempReportFolders}"
+    });
+
     app.UseAuthentication();
     app.UseAuthorization();
 
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangFireAdminDashboardFilter()]
+    });
+
     app.MapControllers();
+    app.MapHub<UserSessionHub>("/hubs/user-session");
 
     app.Run();
 }

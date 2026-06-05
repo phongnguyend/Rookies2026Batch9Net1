@@ -4,7 +4,21 @@ import {
   SortDirection,
 } from "@/lib/api/base.types";
 
+export enum ExportReportJobStatus {
+  Failed = "Failed",
+  Processing = "Processing",
+  ReadyToDownload = "ReadyToDownload",
+}
 
+export enum ExportReportSortBy {
+  Category = "Category",
+  Total = "Total",
+  Assigned = "Assigned",
+  Available = "Available",
+  NotAvailable = "NotAvailable",
+  WaitingForRecycling = "WaitingForRecycling",
+  Recycled = "Recycled",
+}
 
 export namespace ViewReport {
 
@@ -19,20 +33,35 @@ export namespace ViewReport {
     recycled: number;
   }
 
-  export enum SortBy {
-    Category = "Category",
-    Total = "Total",
-    Assigned = "Assigned",
-    Available = "Available",
-    NotAvailable = "NotAvailable",
-    WaitingForRecycling = "WaitingForRecycling",
-    Recycled = "Recycled",
-  }
-
   export interface Request extends PaginationRequest {
-    sortBy?: SortBy;
+    sortBy?: ExportReportSortBy;
     sortDirection?: SortDirection;
   }
 
   export interface Response extends PaginationResponse<ReportRow> { }
+}
+
+export namespace Export {
+  export interface Request {
+    sortBy?: ExportReportSortBy;
+    sortDirection?: SortDirection;
+  }
+  export interface Response {
+    status: ExportReportJobStatus;
+  }
+}
+
+export namespace CurrentDownload {
+  export interface Request { }
+  export interface Response {
+    status: ExportReportJobStatus | null;
+    downloadUrl: string | null;
+  }
+}
+
+export namespace Cancel {
+  export interface Request { }
+  export interface Response {
+    success: boolean;
+  }
 }

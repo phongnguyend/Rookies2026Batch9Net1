@@ -79,12 +79,14 @@ export default function AssignmentsPage() {
     {
       key: "no",
       header: "No.",
+      className: "w-16",
       render: (_assignment, index) => (page - 1) * limit + index + 1,
     },
     {
       key: "assetCode",
       header: "Asset Code",
       sortable: true,
+      className: "w-32",
       headerTestId: "btnSortAssetCode",
       cellTestId: (_row, index) => `colAssetCode-${index}`,
     },
@@ -92,6 +94,7 @@ export default function AssignmentsPage() {
       key: "assetName",
       header: "Asset Name",
       sortable: true,
+      className: "w-48",
       headerTestId: "btnSortAssetName",
       cellTestId: (_row, index) => `colAssetName-${index}`,
     },
@@ -99,6 +102,7 @@ export default function AssignmentsPage() {
       key: "assignedTo",
       header: "Assigned to",
       sortable: true,
+      className: "w-36",
       headerTestId: "btnSortAssignedTo",
       cellTestId: (_row, index) => `colAssignedTo-${index}`,
     },
@@ -106,6 +110,7 @@ export default function AssignmentsPage() {
       key: "assignedBy",
       header: "Assigned by",
       sortable: true,
+      className: "w-36",
       headerTestId: "btnSortAssignedBy",
       cellTestId: (_row, index) => `colAssignedBy-${index}`,
     },
@@ -113,6 +118,7 @@ export default function AssignmentsPage() {
       key: "assignedDate",
       header: "Assigned Date",
       sortable: true,
+      className: "w-32",
       headerTestId: "btnSortAssignedDate",
       cellTestId: (_row, index) => `colAssignedDate-${index}`,
     },
@@ -120,6 +126,7 @@ export default function AssignmentsPage() {
       key: "state",
       header: "State",
       sortable: true,
+      className: "w-28",
       headerTestId: "btnSortState",
       cellTestId: (_row, index) => `colState-${index}`,
       render: (row) =>
@@ -128,6 +135,7 @@ export default function AssignmentsPage() {
     {
       key: "actions",
       header: "",
+      className: "w-28",
       render: (assignment) => {
         const isWaiting =
           assignment.state === "WaitingForAcceptance";
@@ -151,9 +159,9 @@ export default function AssignmentsPage() {
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeclineAssignment"
             returnBtnTestId="btnReturnAssignment"
-            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3}/>}
-            declineIcon={<CircleX size={20} strokeWidth={3}/>}
-            returnIcon={<RotateCcw size={20} strokeWidth={3}/>}
+            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3} />}
+            declineIcon={<CircleX size={20} strokeWidth={3} />}
+            returnIcon={<RotateCcw size={20} strokeWidth={3} />}
           />
         );
       },
@@ -166,109 +174,108 @@ export default function AssignmentsPage() {
         Assignment List
       </div>
 
-      <div className="space-y-4 mb-8">
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
 
-          {/* Left group: State + Assigned Date */}
-          <div className="flex flex-wrap gap-3">
-            <div data-testid="ddlState" className="w-full sm:w-auto">
-              <DropdownFilter
-                items={Object.values(AssignmentState).map((s) => ({
-                  key: s,
-                  label: s,
-                }))}
-                values={states}
-                placeholder="State"
-                getKey={(item) => item.key}
-                getLabel={(item) => item.label}
-                onChange={(values) =>
-                  updateParams({
-                    state: values,
-                    page: "1",
-                  })
-                }
-                getTestIdAll={"chkStateAll"}
-                getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
-              />
-            </div>
+        {/* Left group: State + Assigned Date */}
+        <div className="flex flex-wrap gap-3">
+          <div data-testid="ddlState" className="w-full sm:w-auto">
+            <DropdownFilter
+              items={Object.values(AssignmentState).map((s) => ({
+                key: s,
+                label: s,
+              }))}
+              values={states}
+              placeholder="State"
+              getKey={(item) => item.key}
+              getLabel={(item) => item.label}
+              onChange={(values) =>
+                updateParams({
+                  state: values,
+                  page: "1",
+                })
+              }
+              getTestIdAll={"chkStateAll"}
+              getTestId={(item) => `chkState${item.key.replace(/\s+/g, "")}`}
+            />
+          </div>
 
-            <div data-testid="dtpAssignedDate" className="w-full sm:w-auto">
-              <DatePickerInput
-                value={assignedDate}
-                onChange={(date) =>
-                  updateParams({
-                    assignedDate: date
-                      ? new Date(
-                        Date.UTC(
-                          date.getFullYear(),
-                          date.getMonth(),
-                          date.getDate()
-                        )
+          <div data-testid="dtpAssignedDate" className="w-full sm:w-auto">
+            <DatePickerInput
+              value={assignedDate}
+              onChange={(date) =>
+                updateParams({
+                  assignedDate: date
+                    ? new Date(
+                      Date.UTC(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        date.getDate()
                       )
-                        .toISOString()
-                        .split("T")[0]
-                      : undefined,
-                    page: "1",
-                  })
-                }
-                placeholder="Assigned Date"
-                width="w-full"
-              />
-            </div>
+                    )
+                      .toISOString()
+                      .split("T")[0]
+                    : undefined,
+                  page: "1",
+                })
+              }
+              placeholder="Assigned Date"
+              width="w-full"
+            />
           </div>
-
-          {/* Right group: Search + Create button */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
-            <div className="w-full sm:w-auto">
-              <SearchInput
-                value={searchInput}
-                placeholder="Search..."
-                onChange={(value) => {
-                  setSearchInput(value);
-                }}
-                onSearch={(value) => {
-                  updateParams({
-                    search: value || undefined,
-                    page: "1",
-                  });
-                }}
-                txtInputTestId="txtSearchAssignment"
-                btnSearchTestId="btnSearchAssignment"
-              />
-            </div>
-
-            <button
-              className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base"
-              data-testid="btnCreateNewAssignment"
-            >
-              Create new assignment
-            </button>
-          </div>
-
         </div>
 
-        <div className="overflow-x-auto">
-          <SingleSortDataTable<Assignment>
-            data={assignments}
-            columns={columns}
-            isLoading={isLoading}
-            emptyMessage="No assignments found."
-            sorts={sorts}
-            onSortChange={(newSorts) => {
-              const sort = newSorts[0];
-              updateParams({
-                sortBy: sort?.key,
-                sortDesc:
-                  sort?.direction === SortDirection.Desc ? "true" : undefined,
-                page: "1",
-              });
-            }}
-            onRowClick={(row) => {
-              setSelectedAssignmentId(row.id);
-            }}
-            rowTestId={(_row, index) => `dgdAssignmentRow-${index}`}
-          />
+        {/* Right group: Search + Create button */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+          <div className="w-full sm:w-auto">
+            <SearchInput
+              value={searchInput}
+              placeholder="Search..."
+              onChange={(value) => {
+                setSearchInput(value);
+              }}
+              onSearch={(value) => {
+                updateParams({
+                  search: value || undefined,
+                  page: "1",
+                });
+              }}
+              txtInputTestId="txtSearchAssignment"
+              btnSearchTestId="btnSearchAssignment"
+            />
+          </div>
+
+          <button
+            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base"
+            data-testid="btnCreateNewAssignment"
+            onClick={() => router.push("/admin/assignments/create")}
+          >
+            Create new assignment
+          </button>
         </div>
+
+      </div>
+
+      <div className="space-y-4">
+        <SingleSortDataTable<Assignment>
+          data={assignments}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage="No assignments found."
+          sorts={sorts}
+          onSortChange={(newSorts) => {
+            const sort = newSorts[0];
+            updateParams({
+              sortBy: sort?.key,
+              sortDesc:
+                sort?.direction === SortDirection.Desc ? "true" : undefined,
+              page: "1",
+            });
+          }}
+          onRowClick={(row) => {
+            setSelectedAssignmentId(row.id);
+          }}
+          rowTestId={(_row, index) => `dgdAssignmentRow-${index}`}
+        />
 
         {selectedAssignmentId && (
           <AssignmentDetailPopup

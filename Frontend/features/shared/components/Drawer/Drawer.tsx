@@ -18,7 +18,7 @@ export interface DrawerProps {
 
 const sideBarItems = (
   role = UserRoles.Admin,
-): { label: string; href: string }[] => {
+): { label: string; href: string; dataTestId: string }[] => {
   if (role === UserRoles.Admin) {
     return APP_SIDEBAR_ADMIN_ITEMS;
   }
@@ -51,7 +51,12 @@ export default function Drawer({ role }: DrawerProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col">
+      <nav
+        className="flex flex-col"
+        data-testid={
+          role == UserRoles.Admin ? "mnuAdminAssignment" : "mnuStaffAssignment"
+        }
+      >
         {sideBarItems(role).map((item, index) => {
           const normalizedPathname =
             pathname.endsWith("/") && pathname !== "/"
@@ -62,20 +67,12 @@ export default function Drawer({ role }: DrawerProps) {
             (item.href !== "/admin" &&
               normalizedPathname.startsWith(item.href));
 
-          // add test id based on role
-          let testId: string | undefined;
-          if (role === UserRoles.Staff) {
-            testId = "mnuStaffAssignment";
-          } else if (role == UserRoles.Admin) {
-            testId = "mnuAdminAssignment";
-          }
-
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => dispatch(setDrawerOpen(false))}
-              data-testid={testId}
+              data-testid={item.dataTestId}
               className={`
                 px-6 py-3.5 transition-all duration-150 font-bold text-base block
                 ${index === 0 ? "border-t border-white" : ""}

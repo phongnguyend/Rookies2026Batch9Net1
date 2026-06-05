@@ -23,7 +23,10 @@ namespace NashAssetManagement.WebAPI.Controllers.Users
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation(Tags = [ControllerTags.Users])]
+        [SwaggerOperation(
+            Tags = [ControllerTags.Users],
+            Summary = "Allow admin to view user list with pagination."
+        )]
         public async Task<IActionResult> Get([FromQuery] Request request)
         {
             var result = await _sender.Send(request);
