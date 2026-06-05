@@ -232,7 +232,8 @@ export default function CreateUserPage() {
         }),
       );  
       
-      router.push("/admin/users?sortBy=createdDate&sortDesc=true&pageNumber=1");
+      sessionStorage.setItem("usersTemporarySort", "createdDateDesc");
+      router.push("/admin/users");
       reset();
     } catch (err: any) {
       console.log(err);
