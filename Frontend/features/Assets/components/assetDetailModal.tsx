@@ -83,7 +83,6 @@ export default function AssetDetailModal({
               <Row label="Location" value={data.location} />
               <Row label="State" value={data.state} />
               <Row label="Specification" value={data.specification} />
-
               <Row
                 label="Installed Date"
                 value={formatDate(data.installedAtUtc)}
@@ -117,11 +116,11 @@ function Row({
 }) {
   return (
     <div className="flex gap-4 border-b border-gray-100 pb-2">
-      <span className="w-36 font-semibold text-gray-500 shrink-0">
+      <span className="w-36 shrink-0 font-semibold text-gray-500">
         {label}
       </span>
 
-      <span className="text-gray-800 break-words">
+      <span className="max-w-xl flex-1 break-words whitespace-pre-wrap text-gray-800">
         {value}
       </span>
     </div>

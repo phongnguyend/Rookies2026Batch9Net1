@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { showModal } from "@/features/shared/modal.slice";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import DeleteAssetModal from '@/features/Assets/components/assetDeleteModel';
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from "@/features/Assets/assets.api";
-import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
-import Pagination from "@/features/shared/components/Pagination";
-import SearchInput from "@/features/shared/components/SearchInput";
-import DropdownFilter from "@/features/shared/components/DropdownFilter";
-import AssetDetailModal from "@/features/Assets/components/assetDetailModal";
+} from '@/features/Assets/assets.api';
+import { AssetState, type AssetListItem } from '@/features/Assets/assets.types';
+import Pagination from '@/features/shared/components/Pagination';
+import SearchInput from '@/features/shared/components/SearchInput';
+import DropdownFilter from '@/features/shared/components/DropdownFilter';
+import AssetDetailModal from '@/features/Assets/components/assetDetailModal';
 import DataTable, {
   ColumnDef,
   SortItem,
-} from "@/features/Assets/components/assetDataTable";
-import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+} from '@/features/Assets/components/assetDataTable';
+import DropdownStateFilter from '@/features/Assets/components/stateDropdown';
 import {
   getPinnedEditedAsset,
   clearPinnedEditedAsset,
-} from "@/features/Assets/editAssetStore";
+} from '@/features/Assets/editAssetStore';
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -40,8 +40,8 @@ function AssetsContent() {
 
   // ─── All state via useState ────────────────────
   const [pageNumber, setPageNumber] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] =
     useState<AssetState[]>(default_states);
@@ -52,6 +52,11 @@ function AssetsContent() {
   const isCreatedNewAsset = useAppSelector(
     (state) => state.asset.isCreatedNewAsset,
   );
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+    hasHistory: boolean;
+  } | null>(null);
 
   // ─── Default state check ───────────────────────
   const isDefaultStateSelection =
@@ -92,14 +97,10 @@ function AssetsContent() {
       return items;
     }
     const filteredItems = items.filter(
-      (item) =>
-        item.assetCode !== pinnedEditedAsset.assetCode
+      (item) => item.assetCode !== pinnedEditedAsset.assetCode,
     );
     if (pageNumber === 1) {
-      return [
-        pinnedEditedAsset,
-        ...filteredItems,
-      ];
+      return [pinnedEditedAsset, ...filteredItems];
     }
     return filteredItems;
   })();
@@ -133,20 +134,6 @@ function AssetsContent() {
     setPageNumber(1);
   };
 
-  const handleDelete = (row: AssetListItem, e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch(
-      showModal({
-        title: "Delete Asset",
-        body: `Are you sure you want to delete "${row.name}"?`,
-        yesButtonLabel: "Delete",
-        noButtonLabel: "Cancel",
-        yesActionType: "",
-        yesPayload: row.id,
-      }),
-    );
-  };
-
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/admin/assets/edit?id=${row.id}`);
@@ -155,38 +142,38 @@ function AssetsContent() {
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
     {
-      key: "assetCode",
-      header: "Asset Code",
+      key: 'assetCode',
+      header: 'Asset Code',
       sortable: true,
-      testId: "btnSortAssetCode",
-      className: "w-32",
+      testId: 'btnSortAssetCode',
+      className: 'w-32',
     },
     {
-      key: "name",
-      header: "Asset Name",
+      key: 'name',
+      header: 'Asset Name',
       sortable: true,
-      testId: "btnSortAssetName",
-      className: "w-64",
+      testId: 'btnSortAssetName',
+      className: 'w-64',
       render: (row) => <div className="truncate">{row.name}</div>,
     },
     {
-      key: "category",
-      header: "Category",
+      key: 'category',
+      header: 'Category',
       sortable: true,
-      testId: "btnSortCategory",
-      className: "w-40",
+      testId: 'btnSortCategory',
+      className: 'w-40',
     },
     {
-      key: "state",
-      header: "State",
+      key: 'state',
+      header: 'State',
       sortable: true,
-      testId: "btnSortState",
-      className: "w-32",
+      testId: 'btnSortState',
+      className: 'w-32',
     },
     {
-      key: "",
-      header: "Actions",
-      className: "w-28",
+      key: '',
+      header: 'Actions',
+      className: 'w-28',
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
@@ -216,7 +203,15 @@ function AssetsContent() {
           </button>
           <button
             data-testid="btnIconDelete"
-            onClick={(e) => handleDelete(row, e)}
+            onClick={(e) => {
+              e.stopPropagation();
+
+              setDeleteTarget({
+                id: row.id,
+                name: row.name,
+                hasHistory: row.hasHistory,
+              });
+            }}
             className="btn btn-xs btn-error btn-outline"
             disabled={
               DeleteDisabledStates
@@ -251,6 +246,12 @@ function AssetsContent() {
         assetId={selectedAssetId}
         onClose={() => setSelectedAssetId(null)}
       />
+      <DeleteAssetModal
+        assetId={deleteTarget?.id ?? null}
+        assetName={deleteTarget?.name ?? ''}
+        hasHistory={deleteTarget?.hasHistory ?? false}
+        onClose={() => setDeleteTarget(null)}
+      />
       <div className="pb-4 md:pb-12">
         {/* Filters */}
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -264,7 +265,7 @@ function AssetsContent() {
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleStateChange}
-                customLabel={isDefaultStateSelection ? "State" : undefined}
+                customLabel={isDefaultStateSelection ? 'State' : undefined}
               />
             </div>
             <div
@@ -274,7 +275,7 @@ function AssetsContent() {
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-                placeholder={categoriesLoading ? "Loading..." : "Category"}
+                placeholder={categoriesLoading ? 'Loading...' : 'Category'}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
@@ -296,7 +297,7 @@ function AssetsContent() {
             </div>
             <button
               data-testid="btnCreateAsset"
-              onClick={() => router.push("/admin/assets/create")}
+              onClick={() => router.push('/admin/assets/create')}
               className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
             >
               + Create New Asset
