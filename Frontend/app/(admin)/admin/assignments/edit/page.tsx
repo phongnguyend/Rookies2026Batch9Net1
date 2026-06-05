@@ -11,6 +11,7 @@ import {
   editAssignmentSchema,
 } from "@/features/assignments/admin/edit/editAssignmentSchema";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import EntityNotFound from "@/features/shared/components/EntityNotFound";
 import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
 import { AssetsWithAssignedLookupInput } from "@/features/shared/components/LookupTable/AssetsWithAssignedLookup/AssetsWithAssignedLookupInput";
 import UsersLookupInput from "@/features/shared/components/LookupTable/UsersLookup/UsersLookupInput";
@@ -48,8 +49,6 @@ const EditAssignmentPage = () => {
     reValidateMode: "onChange",
   });
 
-  console.log("assignedDate:", form.watch("assignedDate"));
-
   useEffect(() => {
     if (data) {
       form.reset({
@@ -68,7 +67,7 @@ const EditAssignmentPage = () => {
     handleSubmit,
     setValue,
     formState: { errors, isValid },
-    watch
+    watch,
   } = form;
 
   const onSubmit = async (data: EditAssignmentFormValues) => {
@@ -106,7 +105,6 @@ const EditAssignmentPage = () => {
         detail?: string;
         title?: string;
       };
-      console.log(error);
       dispatch(
         enqueueToast({
           message:
@@ -121,46 +119,30 @@ const EditAssignmentPage = () => {
     }
   };
 
-  if (!id) {
-    return (
-      <div className="w-full max-w-xl rounded-lg bg-white p-4 sm:p-6 md:p-8">
-        <h2 className="mb-8 text-xl font-bold text-red-600">Edit Assignment</h2>
-        <p className="text-gray-600">Assignment ID is missing.</p>
-      </div>
-    );
-  }
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (isError) {
+  if (!id || isError || !data) {
     return (
-      <div className="w-full max-w-xl rounded-lg bg-white p-8">
-        <h2 className="mb-4 text-xl font-bold text-red-600">Edit Assignment</h2>
-        <p className="text-red-500">Failed to load assignment.</p>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="w-full max-w-xl rounded-lg bg-white p-8">
-        <h2 className="mb-4 text-xl font-bold text-red-600">Edit Assignment</h2>
-        <p className="text-gray-600">Assignment not found.</p>
-      </div>
+      <EntityNotFound
+        pageTitle="Edit Assignment"
+        entityName="Assignment"
+        action="edit"
+        redirectPath="/admin/assignments"
+        redirectText="Back to Manage Assignments"
+      />
     );
   }
 
   return (
-    <div className="w-full max-w-xl rounded-lg bg-white p-4 sm:p-6 md:p-8">
+    <div className="w-full max-w-xl">
       <h2 className="mb-8 text-xl font-bold text-red-600">Edit Assignment</h2>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="space-y-5">
           <UsersLookupInput
             value={user}
             onChange={(selectedUser) => {
-              console.log(form.watch("assignedDate"));
               setUser(selectedUser);
               setValue("userId", selectedUser?.id ?? "", {
                 shouldValidate: true,
@@ -192,9 +174,9 @@ const EditAssignmentPage = () => {
                   render={({ field, fieldState }) => (
                     <DatePickerInput
                       value={field.value}
-                      onChange={(date) =>{
-                        field.onChange(date)
-                        field.onBlur()
+                      onChange={(date) => {
+                        field.onChange(date);
+                        field.onBlur();
                       }}
                       placeholder="Select date"
                       width="w-full"
@@ -237,18 +219,18 @@ const EditAssignmentPage = () => {
           </div>
 
           {/* Actions */}
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="submit"
               disabled={!isValid || isLoading || isEditLoading}
-              className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
             >
               {isLoading ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
               onClick={() => router.push("/admin/assignments")}
-              className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               Cancel
             </button>

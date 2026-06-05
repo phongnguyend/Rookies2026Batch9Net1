@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  X,
 } from "lucide-react";
 
 interface DatePickerInputProps {
@@ -229,7 +230,7 @@ export default function DatePickerInput({
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              x
+              <X size={16} className="hover:cursor-pointer"/>
             </button>
           )}
         </div>
@@ -239,7 +240,7 @@ export default function DatePickerInput({
           data-testid="btnAssignedDateCalendar"
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300"
+          className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300 hover:cursor-pointer"
         >
           {<Calendar size={20} />}
         </button>

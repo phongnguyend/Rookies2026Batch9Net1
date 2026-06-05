@@ -117,7 +117,7 @@ export default function CreateAssignment({
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-xl rounded-lg bg-white p-4 sm:p-6 md:p-8">
+    <div className="w-full max-w-xl">
       <h2 className="mb-8 text-xl font-bold text-red-600">{title}</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -193,7 +193,7 @@ export default function CreateAssignment({
                     rows={4}
                     maxLength={2000}
                     data-testid="txtNote"
-                    className="w-full flex-1 resize-none rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
+                    className="w-full flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition-colors focus:border-gray-400"
                   />
                 )}
               />
@@ -210,20 +210,20 @@ export default function CreateAssignment({
         </div>
 
         {/* Actions */}
-        <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={() => router.push("/admin/assignments")}
-            className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <button
             type="submit"
             disabled={!isValid || isLoading}
             className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/assignments")}
+            className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
           </button>
         </div>
       </form>
