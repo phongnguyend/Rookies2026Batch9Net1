@@ -63,7 +63,9 @@ const AssetsLookupInput = ({
             role="button"
             tabIndex={0}
             onClick={handleOpen}
-            onKeyDown={(e) => e.key === "Enter" && handleOpen()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isOpen) handleOpen(); // ← thêm !isOpen
+            }}
             className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded cursor-pointer bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
           >
             {/* Input display is driven by value prop only, never pendingAsset */}
@@ -85,6 +87,10 @@ const AssetsLookupInput = ({
             <div
               className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[100vh]"
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === "Enter") e.preventDefault(); // ← ngăn form submit
+              }}
             >
               <AssetsLookupTable
                 isOpen={isOpen}
