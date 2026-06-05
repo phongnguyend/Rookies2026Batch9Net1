@@ -6,9 +6,12 @@ import LoginForm from "@/features/auth/components/LoginForm";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { loginSuccess, loginFailure } from "@/features/auth/auth.slice";
 import { UserRoles } from "@/features/users/users.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Login } from "@/features/auth/auth.types";
 import { startUserSessionHub } from "@/features/auth/user-session.signalr";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+
+const forceLogoutToastStorageKey = "forceLogoutToastMessage";
 
 export default function HomePage() {
   // Queries and hooks
@@ -18,6 +21,22 @@ export default function HomePage() {
 
   // States
   const [serverErrors, setServerErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    const message = sessionStorage.getItem(forceLogoutToastStorageKey);
+
+    if (!message) {
+      return;
+    }
+
+    sessionStorage.removeItem(forceLogoutToastStorageKey);
+    dispatch(
+      enqueueToast({
+        message,
+        type: ToastType.Error,
+      }),
+    );
+  }, [dispatch]);
 
   const handleLoginSubmit = async (data: Login.Request) => {
     setServerErrors([]);

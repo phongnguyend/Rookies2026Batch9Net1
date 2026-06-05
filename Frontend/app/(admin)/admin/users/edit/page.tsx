@@ -6,6 +6,7 @@ import {
   type FormEvent,
   type ReactNode,
   type SetStateAction,
+  useEffect,
   useState,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -73,6 +74,14 @@ const isApiErrorResponse = (error: unknown): error is ApiErrorResponse =>
   typeof error === "object" &&
   error !== null &&
   "status" in error;
+
+const differentLocationMessage =
+  "You are not allowed to edit the information of users in a different location.";
+
+const getEditUserErrorMessage = (error: ApiErrorResponse) =>
+  error.detail.includes("has a different location")
+    ? differentLocationMessage
+    : error.detail;
 
 const getFieldName = (field: string): keyof FieldErrors | undefined => {
   const normalizedField = field.replace(/[^a-z]/gi, "").toLowerCase();
@@ -241,12 +250,33 @@ const getEditUserValidationErrors = ({
 };
 
 export default function EditUserPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
   const userId = searchParams.get("id") ?? "";
 
-  const { data: user, isLoading } = useGetUserForEditQuery(userId, {
+  const { data: user, isLoading, error } = useGetUserForEditQuery(userId, {
     skip: !userId,
   });
+
+  useEffect(() => {
+    if (!isApiErrorResponse(error)) {
+      return;
+    }
+
+    dispatch(
+      enqueueToast({
+        message: getEditUserErrorMessage(error),
+        type: ToastType.Error,
+      }),
+    );
+
+    if (error.status >= 500) {
+      return;
+    }
+
+    router.replace("/admin/users");
+  }, [dispatch, error, router]);
 
   if (!userId) {
     return (
@@ -416,8 +446,7 @@ function EditUserForm({
         if (error.status === 409) {
           dispatch(
             enqueueToast({
-              message:
-                "This user was updated by someone else. Please reload and try again.",
+              message: getEditUserErrorMessage(error),
               type: ToastType.Error,
             }),
           );
@@ -432,6 +461,14 @@ function EditUserForm({
             return;
           }
         }
+
+        dispatch(
+          enqueueToast({
+            message: getEditUserErrorMessage(error),
+            type: ToastType.Error,
+          }),
+        );
+        return;
       }
 
       dispatch(
