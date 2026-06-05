@@ -1,7 +1,6 @@
 "use client";
 
 import * as signalR from "@microsoft/signalr";
-import { authApi } from "@/features/auth/auth.api";
 import { logoutAccount } from "@/features/auth/auth.slice";
 import { ENV_CONFIGS } from "@/lib/config/env";
 import type { AppDispatch } from "@/lib/redux/store";
@@ -40,18 +39,12 @@ export const startUserSessionHub = async (dispatch: AppDispatch) => {
       message?.reason || defaultForceLogoutMessage,
     );
 
-    try {
-      await dispatch(authApi.endpoints.logout.initiate()).unwrap();
-    } catch (error) {
-      console.error("Forced logout API failed:", error);
-    } finally {
-      dispatch(logoutAccount());
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+    dispatch(logoutAccount());
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
-      await stopUserSessionHub();
-      window.location.replace("/");
-    }
+    await stopUserSessionHub();
+    window.location.replace("/");
   });
 
   try {
