@@ -23,7 +23,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
         {
             // Validation
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
-            if (validationResult.IsValid)
+            if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
             // User and user's auth
             if (!currentUser.IsAuthenticated)
