@@ -37,14 +37,11 @@ export default function CategoryDropdown({
 
   const categoryNameRegex = /^(?=.*\p{L})[\p{L}\p{N}\s]+$/u;
   const prefixRegex = /^[A-Z]{2}$/;
-  const EMOJI_REGEX = /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu;
+  const emojiRegex = /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu;
 
   const isValidCategoryName = (value: string) => {
-  const withoutEmoji = value.replace(EMOJI_REGEX, "");
-    return (
-      withoutEmoji === value &&
-      categoryNameRegex.test(value)
-    );
+    const withoutEmoji = value.replace(emojiRegex, "");
+    return withoutEmoji === value && categoryNameRegex.test(value);
   };
 
   const resetAddForm = () => {
@@ -150,9 +147,12 @@ export default function CategoryDropdown({
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className={`btn w-full justify-between
-          focus:outline-none
-          focus:ring-0
-          ${error ? "btn-error" : "btn-outline"}`}
+    focus:outline-none
+    focus:ring-0
+    hover:bg-transparent
+    hover:border-current
+    hover:text-inherit
+    ${error ? "btn-error" : "btn-outline"}`}
       >
         <span className="truncate">
           {isLoading ? "Loading..." : value || "Select category"}
@@ -194,7 +194,14 @@ export default function CategoryDropdown({
                   data-testid="txtAddNewCategoryName"
                   type="text"
                   value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
+                  onChange={(e) =>
+                    setNewName(
+                      e.target.value.replace(
+                        /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu,
+                        "",
+                      ),
+                    )
+                  }
                   onBlur={(e) => setNewName(toTitleCase(e.target.value))}
                   placeholder="Category name"
                   className="

@@ -1,11 +1,17 @@
 import { AssetState } from "../assets.types";
 
 //Character input validator
-const EMOJI_REGEX = /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu;
-export const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "");
+export const EMOJI_REGEX =
+  /(\p{Extended_Pictographic}|\p{Emoji_Presentation}|\uFE0F|\u20E3)/gu;
+
+export const stripEmoji = (value: string) =>
+  value.replace(EMOJI_REGEX, "");
+
 export const normalizeText = (value: string) =>
   stripEmoji(value).replace(/\s+/g, " ").trim();
-export const ALLOWED_REGEX = /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\., ]+$/u;
+
+export const ALLOWED_REGEX =
+  /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\., ]+$/u;
 
 //Format date
 export const formatDateToISO = (date: Date | null): string => {
