@@ -9,6 +9,8 @@ import {
   GetUsersRequest,
   GetUsersResponse,
   LookupUsers,
+  CanDisableUser,
+  DisableUser,
 } from "./users.types";
 
 export const usersApi = baseApiSlice.injectEndpoints({
@@ -72,6 +74,22 @@ export const usersApi = baseApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Users"],
     }),
+
+    canDisableUser: builder.query<CanDisableUser.Response, CanDisableUser.Request>({
+      query: ({ targetUserId }) => ({
+        url: `v1/users/${targetUserId}/can-disable`,
+        method: "GET",
+      }),
+      providesTags: ["Users"],
+    }),
+
+    disableUser: builder.mutation<DisableUser.Response, DisableUser.Request>({
+      query: ({ targetUserId }) => ({
+        url: `v1/users/${targetUserId}/disable`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Users"],
+    }),
   }),
 });
 
@@ -81,5 +99,7 @@ export const {
   useCreateUserMutation,
   useLookupUsersQuery,
   useEditUserMutation,
-  useGetUserForEditQuery
+  useGetUserForEditQuery,
+  useCanDisableUserQuery,
+  useDisableUserMutation,
 } = usersApi;
