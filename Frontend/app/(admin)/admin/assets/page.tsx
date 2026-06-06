@@ -22,6 +22,7 @@ import {
   getPinnedEditedAsset,
   clearPinnedEditedAsset,
 } from "@/features/Assets/editAssetStore";
+import { CircleX, Pencil } from "lucide-react";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -199,22 +200,10 @@ function AssetsContent() {
             }
             data-testid="btnEdit"
             onClick={(e) => handleEdit(row, e)}
-            className="btn btn-xs btn-outline"
+            className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
+            title="Edit"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              <path d="m15 5 4 4" />
-            </svg>
+            <Pencil size={22} />
           </button>
           <button
             data-testid="btnIconDelete"
@@ -227,28 +216,15 @@ function AssetsContent() {
                 hasHistory: row.hasHistory,
               });
             }}
-            className="btn btn-xs btn-error btn-outline"
+            className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
             disabled={
               DeleteDisabledStates
                 ? DeleteDisabledStates
                 : row.state === AssetState.Assigned
             }
+            title="Delete"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="m15 9-6 6" />
-              <path d="m9 9 6 6" />
-            </svg>
+            <CircleX size={22} />
           </button>
         </div>
       ),
@@ -306,16 +282,30 @@ function AssetsContent() {
                 value={searchInput}
                 onChange={setSearchInput}
                 onSearch={handleSearch}
-                placeholder="Search ..."
+                placeholder="Search..."
                 width="w-full"
               />
             </div>
             <button
               data-testid="btnCreateAsset"
               onClick={() => router.push("/admin/assets/create")}
-              className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
+              title="Create"
+              className="
+                w-full sm:w-auto
+                rounded
+                bg-primary
+                px-5
+                py-2
+                font-semibold
+                text-white
+                whitespace-nowrap
+                text-sm sm:text-base
+                cursor-pointer
+                disabled:opacity-50
+                disabled:cursor-not-allowed
+              "
             >
-              + Create New Asset
+              Create New Asset
             </button>
           </div>
         </div>

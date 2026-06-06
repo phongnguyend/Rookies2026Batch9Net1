@@ -151,16 +151,16 @@ export default function CreateAssetPage() {
               setAssetName(stripEmoji(e.target.value));
             }}
             className="
-      h-9
-      w-full
-      rounded
-      border
-      border-gray-400
-      px-3
-      text-sm
-      outline-none
-      focus:border-primary
-    "
+              h-9
+              w-full
+              rounded
+              border
+              border-gray-400
+              px-3
+              text-sm
+              outline-none
+              focus:border-gray-600
+            "
           />
 
           <CharacterCounter value={assetName} max={100} />
@@ -169,7 +169,6 @@ export default function CreateAssetPage() {
         </FormField>
 
         {/* Category */}
-
         <FormField label="Category">
           <CategoryDropdown
             categories={categoriesData ?? []}
@@ -192,17 +191,17 @@ export default function CreateAssetPage() {
             }}
             rows={4}
             className="
-      w-full
-      resize-none
-      rounded
-      border
-      border-gray-400
-      px-3
-      py-2
-      text-sm
-      outline-none
-      focus:border-primary
-    "
+              w-full
+              resize-none
+              rounded
+              border
+              border-gray-400
+              px-3
+              py-2
+              text-sm
+              outline-none
+              focus:border-gray-600
+            "
           />
 
           <CharacterCounter value={specification} max={500} />

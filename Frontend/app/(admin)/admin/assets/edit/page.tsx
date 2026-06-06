@@ -204,7 +204,7 @@ export default function EditAssetPage() {
                 assetName: stripEmoji(e.target.value),
               }))
             }
-            className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
+            className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-gray-600"
           />
           <CharacterCounter value={form.assetName} max={100} />
           <FieldError message={fieldErrors.assetName} />
@@ -233,7 +233,7 @@ export default function EditAssetPage() {
                 specification: stripEmoji(e.target.value),
               }))
             }
-            className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
+            className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-gray-600"
           />
 
           <CharacterCounter value={form.specification} max={500} />

@@ -146,19 +146,20 @@ export default function CategoryDropdown({
         data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`btn w-full justify-between
-    focus:outline-none
-    focus:ring-0
-    hover:bg-transparent
-    hover:border-current
-    hover:text-inherit
-    ${error ? "btn-error" : "btn-outline"}`}
+        className="
+          select
+          select-bordered
+          w-full
+          border-gray-400
+          focus:outline-none
+          focus:ring-0
+          focus:border-gray-500
+          active:border-gray-500
+        "
       >
         <span className="truncate">
           {isLoading ? "Loading..." : value || "Select category"}
         </span>
-
-        <span className="text-xs">▼</span>
       </button>
 
       {/* Dropdown */}
@@ -169,7 +170,7 @@ export default function CategoryDropdown({
               key={cat.id}
               onClick={() => handleSelectCategory(cat)}
               className={`cursor-pointer px-4 py-2 text-sm hover:bg-base-200 ${
-                value === cat.name ? "bg-base-200 font-semibold" : ""
+                value === cat.name ? "bg-base-200" : ""
               }`}
             >
               {cat.name}
@@ -211,7 +212,7 @@ export default function CategoryDropdown({
                     w-full
                     focus:outline-none
                     focus:ring-0
-                    focus:border-primary
+                    focus:border-gray-400
                   "
                   autoFocus
                 />
@@ -236,7 +237,7 @@ export default function CategoryDropdown({
                     uppercase
                     focus:outline-none
                     focus:ring-0
-                    focus:border-primary
+                    focus:border-gray-400
                   "
                 />
 
