@@ -35,6 +35,18 @@ export default function CategoryDropdown({
   const [newName, setNewName] = useState("");
   const [newPrefix, setNewPrefix] = useState("");
 
+  const categoryNameRegex = /^(?=.*\p{L})[\p{L}\p{N}\s]+$/u;
+  const prefixRegex = /^[A-Z]{2}$/;
+  const EMOJI_REGEX = /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu;
+
+  const isValidCategoryName = (value: string) => {
+  const withoutEmoji = value.replace(EMOJI_REGEX, "");
+    return (
+      withoutEmoji === value &&
+      categoryNameRegex.test(value)
+    );
+  };
+
   const resetAddForm = () => {
     setShowAddForm(false);
     setNewName("");
@@ -75,17 +87,12 @@ export default function CategoryDropdown({
       (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase(),
     );
 
-    const categoryNameRegex = /^[A-Za-z ]+$/;
-    const prefixRegex = /^[A-Z]{2}$/;
-
     const toastErrors: string[] = [];
 
     if (!parsedName) {
       toastErrors.push("Category name is required.");
-    } else if (!categoryNameRegex.test(parsedName)) {
-      toastErrors.push(
-        "Category name must contain Letters in English.",
-      );
+    } else if (!isValidCategoryName(parsedName)) {
+      toastErrors.push("Category name must contain letters only.");
     } else if (nameExists) {
       toastErrors.push(
         "Category is already existed. Please enter a different category",
@@ -95,7 +102,7 @@ export default function CategoryDropdown({
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
     } else if (!prefixRegex.test(parsedPrefix)) {
-      toastErrors.push("Prefix must contain 2 English letters.");
+      toastErrors.push("Prefix must contain 2 letters.");
     } else if (prefixExists) {
       toastErrors.push(
         "Prefix is already existed. Please enter a different prefix",
@@ -142,9 +149,10 @@ export default function CategoryDropdown({
         data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`btn w-full justify-between ${
-          error ? "btn-error" : "btn-outline"
-        }`}
+        className={`btn w-full justify-between
+          focus:outline-none
+          focus:ring-0
+          ${error ? "btn-error" : "btn-outline"}`}
       >
         <span className="truncate">
           {isLoading ? "Loading..." : value || "Select category"}
@@ -189,7 +197,15 @@ export default function CategoryDropdown({
                   onChange={(e) => setNewName(e.target.value)}
                   onBlur={(e) => setNewName(toTitleCase(e.target.value))}
                   placeholder="Category name"
-                  className="input input-bordered input-sm w-full"
+                  className="
+                    input
+                    input-bordered
+                    input-sm
+                    w-full
+                    focus:outline-none
+                    focus:ring-0
+                    focus:border-primary
+                  "
                   autoFocus
                 />
 
@@ -198,9 +214,23 @@ export default function CategoryDropdown({
                   maxLength={2}
                   type="text"
                   value={newPrefix}
-                  onChange={(e) => setNewPrefix(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setNewPrefix(
+                      e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase(),
+                    )
+                  }
                   placeholder="Prefix"
-                  className="input input-bordered input-sm w-full sm:w-20 uppercase"
+                  className="
+                    input
+                    input-bordered
+                    input-sm
+                    w-full
+                    sm:w-20
+                    uppercase
+                    focus:outline-none
+                    focus:ring-0
+                    focus:border-primary
+                  "
                 />
 
                 <div className="flex gap-2 sm:self-center">
