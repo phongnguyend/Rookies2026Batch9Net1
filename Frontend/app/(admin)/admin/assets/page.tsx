@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { useAppSelector } from "@/lib/redux/hooks";
 import DeleteAssetModal from "@/features/Assets/components/assetDeleteModel";
 import {
   useGetAssetsQuery,
@@ -36,7 +36,6 @@ const default_states = [
 
 function AssetsContent() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   // ─── All state via useState ────────────────────
   const [pageNumber, setPageNumber] = useState(1);
@@ -85,10 +84,17 @@ function AssetsContent() {
 
   // ─── Clear when user leaves assets page ────────
   useEffect(() => {
-    return () => {
+    if (!data) return;
+
+    const pinned = getPinnedEditedAsset();
+
+    if (pinned) {
+      setPinnedEditedAssetState(pinned);
       clearPinnedEditedAsset();
-    };
-  }, []);
+    } else {
+      setPinnedEditedAssetState(null);
+    }
+  }, [data]);
 
   const displayItems = (() => {
     const items = data?.items ?? [];
@@ -99,7 +105,6 @@ function AssetsContent() {
       sort === null &&
       isDefaultStateSelection;
 
-    // Normal API result when filtering/sorting
     if (!isDefaultFilter || !pinnedEditedAsset) {
       return items;
     }
