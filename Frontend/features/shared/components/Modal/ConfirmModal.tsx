@@ -19,7 +19,6 @@ export interface ConfirmModalProps {
   confirmBtnTestId?: string;
   cancelBtnTestId?: string;
   closeBtnTestId?: string;
-  isError?: boolean;
 }
 
 export default function ConfirmModal({
@@ -37,9 +36,9 @@ export default function ConfirmModal({
   confirmBtnTestId = "btnConfirm",
   cancelBtnTestId = "btnCancel",
   closeBtnTestId = "btnClose",
-  isError = false,
 }: ConfirmModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const showCloseIcon = !onYes || !!onNo;
 
   // Close modal on ESC key press
   useEffect(() => {
@@ -97,45 +96,35 @@ export default function ConfirmModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", duration: 0.3, bounce: 0.1 }}
-            className={`w-full ${sizeClasses[size]} bg-white rounded-lg border border-gray-400 shadow-xl overflow-hidden`}
+            className={`w-full ${sizeClasses[size]} bg-white rounded-lg border border-gray-500 shadow-xl overflow-hidden`}
           >
             {/* Modal Header */}
-            <div className="bg-[#f1f3f5] border-b border-gray-300 px-6 py-3.5 flex items-center justify-between">
-              <h2
-                className={`text-lg font-bold ${isError ? "text-[#cf2323]" : "text-gray-800"}`}
-              >
-                {title}
-              </h2>
-              <button
-                data-testid={closeBtnTestId}
-                onClick={onClose}
-                className={`transition-colors duration-150 p-0.25 border rounded flex items-center justify-center ${
-                  isError
-                    ? "border-primary bg-white hover:bg-[#f1f3f5] border-2"
-                    : "border-gray-400 bg-white text-gray-600 hover:bg-gray-50"
-                }`}
-                aria-label="Close modal"
-              >
-                {isError ? (
-                  <div className="text-primary p-[2px] rounded-[3px] flex items-center justify-center font-bold">
+            <div className="bg-[#f1f3f5] border-b border-gray-500 px-6 py-3.5 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-primary">{title}</h2>
+              {showCloseIcon && (
+                <button
+                  data-testid={closeBtnTestId}
+                  onClick={onClose}
+                  className="transition-colors duration-150 p-px rounded flex items-center justify-center border-primary bg-white hover:bg-primary hover:border-primary text-primary hover:text-white border-3"
+                  aria-label="Close modal"
+                >
+                  <div className="p-0.5 rounded-[3px] flex items-center justify-center font-bold">
                     <X size={10} strokeWidth={6} />
                   </div>
-                ) : (
-                  <X size={14} strokeWidth={1} />
-                )}
-              </button>
+                </button>
+              )}
             </div>
 
             {/* Modal Body */}
             <div
-              className={`p-6 text-neutral-800 text-base leading-relaxed ${yesButtonLabel ? "border-b border-gray-200" : ""}`}
+              className={`px-6 pt-6 text-neutral-800 text-base leading-relaxed ${yesButtonLabel ? "pb-4" : "pb-6"}`}
             >
               {typeof body === "string" ? <p>{body}</p> : body}
             </div>
 
             {/* Modal Actions */}
             {yesButtonLabel && (
-              <div className="px-6 py-4 bg-white flex items-center justify-end gap-3">
+              <div className="px-6 pb-6 pt-0 bg-white flex items-center justify-start gap-3">
                 <button
                   data-testid={confirmBtnTestId}
                   onClick={onYes}
@@ -158,11 +147,7 @@ export default function ConfirmModal({
                     onClose();
                   }}
                   disabled={isLoading}
-                  className={
-                    onNo
-                      ? "px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
-                      : "px-4 py-2 border border-gray-400 rounded text-neutral-700 font-semibold hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-                  }
+                  className="px-4 py-2 border border-gray-400 rounded text-[#6c757d] font-normal hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {onNo && isLoading && (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

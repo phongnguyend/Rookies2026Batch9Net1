@@ -31,14 +31,12 @@ export const usersApi = baseApiSlice.injectEndpoints({
             : {}),
         },
       }),
-      providesTags: ["Users"],
     }),
     getUserById: builder.query<GetUserByIdResponse, string>({
       query: (id) => ({
         url: `v1/users/${id}`,
         method: "GET",
       }),
-      providesTags: ["Users"],
     }),
 
     createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
@@ -47,7 +45,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Users"],
     }),
 
     lookupUsers: builder.query<LookupUsers.Response, LookupUsers.Request>({
@@ -55,7 +52,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         url: "v1/users/lookup",
         params,
       }),
-      providesTags: ["Users"],
     }),
 
     getUserForEdit: builder.query<GetUserForEditResponse, string>({
@@ -63,7 +59,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         url: `v1/users/${id}/edit`,
         method: "GET",
       }),
-      providesTags: ["Users"],
     }),
 
     editUser: builder.mutation<EditUserResponse, EditUserRequest>({
@@ -72,7 +67,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["Users"],
     }),
 
     canDisableUser: builder.query<CanDisableUser.Response, CanDisableUser.Request>({
@@ -80,7 +74,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         url: `v1/users/${targetUserId}/can-disable`,
         method: "GET",
       }),
-      providesTags: ["Users"],
     }),
 
     disableUser: builder.mutation<DisableUser.Response, DisableUser.Request>({
@@ -88,7 +81,6 @@ export const usersApi = baseApiSlice.injectEndpoints({
         url: `v1/users/${targetUserId}/disable`,
         method: "PATCH",
       }),
-      invalidatesTags: ["Users"],
     }),
   }),
 });
@@ -101,5 +93,6 @@ export const {
   useEditUserMutation,
   useGetUserForEditQuery,
   useCanDisableUserQuery,
+  useLazyCanDisableUserQuery,
   useDisableUserMutation,
 } = usersApi;
