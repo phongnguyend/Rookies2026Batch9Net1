@@ -7,5 +7,6 @@
         string AssignedTo,
         string AssignedBy,
         string AssignedDate,
-        string State);
+        string State,
+        bool IsReturning);
 }

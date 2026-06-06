@@ -16,6 +16,10 @@ import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
 import { CircleX, Pencil, RotateCcw } from "lucide-react";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { useDispatch } from "react-redux";
+import { returnsApi } from "@/features/returns/returns.api";
 
 const limit = 10;
 
@@ -23,12 +27,16 @@ export default function AssignmentsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const dispatchAction = useDispatch();
 
   // Read from Url
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
   const [searchInput, setSearchInput] = useState(search);
-  const states = searchParams.getAll("state");
+  const allowedStates = [AssignmentState.Accepted, AssignmentState.WaitingForAcceptance];
+  const states = searchParams.getAll("state").filter((s) =>
+    allowedStates.includes(s as AssignmentState)
+  );
   const assignedDateParam = searchParams.get("assignedDate");
   const assignedDate = assignedDateParam ? new Date(assignedDateParam) : null;
   const sortBy = searchParams.get("sortBy") || undefined;
@@ -75,6 +83,7 @@ export default function AssignmentsPage() {
 
   const assignments = data?.items ?? [];
 
+  //Columns
   const columns: ColumnDef<Assignment>[] = [
     {
       key: "no",
@@ -143,6 +152,8 @@ export default function AssignmentsPage() {
         const isAccepted =
           assignment.state === "Accepted";
 
+        const isReturning = assignment.isReturning;
+
         const isFinal =
           assignment.state === "Returned" ||
           assignment.state === "Declined";
@@ -152,10 +163,10 @@ export default function AssignmentsPage() {
             row={assignment}
             disabledAccept={isAccepted || isFinal}
             disabledDecline={isAccepted || isFinal}
-            disabledReturn={isWaiting || isFinal}
+            disabledReturn={isWaiting || isFinal || isReturning}
             onAccept={(row) => console.log("accept", row)}
             onDecline={(row) => console.log("decline", row)}
-            onReturn={(row) => console.log("return", row)}
+            onReturn={(row) => setReturningAssignment(row)} //return request
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeclineAssignment"
             returnBtnTestId="btnReturnAssignment"
@@ -168,11 +179,44 @@ export default function AssignmentsPage() {
     }
   ];
 
+  //create return request
+  const [createReturnRequest, { isLoading: isReturning }] =
+    returnsApi.useAdminCreateReturnRequestMutation();
+
+  const [returningAssignment, setReturningAssignment] =
+    useState<Assignment | null>(null);
+
+  const handleConfirmReturn = async () => {
+    if (!returningAssignment) return;
+
+    try {
+      await createReturnRequest({
+        assignmentId: returningAssignment.id,
+      }).unwrap();
+
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Return request created successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch (error) {
+      setReturningAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to create return request. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
+
   return (
     <div data-testid="mnuManageAssignment">
-      <div className="text-lg font-bold text-primary mb-2">
-        Assignment List
-      </div>
+      <h1 className="text-primary font-bold text-xl mb-6">Assignment List</h1>
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
 
@@ -182,7 +226,7 @@ export default function AssignmentsPage() {
             <DropdownFilter
               items={Object.values(AssignmentState).map((s) => ({
                 key: s,
-                label: s,
+                label: displayAssignmentState(s),
               }))}
               values={states}
               placeholder="State"
@@ -245,7 +289,7 @@ export default function AssignmentsPage() {
           </div>
 
           <button
-            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base"
+            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
             data-testid="btnCreateNewAssignment"
             onClick={() => router.push("/admin/assignments/create")}
           >
@@ -299,6 +343,16 @@ export default function AssignmentsPage() {
           />
         </div>
       </div>
+      <ConfirmModal
+        isOpen={!!returningAssignment}
+        onClose={() => setReturningAssignment(null)}
+        onYes={handleConfirmReturn}
+        isLoading={isReturning}
+        title="Are you sure?"
+        body={<p>Do you want to create a returning request for asset?</p>}
+        yesButtonLabel="Yes"
+        noButtonLabel="No"
+      />
     </div>
   );
 }

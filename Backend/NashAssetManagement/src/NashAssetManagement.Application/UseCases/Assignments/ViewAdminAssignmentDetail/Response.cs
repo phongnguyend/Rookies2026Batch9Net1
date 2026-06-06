@@ -9,5 +9,6 @@
         string AssignedBy,
         string AssignedDate,
         string State,
-        string Note);
+        string Note,
+        bool IsReturning);
 }
