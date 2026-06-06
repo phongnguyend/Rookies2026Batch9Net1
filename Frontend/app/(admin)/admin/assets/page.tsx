@@ -245,38 +245,60 @@ function AssetsContent() {
       />
       <div className="pb-4 md:pb-12">
         {/* Filters */}
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-          {/* Left group */}
-          <div className="flex flex-wrap gap-3">
-            <div className="flex-1 min-w-[160px] sm:flex-none">
-              <DropdownStateFilter
-                items={state_options}
-                values={selectedStates}
-                defaultValue={default_states}
-                getKey={(item) => item.key}
-                getLabel={(item) => item.label}
-                onChange={handleStateChange}
-                customLabel={isDefaultStateSelection ? "State" : undefined}
-              />
-            </div>
-            <div
-              data-testid="ddlCategory"
-              className="flex-1 min-w-[160px] sm:flex-none"
-            >
-              <DropdownFilter
-                items={categoryOptions}
-                values={selectedCategories}
-                placeholder={categoriesLoading ? "Loading..." : "Category"}
-                getKey={(item) => item.key}
-                getLabel={(item) => item.label}
-                onChange={handleCategoryChange}
-                allLabel="All Categories"
-              />
-            </div>
+        <div
+          className="
+          mb-4
+          flex
+          flex-col
+          gap-3
+          xl:flex-row
+          xl:items-center
+        "
+        >
+          {/* Left filters */}
+          {/* Left filters */}
+        <div className="flex flex-wrap gap-3">
+
+          <div className="flex-1 min-w-[180px]">
+            <DropdownStateFilter
+              items={state_options}
+              values={selectedStates}
+              defaultValue={default_states}
+              getKey={(item) => item.key}
+              getLabel={(item) => item.label}
+              onChange={handleStateChange}
+              customLabel={isDefaultStateSelection ? "State" : undefined}
+            />
           </div>
 
-          {/* Right group */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+          <div
+            data-testid="ddlCategory"
+            className="flex-1 min-w-[180px]"
+          >
+            <DropdownFilter
+              items={categoryOptions}
+              values={selectedCategories}
+              placeholder={categoriesLoading ? "Loading..." : "Category"}
+              getKey={(item) => item.key}
+              getLabel={(item) => item.label}
+              onChange={handleCategoryChange}
+              allLabel="All Categories"
+            />
+          </div>
+
+        </div>
+
+          {/* Search + button */}
+          <div
+            className="
+              flex
+              flex-col
+              gap-3
+              sm:flex-row
+              sm:items-center
+              xl:ml-auto
+            "
+          >
             <div data-testid="txtSearch" className="w-full sm:w-60">
               <SearchInput
                 value={searchInput}
@@ -286,23 +308,21 @@ function AssetsContent() {
                 width="w-full"
               />
             </div>
+
             <button
               data-testid="btnCreateAsset"
               onClick={() => router.push("/admin/assets/create")}
-              title="Create"
               className="
-                w-full sm:w-auto
+                w-full
+                sm:w-auto
+                whitespace-nowrap
                 rounded
                 bg-primary
                 px-5
                 py-2
                 font-semibold
                 text-white
-                whitespace-nowrap
-                text-sm sm:text-base
                 cursor-pointer
-                disabled:opacity-50
-                disabled:cursor-not-allowed
               "
             >
               Create New Asset
