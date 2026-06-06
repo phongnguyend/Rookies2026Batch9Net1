@@ -3,7 +3,10 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   SortItem,
 } from "@/features/shared/components/DataTable";
-import { useGetAllAssignmentsQuery } from "@/features/assignments/admin/assignments.api";
+import {
+  useDeleteAssignmentMutation,
+  useGetAllAssignmentsQuery,
+} from "@/features/assignments/admin/assignments.api";
 import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
@@ -15,7 +18,11 @@ import AssignmentDetailPopup from "../../../../features/assignments/admin/compon
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
-import { CircleX, Pencil, RotateCcw } from "lucide-react";
+import { Pencil, RotateCcw, Trash2 } from "lucide-react";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
+import { useDispatch } from "react-redux";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import type { ApiErrorResponse } from "@/lib/api/base.types";
 
 const limit = 10;
 
@@ -23,6 +30,7 @@ export default function AssignmentsPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const dispatchAction = useDispatch();
 
   // Read from Url
   const page = Number(searchParams.get("page")) || 1;
@@ -34,6 +42,8 @@ export default function AssignmentsPage() {
   const sortBy = searchParams.get("sortBy") || undefined;
   const sortDesc = searchParams.get("sortDesc") === "true";
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
+  const [deletingAssignment, setDeletingAssignment] =
+    useState<Assignment | null>(null);
 
   const sorts: SortItem[] = sortBy
     ? [{ key: sortBy, direction: sortDesc ? SortDirection.Desc : SortDirection.Asc }]
@@ -72,8 +82,45 @@ export default function AssignmentsPage() {
     sortBy: sortBy,
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
   });
+  const [deleteAssignment, { isLoading: isDeleting }] =
+    useDeleteAssignmentMutation();
 
   const assignments = data?.items ?? [];
+
+  const handleConfirmDeleteAssignment = async () => {
+    if (!deletingAssignment) return;
+
+    try {
+      await deleteAssignment({
+        assignmentId: deletingAssignment.id,
+      }).unwrap();
+
+      setDeletingAssignment(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Assignment deleted successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        })
+      );
+    } catch (error) {
+      setDeletingAssignment(null);
+
+      const apiError = error as ApiErrorResponse;
+      const message =
+        apiError.status === 400 && apiError.detail
+          ? apiError.detail
+          : "Failed to delete assignment. Please try again.";
+
+      dispatchAction(
+        enqueueToast({
+          message,
+          type: ToastType.Error,
+          testId: "toastError",
+        })
+      );
+    }
+  };
 
   const columns: ColumnDef<Assignment>[] = [
     {
@@ -151,16 +198,16 @@ export default function AssignmentsPage() {
           <DataTableButtonActions
             row={assignment}
             disabledAccept={isAccepted || isFinal}
-            disabledDecline={isAccepted || isFinal}
+            disabledDecline={!isWaiting}
             disabledReturn={isWaiting || isFinal}
             onAccept={(row) => console.log("accept", row)}
-            onDecline={(row) => console.log("decline", row)}
+            onDecline={setDeletingAssignment}
             onReturn={(row) => console.log("return", row)}
             acceptBtnTestId="btnAcceptAssignment"
-            declineBtnTestId="btnDeclineAssignment"
+            declineBtnTestId="btnDeleteAssignment"
             returnBtnTestId="btnReturnAssignment"
             acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3} />}
-            declineIcon={<CircleX size={20} strokeWidth={3} />}
+            declineIcon={<Trash2 size={20} strokeWidth={3} />}
             returnIcon={<RotateCcw size={20} strokeWidth={3} />}
           />
         );
@@ -283,6 +330,19 @@ export default function AssignmentsPage() {
             onClose={() => setSelectedAssignmentId(null)}
           />
         )}
+
+        <ConfirmModal
+          isOpen={!!deletingAssignment}
+          onClose={() => setDeletingAssignment(null)}
+          onYes={handleConfirmDeleteAssignment}
+          isLoading={isDeleting}
+          title="Are you sure?"
+          body={<p>Do you want to delete this assignment?</p>}
+          yesButtonLabel="Delete"
+          noButtonLabel="Cancel"
+          confirmBtnTestId="btnDelete"
+          cancelBtnTestId="btnCancel"
+        />
 
         <div data-testid="pagination">
           <Pagination

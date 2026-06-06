@@ -44,5 +44,11 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
                 "DeleteAssignment.InvalidAssignmentAssetLocation",
                 "You are not allowed to delete assignment with asset that currently located in different location."
             );
+
+        public static Error AssignmentAlreadyDeleted =
+            Error.Validation(
+                "DeleteAssignment.AssignmentAlreadyDeleted",
+                "This assignment has already been deleted."
+            );
     }
 }

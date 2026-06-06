@@ -38,6 +38,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
                 return Errors.AssignmentNotFoundWithId(assignmentId.ToString());
             if (assignment.State != Domain.Enums.AssignmentState.WaitingForAcceptance)
                 return Errors.InvalidAssignmentState;
+            if (assignment.IsDeleted)
+                return Errors.AssignmentAlreadyDeleted;
             // Asset
             if (assignment.Asset == null)
                 return Errors.AssetOfAssignmentNotFound(assignmentId.ToString());

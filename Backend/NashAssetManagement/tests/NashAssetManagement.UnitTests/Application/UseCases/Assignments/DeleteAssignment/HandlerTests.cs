@@ -151,6 +151,29 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.DeleteA
         }
 
         [Fact]
+        public async Task Handle_WhenAssignmentIsAlreadyDeleted_ShouldReturnAssignmentAlreadyDeleted()
+        {
+            // Arrange
+            var request = CreateRequest();
+            SetupValidValidation(request);
+            SetupAuthenticatedUser();
+
+            var assignment = BuildAssignment();
+            assignment.IsDeleted = true;
+
+            _repoMock
+                .Setup(x => x.FirstOrDefaultAsync(It.IsAny<ISpecification<Assignment>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(assignment);
+
+            // Act
+            ErrorOr<Deleted> result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.AssignmentAlreadyDeleted, result.FirstError);
+        }
+
+        [Fact]
         public async Task Handle_WhenAssignmentAssetIsNull_ShouldReturnAssetOfAssignmentNotFound()
         {
             // Arrange
