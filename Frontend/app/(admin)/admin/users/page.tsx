@@ -21,7 +21,7 @@ import {
   type GetUsersRequest,
   type UserRow,
 } from "@/features/users/users.types";
-import { useAppDispatch } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { formatDate } from "@/utils/datetime.utils";
@@ -118,6 +118,7 @@ export default function UsersPage() {
     useState<boolean>(false);
 
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.authSlice.user);
   const [triggerCanDisable] = useLazyCanDisableUserQuery();
   const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
 
@@ -261,53 +262,67 @@ export default function UsersPage() {
     {
       key: "actions",
       header: "",
-      className: "w-[96px] text-left",
-      render: (user) => (
-        <div className="flex items-center gap-3">
-          <UserActionButton
-            title="Edit"
-            testId="btnEditUser"
-            className="text-green-600"
-            onClick={() => {
-              router.push(
-                `/admin/users/edit?id=${encodeURIComponent(user.id)}`,
-              );
-            }}
-          >
-            <Pencil className="text-gray-500" size={20} strokeWidth={3} />
-          </UserActionButton>
-
-          <UserActionButton
-            title="Disable"
-            testId="btnDisableUser"
-            className="text-red-400"
-            onClick={async () => {
-              try {
-                setDisablingUserId(user.id);
-                const result = await triggerCanDisable({
-                  targetUserId: user.id,
-                }).unwrap();
-                if (result.canDisable) {
-                  setShowConfirmDisableModal(true);
-                } else {
-                  setShowCanDisableModal(true);
-                }
-              } catch (err) {
-                console.error("Failed to check if user can be disabled:", err);
-                dispatch(
-                  enqueueToast({
-                    message: "Cannoy disable user right now. Please try again.",
-                    type: ToastType.Error,
-                  }),
+      className: "w-[96px] text-left !overflow-visible",
+      render: (user) => {
+        const isSelf =
+          user.userName.toLowerCase() === currentUser?.username?.toLowerCase();
+        return (
+          <div className="flex items-center gap-3">
+            <UserActionButton
+              title="Edit"
+              testId="btnEditUser"
+              className="text-green-600"
+              onClick={() => {
+                router.push(
+                  `/admin/users/edit?id=${encodeURIComponent(user.id)}`,
                 );
-                setDisablingUserId(null);
-              }
-            }}
-          >
-            <CircleX size={20} strokeWidth={3} />
-          </UserActionButton>
-        </div>
-      ),
+              }}
+            >
+              <Pencil className="text-gray-500" size={20} strokeWidth={3} />
+            </UserActionButton>
+
+            <div
+              className={isSelf ? "tooltip tooltip-left" : ""}
+              data-tip={isSelf ? "You cannot disable your self" : undefined}
+            >
+              <UserActionButton
+                title="Disable"
+                testId="btnDisableUser"
+                disabled={isSelf}
+                className="text-red-400"
+                onClick={async () => {
+                  try {
+                    setDisablingUserId(user.id);
+                    const result = await triggerCanDisable({
+                      targetUserId: user.id,
+                    }).unwrap();
+                    if (result.canDisable) {
+                      setShowConfirmDisableModal(true);
+                    } else {
+                      setShowCanDisableModal(true);
+                    }
+                  } catch (err) {
+                    console.error(
+                      "Failed to check if user can be disabled:",
+                      err,
+                    );
+                    dispatch(
+                      enqueueToast({
+                        message:
+                          "Cannoy disable user right now. Please try again.",
+                        type: ToastType.Error,
+                      }),
+                    );
+                    setDisablingUserId(null);
+                  }
+                }}
+              >
+                <CircleX size={20} strokeWidth={3} />
+              </UserActionButton>
+            </div>
+          </div>
+        );
+      },
     },
   ];
 
