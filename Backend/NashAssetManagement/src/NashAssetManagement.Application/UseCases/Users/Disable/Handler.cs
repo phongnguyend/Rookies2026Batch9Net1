@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
+using NashAssetManagement.Application.Abstractions.Realtime;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
 
@@ -15,6 +16,7 @@ namespace NashAssetManagement.Application.UseCases.Users.Disable
         IRepository<Assignment, Guid> assignmentRepository,
         ICurrentUser user,
         IValidator<Request> validator,
+        IUserSessionNotifier userSessionNotifier,
         ILogger<Handler> logger)
         : IRequestHandler<Request, ErrorOr<Response>>
     {
@@ -52,6 +54,16 @@ namespace NashAssetManagement.Application.UseCases.Users.Disable
                 targetUser.IsDeleted = true;
                 var updateResult = await userManager.UpdateAsync(targetUser);
                 if (!updateResult.Succeeded) return Errors.DisableUserFailed;
+
+                // Signout everywhere
+                // - Invalidate cookies
+                await userManager.UpdateSecurityStampAsync(targetUser);
+
+                // Notify client to logout with message
+                await userSessionNotifier.ForceLogoutAsync(
+                       targetUser.Id,
+                       "Your account has been deactivated. Please login again",
+                       cancellationToken);
 
                 return new Response(targetUser.Id);
             }

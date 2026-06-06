@@ -10,6 +10,7 @@ using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Identity;
 using Ardalis.Specification;
 using Xunit;
+using NashAssetManagement.Application.Abstractions.Realtime;
 
 namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
 {
@@ -20,6 +21,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
         private readonly Mock<ICurrentUser> _mockUser;
         private readonly Mock<IValidator<Request>> _mockValidator;
         private readonly Mock<ILogger<Handler>> _mockLogger;
+        private readonly Mock<IUserSessionNotifier> _mockUserSessionNotifier;
         private readonly Handler _handler;
 
         public HandlerTests()
@@ -39,12 +41,14 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
             _mockUser = new Mock<ICurrentUser>();
             _mockValidator = new Mock<IValidator<Request>>();
             _mockLogger = new Mock<ILogger<Handler>>();
+            _mockUserSessionNotifier = new Mock<IUserSessionNotifier>();
 
             _handler = new Handler(
                 _mockUserManager.Object,
                 _mockAssignmentRepository.Object,
                 _mockUser.Object,
                 _mockValidator.Object,
+                _mockUserSessionNotifier.Object,
                 _mockLogger.Object
             );
         }
