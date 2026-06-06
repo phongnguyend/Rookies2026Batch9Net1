@@ -18,10 +18,7 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
-import {
-  getPinnedEditedAsset,
-  clearPinnedEditedAsset,
-} from "@/features/Assets/editAssetStore";
+import { clearPinnedEditedAsset, getPinnedEditedAsset } from "@/features/Assets/editAssetStore";
 import { CircleX, Pencil } from "lucide-react";
 
 const state_options = Object.values(AssetState).map((s) => ({
@@ -67,35 +64,33 @@ function AssetsContent() {
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetCategoriesQuery();
 
-  const { data, isLoading } = useGetAssetsQuery({
-    pageNumber,
-    pageSize: 10,
-    categories: selectedCategories.length > 0 ? selectedCategories : undefined,
-    states: selectedStates.length > 0 ? selectedStates : undefined,
-    search: search || undefined,
-    sortBy: sort?.key,
-    sortDirection: sort?.direction,
-    isCreatedNewAsset,
-  });
+  const { data, isLoading } = useGetAssetsQuery(
+    {
+      pageNumber,
+      pageSize: 10,
+      categories:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
+      states: selectedStates.length > 0 ? selectedStates : undefined,
+      search: search || undefined,
+      sortBy: sort?.key,
+      sortDirection: sort?.direction,
+      isCreatedNewAsset,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   // ─── Display Item ───────────────────────────────────────
   // ─── Read pinned edited asset on mount ─────────
-  const [pinnedEditedAsset, setPinnedEditedAssetState] =
+  const [pinnedEditedAsset] =
     useState<AssetListItem | null>(() => getPinnedEditedAsset());
 
   // ─── Clear when user leaves assets page ────────
   useEffect(() => {
     if (!data) return;
-
-    const pinned = getPinnedEditedAsset();
-
-    if (pinned) {
-      setPinnedEditedAssetState(pinned);
-      clearPinnedEditedAsset();
-    } else {
-      setPinnedEditedAssetState(null);
-    }
-  }, [data]);
+    clearPinnedEditedAsset();
+  });
 
   const displayItems = (() => {
     const items = data?.items ?? [];
@@ -114,12 +109,10 @@ function AssetsContent() {
       (item) => item.assetCode !== pinnedEditedAsset.assetCode,
     );
 
-    if (pageNumber === 1) {
-      return [pinnedEditedAsset, ...filteredItems];
-    }
-
-    return filteredItems;
-  })();
+    return pageNumber === 1
+      ? [pinnedEditedAsset, ...filteredItems]
+      : filteredItems;
+    })();
 
   const categoryOptions =
     categoriesData?.map((c) => ({
@@ -130,24 +123,20 @@ function AssetsContent() {
   // ─── Handlers ─────────────────────────────────
   const handleStateChange = (values: string[]) => {
     setSelectedStates(values as AssetState[]);
-    setPageNumber(1);
   };
 
   const handleCategoryChange = (values: string[]) => {
     setSelectedCategories(values);
-    setPageNumber(1);
   };
 
   const handleSearch = (value: string) => {
     const trimmed = value.trim();
     setSearch(trimmed);
     setSearchInput(trimmed);
-    setPageNumber(1);
   };
 
   const handleSortChange = (newSort: SortItem | null) => {
     setSort(newSort);
-    setPageNumber(1);
   };
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
@@ -257,36 +246,31 @@ function AssetsContent() {
         >
           {/* Left filters */}
           {/* Left filters */}
-        <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[180px]">
+              <DropdownStateFilter
+                items={state_options}
+                values={selectedStates}
+                defaultValue={default_states}
+                getKey={(item) => item.key}
+                getLabel={(item) => item.label}
+                onChange={handleStateChange}
+                customLabel={isDefaultStateSelection ? "State" : undefined}
+              />
+            </div>
 
-          <div className="flex-1 min-w-[180px]">
-            <DropdownStateFilter
-              items={state_options}
-              values={selectedStates}
-              defaultValue={default_states}
-              getKey={(item) => item.key}
-              getLabel={(item) => item.label}
-              onChange={handleStateChange}
-              customLabel={isDefaultStateSelection ? "State" : undefined}
-            />
+            <div data-testid="ddlCategory" className="flex-1 min-w-[180px]">
+              <DropdownFilter
+                items={categoryOptions}
+                values={selectedCategories}
+                placeholder={categoriesLoading ? "Loading..." : "Category"}
+                getKey={(item) => item.key}
+                getLabel={(item) => item.label}
+                onChange={handleCategoryChange}
+                allLabel="All Categories"
+              />
+            </div>
           </div>
-
-          <div
-            data-testid="ddlCategory"
-            className="flex-1 min-w-[180px]"
-          >
-            <DropdownFilter
-              items={categoryOptions}
-              values={selectedCategories}
-              placeholder={categoriesLoading ? "Loading..." : "Category"}
-              getKey={(item) => item.key}
-              getLabel={(item) => item.label}
-              onChange={handleCategoryChange}
-              allLabel="All Categories"
-            />
-          </div>
-
-        </div>
 
           {/* Search + button */}
           <div
