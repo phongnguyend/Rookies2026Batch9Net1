@@ -2,7 +2,7 @@
 
 import { LookupAssetsSummary } from "@/features/Assets/assets.types";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AssetsLookupTable } from "./AssetsLookupTable";
 
 export interface AssetsLookupInputProps {
@@ -41,23 +41,36 @@ const AssetsLookupInput = ({
     setPendingAsset(null);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   return (
     <div className="relative">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
           Asset
         </label>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div
             role="button"
             tabIndex={0}
             onClick={handleOpen}
-            onKeyDown={(e) => e.key === "Enter" && handleOpen()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isOpen) handleOpen(); // ← thêm !isOpen
+            }}
             className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded cursor-pointer bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
           >
             {/* Input display is driven by value prop only, never pendingAsset */}
             {value ? (
-              <span className="text-neutral-800">{value.assetName}</span>
+              <span className="text-neutral-800 break-all">{value.assetName}</span>
             ) : (
               <span className="text-gray-400">{placeholder}</span>
             )}
@@ -74,6 +87,10 @@ const AssetsLookupInput = ({
             <div
               className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[100vh]"
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === "Enter") e.preventDefault(); // ← ngăn form submit
+              }}
             >
               <AssetsLookupTable
                 isOpen={isOpen}

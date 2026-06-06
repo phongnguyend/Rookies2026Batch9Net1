@@ -48,7 +48,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.ViewAdm
                 "admin",
                 "01/01/2024",
                 "Accepted",
-                "Handle with care");
+                "Handle with care",
+                false);
 
         private static Handler CreateHandler(
             Mock<IRepository<Assignment, Guid>> repo,
@@ -146,7 +147,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.ViewAdm
                 "admin",
                 "15/06/2024",
                 "WaitingForAcceptance",
-                "");          // Note → ""
+                "",
+                false);          // Note → ""
 
             userManagerMock
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))

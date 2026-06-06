@@ -9,12 +9,15 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
         public FilterSpec(Query query, Guid locationId) {
             var searchTerm = query.SearchTerm?.Trim();
 
-            Query.Where(x => x.Asset!.LocationId == locationId)
+            Query.Where(x => x.Asset!.LocationId == locationId && x.IsDeleted == false)
                  .Include(x => x.Asset)
                  .Include(x => x.AssignedToUser)
                  .Include(x => x.AssignedByUser)
                  .AsNoTracking()
                  .AsSplitQuery();
+
+            var allowedStates = new[] { AssignmentState.Accepted, AssignmentState.WaitingForAcceptance };
+            Query.Where(x => allowedStates.Contains(x.State));
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -23,12 +26,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                     .Search(x => x.Asset!.AssetCode.ToLower(), search)
                     .Search(x => x.Asset!.Name.ToLower(), search)
                     .Search(x => x.AssignedToUser!.UserName!.ToLower(), search);
-            }
-
-            if (!query.IncludeDeleted ?? false)
-            {
-                Query.Where(x => x.IsDeleted == false);
-            }
+            }     
 
             if (query.State?.Length > 0)
             {
@@ -54,7 +52,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
                x.AssignedToUser!.UserName?? "",
                x.AssignedByUser!.UserName?? "",
                x.AssignedAtUtc.ToString("dd/MM/yyyy"),
-               x.State.ToString()));
+               x.State.ToString(),
+               x.IsReturning));
         }
     }
 }
