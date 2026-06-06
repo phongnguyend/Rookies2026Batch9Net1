@@ -434,6 +434,7 @@ export default function UsersPage() {
                 </>
               }
               modalTestId="dlgCanNotDisableUser"
+              closeBtnTestId="btnCloseDisablePopup"
             />
 
             {/* Confirm disable */}
@@ -472,8 +473,8 @@ export default function UsersPage() {
               noButtonLabel="Cancel"
               isLoading={isDisabling}
               modalTestId="dlgConfirmDisableUser"
-              confirmBtnTestId="btnConfirm"
-              cancelBtnTestId="btnCancel"
+              confirmBtnTestId="btnConfirmDisableUser"
+              cancelBtnTestId="btnCancelDisableUser"
             />
           </div>
 
