@@ -81,6 +81,7 @@ export default function AssignmentsPage() {
       : undefined,
     sortBy: sortBy,
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
+    includeDeleted: false,
   });
   const [deleteAssignment, { isLoading: isDeleting }] =
     useDeleteAssignmentMutation();
