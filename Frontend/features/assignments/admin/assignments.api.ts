@@ -107,7 +107,6 @@ export const assignmentApi =
         }),
         invalidatesTags: ["Assignment", "Asset"],
       }),
-
     }),
   });
 
