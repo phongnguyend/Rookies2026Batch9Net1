@@ -31,14 +31,19 @@ namespace NashAssetManagement.Application.UseCases.Users.Disable
 
             // Implement Logic
             if (!user.IsAuthenticated) return Errors.UnauthorizedUser;
-
+            
             var currentUserId = user.UserId ?? Guid.Empty;
-            if (currentUserId == Guid.Empty) return Errors.UnidentifiedUser;
+            var currentLocationId = user.LocationId;
+            if (currentUserId == Guid.Empty || currentLocationId == null ) return Errors.UnidentifiedUser;
 
             try
             {
                 var targetUser = await userManager.FindByIdAsync(request.TargetUserId);
                 if (targetUser is null) return Errors.UserNotFound;
+
+                // Check if target user and current admin have same location
+                if (!targetUser.LocationId.ToString().Equals(currentLocationId, StringComparison.OrdinalIgnoreCase))
+                    return Errors.UserHasDifferentLocation;
 
                 // Cannot re-disable again, avoid accessing and modifying the database many times
                 // DoS may occurs 

@@ -31,5 +31,8 @@ namespace NashAssetManagement.Application.UseCases.Users.Disable
         public static readonly Error UserAlreadyDisabled = Error.Conflict(
             code: "UserDisable.UserAlreadyDisabled",
             description: "User is already disabled.");
+        public static readonly Error UserHasDifferentLocation = Error.Forbidden(
+            code: "UserDisable.UserHasDifferentLocation",
+            description: "You are not allowed to disable users in a different location.");
     }
 }

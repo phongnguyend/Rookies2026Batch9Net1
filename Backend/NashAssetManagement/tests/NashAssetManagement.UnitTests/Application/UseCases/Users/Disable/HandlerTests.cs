@@ -80,6 +80,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
             // Arrange
             var adminId = Guid.NewGuid();
             var targetUserId = Guid.NewGuid();
+            var locationId = Guid.NewGuid();
             var request = new Request(targetUserId.ToString());
 
             _mockValidator
@@ -88,8 +89,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
 
             _mockUser.Setup(u => u.IsAuthenticated).Returns(true);
             _mockUser.Setup(u => u.UserId).Returns(adminId);
+            _mockUser.Setup(u => u.LocationId).Returns(locationId.ToString());
 
-            var targetUser = new User { Id = targetUserId, IsDeleted = false };
+            var targetUser = new User { Id = targetUserId, IsDeleted = false, LocationId = locationId };
 
             _mockUserManager.Setup(m => m.FindByIdAsync(targetUserId.ToString())).ReturnsAsync(targetUser);
             _mockAssignmentRepository
