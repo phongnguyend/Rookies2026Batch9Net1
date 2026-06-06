@@ -132,6 +132,13 @@ public class HandlerTests
         Assert.Equal(1, result.Value.TotalCount);
     }
 
+    [Fact]
+    public void Response_ShouldNotExposeCanBeDisabled()
+    {
+        // Assert
+        Assert.Null(typeof(Response).GetProperty("CanBeDisabled"));
+    }
+
     private static User CreateUser(
         Guid id,
         string staffCode,

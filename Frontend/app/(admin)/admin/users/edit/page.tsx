@@ -41,6 +41,7 @@ type RequiredDateField = "dateOfBirth" | "joinedDate";
 const editUserValidationMessages = {
   dateOfBirthRequired: "'Date Of Birth' must not be empty.",
   dateOfBirthUnder18: "User is under 18. Please select a different date",
+  dateOfBirthOver90: "User age must not exceed 90 years.",
   dateOfBirthInFuture:
     "Date of birth cannot be in the future. Please select a different date",
   joinedDateRequired: "'Joined Date' must not be empty.",
@@ -225,6 +226,8 @@ const getEditUserValidationErrors = ({
     errors.dateOfBirth = editUserValidationMessages.dateOfBirthInFuture;
   } else if (dateOfBirthOnly > addYears(today, -18)) {
     errors.dateOfBirth = editUserValidationMessages.dateOfBirthUnder18;
+  } else if (dateOfBirthOnly < addYears(today, -90)) {
+    errors.dateOfBirth = editUserValidationMessages.dateOfBirthOver90;
   }
 
   if (!joinedDateOnly) {
