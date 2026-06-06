@@ -23,7 +23,8 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetById
                  x.AssignedByUser!.UserName ?? "",
                  x.AssignedAtUtc.ToString("dd/MM/yyyy"),
                  x.State.ToString(),
-                 x.Note ?? ""));
+                 x.Note ?? "",
+                 x.IsReturning));
         }
     }
 }

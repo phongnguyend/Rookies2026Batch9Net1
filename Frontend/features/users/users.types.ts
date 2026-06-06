@@ -19,7 +19,6 @@ export interface UserRow {
   userType: UserRoles;
   createdDate: string;
   updatedDate: string;
-  canBeDisabled: boolean;
 }
 
 export interface UserDetail {
