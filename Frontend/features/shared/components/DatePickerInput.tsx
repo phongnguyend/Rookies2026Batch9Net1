@@ -25,9 +25,9 @@ interface DatePickerInputProps {
  
 const MONTHS = Object.values(Month);
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
- 
-const DATE_REGEX = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
- 
+
+const DATE_REGEX = /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4}$/;
+
 const parseDate = (input: string): Date | null => {
   if (!DATE_REGEX.test(input)) return null;
  
@@ -180,6 +180,7 @@ export default function DatePickerInput({
  
     onChange(parsedDate);
     setCursor(parsedDate);
+    setInputValue(formatDate(parsedDate)); // auto format 5/6/2000 -> 05/06/2000
     setInputError("");
   };
  
