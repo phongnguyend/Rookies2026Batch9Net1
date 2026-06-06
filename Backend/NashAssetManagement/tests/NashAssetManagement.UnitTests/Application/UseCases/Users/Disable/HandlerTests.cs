@@ -101,7 +101,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.Disable
 
             // Assert
             Assert.False(result.IsError);
-            Assert.Equal(targetUserId, result.Value.UserId);
+            Assert.Equal(targetUserId, result.Value.TargetUserId);
             Assert.True(targetUser.IsDeleted);
             _mockUserManager.Verify(m => m.UpdateAsync(targetUser), Times.Once);
         }
