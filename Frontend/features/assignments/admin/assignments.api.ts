@@ -125,6 +125,13 @@ export const assignmentApi =
         invalidatesTags: ["Assignment", "Asset"]
       }),
 
+      deleteAssignment: builder.mutation<void, { assignmentId: string }>({
+        query: ({ assignmentId }) => ({
+          url: `v1/admin/assignments/${assignmentId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Assignment", "Asset"],
+      }),
     }),
   });
 
@@ -134,4 +141,5 @@ export const {
   useCreateAssignmentMutation,
   useGetEditingAssignmentQuery,
   useAdminEditAssignmentMutation,
+  useDeleteAssignmentMutation,
 } = assignmentApi;

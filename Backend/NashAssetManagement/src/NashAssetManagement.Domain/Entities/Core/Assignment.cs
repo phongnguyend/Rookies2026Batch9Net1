@@ -58,5 +58,16 @@ namespace NashAssetManagement.Domain.Entities.Core
             !IsDeleted &&
             AssignedToUser != null &&
             Asset != null;
+
+        public void Delete(DateTime? deleteTimestamp = null)
+        {
+            ArgumentNullException.ThrowIfNull(Asset);
+            if (Asset.State != AssetState.Assigned)
+                throw new InvalidOperationException($"Assignment contains asset with invalid state for accepting, asset's state: {Asset.State}");
+            IsDeleted = true;
+            DeletedAtUtc = deleteTimestamp;
+            // Release asset back for other assignment to use
+            Asset.State = AssetState.Available;
+        }
     }
 }
