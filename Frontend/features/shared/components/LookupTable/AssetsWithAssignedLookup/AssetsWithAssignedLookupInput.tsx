@@ -8,6 +8,7 @@ import { AssetsWithAssignedLookupTable } from "./AssetsWithAssignedLookupTable";
 export interface AssetsWithAssignedLookupInputProps {
   value?: LookupAssetsSummary | null;
   onChange?: (asset: LookupAssetsSummary | null) => void;
+  data_testid?: string
   placeholder?: string;
   assignedAssetId?: string;
 }
@@ -15,6 +16,7 @@ export interface AssetsWithAssignedLookupInputProps {
 export const AssetsWithAssignedLookupInput = ({
   value,
   onChange,
+  data_testid = "txtAssetWithAssignedLookupInput",
   placeholder = "Select an asset",
   assignedAssetId,
 }: AssetsWithAssignedLookupInputProps) => {
@@ -65,6 +67,7 @@ export const AssetsWithAssignedLookupInput = ({
             role="button"
             tabIndex={0}
             onClick={handleOpen}
+            data-testid={data_testid}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !isOpen) handleOpen();
             }}
