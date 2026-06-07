@@ -35,3 +35,7 @@ export interface GetReturnRequestsResponse
 export interface CompleteReturnRequestRequest {
   returnRequestId: string;
 }
+
+export interface CancelReturnRequestRequest {
+  returnRequestId: string;
+}

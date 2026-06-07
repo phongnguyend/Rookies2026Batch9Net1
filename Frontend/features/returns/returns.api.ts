@@ -1,6 +1,7 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import { SortDirection } from "@/lib/api/base.types";
 import {
+  CancelReturnRequestRequest,
   type CompleteReturnRequestRequest,
   type GetReturnRequestsRequest,
   type GetReturnRequestsResponse,
@@ -73,6 +74,14 @@ export const returnsApi = baseApiSlice.injectEndpoints({
       // Change state "Assignment" to [Return], "Asset" to [Available], "Return" to [Completed]
       invalidatesTags: ["Return", "Assignment", "Asset"],
     }),
+
+    cancelReturnRequest: builder.mutation<void, CancelReturnRequestRequest>({
+      query: ({ returnRequestId }) => ({
+        url: `v1/admin/return-requests/${returnRequestId}/cancel`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Return", "Assignment"],
+    }),
   }),
 });
 
@@ -80,5 +89,6 @@ export const {
   useGetReturnRequestsQuery,
   useAdminCreateReturnRequestMutation,
   useCompleteReturnRequestMutation,
+  useCancelReturnRequestMutation
 } = returnsApi;
 
