@@ -2,6 +2,7 @@
 
 import * as signalR from "@microsoft/signalr";
 import { logoutAccount } from "@/features/auth/auth.slice";
+import { authApi } from "./auth.api";
 import { ENV_CONFIGS } from "@/lib/config/env";
 import type { AppDispatch } from "@/lib/redux/store";
 
@@ -34,17 +35,21 @@ export const startUserSessionHub = async (dispatch: AppDispatch) => {
     }
 
     isForceLoggingOut = true;
+
+    // keep the message alive and appears onthe login toast, after being redirect to the login page
     sessionStorage.setItem(
       forceLogoutToastStorageKey,
       message?.reason || defaultForceLogoutMessage,
     );
 
-    dispatch(logoutAccount());
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    // call logout endpoint by using imperative api to clear cookie
+    dispatch(authApi.endpoints.logout.initiate());
 
+    // clear user state
+    dispatch(logoutAccount());
+
+    // disconnect the signalr hub
     await stopUserSessionHub();
-    window.location.replace("/");
   });
 
   try {

@@ -13,7 +13,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
     public class HandlerTests
     {
         [Fact]
-        public async Task Handle_UserIsNotAuthenticated_ShouldReturnUnauthorized()
+        public async Task Handle_UserIsNotAuthenticated_ShouldReturnDeleted()
         {
             // Arrange
             var uowMock = new Mock<IUnitOfWork>();
@@ -37,8 +37,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
             var result = await handler.Handle(new Request(), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsError);
-            Assert.Equal(Errors.Unauthorized.Code, result.FirstError.Code);
+            Assert.False(result.IsError);
+            Assert.Equal(Result.Deleted, result.Value);
 
             refreshTokenRepositoryMock.Verify(
                 x => x.GetQueryableSet(),
@@ -50,7 +50,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
         }
 
         [Fact]
-        public async Task Handle_ActiveRefreshTokenDoesNotExist_ShouldReturnInvalidRefreshToken()
+        public async Task Handle_ActiveRefreshTokenDoesNotExist_ShouldReturnDeleted()
         {
             // Arrange
             var uowMock = new Mock<IUnitOfWork>();
@@ -85,8 +85,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
             var result = await handler.Handle(new Request(), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsError);
-            Assert.Equal(Errors.InvalidRefreshToken.Code, result.FirstError.Code);
+            Assert.False(result.IsError);
+            Assert.Equal(Result.Deleted, result.Value);
 
             uowMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
@@ -94,7 +94,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
         }
 
         [Fact]
-        public async Task Handle_RefreshTokenIsExpired_ShouldReturnInvalidRefreshToken()
+        public async Task Handle_RefreshTokenIsExpired_ShouldReturnDeleted()
         {
             // Arrange
             var uowMock = new Mock<IUnitOfWork>();
@@ -138,8 +138,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
             var result = await handler.Handle(new Request(), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsError);
-            Assert.Equal(Errors.InvalidRefreshToken.Code, result.FirstError.Code);
+            Assert.False(result.IsError);
+            Assert.Equal(Result.Deleted, result.Value);
 
             uowMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
@@ -147,7 +147,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
         }
 
         [Fact]
-        public async Task Handle_RefreshTokenIsAlreadyRevoked_ShouldReturnInvalidRefreshToken()
+        public async Task Handle_RefreshTokenIsAlreadyRevoked_ShouldReturnDeleted()
         {
             // Arrange
             var uowMock = new Mock<IUnitOfWork>();
@@ -191,8 +191,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Auth.Logout
             var result = await handler.Handle(new Request(), CancellationToken.None);
 
             // Assert
-            Assert.True(result.IsError);
-            Assert.Equal(Errors.InvalidRefreshToken.Code, result.FirstError.Code);
+            Assert.False(result.IsError);
+            Assert.Equal(Result.Deleted, result.Value);
 
             uowMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SingleSortDataTable, {
   type ColumnDef,
@@ -16,12 +11,19 @@ import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import { SortDirection } from "@/lib/api/base.types";
 import UserDetailModal from "@/features/users/components/UserDetailModal";
-import { useGetUsersQuery } from "@/features/users/users.api";
+import {
+  useGetUsersQuery,
+  useLazyCanDisableUserQuery,
+  useDisableUserMutation,
+} from "@/features/users/users.api";
 import {
   UserRoles,
   type GetUsersRequest,
   type UserRow,
 } from "@/features/users/users.types";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { formatDate } from "@/utils/datetime.utils";
 import { CircleX, Pencil } from "lucide-react";
 
@@ -97,14 +99,14 @@ export default function UsersPage() {
 
   const sorts: SortItem[] = sortByParam
     ? [
-      {
-        key: sortByParam,
-        direction:
-          sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
-      },
-    ]
+        {
+          key: sortByParam,
+          direction:
+            sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
+        },
+      ]
     : [defaultSort];
-  
+
   const displayedSorts = temporarySort ? [] : sorts;
 
   const [searchState, setSearchState] = useState({
@@ -112,6 +114,17 @@ export default function UsersPage() {
     urlValue: querySearch,
   });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [disablingUserId, setDisablingUserId] = useState<string | null>(null);
+  const [showCanDisableModal, setShowCanDisableModal] =
+    useState<boolean>(false);
+  const [showConfirmDisableModal, setShowConfirmDisableModal] =
+    useState<boolean>(false);
+
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.authSlice.user);
+  const [triggerCanDisable] = useLazyCanDisableUserQuery();
+  const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
+
   const searchInput =
     searchState.urlValue === querySearch ? searchState.inputValue : querySearch;
 
@@ -254,39 +267,77 @@ export default function UsersPage() {
     {
       key: "actions",
       header: "",
-      className: "w-[96px] text-left",
-      render: (user) => (
-        <div className="flex items-center gap-3">
-          <UserActionButton
-            title="Edit"
-            testId="btnEditUser"
-            className="text-green-600"
-            onClick={() => {
-              router.push(`/admin/users/edit?id=${encodeURIComponent(user.id)}`);
-            }}
-          >
-            <Pencil className="text-gray-500" size={20} strokeWidth={3} />
-          </UserActionButton>
+      className: "w-[96px] text-left !overflow-visible",
+      render: (user) => {
+        const isSelf =
+          user.userName.toLowerCase() === currentUser?.username?.toLowerCase();
+        return (
+          <div className="flex items-center gap-3">
+            <UserActionButton
+              title="Edit"
+              testId="btnEditUser"
+              className="text-green-600"
+              onClick={() => {
+                router.push(
+                  `/admin/users/edit?id=${encodeURIComponent(user.id)}`,
+                );
+              }}
+            >
+              <Pencil className="text-gray-500" size={20} strokeWidth={3} />
+            </UserActionButton>
 
-          <UserActionButton
-            title="Disable"
-            testId="btnDisableUser"
-            className="text-red-400"
-            onClick={() => {
-              // Disable user logic goes here
-            }}
-          >
-            <CircleX size={20} strokeWidth={3} />
-          </UserActionButton>
-        </div>
-      ),
+            <div
+              className={isSelf ? "tooltip tooltip-left" : ""}
+              data-tip={isSelf ? "You cannot disable your self" : undefined}
+            >
+              <UserActionButton
+                title="Disable"
+                testId="btnDisableUser"
+                disabled={isSelf}
+                className="text-red-400"
+                onClick={async () => {
+                  try {
+                    setDisablingUserId(user.id);
+                    const result = await triggerCanDisable({
+                      targetUserId: user.id,
+                    }).unwrap();
+                    if (result.canDisable) {
+                      setShowConfirmDisableModal(true);
+                    } else {
+                      setShowCanDisableModal(true);
+                    }
+                  } catch (err) {
+                    console.error(
+                      "Failed to check if user can be disabled:",
+                      err,
+                    );
+                    dispatch(
+                      enqueueToast({
+                        message:
+                          "Cannoy disable user right now. Please try again.",
+                        type: ToastType.Error,
+                      }),
+                    );
+                    setDisablingUserId(null);
+                  }
+                }}
+              >
+                <CircleX size={20} strokeWidth={3} />
+              </UserActionButton>
+            </div>
+          </div>
+        );
+      },
     },
   ];
 
   const currentUrl = `${pathname}?${searchParams.toString()}`;
 
   return (
-    <div className="min-h-screen bg-white text-[#333]" data-testid="tabManagerUser">
+    <div
+      className="min-h-screen bg-white text-[#333]"
+      data-testid="tabManagerUser"
+    >
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
@@ -342,7 +393,9 @@ export default function UsersPage() {
                 type="button"
                 data-testid="btnCreateUser"
                 onClick={() =>
-                  router.push(`/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`)
+                  router.push(
+                    `/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`,
+                  )
                 }
                 className="rounded bg-primary px-5 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
               >
@@ -368,6 +421,65 @@ export default function UsersPage() {
               userId={selectedUserId}
               isOpen={selectedUserId !== null}
               onClose={() => setSelectedUserId(null)}
+            />
+
+            {/* Warn when cannot disable */}
+            <ConfirmModal
+              isOpen={showCanDisableModal}
+              onClose={() => {
+                setShowCanDisableModal(false);
+                setDisablingUserId(null);
+              }}
+              title="Can not disable user"
+              body={
+                <>
+                  There are valid assignments belonging to this user.
+                  <br />
+                  Please close all assignments before disabling user.
+                </>
+              }
+              modalTestId="dlgCanNotDisableUser"
+              closeBtnTestId="btnCloseDisablePopup"
+            />
+
+            {/* Confirm disable */}
+            <ConfirmModal
+              isOpen={showConfirmDisableModal}
+              onClose={() => {
+                setShowConfirmDisableModal(false);
+                setDisablingUserId(null);
+              }}
+              onYes={async () => {
+                if (!disablingUserId) return;
+                try {
+                  await disableUser({ targetUserId: disablingUserId }).unwrap();
+                  dispatch(
+                    enqueueToast({
+                      message: "User was disabled successfully.",
+                      type: ToastType.Success,
+                    }),
+                  );
+                } catch (err) {
+                  console.error("Failed to disable user:", err);
+                  dispatch(
+                    enqueueToast({
+                      message: "Failed to disable user.",
+                      type: ToastType.Error,
+                    }),
+                  );
+                } finally {
+                  setShowConfirmDisableModal(false);
+                  setDisablingUserId(null);
+                }
+              }}
+              title="Are you sure?"
+              body="Do you want to disable this user?"
+              yesButtonLabel="Disable"
+              noButtonLabel="Cancel"
+              isLoading={isDisabling}
+              modalTestId="dlgConfirmDisableUser"
+              confirmBtnTestId="btnConfirmDisableUser"
+              cancelBtnTestId="btnCancelDisableUser"
             />
           </div>
 

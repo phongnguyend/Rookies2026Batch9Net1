@@ -12,7 +12,8 @@ namespace NashAssetManagement.WebAPI.Controllers.Auth
     [Route("api/v{version:apiVersion}/auth/logout")]
     public sealed class LogoutController(ISender sender) : BaseApiController(sender)
     {
-        [Authorize]
+        // allow invalid, expired cookie to be deleted, rather than only [Authorize] cookie
+        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
