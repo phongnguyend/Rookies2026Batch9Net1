@@ -13,7 +13,6 @@ export function createColumns(
       cellTestId: (_, index) => `rdoAsset-${index}`,
       className: "w-8 overflow-visible text-center",
       render: (asset, index) => {
-        console.log(`${index} - ${pendingAsset?.id === asset.id}`)
         return (
           <input
             type="radio"

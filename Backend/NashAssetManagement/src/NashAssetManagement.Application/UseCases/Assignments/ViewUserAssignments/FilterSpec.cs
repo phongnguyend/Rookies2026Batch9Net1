@@ -10,11 +10,11 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
         public FilterSpec(Guid userId, DateTime currentDate, Request request)
         {
             // User Id/Assignee
-            Query.Where(x => x.AssignedToUserId == userId);
+            Query.Where(x => x.AssignedToUserId == userId && !x.IsDeleted);
             // Assignment state
             Query.Where(x => x.State == AssignmentState.WaitingForAcceptance || x.State == AssignmentState.Accepted);
             // Assignment created date
-            Query.Where(x => x.CreatedAtUtc <= currentDate);
+            Query.Where(x => x.AssignedAtUtc <= currentDate);
 
             Query.AsNoTracking()
                 .Select(x => new Response(

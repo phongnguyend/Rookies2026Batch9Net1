@@ -1,7 +1,10 @@
 import { SortDirection } from "@/lib/api/base.types";
 import {
+  AdminEditAssignment,
+  Assignment,
   AssignmentDetails,
   CreateAssignmentRequest,
+  GetAssignmentForEditing,
   GetAssignmentsRequest,
   GetAssignmentsResponse,
 } from "./assignments.types";
@@ -100,6 +103,28 @@ export const assignmentApi =
         invalidatesTags: ["Assignment", "Asset"],
       }),
 
+      getEditingAssignment: builder.query<
+        GetAssignmentForEditing.Response,
+        GetAssignmentForEditing.Request
+      >({
+        query: ({assignmentId}) => ({
+          url: `v1/assignments/${assignmentId}/edit`,
+          method: "GET",
+        }),
+      }),
+
+      adminEditAssignment: builder.mutation<
+        Assignment,
+        AdminEditAssignment.Request
+      >({
+        query: ({assignmentId, payload}) =>({
+          url: `v1/assignments/${assignmentId}/edit`,
+          body: payload,
+          method: "PATCH",
+        }),
+        invalidatesTags: ["Assignment", "Asset"]
+      }),
+
       deleteAssignment: builder.mutation<void, { assignmentId: string }>({
         query: ({ assignmentId }) => ({
           url: `v1/admin/assignments/${assignmentId}`,
@@ -114,5 +139,7 @@ export const {
   useGetAllAssignmentsQuery,
   useGetAssignmentByIdQuery,
   useCreateAssignmentMutation,
+  useGetEditingAssignmentQuery,
+  useAdminEditAssignmentMutation,
   useDeleteAssignmentMutation,
 } = assignmentApi;

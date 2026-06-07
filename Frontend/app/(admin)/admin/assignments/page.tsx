@@ -1,19 +1,22 @@
 "use client";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
-  SortItem,
-} from "@/features/shared/components/DataTable";
+  useSearchParams,
+  useRouter,
+  usePathname,
+  useParams,
+} from "next/navigation";
+import { SortItem } from "@/features/shared/components/DataTable";
+import { useGetAllAssignmentsQuery, useDeleteAssignmentMutation } from "@/features/assignments/admin/assignments.api";
 import {
-  useDeleteAssignmentMutation,
-  useGetAllAssignmentsQuery,
-} from "@/features/assignments/admin/assignments.api";
-import { Assignment, AssignmentState } from "@/features/assignments/admin/assignments.types";
+  Assignment,
+  AssignmentState,
+} from "@/features/assignments/admin/assignments.types";
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
@@ -24,6 +27,8 @@ import { useDispatch } from "react-redux";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { returnsApi } from "@/features/returns/returns.api";
+import { useAppSelector } from "@/lib/redux/hooks";
+import { selectPromotedAssignment } from "@/features/assignments/admin/edit/admin-assignment-list-ui.selectors";
 
 const limit = 10;
 
@@ -32,6 +37,7 @@ export default function AssignmentsPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const dispatchAction = useDispatch();
+  const promotedAssignment = useAppSelector(selectPromotedAssignment);
 
   // Read from Url
   const page = Number(searchParams.get("page")) || 1;
@@ -50,12 +56,17 @@ export default function AssignmentsPage() {
     useState<Assignment | null>(null);
 
   const sorts: SortItem[] = sortBy
-    ? [{ key: sortBy, direction: sortDesc ? SortDirection.Desc : SortDirection.Asc }]
+    ? [
+        {
+          key: sortBy,
+          direction: sortDesc ? SortDirection.Desc : SortDirection.Asc,
+        },
+      ]
     : [];
 
   // Function update URL
   const updateParams = (
-    updates: Record<string, string | string[] | undefined>
+    updates: Record<string, string | string[] | undefined>,
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
@@ -76,12 +87,12 @@ export default function AssignmentsPage() {
     state: states.length > 0 ? states : undefined,
     assignedDate: assignedDate
       ? new Date(
-        Date.UTC(
-          assignedDate.getFullYear(),
-          assignedDate.getMonth(),
-          assignedDate.getDate()
-        )
-      ).toISOString()
+          Date.UTC(
+            assignedDate.getFullYear(),
+            assignedDate.getMonth(),
+            assignedDate.getDate(),
+          ),
+        ).toISOString()
       : undefined,
     sortBy: sortBy,
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
@@ -90,7 +101,23 @@ export default function AssignmentsPage() {
   const [deleteAssignment, { isLoading: isDeleting }] =
     useDeleteAssignmentMutation();
 
-  const assignments = data?.items ?? [];
+  const displayAssignments = useMemo(() => {
+    if (!data?.items) {
+      return [];
+    }
+
+    if (!promotedAssignment || page !== 1) {
+      return data.items;
+    }
+
+    return [
+      promotedAssignment,
+      ...data.items.filter((x) => x.id !== promotedAssignment.id),
+    ];
+  }, [data?.items, promotedAssignment, page]);
+
+  // const assignments = data?.items ?? [];
+  const assignments = displayAssignments;
 
   const handleConfirmDeleteAssignment = async () => {
     if (!deletingAssignment) return;
@@ -182,25 +209,21 @@ export default function AssignmentsPage() {
       className: "w-28",
       headerTestId: "btnSortState",
       cellTestId: (_row, index) => `colState-${index}`,
-      render: (row) =>
-        displayAssignmentState(row.state),
+      render: (row) => displayAssignmentState(row.state),
     },
     {
       key: "actions",
       header: "",
       className: "w-28",
       render: (assignment) => {
-        const isWaiting =
-          assignment.state === "WaitingForAcceptance";
+        const isWaiting = assignment.state === "WaitingForAcceptance";
 
-        const isAccepted =
-          assignment.state === "Accepted";
+        const isAccepted = assignment.state === "Accepted";
 
         const isReturning = assignment.isReturning;
 
         const isFinal =
-          assignment.state === "Returned" ||
-          assignment.state === "Declined";
+          assignment.state === "Returned" || assignment.state === "Declined";
 
         return (
           <DataTableButtonActions
@@ -208,8 +231,10 @@ export default function AssignmentsPage() {
             disabledAccept={isAccepted || isFinal}
             disabledDecline={!isWaiting}
             disabledReturn={isWaiting || isFinal || isReturning}
-            onAccept={(row) => console.log("accept", row)}
             onDecline={setDeletingAssignment}
+            onAccept={(row) => {
+              router.push(`/admin/assignments/edit?id=${row.id}`);
+            }}
             onReturn={(row) => setReturningAssignment(row)} //return request
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeleteAssignment"
@@ -220,7 +245,7 @@ export default function AssignmentsPage() {
           />
         );
       },
-    }
+    },
   ];
 
   //create return request
@@ -263,7 +288,6 @@ export default function AssignmentsPage() {
       <h1 className="text-primary font-bold text-xl mb-6">Assignment List</h1>
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-
         {/* Left group: State + Assigned Date */}
         <div className="flex flex-wrap gap-3">
           <div data-testid="ddlState" className="w-full sm:w-auto">
@@ -294,14 +318,14 @@ export default function AssignmentsPage() {
                 updateParams({
                   assignedDate: date
                     ? new Date(
-                      Date.UTC(
-                        date.getFullYear(),
-                        date.getMonth(),
-                        date.getDate()
+                        Date.UTC(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate(),
+                        ),
                       )
-                    )
-                      .toISOString()
-                      .split("T")[0]
+                        .toISOString()
+                        .split("T")[0]
                     : undefined,
                   page: "1",
                 })
@@ -340,7 +364,6 @@ export default function AssignmentsPage() {
             Create new assignment
           </button>
         </div>
-
       </div>
 
       <div className="space-y-4">
@@ -413,4 +436,3 @@ export default function AssignmentsPage() {
     </div>
   );
 }
-

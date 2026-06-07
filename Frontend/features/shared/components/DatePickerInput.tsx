@@ -10,11 +10,13 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  X,
 } from "lucide-react";
- 
+
 interface DatePickerInputProps {
   value: Date | null | undefined;
   onChange: (date: Date | null) => void;
+  onBlur?: () => void;
   placeholder?: string;
   width?: string;
   txtInputTestId?: string;
@@ -53,6 +55,7 @@ const parseDate = (input: string): Date | null => {
 export default function DatePickerInput({
   value,
   onChange,
+  onBlur,
   placeholder = "Assigned Date",
   width = "w-full sm:w-64",
   txtInputTestId = "txtDatePicker",
@@ -64,7 +67,7 @@ export default function DatePickerInput({
  
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(value ?? today);
- 
+
   const [inputError, setInputError] = useState("");
   const dispatch = useAppDispatch();
  
@@ -94,16 +97,16 @@ export default function DatePickerInput({
  
     return `${day}/${monthValue}/${date.getFullYear()}`;
   };
- 
+
   const [inputValue, setInputValue] = useState(formatDate(value!));
   useEffect(() => {
     setInputValue(formatDate(value!));
- 
+
     if (value) {
       setCursor(value);
     }
   }, [value]);
- 
+
   const isSameDay = (a: Date, b: Date | null) =>
     !!b &&
     a.getFullYear() === b.getFullYear() &&
@@ -130,7 +133,7 @@ export default function DatePickerInput({
         inMonth: true,
       });
     }
- 
+
     while (result.length < 42) {
       const lastDate = result[result.length - 1].date;
  
@@ -157,6 +160,7 @@ export default function DatePickerInput({
  
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
+      onChange(null);
       setInputError("");
       return;
     }
@@ -174,7 +178,7 @@ export default function DatePickerInput({
           }),
         );
       }
- 
+
       return;
     }
  
@@ -212,7 +216,7 @@ export default function DatePickerInput({
               inputError ? "text-error" : ""
             }`}
           />
- 
+
           {inputValue && canClearValue && (
             <button
               type="button"
@@ -223,10 +227,11 @@ export default function DatePickerInput({
                 setInputError("");
                 setCursor(new Date());
                 onChange(null);
+                onChange(null);
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              x
+              <X size={16} className="hover:cursor-pointer"/>
             </button>
           )}
         </div>
@@ -236,7 +241,7 @@ export default function DatePickerInput({
           data-testid="btnAssignedDateCalendar"
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300"
+          className="flex h-full w-11 shrink-0 items-center justify-center border-l border-gray-400 bg-base-200 text-gray-500 hover:bg-base-300 hover:cursor-pointer"
         >
           {<Calendar size={20} />}
         </button>
@@ -244,7 +249,7 @@ export default function DatePickerInput({
       {(inputError || error) && !showToast && (
         <p className="mt-1 text-sm text-error">{inputError || error}</p>
       )}
- 
+
       {open && (
         <div className="absolute left-0 top-9.5 z-50 w-[320px] overflow-hidden rounded-sm border border-gray-400 bg-base-100 shadow">
           {/* Year and Month Navigator */}
@@ -331,4 +336,3 @@ export default function DatePickerInput({
     </div>
   );
 }
- 

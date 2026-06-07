@@ -1,3 +1,5 @@
+import { LookupAssetsSummary } from "@/features/Assets/assets.types";
+import { LookupUsers } from "@/features/users/users.types";
 import {
   PaginationRequest,
   PaginationResponse,
@@ -54,3 +56,31 @@ export interface AdminCreateReturnRequest {
 }
 
 export interface GetAssignmentsResponse extends PaginationResponse<Assignment> { }
+
+export namespace GetAssignmentForEditing {
+  export interface Request {
+    assignmentId: string;
+  }
+
+  export interface Response {
+    id: string;
+    user: LookupUsers.LookupUsersSummary;
+    asset: LookupAssetsSummary
+    assignedDate: string;
+    note: string;
+  }
+}
+
+export namespace AdminEditAssignment {
+  export interface Request {
+    assignmentId: string;
+    payload: AdminEditAssignmentPayload;
+  }
+
+  export interface AdminEditAssignmentPayload {
+    userId: string;
+    assetId: string;
+    assignedDate: string;
+    note?: string;
+  }
+}

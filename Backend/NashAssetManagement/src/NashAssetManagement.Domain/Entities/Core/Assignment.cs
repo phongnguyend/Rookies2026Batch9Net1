@@ -52,6 +52,13 @@ namespace NashAssetManagement.Domain.Entities.Core
             UpdatedAtUtc = acceptTimestamp;
         }
 
+        // Must be in WaitingForAcceptance state, not deleted, have assignee and asset.
+        public bool CanEdit() =>
+            State == AssignmentState.WaitingForAcceptance &&
+            !IsDeleted &&
+            AssignedToUser != null &&
+            Asset != null;
+
         public void Delete(DateTime? deleteTimestamp = null)
         {
             ArgumentNullException.ThrowIfNull(Asset);

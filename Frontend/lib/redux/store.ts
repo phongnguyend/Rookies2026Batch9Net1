@@ -6,6 +6,7 @@ import { modalSlice } from "@/features/shared/modal.slice";
 import { authSlice } from "@/features/auth/auth.slice";
 import assetReducer from "@/features/Assets/assets.slice"
 import { reportSlice } from "@/features/report/report.slice";
+import adminAssignmentListUiReducer from "@/features/assignments/admin/edit/admin-assignment-list-ui.slice"
 
 export const makeStore = () => {
   return configureStore({
@@ -16,7 +17,8 @@ export const makeStore = () => {
       modalSlice: modalSlice.reducer,
       authSlice: authSlice.reducer,
       asset: assetReducer,
-      reportSlice: reportSlice.reducer
+      reportSlice: reportSlice.reducer,
+      adminAssignmentListUi: adminAssignmentListUiReducer,
     },
 
     middleware: (getDefaultMiddleware) =>

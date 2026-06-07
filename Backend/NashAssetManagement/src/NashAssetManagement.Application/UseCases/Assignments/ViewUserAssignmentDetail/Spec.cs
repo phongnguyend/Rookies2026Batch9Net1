@@ -8,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.ViewUserAssignmen
     {
         public Spec(Guid assignmentId, Guid assigneeId)
         {
-            Query.Where(x => x.Id == assignmentId && x.AssignedToUserId == assigneeId)
+            Query.Where(x => x.Id == assignmentId && x.AssignedToUserId == assigneeId && !x.IsDeleted)
                 .AsNoTracking()
                 .Select(x => new Response(
                     AssignmentId: x.Id,
