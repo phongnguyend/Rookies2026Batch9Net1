@@ -11,7 +11,10 @@ import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import DatePickerInput from "@/features/returns/components/DatePickerInput";
-import { returnsApi, useGetReturnRequestsQuery } from "@/features/returns/returns.api";
+import {
+  returnsApi,
+  useGetReturnRequestsQuery,
+} from "@/features/returns/returns.api";
 import {
   ReturnRequestState,
   type ReturnRequestRow,
@@ -32,7 +35,10 @@ const defaultSort: SortItem = {
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
-  { id: ReturnRequestState.WaitingForReturning, label: "Waiting for returning" }
+  {
+    id: ReturnRequestState.WaitingForReturning,
+    label: "Waiting for returning",
+  },
 ];
 
 function parseDateParam(value: string | null) {
@@ -115,9 +121,11 @@ function getStateLabel(state: string) {
 function RequestActions({
   row,
   onCompleteClick,
+  onCancelClick,
 }: {
   row: ReturnRequestRow;
   onCompleteClick: (row: ReturnRequestRow) => void;
+  onCancelClick: (row: ReturnRequestRow) => void;
 }) {
   const isWaiting = row.state === ReturnRequestState.WaitingForReturning;
 
@@ -127,9 +135,7 @@ function RequestActions({
       disabledAccept={!isWaiting}
       disabledDecline={!isWaiting}
       onAccept={() => onCompleteClick(row)}
-      onDecline={() => {
-        // Cancel return request logic goes here
-      }}
+      onDecline={() => onCancelClick(row)}
       acceptBtnTestId="btnAccept"
       declineBtnTestId="btnDecline"
       acceptIcon={<Check className="text-primary" strokeWidth={3} size={20} />}
@@ -322,6 +328,7 @@ export default function ReturnsPage() {
         <RequestActions
           row={request}
           onCompleteClick={setCompletingRequest}
+          onCancelClick={setCancelingRequest}
         />
       ),
     },
@@ -334,6 +341,12 @@ export default function ReturnsPage() {
 
   const [completingRequest, setCompletingRequest] =
     useState<ReturnRequestRow | null>(null);
+
+  const [cancelingRequest, setCancelingRequest] =
+    useState<ReturnRequestRow | null>(null);
+
+  const [cancelReturnRequest, { isLoading: isCanceling }] =
+    returnsApi.useCancelReturnRequestMutation();
 
   const handleConfirmComplete = async () => {
     if (!completingRequest) return;
@@ -365,8 +378,38 @@ export default function ReturnsPage() {
     }
   };
 
+  const handleConfirmCancel = async () => {
+    if (!cancelingRequest) return;
+    try {
+      await cancelReturnRequest({
+        returnRequestId: cancelingRequest.id,
+      }).unwrap();
+      setCancelingRequest(null);
+
+      dispatchAction(
+        enqueueToast({
+          message: "Returning request cancelled successfully.",
+          type: ToastType.Success,
+          testId: "toastSuccess",
+        }),
+      );
+    } catch (error) {
+      setCancelingRequest(null);
+      dispatchAction(
+        enqueueToast({
+          message: "Failed to cancel returning request. Please try again.",
+          type: ToastType.Error,
+          testId: "toastError",
+        }),
+      );
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white text-[#333]" data-testid="mnuReturning">
+    <div
+      className="min-h-screen bg-white text-[#333]"
+      data-testid="mnuReturning"
+    >
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
@@ -485,6 +528,25 @@ export default function ReturnsPage() {
             modalTestId="CompleteReturningRequestModal"
             confirmBtnTestId="btnConfirmCompleteRequest"
             cancelBtnTestId="btnCancelCompleteRequest"
+          />
+
+          {/* Cancel Return Request Modal */}
+          <ConfirmModal
+            isOpen={!!cancelingRequest}
+            onClose={() => setCancelingRequest(null)}
+            onYes={handleConfirmCancel}
+            isLoading={isCanceling}
+            title="Are you sure?"
+            body={
+              <p data-testid="txtCancelRequestMessage">
+                Do you want to cancel this returning request?
+              </p>
+            }
+            yesButtonLabel="Yes"
+            noButtonLabel="No"
+            modalTestId="CancelReturningRequestModal"
+            confirmBtnTestId="btnConfirmCancelRequest"
+            cancelBtnTestId="btnCancelCancelRequest"
           />
         </main>
       </div>
