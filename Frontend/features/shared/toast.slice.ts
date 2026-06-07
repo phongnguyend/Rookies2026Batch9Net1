@@ -40,7 +40,7 @@ export const toastSlice = createSlice({
         id: crypto.randomUUID(),
         message: action.payload.message,
         type: action.payload.type,
-        duration: action.payload.duration ?? 10000,
+        duration: action.payload.duration ?? 3000,
         testId: action.payload.testId,
       });
     },

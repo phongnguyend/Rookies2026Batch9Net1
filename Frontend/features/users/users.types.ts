@@ -42,7 +42,7 @@ export interface GetUsersRequest {
   sortDesc?: boolean;
 }
 
-export interface GetUsersResponse extends PaginationResponse<UserRow> {}
+export interface GetUsersResponse extends PaginationResponse<UserRow> { }
 
 export type GetUserByIdResponse = UserDetail;
 
@@ -70,7 +70,7 @@ export interface EditUserRequest {
 export interface EditUserResponse {
   id: string;
 }
-export namespace LookupUsers{
+export namespace LookupUsers {
   export interface Request {
     searchTerm?: string;
     sortBy?: string;
@@ -86,7 +86,7 @@ export namespace LookupUsers{
     type: string;
   }
 
-  export interface Response extends PaginationResponse<LookupUsersSummary> {}
+  export interface Response extends PaginationResponse<LookupUsersSummary> { }
 }
 
 
@@ -109,4 +109,23 @@ export interface CreateUserResponse {
   joinedDate: string;
   userType: UserRoles;
   gender: Gender;
+}
+
+export namespace CanDisableUser {
+  export interface Request {
+    targetUserId: string;
+  }
+  export interface Response {
+    targetUserId: string;
+    canDisable: boolean;
+  }
+}
+
+export namespace DisableUser {
+  export interface Request {
+    targetUserId: string;
+  }
+  export interface Response {
+    targetUserId: string;
+  }
 }

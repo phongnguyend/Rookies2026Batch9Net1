@@ -21,7 +21,8 @@ namespace NashAssetManagement.Application.UseCases.Auth.Logout
             // authenticated user
             if (currentUser == null || !currentUser.UserId.HasValue)
             {
-                return Errors.Unauthorized;
+                // user is not authenticated, return deleted
+                return Result.Deleted;
             }
 
             var userId = currentUser.UserId.Value;
@@ -37,11 +38,11 @@ namespace NashAssetManagement.Application.UseCases.Auth.Logout
 
             if (refreshToken is null)
             {
-                logger.LogWarning(
-                    "Logout failed: no active refresh token found for user {UserId}.",
+                logger.LogInformation(
+                    "Logout completed: no active refresh token found for user {UserId}.",
                     userId);
 
-                return Errors.InvalidRefreshToken;
+                return Result.Deleted;
             }
 
             // revoke refresh token

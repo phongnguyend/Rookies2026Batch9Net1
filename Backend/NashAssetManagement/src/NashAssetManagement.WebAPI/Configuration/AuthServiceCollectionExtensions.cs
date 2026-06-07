@@ -1,10 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NashAssetManagement.Domain.Constants;
+using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Infrastructure.Jwt;
 
 namespace NashAssetManagement.WebAPI.Configuration
@@ -62,7 +64,8 @@ namespace NashAssetManagement.WebAPI.Configuration
                         OnChallenge = async context =>
                         {
                             context.HandleResponse();
-                            context.Response.Clear();
+                            // should remove to allow firefox readthe CORS headers, if set .Clear(), firefox cannot read CORS header
+                            // context.Response.Clear();
                             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             context.Response.Headers.Append("WWW-Authenticate", "Bearer");
                             context.Response.ContentType = "application/problem+json";
@@ -78,7 +81,7 @@ namespace NashAssetManagement.WebAPI.Configuration
 
                         OnForbidden = async context =>
                         {
-                            context.Response.Clear();
+                            // context.Response.Clear();
                             context.Response.StatusCode = StatusCodes.Status403Forbidden;
                             context.Response.ContentType = "application/problem+json";
                             var problem = new ProblemDetails
@@ -89,6 +92,26 @@ namespace NashAssetManagement.WebAPI.Configuration
                                 Detail = "You do not have permission to perform this action."
                             };
                             await context.Response.WriteAsJsonAsync(problem);
+                        },
+
+                        // Validate Token
+                        OnTokenValidated = async context =>
+                        {
+                            var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+                            var userId = context.Principal?.FindFirst(JwtTokenConstants.UserId)?.Value;
+
+                            if (!Guid.TryParse(userId, out var id))
+                            {
+                                context.Fail("Invalid user.");
+                                return;
+                            }
+
+                            var user = await userManager.FindByIdAsync(id.ToString());
+
+                            if (user is null || user.IsDeleted)
+                            {
+                                context.Fail("User disabled.");
+                            }
                         }
                     };
                 });

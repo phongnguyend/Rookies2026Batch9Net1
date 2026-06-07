@@ -60,6 +60,10 @@ const isWeekend = (date: Date) => {
   return day === 0 || day === 6;
 };
 
+const isFutureDate = (date: Date) => {
+  return normalizeDate(date) > getToday();
+};
+
 const createUserSchema = z
   .object({
     firstName: z
@@ -85,8 +89,11 @@ const createUserSchema = z
     dateOfBirth: z
       .date()
       .nullable()
-      .refine((value): value is Date => value !== null, {
+      .refine((value): value is Date => value !== null, { 
         message: "Date of Birth is required.",
+      })
+      .refine((value) => !isFutureDate(value), {
+        message: "Date of Birth cannot be in the future",
       })
       .refine((value) => !isUnder18(value), {
         message: "User is under 18. Please select a different date.",
@@ -126,6 +133,17 @@ const createUserSchema = z
     const dob = normalizeDate(data.dateOfBirth);
     const joinedDate = normalizeDate(data.joinedDate);
 
+    if (joinedDate <= dob) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["joinedDate"],
+        message:
+          "Joined date must be later than Date of Birth. Please select a different date",
+      });
+
+      return;
+    }
+
     const minJoinedDateByAge = new Date(dob);
     minJoinedDateByAge.setFullYear(dob.getFullYear() + 18);
 
@@ -134,7 +152,7 @@ const createUserSchema = z
         code: z.ZodIssueCode.custom,
         path: ["joinedDate"],
         message:
-          "User is under 18 at joined date. Please select a different date",
+          "User must be at least 18 years old at the Joined Date",
       });
     }
   });
@@ -154,7 +172,7 @@ export default function CreateUserPage() {
     trigger,
     handleSubmit,
     reset,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting, touchedFields },
   } = useForm<CreateUserFormInput, unknown, CreateUserFormOutput>({
     resolver: zodResolver(createUserSchema),
     mode: "onChange",
@@ -172,6 +190,14 @@ export default function CreateUserPage() {
   const dateOfBirthValue = watch("dateOfBirth");
   const joinedDateValue = watch("joinedDate");
   const userTypeValue = watch("userType");
+
+  const dateOfBirthError = touchedFields.dateOfBirth
+    ? errors.dateOfBirth?.message
+    : undefined;
+
+  const joinedDateError = touchedFields.joinedDate
+    ? errors.joinedDate?.message
+    : undefined;
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -206,7 +232,8 @@ export default function CreateUserPage() {
         }),
       );  
       
-      router.push("/admin/users?sortBy=createdDate&sortDesc=true&pageNumber=1");
+      sessionStorage.setItem("usersTemporarySort", "createdDateDesc");
+      router.push("/admin/users");
       reset();
     } catch (err: any) {
       console.log(err);
@@ -274,25 +301,23 @@ export default function CreateUserPage() {
         <div className="flex-1">
           <DatePickerInput
             value={dateOfBirthValue}
-            onChange={(date) => {
+            onChange={(date) => { 
               setValue("dateOfBirth", date, {
                 shouldValidate: true,
                 shouldDirty: true,
                 shouldTouch: true,
               });
 
-              void trigger(["dateOfBirth", "joinedDate"]);
+              if (touchedFields.joinedDate) {
+                void trigger(["dateOfBirth", "joinedDate"]);
+              }
             }}
             placeholder=""
             width="w-full"
             txtInputTestId="dtpUserDateOfBirth"
+            error={dateOfBirthError}
+            showToast={false}
           />
-
-          {errors.dateOfBirth && (
-            <p className="mt-1 text-sm text-error">
-              {errors.dateOfBirth.message}
-            </p>
-          )}
         </div>
       </div>
 
@@ -338,18 +363,16 @@ export default function CreateUserPage() {
                 shouldTouch: true,
               });
 
-              void trigger(["dateOfBirth", "joinedDate"]);
+              if (touchedFields.dateOfBirth) {
+                void trigger(["dateOfBirth", "joinedDate"]);
+              }
             }}
+            error={joinedDateError}
+            showToast={false}
             placeholder=""
             width="w-full"
             txtInputTestId="dtpUserJoinedDate"
           />
-
-          {errors.joinedDate && (
-            <p className="mt-1 text-sm text-error">
-              {errors.joinedDate.message}
-            </p>
-          )}
         </div>
       </div>
 
