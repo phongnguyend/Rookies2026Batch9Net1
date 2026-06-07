@@ -8,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.UserAcceptingAssi
     {
         public Spec(Guid assignmentId)
         {
-            Query.Where(x => x.Id == assignmentId)
+            Query.Where(x => x.Id == assignmentId && !x.IsDeleted)
                 .Include(x => x.Asset)
                 .AsTracking();
         }

@@ -80,11 +80,11 @@ const UsersLookupInput = ({
         {/* Dialog overlay */}
         {isOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
             onClick={handleClose}
           >
             <div
-              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[100vh]"
+              className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => {
                 e.stopPropagation();

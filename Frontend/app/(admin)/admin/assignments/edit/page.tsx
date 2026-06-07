@@ -68,7 +68,6 @@ const EditAssignmentPage = () => {
     handleSubmit,
     setValue,
     formState: { errors, isValid },
-    watch,
   } = form;
 
   const onSubmit = async (data: EditAssignmentFormValues) => {

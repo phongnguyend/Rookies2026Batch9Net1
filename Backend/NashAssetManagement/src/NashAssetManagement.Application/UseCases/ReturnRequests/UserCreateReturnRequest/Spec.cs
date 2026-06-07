@@ -8,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.UserCreateRetu
     {
         public Spec(Guid assignmentId)
         {
-            Query.Where(x => x.Id == assignmentId)
+            Query.Where(x => x.Id == assignmentId && !x.IsDeleted)
                 .Include(x => x.ReturnRequests);
         }
     }

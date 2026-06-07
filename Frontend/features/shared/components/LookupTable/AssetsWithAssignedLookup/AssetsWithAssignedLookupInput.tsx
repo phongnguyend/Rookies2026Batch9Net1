@@ -2,7 +2,7 @@
 
 import { LookupAssetsSummary } from "@/features/Assets/assets.types";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AssetsWithAssignedLookupTable } from "./AssetsWithAssignedLookupTable";
 
 export interface AssetsWithAssignedLookupInputProps {
@@ -43,6 +43,17 @@ export const AssetsWithAssignedLookupInput = ({
     setPendingAsset(null);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   return (
     <div className="relative">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
@@ -54,7 +65,9 @@ export const AssetsWithAssignedLookupInput = ({
             role="button"
             tabIndex={0}
             onClick={handleOpen}
-            onKeyDown={(e) => e.key === "Enter" && handleOpen()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isOpen) handleOpen();
+            }}
             className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded cursor-pointer bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
           >
             {/* Input display is driven by value prop only, never pendingAsset */}
@@ -70,12 +83,16 @@ export const AssetsWithAssignedLookupInput = ({
         {/* Dialog overlay */}
         {isOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
             onClick={handleClose}
           >
             <div
-              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl mx-4 max-h-[90vh]"
+              className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === "Enter") e.preventDefault();
+              }}
             >
               <AssetsWithAssignedLookupTable
                 isOpen={isOpen}
