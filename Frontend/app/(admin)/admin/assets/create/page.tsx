@@ -12,13 +12,16 @@ import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { setCreatedNewAsset } from "@/features/Assets/assets.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
-
-const EMOJI_REGEX = /\p{Extended_Pictographic}/gu
-const normalizeText = (value: string) =>
-  stripEmoji(value)
-    .replace(/\s+/g, " ")
-    .trim();
-const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "")
+import {
+  ALLOWED_REGEX,
+  normalizeText,
+  stripEmoji,
+} from "@/features/Assets/components/assetConstant";
+import {
+  FormField,
+  CharacterCounter,
+  FieldError,
+} from "@/features/Assets/components/assetSharedForm";
 
 export default function CreateAssetPage() {
   const router = useRouter();
@@ -98,12 +101,18 @@ export default function CreateAssetPage() {
       errors.assetName = "Asset name is required.";
     } else if (normalizedName.length > 100) {
       errors.assetName = "Asset name must not exceed 100 characters.";
+    } else if (!ALLOWED_REGEX.test(normalizedName)) {
+      errors.assetName =
+        'Asset name must contain at least one letter and only allow letters, numbers and these special characters: " / - | ( ) + . ,';
     }
 
     if (!normalizedSpec) {
       errors.specification = "Specification is required.";
     } else if (normalizedSpec.length > 500) {
       errors.specification = "Specification must not exceed 500 characters.";
+    } else if (!ALLOWED_REGEX.test(normalizedSpec)) {
+      errors.specification =
+        'Asset name must contain at least one letter and only allow letters, numbers and these special characters: " / - | ( ) + . ,';
     }
 
     if (!categoryId.trim()) {
@@ -132,126 +141,73 @@ export default function CreateAssetPage() {
 
       <div className="space-y-4">
         {/* Name */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <div className="flex-1">
-            <input
-              maxLength={100}
-              data-testid="txtName"
-              type="text"
-              value={assetName}
-              onChange={(e) => {
-                setAssetName(stripEmoji(e.target.value));
-              }}
-              className="
-            h-9
-            w-full
-            rounded
-            border
-            border-gray-400
-            px-3
-            text-sm
-            outline-none
-            focus:border-primary
-          "
-            />
-            <div className="mt-1 flex justify-between text-xs">
-              {assetName.length === 100 ? (
-                <span className="text-orange-500">
-                  Maximum characters is 100.
-                </span>
-              ) : (
-                <span />
-              )}
-              <span
-                className={
-                  assetName.length === 100 ? "text-red-500" : "text-gray-500"
-                }
-              >
-                {assetName.length}/100
-              </span>
-            </div>
-            {fieldErrors.assetName && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.assetName}
-              </p>
-            )}
-          </div>
-        </div>
+        <FormField label="Name">
+          <input
+            maxLength={100}
+            data-testid="txtName"
+            type="text"
+            value={assetName}
+            onChange={(e) => {
+              setAssetName(stripEmoji(e.target.value));
+            }}
+            className="
+              h-9
+              w-full
+              rounded
+              border
+              border-gray-400
+              px-3
+              text-sm
+              outline-none
+              focus:border-gray-600
+            "
+          />
+
+          <CharacterCounter value={assetName} max={100} />
+
+          <FieldError message={fieldErrors.assetName} />
+        </FormField>
 
         {/* Category */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
-            Category
-          </label>
-          <div className="flex-1">
-            <CategoryDropdown
-              categories={categoriesData ?? []}
-              isLoading={categoriesLoading}
-              value={categoryName}
-              onChange={handleCategoryChange}
-            />
-            {fieldErrors.categoryId && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.categoryId}
-              </p>
-            )}
-          </div>
-        </div>
+        <FormField label="Category">
+          <CategoryDropdown
+            categories={categoriesData ?? []}
+            isLoading={categoriesLoading}
+            value={categoryName}
+            onChange={handleCategoryChange}
+          />
+
+          <FieldError message={fieldErrors.categoryId} />
+        </FormField>
         {/* Specification */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
-            Specification
-          </label>
-          <div className="flex-1">
-            <textarea
-              data-testid="txaSpecification"
-              maxLength={500}
-              value={specification}
-              onChange={(e) => {
-                setSpecification(stripEmoji(e.target.value));
-              }}
-              rows={4}
-              className="
-            w-full
-            resize-none
-            rounded
-            border
-            border-gray-400
-            px-3
-            py-2
-            text-sm
-            outline-none
-            focus:border-primary
-          "
-            />
-            <div className="mt-1 flex justify-between text-xs">
-              {specification.length === 500 ? (
-                <span className="text-orange-500">
-                  Maximum characters is 500.
-                </span>
-              ) : (
-                <span />
-              )}
-              <span
-                className={
-                  specification.length === 500
-                    ? "text-red-500"
-                    : "text-gray-500"
-                }
-              >
-                {specification.length}/500
-              </span>
-            </div>
-            {fieldErrors.specification && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.specification}
-              </p>
-            )}
-          </div>
-        </div>
+
+        <FormField label="Specification">
+          <textarea
+            data-testid="txaSpecification"
+            maxLength={500}
+            value={specification}
+            onChange={(e) => {
+              setSpecification(stripEmoji(e.target.value));
+            }}
+            rows={4}
+            className="
+              w-full
+              resize-none
+              rounded
+              border
+              border-gray-400
+              px-3
+              py-2
+              text-sm
+              outline-none
+              focus:border-gray-600
+            "
+          />
+
+          <CharacterCounter value={specification} max={500} />
+
+          <FieldError message={fieldErrors.specification} />
+        </FormField>
         {/* Installed Date */}
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
           <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
@@ -274,33 +230,33 @@ export default function CreateAssetPage() {
 
         {/* State */}
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
-            State
-          </label>
-          <div className="flex flex-col gap-2 pt-2">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                data-testid="rdoAvailable"
-                type="radio"
-                name="state"
-                checked={state === AssetState.Available}
-                onChange={() => setState(AssetState.Available)}
-                className="radio radio-primary radio-sm"
-              />
-              Available
-            </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                data-testid="rdoNotAvailable"
-                type="radio"
-                name="state"
-                checked={state === AssetState.NotAvailable}
-                onChange={() => setState(AssetState.NotAvailable)}
-                className="radio radio-primary radio-sm"
-              />
-              Not available
-            </label>
-          </div>
+          <FormField label="State">
+            <div className="flex flex-col gap-2 pt-2">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  data-testid="rdoAvailable"
+                  type="radio"
+                  name="state"
+                  checked={state === AssetState.Available}
+                  onChange={() => setState(AssetState.Available)}
+                  className="radio radio-primary radio-sm"
+                />
+                Available
+              </label>
+
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  data-testid="rdoNotAvailable"
+                  type="radio"
+                  name="state"
+                  checked={state === AssetState.NotAvailable}
+                  onChange={() => setState(AssetState.NotAvailable)}
+                  className="radio radio-primary radio-sm"
+                />
+                Not available
+              </label>
+            </div>
+          </FormField>
         </div>
       </div>
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
