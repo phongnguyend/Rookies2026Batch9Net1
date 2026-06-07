@@ -181,4 +181,6 @@ export const baseApiSlice = createApi({
   baseQuery: customBaseQuery,
   tagTypes: ["Account", "Asset", "Assignment", "Report", "Return", "Users"],
   endpoints: () => ({}),
+  // Default caching duration of 15 seconds
+  keepUnusedDataFor: 15
 });

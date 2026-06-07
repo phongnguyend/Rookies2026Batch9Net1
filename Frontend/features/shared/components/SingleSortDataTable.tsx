@@ -66,21 +66,9 @@ export default function SingleSortDataTable<T>({
     return "↕";
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="text-center">
-  //       <span className="loading loading-spinner loading-lg text-primary"></span>
-  //     </div>
-  //   );
-  // }
-
-  // if (data.length === 0) {
-  //   return <p className="py-8 text-center text-gray-500">{emptyMessage}</p>;
-  // }
-
   return (
     <div className="w-full overflow-x-auto rounded border border-gray-200">
-      <table className="w-full min-w-[600px] text-left text-sm table-fixed">
+      <table className="w-full min-w-150 text-left text-sm table-fixed">
         <thead>
           <tr className="border-b border-gray-400 bg-gray-50">
             {columns.map((column) => {
