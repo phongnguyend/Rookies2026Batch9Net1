@@ -36,5 +36,7 @@ namespace NashAssetManagement.Domain.Entities.Core
                 CreatedAtUtc = createAtUtc ?? DateTime.UtcNow
             };
         }
+
+        public bool CanCancel() => State == ReturnRequestState.WaitingForReturning && Assignment != null && Assignment.IsReturning;
     }
 }
