@@ -14,10 +14,10 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
                 "DeleteAssignment.UnidentifiedUser",
                 "Cannot identify user with user's ID.");
 
-        public static Error AssignmentNotFoundWithId(string assignmentId) =>
+        public static Error AssignmentNotFound =
             Error.NotFound(
-                "DeleteAssignment.AssignmentNotFoundWithId",
-                $"Failed to find assignment with Id '{assignmentId}'.");
+                "DeleteAssignment.AssignmentNotFound",
+                $"Failed to find assignment.");
 
         public static Error UnexpectedErrorOccurred =
             Error.Failure(
@@ -29,10 +29,10 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
                 "DeleteAssignment.InvalidAssignmentState",
                 "Assignment must be in 'Waiting for acceptance' state in order to be deleted.");
 
-        public static Error AssetOfAssignmentNotFound(string assignmentId) =>
+        public static Error AssetOfAssignmentNotFound =
             Error.NotFound(
                 "DeleteAssignment.AssetOfAssignmentNotFound",
-                $"Failed to find asset of assignment with Id '{assignmentId}'.");
+                $"Failed to find asset of assignment.");
 
         public static Error InvalidAssignmentAssetState =
             Error.Validation(

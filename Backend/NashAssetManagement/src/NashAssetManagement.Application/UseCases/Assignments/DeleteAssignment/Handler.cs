@@ -25,6 +25,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
             var validationResult = await validator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
+
             // User and user's auth
             if (!currentUser.IsAuthenticated)
                 return Errors.UnauthorizedUser;
@@ -33,16 +34,18 @@ namespace NashAssetManagement.Application.UseCases.Assignments.DeleteAssignment
                 return Errors.UnidentifiedUser;
             var assignmentId = Guid.Parse(request.AssignmentId!);
             var assignment = await repo.FirstOrDefaultAsync(new Spec(assignmentId), cancellationToken);
+
             // Assignment
             if (assignment == null)
-                return Errors.AssignmentNotFoundWithId(assignmentId.ToString());
+                return Errors.AssignmentNotFound;
             if (assignment.State != Domain.Enums.AssignmentState.WaitingForAcceptance)
                 return Errors.InvalidAssignmentState;
             if (assignment.IsDeleted)
                 return Errors.AssignmentAlreadyDeleted;
+                
             // Asset
             if (assignment.Asset == null)
-                return Errors.AssetOfAssignmentNotFound(assignmentId.ToString());
+                return Errors.AssetOfAssignmentNotFound;
             if (assignment.Asset.State != Domain.Enums.AssetState.Assigned)
                 return Errors.InvalidAssignmentAssetState;
             if (assignment.Asset.LocationId.ToString() != currentUser.LocationId)

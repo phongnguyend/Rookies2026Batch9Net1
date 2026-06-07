@@ -57,9 +57,11 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.DeleteA
                 .Setup(x => x.ValidateAsync(request, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult(errors));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                _handler.Handle(request, CancellationToken.None));
+            // Act
+            Func<Task> act = () => _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            await Assert.ThrowsAsync<ValidationException>(act);
 
             _repoMock.Verify(
                 x => x.FirstOrDefaultAsync(It.IsAny<ISpecification<Assignment>>(), It.IsAny<CancellationToken>()),
@@ -125,7 +127,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.DeleteA
 
             // Assert
             Assert.True(result.IsError);
-            Assert.Equal(Errors.AssignmentNotFoundWithId(request.AssignmentId!).Description, result.FirstError.Description);
+            Assert.Equal(Errors.AssignmentNotFound, result.FirstError);
         }
 
         [Fact]
@@ -174,6 +176,29 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.DeleteA
         }
 
         [Fact]
+        public async Task Handle_WhenAssignmentIsAlreadyDeletedButStateIsNotWaitingForAcceptance_ShouldReturnInvalidAssignmentState()
+        {
+            // Arrange
+            var request = CreateRequest();
+            SetupValidValidation(request);
+            SetupAuthenticatedUser();
+
+            var assignment = BuildAssignment(state: AssignmentState.Accepted);
+            assignment.IsDeleted = true;
+
+            _repoMock
+                .Setup(x => x.FirstOrDefaultAsync(It.IsAny<ISpecification<Assignment>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(assignment);
+
+            // Act
+            ErrorOr<Deleted> result = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            Assert.True(result.IsError);
+            Assert.Equal(Errors.InvalidAssignmentState, result.FirstError);
+        }
+
+        [Fact]
         public async Task Handle_WhenAssignmentAssetIsNull_ShouldReturnAssetOfAssignmentNotFound()
         {
             // Arrange
@@ -196,7 +221,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Assignments.DeleteA
 
             // Assert
             Assert.True(result.IsError);
-            Assert.Equal(Errors.AssetOfAssignmentNotFound(request.AssignmentId!).Description, result.FirstError.Description);
+            Assert.Equal(Errors.AssetOfAssignmentNotFound, result.FirstError);
         }
 
         [Fact]
