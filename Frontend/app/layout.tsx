@@ -118,37 +118,39 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <RouteGuard>
-      {isAuthenticated ? (
-        <>
-          {/* Navbar */}
-          <NavBar />
+      <>
+        {isAuthenticated ? (
+          <>
+            {/* Navbar */}
+            <NavBar />
 
-          {/* Main Layout */}
-          <div className="drawer md:drawer-open relative px-8 pt-12">
-            <DrawerCheckbox />
-            <FloatingDrawerButton />
+            {/* Main Layout */}
+            <div className="drawer md:drawer-open relative px-8 pt-12">
+              <DrawerCheckbox />
+              <FloatingDrawerButton />
 
-            {/* Left Content */}
-            <div className="drawer-content md:pl-15 md:pt-15">
-              <main>{children}</main>
+              {/* Left Content */}
+              <div className="drawer-content md:pl-15 md:pt-15">
+                <main>{children}</main>
+              </div>
+
+              {/* Drawer Sidebar */}
+              <div className="drawer-side">
+                <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+
+                <Drawer role={user?.role as UserRoles} />
+              </div>
             </div>
 
-            {/* Drawer Sidebar */}
-            <div className="drawer-side">
-              <label htmlFor="admin-drawer" className="drawer-overlay"></label>
-
-              <Drawer role={user?.role as UserRoles} />
-            </div>
-          </div>
-
-          {/* Utility Components */}
-          <ToastContainer />
-          <GlobalModalContainer />
-          <FirstChangePasswordModal isOpen={user?.isFirstLogin === true} />
-        </>
-      ) : (
-        children
-      )}
+            {/* Utility Components */}
+            <GlobalModalContainer />
+            <FirstChangePasswordModal isOpen={user?.isFirstLogin === true} />
+          </>
+        ) : (
+          children
+        )}
+        <ToastContainer />
+      </>
     </RouteGuard>
   );
 }

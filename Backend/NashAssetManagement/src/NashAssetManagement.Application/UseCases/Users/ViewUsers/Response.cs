@@ -7,8 +7,5 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
         string UserName,
         DateTime JoinedDate,
         string UserType
-    )
-    {
-        public bool CanBeDisabled { get; set; }
-    }
+    );
 }

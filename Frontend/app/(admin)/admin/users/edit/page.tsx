@@ -6,6 +6,7 @@ import {
   type FormEvent,
   type ReactNode,
   type SetStateAction,
+  useEffect,
   useState,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -40,6 +41,7 @@ type RequiredDateField = "dateOfBirth" | "joinedDate";
 const editUserValidationMessages = {
   dateOfBirthRequired: "'Date Of Birth' must not be empty.",
   dateOfBirthUnder18: "User is under 18. Please select a different date",
+  dateOfBirthOver90: "User age must not exceed 90 years.",
   dateOfBirthInFuture:
     "Date of birth cannot be in the future. Please select a different date",
   joinedDateRequired: "'Joined Date' must not be empty.",
@@ -73,6 +75,14 @@ const isApiErrorResponse = (error: unknown): error is ApiErrorResponse =>
   typeof error === "object" &&
   error !== null &&
   "status" in error;
+
+const differentLocationMessage =
+  "You are not allowed to edit the information of users in a different location.";
+
+const getEditUserErrorMessage = (error: ApiErrorResponse) =>
+  error.detail.includes("has a different location")
+    ? differentLocationMessage
+    : error.detail;
 
 const getFieldName = (field: string): keyof FieldErrors | undefined => {
   const normalizedField = field.replace(/[^a-z]/gi, "").toLowerCase();
@@ -216,6 +226,8 @@ const getEditUserValidationErrors = ({
     errors.dateOfBirth = editUserValidationMessages.dateOfBirthInFuture;
   } else if (dateOfBirthOnly > addYears(today, -18)) {
     errors.dateOfBirth = editUserValidationMessages.dateOfBirthUnder18;
+  } else if (dateOfBirthOnly < addYears(today, -90)) {
+    errors.dateOfBirth = editUserValidationMessages.dateOfBirthOver90;
   }
 
   if (!joinedDateOnly) {
@@ -241,12 +253,33 @@ const getEditUserValidationErrors = ({
 };
 
 export default function EditUserPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
   const userId = searchParams.get("id") ?? "";
 
-  const { data: user, isLoading } = useGetUserForEditQuery(userId, {
+  const { data: user, isLoading, error } = useGetUserForEditQuery(userId, {
     skip: !userId,
   });
+
+  useEffect(() => {
+    if (!isApiErrorResponse(error)) {
+      return;
+    }
+
+    dispatch(
+      enqueueToast({
+        message: getEditUserErrorMessage(error),
+        type: ToastType.Error,
+      }),
+    );
+
+    if (error.status >= 500) {
+      return;
+    }
+
+    router.replace("/admin/users");
+  }, [dispatch, error, router]);
 
   if (!userId) {
     return (
@@ -416,8 +449,7 @@ function EditUserForm({
         if (error.status === 409) {
           dispatch(
             enqueueToast({
-              message:
-                "This user was updated by someone else. Please reload and try again.",
+              message: getEditUserErrorMessage(error),
               type: ToastType.Error,
             }),
           );
@@ -432,6 +464,14 @@ function EditUserForm({
             return;
           }
         }
+
+        dispatch(
+          enqueueToast({
+            message: getEditUserErrorMessage(error),
+            type: ToastType.Error,
+          }),
+        );
+        return;
       }
 
       dispatch(

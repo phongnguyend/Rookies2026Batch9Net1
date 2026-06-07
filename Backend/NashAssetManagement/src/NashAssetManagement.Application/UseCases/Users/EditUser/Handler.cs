@@ -45,7 +45,7 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
 
             // Check if user and current admin have same location
             if (!user.LocationId.ToString().Equals(currentUser.LocationId))
-                return Errors.UserHasDifferentLocation(request.UserId!);
+                return Errors.UserHasDifferentLocation();
 
             // Check if admin edit their own information
             if (request.Type != user.UserType &&
@@ -126,7 +126,7 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 {
                     await userSessionNotifier.ForceLogoutAsync(
                         user.Id,
-                        "Your user type was updated. Please sign in again.",
+                        "Your account privilege has changed. Please login again.",
                         cancellationToken);
                 }
 

@@ -14,6 +14,7 @@ export interface Assignment {
   assignedBy: string;
   assignedDate: string;
   state: string;
+  isReturning: boolean;
 }
 
 export type AssignmentDetails = {
@@ -25,13 +26,12 @@ export type AssignmentDetails = {
   assignedDate: string;
   state: string;
   note: string;
+  isReturning: boolean;
 };
 
 export enum AssignmentState {
   WaitingForAcceptance = "WaitingForAcceptance",
   Accepted = "Accepted",
-  Declined = "Declined",
-  Returned = "Returned",
 }
 
 export interface GetAssignmentsRequest
@@ -49,6 +49,10 @@ export interface CreateAssignmentRequest {
   assetId: string;
   assignedDate: string;
   note?: string;
+}
+
+export interface AdminCreateReturnRequest {
+  assignmentId: string;
 }
 
 export interface GetAssignmentsResponse extends PaginationResponse<Assignment> { }

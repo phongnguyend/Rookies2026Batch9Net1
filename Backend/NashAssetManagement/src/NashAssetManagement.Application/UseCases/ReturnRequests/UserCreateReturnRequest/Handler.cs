@@ -40,9 +40,11 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.UserCreateRetu
 
             try
             {
-                var createRequest = ReturnRequest.Create(assignmentId, userId.Value, dateTimeProvider.UtcNow);
+                var dateTimeNow = dateTimeProvider.UtcNow;
+                var createRequest = ReturnRequest.Create(assignmentId, userId.Value, dateTimeNow);
                 assignment.ReturnRequests.Add(createRequest);
                 assignment.IsReturning = true;
+                assignment.UpdatedAtUtc = dateTimeNow;
                 await uow.SaveChangesAsync(cancellationToken);
                 return Result.Created;
             }

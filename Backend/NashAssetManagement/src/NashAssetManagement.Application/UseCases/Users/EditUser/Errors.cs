@@ -19,10 +19,10 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
                 "EditUser.NotFound",
                 $"User with ID {userId} not found.");
 
-        public static Error UserHasDifferentLocation(string userId) =>
+        public static Error UserHasDifferentLocation() =>
             Error.Conflict(
                 "EditUser.Conflict",
-                $"User with ID {userId} has a different location.");
+                "You are not allowed to edit the information of users in a different location.");
 
         public static Error UserHasNoLocation() =>
             Error.NotFound(

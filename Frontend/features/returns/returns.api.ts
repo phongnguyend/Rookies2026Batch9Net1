@@ -1,9 +1,11 @@
 import { baseApiSlice } from "@/lib/api/base.api";
 import { SortDirection } from "@/lib/api/base.types";
 import {
+  type CompleteReturnRequestRequest,
   type GetReturnRequestsRequest,
   type GetReturnRequestsResponse,
 } from "./returns.types";
+import { AdminCreateReturnRequest } from "../assignments/admin/assignments.types";
 
 export const returnsApi = baseApiSlice.injectEndpoints({
   overrideExisting: true,
@@ -50,7 +52,33 @@ export const returnsApi = baseApiSlice.injectEndpoints({
 
       providesTags: ["Return"],
     }),
+
+    adminCreateReturnRequest: builder.mutation<
+      void,
+      AdminCreateReturnRequest
+    >({
+      query: ({ assignmentId }) => ({
+        url: `/v1/admin/assignments/${assignmentId}/return-request`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Assignment", "Return"],
+    }),
+
+    completeReturnRequest: builder.mutation<void, CompleteReturnRequestRequest>({
+      query: ({ returnRequestId }) => ({
+        url: `v1/admin/return-requests/${returnRequestId}/complete`,
+        method: "POST",
+      }),
+
+      // Change state "Assignment" to [Return], "Asset" to [Available], "Return" to [Completed]
+      invalidatesTags: ["Return", "Assignment", "Asset"],
+    }),
   }),
 });
 
-export const { useGetReturnRequestsQuery } = returnsApi;
+export const {
+  useGetReturnRequestsQuery,
+  useAdminCreateReturnRequestMutation,
+  useCompleteReturnRequestMutation,
+} = returnsApi;
+

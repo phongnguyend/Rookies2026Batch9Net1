@@ -1,10 +1,18 @@
 "use client";
 
 import * as signalR from "@microsoft/signalr";
-import { authApi } from "@/features/auth/auth.api";
 import { logoutAccount } from "@/features/auth/auth.slice";
+import { authApi } from "./auth.api";
 import { ENV_CONFIGS } from "@/lib/config/env";
 import type { AppDispatch } from "@/lib/redux/store";
+
+const forceLogoutToastStorageKey = "forceLogoutToastMessage";
+const defaultForceLogoutMessage =
+  "Your account privilege has changed. Please login again.";
+
+type ForceLogoutMessage = {
+  reason?: string;
+};
 
 let connection: signalR.HubConnection | null = null;
 let isForceLoggingOut = false;
@@ -21,25 +29,27 @@ export const startUserSessionHub = async (dispatch: AppDispatch) => {
     .withAutomaticReconnect()
     .build();
 
-  connection.on("forceLogout", async () => {
+  connection.on("forceLogout", async (message?: ForceLogoutMessage) => {
     if (isForceLoggingOut) {
       return;
     }
 
     isForceLoggingOut = true;
 
-    try {
-      await dispatch(authApi.endpoints.logout.initiate()).unwrap();
-    } catch (error) {
-      console.error("Forced logout API failed:", error);
-    } finally {
-      dispatch(logoutAccount());
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+    // keep the message alive and appears onthe login toast, after being redirect to the login page
+    sessionStorage.setItem(
+      forceLogoutToastStorageKey,
+      message?.reason || defaultForceLogoutMessage,
+    );
 
-      await stopUserSessionHub();
-      window.location.replace("/");
-    }
+    // call logout endpoint by using imperative api to clear cookie
+    dispatch(authApi.endpoints.logout.initiate());
+
+    // clear user state
+    dispatch(logoutAccount());
+
+    // disconnect the signalr hub
+    await stopUserSessionHub();
   });
 
   try {

@@ -29,7 +29,7 @@ export default function ToastItem({ toast }: { toast: Toast }) {
   return (
     <div
       data-testid={toast.testId}
-      className={`alert ${typeClass} shadow-xl border-none text-white min-w-[320px] flex items-center gap-3 cursor-pointer hover:scale-[1.02] transition-transform duration-200 ease-out`}
+      className={`alert ${typeClass} shadow-xl border-none text-white w-[calc(100vw-2rem)] sm:w-auto sm:min-w-[320px] whitespace-normal flex items-center gap-3 cursor-pointer hover:scale-[1.02] transition-transform duration-200 ease-out`}
       onClick={() => dispatch(removeToast({ id: toast.id }))}
     >
       {/* Icon based on type */}
