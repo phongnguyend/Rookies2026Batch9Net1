@@ -73,7 +73,7 @@ export default function NavbarProfile() {
         </div>
         <ul
           tabIndex={0}
-          className="dropdown-content menu bg-base-100 rounded-box z-100 w-42 p-2 shadow text-base-content mt-2 border border-base-200"
+          className="dropdown-content menu bg-base-100 rounded-box z-100 w-42 p-2 shadow text-base-content mt-2 right-[-20px] border border-base-200"
         >
           <div className="px-3 py-2 text-xs select-text cursor-text md:hidden">
             Role: <span className="text-primary font-bold">{user.role}</span>

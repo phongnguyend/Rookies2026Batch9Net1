@@ -42,7 +42,7 @@ namespace NashAssetManagement.WebAPI.Configuration
                             // get from cookie first
                             var token = context.Request.Cookies[JwtTokenConstants.CookieAccessToken];
 
-                            // if failed, back up and get from request header
+                            // backup request header for Incognito Mode
                             if (string.IsNullOrWhiteSpace(token))
                             {
                                 var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
@@ -51,6 +51,20 @@ namespace NashAssetManagement.WebAPI.Configuration
                                     token = authHeader.Substring("Bearer ".Length).Trim();
                                 }
                             }
+
+                            // backup request header for signalR, hubs connection passing access_token on query string
+                            // https://learn.microsoft.com/en-us/aspnet/core/signalr/authn-and-authz?view=aspnetcore-10.0
+                            if (string.IsNullOrWhiteSpace(token))
+                            {
+                                var accessToken = context.Request.Query["access_token"];
+                                var path = context.HttpContext.Request.Path;
+
+                                if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/hubs/user-session"))
+                                {
+                                    token = accessToken;
+                                }
+                            }
+
                             context.Token = token;
                             return Task.CompletedTask;
                         },

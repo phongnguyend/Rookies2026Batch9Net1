@@ -1,27 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import DeleteAssetModal from '@/features/Assets/components/assetDeleteModel';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/redux/hooks";
+import DeleteAssetModal from "@/features/Assets/components/assetDeleteModel";
 import {
   useGetAssetsQuery,
   useGetCategoriesQuery,
-} from '@/features/Assets/assets.api';
-import { AssetState, type AssetListItem } from '@/features/Assets/assets.types';
-import Pagination from '@/features/shared/components/Pagination';
-import SearchInput from '@/features/shared/components/SearchInput';
-import DropdownFilter from '@/features/shared/components/DropdownFilter';
-import AssetDetailModal from '@/features/Assets/components/assetDetailModal';
+} from "@/features/Assets/assets.api";
+import { AssetState, type AssetListItem } from "@/features/Assets/assets.types";
+import Pagination from "@/features/shared/components/Pagination";
+import SearchInput from "@/features/shared/components/SearchInput";
+import DropdownFilter from "@/features/shared/components/DropdownFilter";
+import AssetDetailModal from "@/features/Assets/components/assetDetailModal";
 import DataTable, {
   ColumnDef,
   SortItem,
-} from '@/features/Assets/components/assetDataTable';
-import DropdownStateFilter from '@/features/Assets/components/stateDropdown';
-import {
-  getPinnedEditedAsset,
-  clearPinnedEditedAsset,
-} from '@/features/Assets/editAssetStore';
+} from "@/features/Assets/components/assetDataTable";
+import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
+import { clearPinnedEditedAsset, getPinnedEditedAsset } from "@/features/Assets/editAssetStore";
+import { CircleX, Pencil } from "lucide-react";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -36,12 +34,11 @@ const default_states = [
 
 function AssetsContent() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   // ─── All state via useState ────────────────────
   const [pageNumber, setPageNumber] = useState(1);
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] =
     useState<AssetState[]>(default_states);
@@ -67,43 +64,55 @@ function AssetsContent() {
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetCategoriesQuery();
 
-  const { data, isLoading } = useGetAssetsQuery({
-    pageNumber,
-    pageSize: 10,
-    categories: selectedCategories.length > 0 ? selectedCategories : undefined,
-    states: selectedStates.length > 0 ? selectedStates : undefined,
-    search: search || undefined,
-    sortBy: sort?.key,
-    sortDirection: sort?.direction,
-    isCreatedNewAsset,
-  });
+  const { data, isLoading } = useGetAssetsQuery(
+    {
+      pageNumber,
+      pageSize: 10,
+      categories:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
+      states: selectedStates.length > 0 ? selectedStates : undefined,
+      search: search || undefined,
+      sortBy: sort?.key,
+      sortDirection: sort?.direction,
+      isCreatedNewAsset,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   // ─── Display Item ───────────────────────────────────────
   // ─── Read pinned edited asset on mount ─────────
-  const [pinnedEditedAsset] = useState<AssetListItem | null>(() =>
-    getPinnedEditedAsset(),
-  );
+  const [pinnedEditedAsset] =
+    useState<AssetListItem | null>(() => getPinnedEditedAsset());
 
   // ─── Clear when user leaves assets page ────────
   useEffect(() => {
-    return () => {
-      clearPinnedEditedAsset(); // ← clears on unmount (tab switch)
-    };
-  }, []);
+    if (!data) return;
+    clearPinnedEditedAsset();
+  });
 
   const displayItems = (() => {
     const items = data?.items ?? [];
-    if (!pinnedEditedAsset) {
+
+    const isDefaultFilter =
+      selectedCategories.length === 0 &&
+      search === "" &&
+      sort === null &&
+      isDefaultStateSelection;
+
+    if (!isDefaultFilter || !pinnedEditedAsset) {
       return items;
     }
+
     const filteredItems = items.filter(
       (item) => item.assetCode !== pinnedEditedAsset.assetCode,
     );
-    if (pageNumber === 1) {
-      return [pinnedEditedAsset, ...filteredItems];
-    }
-    return filteredItems;
-  })();
+
+    return pageNumber === 1
+      ? [pinnedEditedAsset, ...filteredItems]
+      : filteredItems;
+    })();
 
   const categoryOptions =
     categoriesData?.map((c) => ({
@@ -131,7 +140,6 @@ function AssetsContent() {
 
   const handleSortChange = (newSort: SortItem | null) => {
     setSort(newSort);
-    setPageNumber(1);
   };
 
   const handleEdit = (row: AssetListItem, e: React.MouseEvent) => {
@@ -142,38 +150,38 @@ function AssetsContent() {
   // ─── Columns ───────────────────────────────────
   const columns: ColumnDef<AssetListItem>[] = [
     {
-      key: 'assetCode',
-      header: 'Asset Code',
+      key: "assetCode",
+      header: "Asset Code",
       sortable: true,
-      testId: 'btnSortAssetCode',
-      className: 'w-32',
+      testId: "btnSortAssetCode",
+      className: "w-32",
     },
     {
-      key: 'name',
-      header: 'Asset Name',
+      key: "name",
+      header: "Asset Name",
       sortable: true,
-      testId: 'btnSortAssetName',
-      className: 'w-64',
+      testId: "btnSortAssetName",
+      className: "w-64",
       render: (row) => <div className="truncate">{row.name}</div>,
     },
     {
-      key: 'category',
-      header: 'Category',
+      key: "category",
+      header: "Category",
       sortable: true,
-      testId: 'btnSortCategory',
-      className: 'w-40',
+      testId: "btnSortCategory",
+      className: "w-40",
     },
     {
-      key: 'state',
-      header: 'State',
+      key: "state",
+      header: "State",
       sortable: true,
-      testId: 'btnSortState',
-      className: 'w-32',
+      testId: "btnSortState",
+      className: "w-32",
     },
     {
-      key: '',
-      header: 'Actions',
-      className: 'w-28',
+      key: "",
+      header: "Actions",
+      className: "w-28",
       render: (row) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button
@@ -184,22 +192,10 @@ function AssetsContent() {
             }
             data-testid="btnEdit"
             onClick={(e) => handleEdit(row, e)}
-            className="btn btn-xs btn-outline"
+            className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
+            title="Edit"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              <path d="m15 5 4 4" />
-            </svg>
+            <Pencil size={22} />
           </button>
           <button
             data-testid="btnIconDelete"
@@ -212,28 +208,15 @@ function AssetsContent() {
                 hasHistory: row.hasHistory,
               });
             }}
-            className="btn btn-xs btn-error btn-outline"
+            className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
             disabled={
               DeleteDisabledStates
                 ? DeleteDisabledStates
                 : row.state === AssetState.Assigned
             }
+            title="Delete"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="m15 9-6 6" />
-              <path d="m9 9 6 6" />
-            </svg>
+            <CircleX size={22} />
           </button>
         </div>
       ),
@@ -248,16 +231,26 @@ function AssetsContent() {
       />
       <DeleteAssetModal
         assetId={deleteTarget?.id ?? null}
-        assetName={deleteTarget?.name ?? ''}
+        assetName={deleteTarget?.name ?? ""}
         hasHistory={deleteTarget?.hasHistory ?? false}
         onClose={() => setDeleteTarget(null)}
       />
       <div className="pb-4 md:pb-12">
         {/* Filters */}
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-          {/* Left group */}
+        <div
+          className="
+          mb-4
+          flex
+          flex-col
+          gap-3
+          xl:flex-row
+          xl:items-center
+        "
+        >
+          {/* Left filters */}
+          {/* Left filters */}
           <div className="flex flex-wrap gap-3">
-            <div className="flex-1 min-w-[160px] sm:flex-none">
+            <div className="flex-1 min-w-[180px]">
               <DropdownStateFilter
                 items={state_options}
                 values={selectedStates}
@@ -265,17 +258,15 @@ function AssetsContent() {
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleStateChange}
-                customLabel={isDefaultStateSelection ? 'State' : undefined}
+                customLabel={isDefaultStateSelection ? "State" : undefined}
               />
             </div>
-            <div
-              data-testid="ddlCategory"
-              className="flex-1 min-w-[160px] sm:flex-none"
-            >
+
+            <div data-testid="ddlCategory" className="flex-1 min-w-[180px]">
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-                placeholder={categoriesLoading ? 'Loading...' : 'Category'}
+                placeholder={categoriesLoading ? "Loading..." : "Category"}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
@@ -284,23 +275,44 @@ function AssetsContent() {
             </div>
           </div>
 
-          {/* Right group */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+          {/* Search + button */}
+          <div
+            className="
+              flex
+              flex-col
+              gap-3
+              sm:flex-row
+              sm:items-center
+              xl:ml-auto
+            "
+          >
             <div data-testid="txtSearch" className="w-full sm:w-60">
               <SearchInput
                 value={searchInput}
                 onChange={setSearchInput}
                 onSearch={handleSearch}
-                placeholder="Search ..."
+                placeholder="Search..."
                 width="w-full"
               />
             </div>
+
             <button
               data-testid="btnCreateAsset"
-              onClick={() => router.push('/admin/assets/create')}
-              className="btn btn-primary btn-sm w-full sm:w-auto whitespace-nowrap"
+              onClick={() => router.push("/admin/assets/create")}
+              className="
+                w-full
+                sm:w-auto
+                whitespace-nowrap
+                rounded
+                bg-primary
+                px-5
+                py-2
+                font-semibold
+                text-white
+                cursor-pointer
+              "
             >
-              + Create New Asset
+              Create New Asset
             </button>
           </div>
         </div>

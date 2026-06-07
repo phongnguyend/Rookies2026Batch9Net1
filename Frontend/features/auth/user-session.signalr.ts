@@ -24,6 +24,13 @@ export const startUserSessionHub = async (dispatch: AppDispatch) => {
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl(`${ENV_CONFIGS.apiUrl}/hubs/user-session`, {
+
+      // backup sending accessToken in incognito mode
+      accessTokenFactory: () => {
+        return localStorage.getItem("accessToken") || "";
+      },
+
+      // cookie first
       withCredentials: true,
     })
     .withAutomaticReconnect()
