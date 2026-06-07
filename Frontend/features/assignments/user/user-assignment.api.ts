@@ -18,6 +18,7 @@ export const userAssignmentApi = baseApiSlice.injectEndpoints({
         url: "/v1/user/assignments",
         params,
       }),
+      providesTags: ["Assignment"]
     }),
 
     viewUserAssignmentDetail: builder.query<
@@ -27,6 +28,7 @@ export const userAssignmentApi = baseApiSlice.injectEndpoints({
       query: ({ assignmentId }) => ({
         url: `/v1/user/assignments/${assignmentId}/detail`,
       }),
+      providesTags: ["Assignment"]
     }),
 
     userCreateReturnRequest: builder.mutation<
