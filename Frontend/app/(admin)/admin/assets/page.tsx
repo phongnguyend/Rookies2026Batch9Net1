@@ -123,16 +123,19 @@ function AssetsContent() {
   // ─── Handlers ─────────────────────────────────
   const handleStateChange = (values: string[]) => {
     setSelectedStates(values as AssetState[]);
+    setPageNumber(1);
   };
 
   const handleCategoryChange = (values: string[]) => {
     setSelectedCategories(values);
+    setPageNumber(1);
   };
 
   const handleSearch = (value: string) => {
     const trimmed = value.trim();
     setSearch(trimmed);
     setSearchInput(trimmed);
+    setPageNumber(1);
   };
 
   const handleSortChange = (newSort: SortItem | null) => {
