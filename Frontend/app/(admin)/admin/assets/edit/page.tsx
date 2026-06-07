@@ -12,35 +12,18 @@ import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { setPinnedEditedAsset } from "@/features/Assets/editAssetStore";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
-
-const EDITABLE_STATES = [
-  {
-    value: AssetState.Available,
-    label: "Available",
-    testId: "rdoAvailable",
-  },
-  {
-    value: AssetState.NotAvailable,
-    label: "Not available",
-    testId: "rdoNotAvailable",
-  },
-  {
-    value: AssetState.WaitingForRecycling,
-    label: "Waiting for recycling",
-    testId: "rdoWaiting",
-  },
-  {
-    value: AssetState.Recycled,
-    label: "Recycled",
-    testId: "rdoRecycled",
-  },
-];
-
-const EMOJI_REGEX = /\p{Extended_Pictographic}/gu;
-const allowedRegex =
-  /^(?=.*[\p{L}])[\p{L}\p{N}"\/\-\|\(\)\+\.,]+(?: ?[\p{L}\p{N}"\/\-\|\(\)\+\.,]+)*$/u;
-const normalize = (value: string) => stripEmoji(value);
-const stripEmoji = (value: string) => value.replace(EMOJI_REGEX, "");
+import {
+  ALLOWED_REGEX,
+  normalizeText,
+  stripEmoji,
+  formatDateToISO,
+  EDITABLE_STATES,
+} from "@/features/Assets/components/assetConstant";
+import {
+  FormField,
+  CharacterCounter,
+  FieldError,
+} from "@/features/Assets/components/assetSharedForm";
 
 export default function EditAssetPage() {
   const router = useRouter();
@@ -82,18 +65,18 @@ export default function EditAssetPage() {
       errors.assetName = "Asset name is required.";
     } else if (form.assetName.length > 100) {
       errors.assetName = "Asset name must not exceed 100 characters.";
-    } else if (!allowedRegex.test(form.assetName)) {
+    } else if (!ALLOWED_REGEX.test(form.assetName)) {
       errors.assetName =
-        'Asset name must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
+        'Asset name must contain at least one letter and only allow letters, numbers and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.specification.trim()) {
       errors.specification = "Specification is required.";
     } else if (form.specification.length > 500) {
       errors.specification = "Specification must not exceed 500 characters.";
-    } else if (!allowedRegex.test(form.specification)) {
+    } else if (!ALLOWED_REGEX.test(form.specification)) {
       errors.specification =
-        'Specification must contain at least one letter and only allow letters, numbers, one spaces between words, and these special characters: " / - | ( ) + . ,';
+        'Specification must contain at least one letter and only allow letters, numbers and these special characters: " / - | ( ) + . ,';
     }
 
     if (!form.installedDate) {
@@ -110,20 +93,13 @@ export default function EditAssetPage() {
     form.installedDate instanceof Date &&
     !isNaN(form.installedDate.getTime());
 
-  const formatDate = (date: Date | null) => {
-    if (!date || isNaN(date.getTime())) return "";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`; // ← YYYY-MM-DD not DD/MM/YYYY
-  };
-
   const isChanged =
     asset &&
     (form.assetName !== asset.name ||
       form.specification !== asset.specification ||
       form.state !== asset.state ||
-      formatDate(form.installedDate) !== asset.installedAtUtc.split("T")[0]);
+      formatDateToISO(form.installedDate) !==
+        asset.installedAtUtc.split("T")[0]);
 
   //-- Enable Save Button when something is edited ----------------------
   const canSave = isFormValid && isChanged && !isEditing;
@@ -143,9 +119,9 @@ export default function EditAssetPage() {
     try {
       const result = await editAsset({
         assetId: assetId!,
-        assetName: stripEmoji(form.assetName).trim(),
-        specification: stripEmoji(form.specification).trim(),
-        installedDate: formatDate(form.installedDate),
+        assetName: normalizeText(form.assetName).trim(),
+        specification: normalizeText(form.specification).trim(),
+        installedDate: formatDateToISO(form.installedDate),
         state: form.state,
       }).unwrap();
 
@@ -185,7 +161,7 @@ export default function EditAssetPage() {
     }
   };
 
-  //-- Check Url (Scenario : user parse id of assinged or softdeleted on URL) -------
+  //-- Check Url (Scenario : user parse id of assigned or deleted on URL) -------
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -216,144 +192,75 @@ export default function EditAssetPage() {
       )}
       {/* Name */}
       <div className="space-y-4">
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full pt-0 text-sm font-medium text-gray-700 md:w-36 md:shrink-0 md:pt-2">
-            Name
-          </label>
-          <div className="flex-1">
-            <input
-              data-testid="txtName"
-              type="text"
-              maxLength={100}
-              value={form.assetName}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  assetName: stripEmoji(e.target.value),
-                }))
-              }
-              className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-primary"
-            />
-            <div className="mt-1 flex justify-between text-xs">
-              {normalize(form.assetName).length === 100 ? (
-                <span className="text-orange-500">
-                  Maximum characters is 100.
-                </span>
-              ) : (
-                <span />
-              )}
-              <span
-                className={
-                  normalize(form.assetName).length === 0 ||
-                  normalize(form.assetName).length === 100
-                    ? "text-red-500"
-                    : "text-gray-500"
-                }
-              >
-                {normalize(form.assetName).length}/100
-              </span>
-            </div>
-            {fieldErrors.assetName && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.assetName}
-              </p>
-            )}
-          </div>
-        </div>
+        <FormField label="Name">
+          <input
+            data-testid="txtName"
+            type="text"
+            maxLength={100}
+            value={form.assetName}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                assetName: stripEmoji(e.target.value),
+              }))
+            }
+            className="h-9 w-full rounded border border-gray-400 px-3 text-sm outline-none focus:border-gray-600"
+          />
+          <CharacterCounter value={form.assetName} max={100} />
+          <FieldError message={fieldErrors.assetName} />
+        </FormField>
+
         {/* Category */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full pt-0 text-sm font-medium text-gray-700 md:w-36 md:shrink-0 md:pt-2">
-            Category
-          </label>
-          <div className="flex-1">
-            <input
-              data-testid="txtCategory"
-              type="text"
-              value={asset?.category ?? ""}
-              disabled
-              className="h-9 w-full cursor-not-allowed rounded border border-gray-200 bg-gray-100 px-3 text-sm text-gray-500"
-            />
-          </div>
-        </div>
+        <FormField label="Category">
+          <input
+            data-testid="txtCategory"
+            type="text"
+            value={asset?.category ?? ""}
+            disabled
+            className="h-9 w-full cursor-not-allowed rounded border border-gray-200 bg-gray-100 px-3 text-sm text-gray-500"
+          />
+        </FormField>
         {/* Specification */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full pt-0 text-sm font-medium text-gray-700 md:w-36 md:shrink-0 md:pt-2">
-            Specification
-          </label>
-          <div className="flex-1">
-            <textarea
-              data-testid="txaSpecification"
-              rows={4}
-              maxLength={500}
-              value={form.specification}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  specification: stripEmoji(e.target.value),
-                }))
-              }
-              className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-            <div className="mt-1 flex items-center justify-between text-xs">
-              {normalize(form.specification).length === 500 ? (
-                <span className="text-orange-500">
-                  Maximum characters is 500.
-                </span>
-              ) : (
-                <span />
-              )}
-              <span
-                className={
-                  normalize(form.specification).length === 0 ||
-                  normalize(form.specification).length === 500
-                    ? "text-red-500"
-                    : "text-gray-500"
-                }
-              >
-                {normalize(form.specification).length}/500
-              </span>
-            </div>
-            {fieldErrors.specification && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.specification}
-              </p>
-            )}
-          </div>
-        </div>
+        <FormField label="Specification">
+          <textarea
+            data-testid="txaSpecification"
+            rows={4}
+            maxLength={500}
+            value={form.specification}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                specification: stripEmoji(e.target.value),
+              }))
+            }
+            className="w-full resize-none rounded border border-gray-400 px-3 py-2 text-sm outline-none focus:border-gray-600"
+          />
+
+          <CharacterCounter value={form.specification} max={500} />
+
+          <FieldError message={fieldErrors.specification} />
+        </FormField>
 
         {/* Installed Date */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full pt-0 text-sm font-medium text-gray-700 md:w-36 md:shrink-0 md:pt-2">
-            Installed Date
-          </label>
-          <div className="flex-1">
-            <DatePickerInput
-              key={form.installedDate?.toISOString() ?? "empty"}
-              value={form.installedDate}
-              onChange={(date) => {
-                setForm((prev) => ({
-                  ...prev,
-                  installedDate:
-                    date instanceof Date && !isNaN(date.getTime())
-                      ? date
-                      : null,
-                }));
-              }}
-              placeholder="Select date"
-              width="w-full"
-            />
-            {fieldErrors.installedDate && (
-              <p className="mt-1 text-sm text-red-500">
-                {fieldErrors.installedDate}
-              </p>
-            )}
-          </div>
-        </div>
+        <FormField label="Installed Date">
+          <DatePickerInput
+            key={form.installedDate?.toISOString() ?? "empty"}
+            value={form.installedDate}
+            onChange={(date) => {
+              setForm((prev) => ({
+                ...prev,
+                installedDate:
+                  date instanceof Date && !isNaN(date.getTime()) ? date : null,
+              }));
+            }}
+            placeholder="Select date"
+            width="w-full"
+          />
+
+          <FieldError message={fieldErrors.installedDate} />
+        </FormField>
         {/* State */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full pt-0 text-sm font-medium text-gray-700 md:w-36 md:shrink-0 md:pt-2">
-            State
-          </label>
+        <FormField label="State">
           <div className="flex flex-col gap-2 pt-2">
             {EDITABLE_STATES.map((s) => (
               <label
@@ -373,11 +280,12 @@ export default function EditAssetPage() {
                   }
                   className="radio radio-primary radio-sm"
                 />
+
                 {s.label}
               </label>
             ))}
           </div>
-        </div>
+        </FormField>
       </div>
 
       <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

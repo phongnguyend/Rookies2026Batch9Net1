@@ -35,6 +35,15 @@ export default function CategoryDropdown({
   const [newName, setNewName] = useState("");
   const [newPrefix, setNewPrefix] = useState("");
 
+  const categoryNameRegex = /^(?=.*\p{L})[\p{L}\p{N}\s]+$/u;
+  const prefixRegex = /^[A-Z]{2}$/;
+  const emojiRegex = /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu;
+
+  const isValidCategoryName = (value: string) => {
+    const withoutEmoji = value.replace(emojiRegex, "");
+    return withoutEmoji === value && categoryNameRegex.test(value);
+  };
+
   const resetAddForm = () => {
     setShowAddForm(false);
     setNewName("");
@@ -75,17 +84,12 @@ export default function CategoryDropdown({
       (c) => c.prefix.toLowerCase() === parsedPrefix.toLowerCase(),
     );
 
-    const categoryNameRegex = /^[A-Za-z ]+$/;
-    const prefixRegex = /^[A-Z]{2}$/;
-
     const toastErrors: string[] = [];
 
     if (!parsedName) {
       toastErrors.push("Category name is required.");
-    } else if (!categoryNameRegex.test(parsedName)) {
-      toastErrors.push(
-        "Category name must contain Letters in English.",
-      );
+    } else if (!isValidCategoryName(parsedName)) {
+      toastErrors.push("Category name must contain letters only.");
     } else if (nameExists) {
       toastErrors.push(
         "Category is already existed. Please enter a different category",
@@ -95,7 +99,7 @@ export default function CategoryDropdown({
     if (!parsedPrefix) {
       toastErrors.push("Prefix is required.");
     } else if (!prefixRegex.test(parsedPrefix)) {
-      toastErrors.push("Prefix must contain 2 English letters.");
+      toastErrors.push("Prefix must contain 2 letters.");
     } else if (prefixExists) {
       toastErrors.push(
         "Prefix is already existed. Please enter a different prefix",
@@ -142,15 +146,20 @@ export default function CategoryDropdown({
         data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`btn w-full justify-between ${
-          error ? "btn-error" : "btn-outline"
-        }`}
+        className="
+          select
+          select-bordered
+          w-full
+          border-gray-400
+          focus:outline-none
+          focus:ring-0
+          focus:border-gray-500
+          active:border-gray-500
+        "
       >
         <span className="truncate">
           {isLoading ? "Loading..." : value || "Select category"}
         </span>
-
-        <span className="text-xs">▼</span>
       </button>
 
       {/* Dropdown */}
@@ -161,7 +170,7 @@ export default function CategoryDropdown({
               key={cat.id}
               onClick={() => handleSelectCategory(cat)}
               className={`cursor-pointer px-4 py-2 text-sm hover:bg-base-200 ${
-                value === cat.name ? "bg-base-200 font-semibold" : ""
+                value === cat.name ? "bg-base-200" : ""
               }`}
             >
               {cat.name}
@@ -186,10 +195,25 @@ export default function CategoryDropdown({
                   data-testid="txtAddNewCategoryName"
                   type="text"
                   value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
+                  onChange={(e) =>
+                    setNewName(
+                      e.target.value.replace(
+                        /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu,
+                        "",
+                      ),
+                    )
+                  }
                   onBlur={(e) => setNewName(toTitleCase(e.target.value))}
                   placeholder="Category name"
-                  className="input input-bordered input-sm w-full"
+                  className="
+                    input
+                    input-bordered
+                    input-sm
+                    w-full
+                    focus:outline-none
+                    focus:ring-0
+                    focus:border-gray-400
+                  "
                   autoFocus
                 />
 
@@ -198,9 +222,23 @@ export default function CategoryDropdown({
                   maxLength={2}
                   type="text"
                   value={newPrefix}
-                  onChange={(e) => setNewPrefix(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setNewPrefix(
+                      e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase(),
+                    )
+                  }
                   placeholder="Prefix"
-                  className="input input-bordered input-sm w-full sm:w-20 uppercase"
+                  className="
+                    input
+                    input-bordered
+                    input-sm
+                    w-full
+                    sm:w-20
+                    uppercase
+                    focus:outline-none
+                    focus:ring-0
+                    focus:border-gray-400
+                  "
                 />
 
                 <div className="flex gap-2 sm:self-center">

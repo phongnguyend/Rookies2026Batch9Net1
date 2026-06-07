@@ -35,7 +35,12 @@ public sealed class AssetDetailSpec
                 asset.Category!.CategoryName,
                 asset.Location!.Name,
                 asset.Assignments
-                    .OrderByDescending(a => a.AssignedAtUtc)
+                    .Where(a => a.State != AssignmentState.Declined && !a.IsDeleted)
+                    .OrderBy(a =>
+                        a.State == AssignmentState.WaitingForAcceptance ? 0 :
+                        a.State == AssignmentState.Accepted ? 1 :
+                        2)
+                    .ThenByDescending(a => a.AssignedAtUtc)
                     .Select(a => new GetAssetAssignmentHistoryResponse(
                         a.AssignedAtUtc,
                         $"{a.AssignedToUser!.FirstName} {a.AssignedToUser.LastName}",
