@@ -88,13 +88,15 @@ export default function UsersPage() {
     (type): type is UserRoles =>
       type === UserRoles.Admin || type === UserRoles.Staff,
   );
-  const [useTemporaryUpdatedSort, setUseTemporaryUpdatedSort] = useState(() => {
+
+  const [temporarySort, setTemporarySort] = useState<string | null>(() => {
     if (typeof window === "undefined") {
-      return false;
+      return null;
     }
 
-    return sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc";
+    return sessionStorage.getItem("usersTemporarySort");
   });
+
   const sorts: SortItem[] = sortByParam
     ? [
         {
@@ -104,7 +106,8 @@ export default function UsersPage() {
         },
       ]
     : [defaultSort];
-  const displayedSorts = useTemporaryUpdatedSort ? [] : sorts;
+
+  const displayedSorts = temporarySort ? [] : sorts;
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -190,14 +193,15 @@ export default function UsersPage() {
     pageNumber: queryPage,
     pageSize,
     ...(querySearch ? { searchTerm: querySearch } : {}),
-
-    // Backend currently accepts a single type value. When both roles are
-    // selected, the dropdown normalizes to "All", so no type filter is sent.
     ...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
-    sortBy: useTemporaryUpdatedSort
-      ? "updatedDate"
-      : (sorts[0]?.key ?? defaultSort.key),
-    ...(useTemporaryUpdatedSort || sorts[0]?.direction === SortDirection.Desc
+    sortBy:
+      temporarySort === "createdDateDesc"
+        ? "createdDate"
+        : temporarySort === "updatedDateDesc"
+          ? "updatedDate"
+          : (sorts[0]?.key ?? defaultSort.key),
+    ...(temporarySort ||
+    sorts[0]?.direction === SortDirection.Desc
       ? { sortDesc: true }
       : {}),
   };
@@ -206,7 +210,8 @@ export default function UsersPage() {
   const users = data?.items ?? [];
 
   const handleSortChange = (newSorts: SortItem[]) => {
-    setUseTemporaryUpdatedSort(false);
+    setTemporarySort(null);
+    sessionStorage.removeItem("usersTemporarySort");
 
     if (newSorts.length === 0) {
       updateQueryParams({ page: 1, sortBy: null, sortDesc: null });
@@ -222,10 +227,10 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    if (sessionStorage.getItem("usersTemporarySort") === "updatedDateDesc") {
+    if (temporarySort) {
       sessionStorage.removeItem("usersTemporarySort");
     }
-  }, []);
+  }, [temporarySort]);
 
   const columns: ColumnDef<UserRow>[] = [
     {
