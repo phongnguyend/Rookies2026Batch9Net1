@@ -255,10 +255,9 @@ export default function ReportPage() {
   const showPagination = totalCount > pageSize;
 
   return (
-    <div data-testid="tabReport">
-      <div className="text-lg font-bold text-primary mb-2">Report</div>
+    <div data-testid="tabReport" className="mb-10">
+      <div className="mb-6 text-xl font-bold text-primary">Report</div>
 
-      <div className="space-y-4 mb-8">
         <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
           {/* Right-aligned Export Button */}
           <div className="w-full sm:w-auto sm:ml-auto flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -300,7 +299,6 @@ export default function ReportPage() {
             />
           </div>
         )}
-      </div>
 
       <ConfirmModal
         isOpen={isModalOpen}

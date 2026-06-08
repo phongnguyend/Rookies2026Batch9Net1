@@ -335,14 +335,14 @@ export default function UsersPage() {
 
   return (
     <div
-      className="min-h-screen bg-white text-[#333]"
+      className="mb-10"
       data-testid="tabManagerUser"
     >
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
-          <div className="mb-6 mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex gap-5">
               <div data-testid="ddlFilterType">
                 <DropdownFilter

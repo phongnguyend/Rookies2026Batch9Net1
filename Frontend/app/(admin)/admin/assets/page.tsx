@@ -237,7 +237,7 @@ function AssetsContent() {
         hasHistory={deleteTarget?.hasHistory ?? false}
         onClose={() => setDeleteTarget(null)}
       />
-      <div className="pb-4 md:pb-12">
+      <div>
         {/* Filters */}
         <div
           className="
@@ -249,7 +249,6 @@ function AssetsContent() {
           xl:items-center
         "
         >
-          {/* Left filters */}
           {/* Left filters */}
           <div className="flex flex-wrap gap-3">
             <div className="flex-1 min-w-45">
@@ -351,7 +350,7 @@ function AssetsContent() {
 
 export default function AssetsPage() {
   return (
-    <div>
+    <div className="mb-10">
       <h1 className="text-primary font-bold text-xl mb-6">List Asset</h1>
       <AssetsContent />
     </div>

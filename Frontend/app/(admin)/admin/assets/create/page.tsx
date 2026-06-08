@@ -130,7 +130,7 @@ export default function CreateAssetPage() {
 
   // ─── Render ───────────────────────────────────────
   return (
-    <div className="max-w-lg">
+    <div className="max-w-lg mb-10">
       <h1 className="text-primary font-bold text-xl mb-6">Create New Asset</h1>
 
       {serverError && (
