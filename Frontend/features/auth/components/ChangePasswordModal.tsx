@@ -76,7 +76,6 @@ export default function ChangePasswordModal({
     register,
     handleSubmit,
     reset,
-    watch,
     trigger,
     formState: { errors, isValid, isSubmitted, touchedFields},
   } = useForm<ChangePasswordForm>({
@@ -88,13 +87,6 @@ export default function ChangePasswordModal({
       confirmPassword: "",
     },
   });
-
-  const oldPassword = watch("oldPassword");
-  const newPassword = watch("newPassword");
-
-  useEffect(() => {
-    trigger(["newPassword", "confirmPassword"]);
-  }, [oldPassword, newPassword, trigger]);
 
   const showOldPasswordError =
     !!errors.oldPassword && (touchedFields.oldPassword || isSubmitted);
@@ -220,7 +212,13 @@ export default function ChangePasswordModal({
                         type={showOldPassword ? "text" : "password"}
                         className={`${inputClass(showOldPasswordError)} pr-12`}
                         disabled={isLoading}
-                        {...register("oldPassword")}
+                        {...register("oldPassword", {
+                          onChange: () => {
+                            if (touchedFields.newPassword) {
+                              void trigger("newPassword");
+                            }
+                          },
+                        })}
                       />
 
                       <button
@@ -288,7 +286,17 @@ export default function ChangePasswordModal({
                         type={showNewPassword ? "text" : "password"}
                         className={inputClass(showNewPasswordError)}
                         disabled={isLoading}
-                        {...register("newPassword")}
+                        {...register("newPassword", {
+                          onChange: () => {
+                            if (touchedFields.oldPassword) {
+                              void trigger("newPassword");
+                            }
+
+                            if (touchedFields.confirmPassword) {
+                              void trigger("confirmPassword");
+                            }
+                          },
+                        })}
                       />
                       <button
                           data-testid="btnToggleNewPassword"
@@ -355,7 +363,11 @@ export default function ChangePasswordModal({
                         type={showConfirmPassword ? "text" : "password"}
                         className={inputClass(showConfirmPasswordError)}
                         disabled={isLoading}
-                        {...register("confirmPassword")}
+                        {...register("confirmPassword", {
+                          onChange: () => {
+                            void trigger("confirmPassword");
+                          },
+                        })}
                       />
                       <button
                         data-testid="btnToggleConfirmPassword"
