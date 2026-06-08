@@ -44,8 +44,8 @@ namespace NashAssetManagement.Application.UseCases.Users.UsersLookup
                 query = query.Where(x => x.StaffCode.Contains(searchTerm)
                     || x.FirstName.Contains(searchTerm)
                     || x.LastName.Contains(searchTerm)
-                    || (x.FirstName + " " + x.LastName).StartsWith(searchTerm)  
-                    || (x.LastName + " " + x.FirstName).StartsWith(searchTerm));
+                    || (x.FirstName + " " + x.LastName).Contains(searchTerm)  
+                    || (x.LastName + " " + x.FirstName).Contains(searchTerm));
             }
 
             int totalCount = await query.CountAsync(cancellationToken);
