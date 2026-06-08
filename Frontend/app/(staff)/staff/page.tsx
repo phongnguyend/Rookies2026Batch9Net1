@@ -4,7 +4,7 @@ import { UserAssignmentsDataTable } from "@/features/assignments/user/components
 
 export default function StaffHomePage() {
   return (
-    <div data-testid="mnuMyAssignment">
+    <div data-testid="mnuMyAssignment" className="mb-10">
       <div className="mb-6 text-xl font-bold text-primary">My Assignment</div>
       <UserAssignmentsDataTable></UserAssignmentsDataTable>
     </div>

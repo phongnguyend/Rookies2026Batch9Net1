@@ -407,14 +407,14 @@ export default function ReturnsPage() {
 
   return (
     <div
-      className="min-h-screen bg-white text-[#333]"
+      className="mb-10"
       data-testid="mnuReturning"
     >
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
-          <div className="mb-6 mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:gap-5 sm:items-center">
               <div data-testid="ddlState">
                 <DropdownFilter

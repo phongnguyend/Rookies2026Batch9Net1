@@ -117,7 +117,7 @@ export default function CreateAssignment({
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-xl">
+    <div className="w-full max-w-xl mb-10">
       <h2 className="mb-8 text-xl font-bold text-red-600">{title}</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>

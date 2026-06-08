@@ -284,7 +284,7 @@ export default function AssignmentsPage() {
   };
 
   return (
-    <div data-testid="mnuManageAssignment">
+    <div data-testid="mnuManageAssignment" className="mb-10">
       <h1 className="text-primary font-bold text-xl mb-6">Assignment List</h1>
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">

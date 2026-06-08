@@ -253,7 +253,7 @@ export default function CreateUserPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-lg space-y-4 px-4 sm:px-0">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-lg space-y-4 px-4 sm:px-0 mb-10">
       <h1 className="mb-6 text-xl font-bold text-primary">Create New User</h1>
 
       {/* First Name */}

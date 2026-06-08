@@ -26,6 +26,8 @@ import {
   localDateToUtcIso,
   utcDateToLocalDate,
 } from "@/utils/datetime.utils";
+import EntityNotFound from "@/features/shared/components/EntityNotFound";
+import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
 
 const genderOptions = [
   { label: "Female", value: Gender.Female },
@@ -160,7 +162,7 @@ function FormFieldRow({
 }) {
   return (
     <div className="grid grid-cols-1 gap-y-1 sm:grid-cols-[128px_minmax(0,1fr)] sm:gap-x-5">
-      <label className="text-sm text-gray-800 sm:pt-[7px]">{label}</label>
+      <label className="text-sm text-gray-800 sm:pt-1.75">{label}</label>
       <div>
         {children}
         {!hideError && <FieldErrorMessage message={error} />}
@@ -232,53 +234,41 @@ const getEditUserValidationErrors = ({
 };
 
 export default function EditUserPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const dispatch = useAppDispatch();
   const userId = searchParams.get("id") ?? "";
 
   const { data: user, isLoading, error } = useGetUserForEditQuery(userId, {
     skip: !userId,
   });
 
-  useEffect(() => {
-    if (!isApiErrorResponse(error)) {
-      return;
-    }
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
-    dispatch(
-      enqueueToast({
-        message: getEditUserErrorMessage(error),
-        type: ToastType.Error,
-      }),
-    );
-
-    if (error.status >= 500) {
-      return;
-    }
-
-    router.replace("/admin/users");
-  }, [dispatch, error, router]);
-
-  if (!userId) {
+  if (!userId || error || !user) {
     return (
       <div className="min-h-screen bg-white text-[#333]">
-        <main className="min-w-0 flex-1 px-4 sm:px-6 lg:pl-16 xl:pl-24">
-          <h2 className="mb-6 text-xl font-bold text-primary">Edit User</h2>
-          <p className="text-sm text-gray-700">Missing user id.</p>
-        </main>
+        <div className="min-w-0 flex-1">
+          <EntityNotFound
+            pageTitle="Edit User"
+            entityName="User"
+            action="edit"
+            redirectPath="/admin/users"
+            redirectText="Back to Manage Users"
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-[#333]" data-testid="tabManagerUser">
+    <div className="mb-10" data-testid="tabManagerUser">
       <div className="flex min-w-0">
-        <main className="min-w-0 flex-1 px-4 sm:px-6 lg:pl-16 xl:pl-24">
+        <div className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Edit User</h2>
           {isLoading && <p className="text-sm text-gray-700">Loading...</p>}
           {!isLoading && user && <EditUserForm userId={userId} user={user} />}
-        </main>
+        </div>
       </div>
     </div>
   );
@@ -402,14 +392,14 @@ function EditUserForm({
   };
 
   return (
-    <form className="w-full max-w-[560px] space-y-3" onSubmit={handleSubmit}>
+    <form className="w-full max-w-140 space-y-3" onSubmit={handleSubmit}>
       <FormFieldRow label="First Name">
         <input
           type="text"
           data-testid="txtEditFirstName"
           disabled
           value={user.firstName}
-          className="h-[33px] w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
+          className="h-8.25 w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
         />
       </FormFieldRow>
 
@@ -419,7 +409,7 @@ function EditUserForm({
           data-testid="txtEditLastName"
           disabled
           value={user.lastName}
-          className="h-[33px] w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
+          className="h-8.25 w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
         />
       </FormFieldRow>
 
@@ -496,7 +486,7 @@ function EditUserForm({
           type="submit"
           data-testid="btnSaveEditUser"
           disabled={isSaveDisabled}
-          className="h-[35px] w-full rounded bg-primary px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="hover:cursor-pointer h-8.75 w-full rounded bg-primary px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {isSaving ? "Saving..." : "Save"}
         </button>
@@ -505,7 +495,7 @@ function EditUserForm({
           type="button"
           data-testid="btnCancelEditUser"
           onClick={redirectToUsers}
-          className="h-[35px] w-full rounded border border-gray-400 bg-white px-4 text-sm text-gray-600 transition hover:bg-gray-50 sm:w-auto"
+          className="hover:cursor-pointer h-8.75 w-full rounded border border-gray-400 bg-white px-4 text-sm text-gray-600 transition hover:bg-gray-50 sm:w-auto"
         >
           Cancel
         </button>

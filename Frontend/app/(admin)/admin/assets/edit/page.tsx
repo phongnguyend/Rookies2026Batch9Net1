@@ -24,6 +24,8 @@ import {
   CharacterCounter,
   FieldError,
 } from "@/features/Assets/components/assetSharedForm";
+import EntityNotFound from "@/features/shared/components/EntityNotFound";
+import LoadingSpinner from "@/features/shared/components/LoadingSpinner";
 
 export default function EditAssetPage() {
   const router = useRouter();
@@ -32,7 +34,7 @@ export default function EditAssetPage() {
   const dispatch = useAppDispatch();
   const [serverError, setServerError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const { data: asset, isLoading } = useGetAssetByIdQuery(assetId ?? "", {
+  const { data: asset, isLoading, error } = useGetAssetByIdQuery(assetId ?? "", {
     skip: !assetId,
   });
 
@@ -163,26 +165,24 @@ export default function EditAssetPage() {
 
   //-- Check Url (Scenario : user parse id of assigned or deleted on URL) -------
   if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!assetId || !asset || error){
     return (
-      <div className="flex justify-center py-8">
-        <span className="loading loading-spinner loading-md" />
-      </div>
+      <EntityNotFound
+        pageTitle="Edit Asset"
+        entityName="Asset"
+        action="edit"
+        redirectPath="/admin/assets"
+        redirectText="Back to Manage Assets"
+      />
     );
-  }
-
-  if (!asset) {
-    router.replace("/admin/assets");
-    return null;
-  }
-
-  if (asset.state === AssetState.Assigned) {
-    router.replace("/admin/assets");
-    return null;
   }
 
   //-- Render -----------------------------------------------
   return (
-    <div className="w-full max-w-lg px-4 sm:px-0 mb-8">
+    <div className="w-full max-w-lg px-4 sm:px-0 mb-10">
       <h1 className="mb-6 text-xl font-bold text-primary">Edit Asset</h1>
 
       {serverError && (

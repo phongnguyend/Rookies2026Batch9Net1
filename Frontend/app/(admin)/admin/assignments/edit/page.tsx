@@ -136,7 +136,7 @@ const EditAssignmentPage = () => {
   }
 
   return (
-    <div className="w-full max-w-xl">
+    <div className="w-full max-w-xl mb-10">
       <h2 className="mb-8 text-xl font-bold text-red-600">Edit Assignment</h2>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="space-y-5">
