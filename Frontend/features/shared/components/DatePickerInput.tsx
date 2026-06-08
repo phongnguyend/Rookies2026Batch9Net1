@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { Month } from "@/lib/api/base.types";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
@@ -24,34 +24,35 @@ interface DatePickerInputProps {
   error?: string;
   showToast?: boolean;
 }
- 
+
 const MONTHS = Object.values(Month);
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
-const DATE_REGEX = /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4}$/;
+const DATE_REGEX =
+  /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4}$/;
 
 const parseDate = (input: string): Date | null => {
   if (!DATE_REGEX.test(input)) return null;
- 
+
   const [day, month, year] = input.split("/").map(Number);
   const date = new Date(year, month - 1, day);
- 
+
   const isValidDate =
     date.getFullYear() === year &&
     date.getMonth() === month - 1 &&
     date.getDate() === day;
- 
+
   if (!isValidDate) return null;
- 
+
   const currentYear = new Date().getFullYear();
- 
+
   if (year < currentYear - 100 || year > currentYear + 100) {
     return null;
   }
- 
+
   return date;
 };
- 
+
 export default function DatePickerInput({
   value,
   onChange,
@@ -64,18 +65,17 @@ export default function DatePickerInput({
   error,
 }: DatePickerInputProps) {
   const today = new Date();
- 
+
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(value ?? today);
 
   const [inputError, setInputError] = useState("");
   const dispatch = useAppDispatch();
- 
+
   const ref = useRef<HTMLDivElement>(null);
- 
+
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
- 
   // handle click outside for calendar modal
   useEffect(() => {
     const handleClickOutside = (e: PointerEvent) => {
@@ -83,18 +83,18 @@ export default function DatePickerInput({
         setOpen(false);
       }
     };
- 
+
     document.addEventListener("pointerdown", handleClickOutside);
     return () =>
       document.removeEventListener("pointerdown", handleClickOutside);
   }, []);
- 
+
   const formatDate = (date: Date | null) => {
     if (!date) return "";
- 
+
     const day = String(date.getDate()).padStart(2, "0");
     const monthValue = String(date.getMonth() + 1).padStart(2, "0");
- 
+
     return `${day}/${monthValue}/${date.getFullYear()}`;
   };
 
@@ -112,21 +112,21 @@ export default function DatePickerInput({
     a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate();
- 
+
   const days = useMemo(() => {
     const firstDay = new Date(year, month, 1).getDay();
     const totalDays = new Date(year, month + 1, 0).getDate();
     const prevMonthTotalDays = new Date(year, month, 0).getDate();
- 
+
     const result: { date: Date; inMonth: boolean }[] = [];
- 
+
     for (let i = firstDay - 1; i >= 0; i--) {
       result.push({
         date: new Date(year, month - 1, prevMonthTotalDays - i),
         inMonth: false,
       });
     }
- 
+
     for (let day = 1; day <= totalDays; day++) {
       result.push({
         date: new Date(year, month, day),
@@ -136,7 +136,7 @@ export default function DatePickerInput({
 
     while (result.length < 42) {
       const lastDate = result[result.length - 1].date;
- 
+
       result.push({
         date: new Date(
           lastDate.getFullYear(),
@@ -146,10 +146,10 @@ export default function DatePickerInput({
         inMonth: false,
       });
     }
- 
+
     return result;
   }, [year, month]);
- 
+
   const selectDate = (date: Date) => {
     onChange(date);
     setInputValue(formatDate(date));
@@ -157,16 +157,16 @@ export default function DatePickerInput({
     setInputError("");
     setOpen(false);
   };
- 
+
   const handleDateValidation = () => {
     if (!inputValue.trim()) {
       onChange(null);
       setInputError("");
       return;
     }
- 
+
     const parsedDate = parseDate(inputValue);
- 
+
     if (!parsedDate) {
       setInputError("Date must be valid and follow dd/MM/yyyy format");
       if (showToast) {
@@ -181,13 +181,21 @@ export default function DatePickerInput({
 
       return;
     }
- 
+
     onChange(parsedDate);
     setCursor(parsedDate);
     setInputValue(formatDate(parsedDate)); // auto format 5/6/2000 -> 05/06/2000
     setInputError("");
   };
- 
+
+  const [dropdownAlign, setDropdownAlign] = useState<"left" | "right">("left");
+  useEffect(() => {
+    if (!open) return;
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    setDropdownAlign(window.innerWidth - rect.left < 320 ? "right" : "left");
+  }, [open]);
+
   return (
     <div ref={ref} className={`relative ${width}`}>
       <div
@@ -231,11 +239,11 @@ export default function DatePickerInput({
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              <X size={16} className="hover:cursor-pointer"/>
+              <X size={16} className="hover:cursor-pointer" />
             </button>
           )}
         </div>
- 
+
         {/* Button Calendar */}
         <button
           data-testid="btnAssignedDateCalendar"
@@ -251,87 +259,106 @@ export default function DatePickerInput({
       )}
 
       {open && (
-        <div className="absolute left-0 top-9.5 z-50 w-[320px] overflow-hidden rounded-sm border border-gray-400 bg-base-100 shadow">
-          {/* Year and Month Navigator */}
-          <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-base-200 px-4">
-            <div className="flex gap-2">
-              <button
-                data-testid="btnPreviousYear"
-                type="button"
-                onClick={() => setCursor(new Date(year - 1, month, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
-              >
-                {<ChevronsLeft size={20} />}
-              </button>
- 
-              <button
-                data-testid="btnPreviousMonth"
-                type="button"
-                onClick={() => setCursor(new Date(year, month - 1, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
-              >
-                {<ChevronLeft size={20} />}
-              </button>
-            </div>
- 
-            <div className="text-base font-normal text-gray-700">
-              {MONTHS[month]} {year}
-            </div>
- 
-            <div className="flex justify-end gap-2">
-              <button
-                data-testid="btnNextMonth"
-                type="button"
-                onClick={() => setCursor(new Date(year, month + 1, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
-              >
-                {<ChevronRight size={20} />}
-              </button>
- 
-              <button
-                data-testid="btnNextYear"
-                type="button"
-                onClick={() => setCursor(new Date(year + 1, month, 1))}
-                className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
-              >
-                {<ChevronsRight size={20} />}
-              </button>
-            </div>
-          </div>
- 
-          <div className="grid grid-cols-7 px-4 pb-2 pt-4 text-center text-sm font-medium text-gray-500">
-            {WEEKDAYS.map((day, index) => (
-              <div key={`${day}-${index}`}>{day}</div>
-            ))}
-          </div>
- 
-          <div className="grid grid-cols-7 px-4 pb-4 text-center">
-            {days.map(({ date, inMonth }, index) => {
-              const selected = isSameDay(date, value!);
-              const currentDay = isSameDay(date, today);
- 
-              return (
+        <>
+          {/* Mobile backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-black/20 sm:hidden"
+            onClick={() => setOpen(false)}
+          />
+
+          <div
+            className={[
+              // Mobile: full-width bottom sheet
+              "fixed bottom-0 left-0 right-0 z-50 overflow-hidden rounded-t-xl border border-gray-400 bg-base-100 shadow",
+              // Desktop: absolute dropdown, restore dimensions
+              "sm:absolute sm:bottom-auto sm:top-9.5 sm:w-[320px] sm:rounded-sm",
+              // Desktop: flip alignment based on available space
+              dropdownAlign === "right"
+                ? "sm:right-0 sm:left-auto"
+                : "sm:left-0 sm:right-auto",
+            ].join(" ")}
+          >
+            {/* Year and Month Navigator */}
+            <div className="grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-base-200 px-4">
+              <div className="flex gap-2">
                 <button
-                  key={index}
+                  data-testid="btnPreviousYear"
                   type="button"
-                  onClick={() => selectDate(date)}
-                  className={[
-                    "mx-auto my-0.5 h-8 w-8 rounded text-sm leading-8 transition",
-                    selected
-                      ? "bg-primary text-primary-content"
-                      : currentDay
-                        ? "text-error"
-                        : inMonth
-                          ? "text-gray-600 hover:bg-base-200"
-                          : "text-gray-300",
-                  ].join(" ")}
+                  onClick={() => setCursor(new Date(year - 1, month, 1))}
+                  className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
                 >
-                  {date.getDate()}
+                  {<ChevronsLeft size={20} />}
                 </button>
-              );
-            })}
+
+                <button
+                  data-testid="btnPreviousMonth"
+                  type="button"
+                  onClick={() => setCursor(new Date(year, month - 1, 1))}
+                  className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
+                >
+                  {<ChevronLeft size={20} />}
+                </button>
+              </div>
+
+              <div className="text-base font-normal text-gray-700">
+                {MONTHS[month]} {year}
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  data-testid="btnNextMonth"
+                  type="button"
+                  onClick={() => setCursor(new Date(year, month + 1, 1))}
+                  className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
+                >
+                  {<ChevronRight size={20} />}
+                </button>
+
+                <button
+                  data-testid="btnNextYear"
+                  type="button"
+                  onClick={() => setCursor(new Date(year + 1, month, 1))}
+                  className="text-lg leading-none text-gray-300 transition hover:text-gray-500 hover:cursor-pointer"
+                >
+                  {<ChevronsRight size={20} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-7 px-4 pb-2 pt-4 text-center text-sm font-medium text-gray-500">
+              {WEEKDAYS.map((day, index) => (
+                <div key={`${day}-${index}`}>{day}</div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 px-4 pb-4 text-center">
+              {days.map(({ date, inMonth }, index) => {
+                const selected = isSameDay(date, value!);
+                const currentDay = isSameDay(date, today);
+
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => selectDate(date)}
+                    className={[
+                      "mx-auto my-0.5 h-8 w-8 rounded text-sm leading-8 transition",
+                      selected
+                        ? "bg-primary text-primary-content"
+                        : currentDay
+                          ? "text-error"
+                          : inMonth
+                            ? "text-gray-600 hover:bg-base-200"
+                            : "text-gray-300",
+                    ].join(" ")}
+                  >
+                    {date.getDate()}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
