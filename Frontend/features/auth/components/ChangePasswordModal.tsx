@@ -98,30 +98,32 @@ export default function ChangePasswordModal({
     !!errors.confirmPassword && (touchedFields.confirmPassword || isSubmitted);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) onClose();
+  const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        reset();
+        setErrorMessage(null);
+        setShowOldPassword(false);
+        setShowNewPassword(false);
+        setShowConfirmPassword(false);
+        onClose();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, reset, onClose]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
 
-    if (!isOpen) {
-      reset();
-      setErrorMessage(null);
-    }
-
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen, reset]);
+  }, [isOpen]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -142,8 +144,7 @@ export default function ChangePasswordModal({
         }),
       );
 
-      reset();
-      onClose();
+      handleClose();
       setIsSuccessOpen(true);
     } catch (err: any) {
       console.log(err);
@@ -155,11 +156,22 @@ export default function ChangePasswordModal({
   };
 
   const inputClass = (hasError?: boolean) =>
-    `w-full border rounded px-3 py-2 text-sm outline-none bg-white ${
+    `w-full border rounded px-3 py-2 pr-12 text-sm outline-none bg-white ${
       hasError
         ? "border-red-500 focus:border-red-500"
         : "border-gray-300 focus:border-primary"
     }`;
+
+  const handleClose = () => {
+    reset();
+    setErrorMessage(null);
+
+    setShowOldPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+
+    onClose();
+  };
 
   return (
     <>
@@ -190,7 +202,7 @@ export default function ChangePasswordModal({
 
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="text-gray-500 hover:text-gray-700 transition-colors duration-150 p-1 rounded-full hover:bg-gray-200"
                   aria-label="Close modal"
                 >
@@ -210,7 +222,7 @@ export default function ChangePasswordModal({
                       <input
                         data-testid="txtOldPassword"
                         type={showOldPassword ? "text" : "password"}
-                        className={`${inputClass(showOldPasswordError)} pr-12`}
+                        className={inputClass(showOldPasswordError)}
                         disabled={isLoading}
                         {...register("oldPassword", {
                           onChange: () => {
@@ -449,7 +461,7 @@ export default function ChangePasswordModal({
                   <button
                     data-testid="btnCancel"
                     type="button"
-                    onClick={onClose}
+                    onClick={handleClose}
                     disabled={isLoading}
                     className="hover:cursor-pointer px-4 py-2 border border-gray-400 rounded text-neutral-700 font-semibold hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
