@@ -94,7 +94,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.EditUser
                      && x.ErrorMessage == "Joined date is not later than Date of Birth. Please select a different date");
             Assert.DoesNotContain(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
-                     && x.ErrorMessage == "User must be at least 18 years old on the joined date. Please select a different date");
+                     && x.ErrorMessage == "User must be at least 18 years old at the Joined Date");
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.Users.EditUser
             result.ShouldHaveValidationErrorFor(x => x.JoinedDate);
             Assert.Contains(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
-                     && x.ErrorMessage == "User must be at least 18 years old on the joined date. Please select a different date");
+                     && x.ErrorMessage == "User must be at least 18 years old at the Joined Date");
             Assert.DoesNotContain(result.Errors,
                 x => x.PropertyName == nameof(Request.JoinedDate)
                      && x.ErrorMessage == "Joined date is not later than Date of Birth. Please select a different date");

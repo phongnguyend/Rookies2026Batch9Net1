@@ -39,16 +39,16 @@ type FieldErrors = Partial<Record<"dateOfBirth" | "gender" | "joinedDate" | "typ
 type RequiredDateField = "dateOfBirth" | "joinedDate";
 
 const editUserValidationMessages = {
-  dateOfBirthRequired: "'Date Of Birth' must not be empty.",
+  dateOfBirthRequired: "Date of Birth is required",
   dateOfBirthUnder18: "User is under 18. Please select a different date",
   dateOfBirthOver90: "User age must not exceed 90 years.",
   dateOfBirthInFuture:
     "Date of birth cannot be in the future. Please select a different date",
-  joinedDateRequired: "'Joined Date' must not be empty.",
+  joinedDateRequired: "Joined Date is required",
   joinedDateNotLaterThanDateOfBirth:
     "Joined date is not later than Date of Birth. Please select a different date",
   joinedDateUnder18:
-    "User must be at least 18 years old on the joined date. Please select a different date",
+    "User must be at least 18 years old at the Joined Date",
   joinedDateWeekend:
     "Joined date is Saturday or Sunday. Please select a different date",
   invalidGender: "Invalid gender. Please select a valid gender",
