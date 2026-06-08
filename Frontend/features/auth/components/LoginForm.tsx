@@ -173,7 +173,7 @@ export default function LoginForm({
         {/* enable initially, disable after a failed submission or form is not valid */}
         <button
           type="submit"
-          className="w-full bg-primary hover:bg-[#b52222] text-white font-semibold py-2.5 rounded-lg transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:bg-[#b52222] text-white font-semibold py-2.5 rounded-lg transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
           disabled={!isValid || isLoading}
           data-testid="btnLogin"
         >
