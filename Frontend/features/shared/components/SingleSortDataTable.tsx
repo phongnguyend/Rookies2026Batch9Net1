@@ -125,6 +125,13 @@ export default function SingleSortDataTable<T>({
                     ? getRowKey(row, rowIndex)
                     : rowIndex
                 }
+                tabIndex={onRowClick ? 0 : undefined}  //tabIndex focus for lookup
+                onKeyDown={(e) => {                          // tabIndex focus for lookup
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onRowClick?.(row);
+                  }
+                }}
                 onClick={() => onRowClick?.(row)}
                 className={`
                   border-b border-gray-200
