@@ -1,11 +1,8 @@
 "use client";
 
 import {
-  type FocusEvent,
-  type Dispatch,
   type FormEvent,
   type ReactNode,
-  type SetStateAction,
   useEffect,
   useState,
 } from "react";
@@ -53,11 +50,6 @@ const editUserValidationMessages = {
     "Joined date is Saturday or Sunday. Please select a different date",
   invalidGender: "Invalid gender. Please select a valid gender",
   invalidType: "Invalid type. Please select a valid type",
-};
-
-const requiredDateMessages = {
-  dateOfBirth: editUserValidationMessages.dateOfBirthRequired,
-  joinedDate: editUserValidationMessages.joinedDateRequired,
 };
 
 const validGenderValues = new Set<string>(Object.values(Gender));
@@ -158,10 +150,12 @@ function FieldErrorMessage({ message }: { message?: string }) {
 function FormFieldRow({
   label,
   error,
+  hideError = false,
   children,
 }: {
   label: string;
   error?: string;
+  hideError?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -169,26 +163,11 @@ function FormFieldRow({
       <label className="text-sm text-gray-800 sm:pt-[7px]">{label}</label>
       <div>
         {children}
-        <FieldErrorMessage message={error} />
+        {!hideError && <FieldErrorMessage message={error} />}
       </div>
     </div>
   );
 }
-
-function getDateInputValue(container: HTMLDivElement) {
-  return container.querySelector("input")?.value.trim() ?? "";
-}
-
-const formatDateInputValue = (date: Date | null) => {
-  if (!date) {
-    return "";
-  }
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-
-  return `${day}/${month}/${date.getFullYear()}`;
-};
 
 const toDateOnly = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -324,63 +303,10 @@ function EditUserForm({
   );
   const [selectedGender, setSelectedGender] = useState<Gender>(user.gender);
   const [selectedType, setSelectedType] = useState<UserRoles>(user.userType);
-  const [dateInputValues, setDateInputValues] = useState<
-    Record<RequiredDateField, string>
-  >({
-    dateOfBirth: formatDateInputValue(utcDateToLocalDate(user.dateOfBirth)),
-    joinedDate: formatDateInputValue(utcDateToLocalDate(user.joinedDate)),
-  });
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const redirectToUsers = () => {
     router.push("/admin/users");
-  };
-
-  const syncEmptyDateField = (
-    field: RequiredDateField,
-    setValue: Dispatch<SetStateAction<Date | null>>,
-    container: HTMLDivElement,
-  ) => {
-    const inputValue = getDateInputValue(container);
-
-    setDateInputValues((current) => ({
-      ...current,
-      [field]: inputValue,
-    }));
-
-    if (!inputValue) {
-      setValue(null);
-    }
-  };
-
-  const handleDateBlur = (
-    field: RequiredDateField,
-    setValue: Dispatch<SetStateAction<Date | null>>,
-    event: FocusEvent<HTMLDivElement>,
-  ) => {
-    if (
-      event.relatedTarget instanceof Node &&
-      event.currentTarget.contains(event.relatedTarget)
-    ) {
-      return;
-    }
-
-    const inputValue = getDateInputValue(event.currentTarget);
-    const isEmpty = !inputValue;
-
-    if (isEmpty) {
-      setValue(null);
-    }
-
-    setDateInputValues((current) => ({
-      ...current,
-      [field]: inputValue,
-    }));
-
-    setFieldErrors((current) => ({
-      ...current,
-      [field]: isEmpty ? requiredDateMessages[field] : undefined,
-    }));
   };
 
   const validationErrors = getEditUserValidationErrors({
@@ -393,14 +319,6 @@ function EditUserForm({
     isSaving || Object.keys(validationErrors).length > 0;
   const getDisplayedDateError = (field: RequiredDateField) => {
     const fieldError = fieldErrors[field];
-
-    if (
-      dateInputValues[field] &&
-      (fieldError === requiredDateMessages[field] ||
-        validationErrors[field] === requiredDateMessages[field])
-    ) {
-      return undefined;
-    }
 
     return validationErrors[field] ?? fieldError;
   };
@@ -505,39 +423,23 @@ function EditUserForm({
         />
       </FormFieldRow>
 
-      <FormFieldRow label="Date of Birth" error={displayedFieldErrors.dateOfBirth}>
-        <div
-          onInputCapture={(event) => {
-            syncEmptyDateField("dateOfBirth", setDateOfBirth, event.currentTarget);
+      <FormFieldRow
+        label="Date of Birth"
+        error={displayedFieldErrors.dateOfBirth}
+        hideError
+      >
+        <DatePickerInput
+          value={dateOfBirth}
+          onChange={(value) => {
+            setDateOfBirth(value);
+            setFieldErrors((current) => ({ ...current, dateOfBirth: undefined }));
           }}
-          onClickCapture={(event) => {
-            const container = event.currentTarget;
-
-            window.setTimeout(() => {
-              syncEmptyDateField("dateOfBirth", setDateOfBirth, container);
-            });
-          }}
-          onBlurCapture={(event) => {
-            handleDateBlur("dateOfBirth", setDateOfBirth, event);
-          }}
-        >
-          <DatePickerInput
-            value={dateOfBirth}
-            onChange={(value) => {
-              setDateOfBirth(value);
-              if (value) {
-                setDateInputValues((current) => ({
-                  ...current,
-                  dateOfBirth: formatDateInputValue(value),
-                }));
-              }
-              setFieldErrors((current) => ({ ...current, dateOfBirth: undefined }));
-            }}
-            placeholder="Date of Birth"
-            width="w-full"
-            txtInputTestId="dtpEditDateOfBirth"
-          />
-        </div>
+          placeholder="Date of Birth"
+          width="w-full"
+          txtInputTestId="dtpEditDateOfBirth"
+          error={displayedFieldErrors.dateOfBirth}
+          showToast={false}
+        />
       </FormFieldRow>
 
       <FormFieldRow label="Gender" error={displayedFieldErrors.gender}>
@@ -557,39 +459,23 @@ function EditUserForm({
         />
       </FormFieldRow>
 
-      <FormFieldRow label="Joined Date" error={displayedFieldErrors.joinedDate}>
-        <div
-          onInputCapture={(event) => {
-            syncEmptyDateField("joinedDate", setJoinedDate, event.currentTarget);
+      <FormFieldRow
+        label="Joined Date"
+        error={displayedFieldErrors.joinedDate}
+        hideError
+      >
+        <DatePickerInput
+          value={joinedDate}
+          onChange={(value) => {
+            setJoinedDate(value);
+            setFieldErrors((current) => ({ ...current, joinedDate: undefined }));
           }}
-          onClickCapture={(event) => {
-            const container = event.currentTarget;
-
-            window.setTimeout(() => {
-              syncEmptyDateField("joinedDate", setJoinedDate, container);
-            });
-          }}
-          onBlurCapture={(event) => {
-            handleDateBlur("joinedDate", setJoinedDate, event);
-          }}
-        >
-          <DatePickerInput
-            value={joinedDate}
-            onChange={(value) => {
-              setJoinedDate(value);
-              if (value) {
-                setDateInputValues((current) => ({
-                  ...current,
-                  joinedDate: formatDateInputValue(value),
-                }));
-              }
-              setFieldErrors((current) => ({ ...current, joinedDate: undefined }));
-            }}
-            placeholder="Joined Date"
-            width="w-full"
-            txtInputTestId="dtpEditJoinedDate"
-          />
-        </div>
+          placeholder="Joined Date"
+          width="w-full"
+          txtInputTestId="dtpEditJoinedDate"
+          error={displayedFieldErrors.joinedDate}
+          showToast={false}
+        />
       </FormFieldRow>
 
       <FormFieldRow label="Type" error={displayedFieldErrors.type}>
