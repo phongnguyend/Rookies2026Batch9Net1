@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UsersLookupTable } from "./UsersLookupTable";
+import { FocusTrap } from "focus-trap-react";
 import { LookupUsers } from "@/features/users/users.types";
 import { Search } from "lucide-react";
 
@@ -81,27 +82,34 @@ const UsersLookupInput = ({
 
         {/* Dialog overlay */}
         {isOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
-            onClick={handleClose}
+          <FocusTrap
+            focusTrapOptions={{
+              escapeDeactivates: false, // we handle Escape ourselves above
+              allowOutsideClick: true,  // lets the backdrop click still close it
+            }}
           >
             <div
-              className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => {
-                e.stopPropagation();
-                if (e.key === "Enter") e.preventDefault(); // ← ngăn form submit
-              }}
+              className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
+              onClick={handleClose}
             >
-              <UsersLookupTable
-                isOpen={isOpen}
-                onConfirm={handleSave}
-                onClose={handleClose}
-                pendingUser={pendingUser}
-                onPendingUserChange={setPendingUser}
-              />
+              <div
+                className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Enter") e.preventDefault(); // ← ngăn form submit
+                }}
+              >
+                <UsersLookupTable
+                  isOpen={isOpen}
+                  onConfirm={handleSave}
+                  onClose={handleClose}
+                  pendingUser={pendingUser}
+                  onPendingUserChange={setPendingUser}
+                />
+              </div>
             </div>
-          </div>
+          </FocusTrap>
         )}
       </div>
     </div>

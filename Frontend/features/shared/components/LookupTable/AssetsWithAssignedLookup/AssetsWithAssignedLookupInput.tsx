@@ -4,6 +4,7 @@ import { LookupAssetsSummary } from "@/features/Assets/assets.types";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AssetsWithAssignedLookupTable } from "./AssetsWithAssignedLookupTable";
+import { FocusTrap } from "focus-trap-react";
 
 export interface AssetsWithAssignedLookupInputProps {
   value?: LookupAssetsSummary | null;
@@ -85,28 +86,35 @@ export const AssetsWithAssignedLookupInput = ({
 
         {/* Dialog overlay */}
         {isOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
-            onClick={handleClose}
+          <FocusTrap
+            focusTrapOptions={{
+              escapeDeactivates: false, // we handle Escape ourselves above
+              allowOutsideClick: true,  // lets the backdrop click still close it
+            }}
           >
             <div
-              className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => {
-                e.stopPropagation();
-                if (e.key === "Enter") e.preventDefault();
-              }}
+              className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center sm:p-4"
+              onClick={handleClose}
             >
-              <AssetsWithAssignedLookupTable
-                isOpen={isOpen}
-                onConfirm={handleSave}
-                onClose={handleClose}
-                pendingAsset={pendingAsset}
-                onPendingAssetChange={setPendingAsset}
-                assignedAssetId={assignedAssetId}
-              />
+              <div
+                className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl flex flex-col max-h-[90dvh]"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                  if (e.key === "Enter") e.preventDefault();
+                }}
+              >
+                <AssetsWithAssignedLookupTable
+                  isOpen={isOpen}
+                  onConfirm={handleSave}
+                  onClose={handleClose}
+                  pendingAsset={pendingAsset}
+                  onPendingAssetChange={setPendingAsset}
+                  assignedAssetId={assignedAssetId}
+                />
+              </div>
             </div>
-          </div>
+          </FocusTrap>
         )}
       </div>
     </div>
