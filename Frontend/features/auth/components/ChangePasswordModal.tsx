@@ -146,7 +146,7 @@ export default function ChangePasswordModal({
         enqueueToast({
           message: "Password changed successfully.",
           type: ToastType.Success,
-          testId: "txtChangePasswordSuccess", 
+          testId: "txtChangePasswordSuccess",
         }),
       );
 
@@ -268,7 +268,7 @@ export default function ChangePasswordModal({
                         )}
                       </button>
                     </div>
-                    
+
                     {/* Old Password Error */}
                     {showOldPasswordError && (
                       <p className="mt-1 text-sm text-red-600">
@@ -402,7 +402,7 @@ export default function ChangePasswordModal({
                           )}
                       </button>
                     </div>
-                    
+
                     {/* Confirm Password Error */}
                     {showConfirmPasswordError && (
                       <p className="mt-1 text-sm text-red-600">
@@ -426,7 +426,7 @@ export default function ChangePasswordModal({
                     data-testid="btnSave"
                     type="submit"
                     disabled={!isValid || isLoading}
-                    className="px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="hover:cursor-pointer px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading && (
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -439,7 +439,7 @@ export default function ChangePasswordModal({
                     type="button"
                     onClick={onClose}
                     disabled={isLoading}
-                    className="px-4 py-2 border border-gray-400 rounded text-neutral-700 font-semibold hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="hover:cursor-pointer px-4 py-2 border border-gray-400 rounded text-neutral-700 font-semibold hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
@@ -463,7 +463,7 @@ export default function ChangePasswordModal({
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-[530px] bg-white rounded-lg border border-gray-500 shadow-xl overflow-hidden"
+              className="w-full max-w-132.5 bg-white rounded-lg border border-gray-500 shadow-xl overflow-hidden"
             >
               <div className="bg-gray-100 border-b border-gray-500 px-14 py-5">
                 <h2 className="text-2xl font-bold text-primary">

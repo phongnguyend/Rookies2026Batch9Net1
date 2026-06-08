@@ -3,6 +3,7 @@ import { ViewUserAssignments } from "../user-assignment.types";
 import { userAssignmentApi } from "../user-assignment.api";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import { AssignmentState } from "@/lib/api/base.types";
+import { X } from "lucide-react";
 
 interface Props {
   assignment: ViewUserAssignments.UserAssignmentSummary | null;
@@ -58,10 +59,12 @@ export default function UserAssignmentDetailDialog({
           </h2>
           <button
             data-testid={"btnClose"}
+            type="button"
             onClick={onClose}
-            className="rounded border-3 font-semibold border-primary px-2 py-0.5 text-sm text-primary hover:cursor-pointer hover:font-bold"
+            aria-label="Close"
+            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
           >
-            ✕
+            <X />
           </button>
         </div>
 

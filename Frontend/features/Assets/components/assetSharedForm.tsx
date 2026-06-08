@@ -9,7 +9,10 @@ export function CharacterCounter({ value, max }: { value: string; max: number })
     <div className="mt-1 flex justify-between text-xs">
       <span>
         {isMax && (
-          <span className="text-orange-500">Maximum characters is {max}.</span>
+          <span className="text-red-500">Maximum characters is {max}.</span>
+        )}
+        {isEmpty && (
+          <span className="text-red-500">This field is required.</span>
         )}
       </span>
       <span className={isMax || isEmpty ? "text-red-500" : "text-gray-500"}>

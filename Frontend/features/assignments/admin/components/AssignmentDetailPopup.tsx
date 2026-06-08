@@ -1,5 +1,6 @@
 import { useGetAssignmentByIdQuery } from "@/features/assignments/admin/assignments.api";
 import { displayAssignmentState } from "@/utils/assignment.utils";
+import { X } from "lucide-react";
 import { ReactNode, useEffect } from "react";
 
 function DetailRow({
@@ -15,7 +16,7 @@ function DetailRow({
     <div className="grid grid-cols-[140px_1fr] gap-4 py-2 text-sm">
       <div className="text-gray-700">{label}</div>
 
-      <div className="text-gray-900 break-words">
+      <div className="text-gray-900 wrap-break-word">
         {value
           ? render
             ? render(value)
@@ -79,10 +80,10 @@ export default function AssignmentDetailPopup({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
+            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
             data-testid="btnClose"
           >
-            ✕
+            <X />
           </button>
         </div>
 
@@ -112,7 +113,7 @@ export default function AssignmentDetailPopup({
                 label="Specification"
                 value={data.specification}
                 render={(value) => (
-                  <div className="max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-1">
+                  <div className="max-h-24 overflow-y-auto whitespace-pre-wrap wrap-break-word pr-1">
                     {value}
                   </div>
                 )}
@@ -143,13 +144,13 @@ export default function AssignmentDetailPopup({
                 label="Note"
                 value={data.note}
                 render={(value) => (
-                  <div className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words">
+                  <div className="max-h-32 overflow-y-auto whitespace-pre-wrap wrap-break-word">
                     {value}
                   </div>
                 )}
               />
 
-              {data.isReturning && (<div className="text-start my-2 text-gray-500">
+              {data.isReturning && (<div className="my-2 text-gray-500 text-center text-sm">
                 Assignment is currently in returning process
               </div>)}
             </div>

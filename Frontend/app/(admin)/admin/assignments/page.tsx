@@ -289,7 +289,7 @@ export default function AssignmentsPage() {
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
         {/* Left group: State + Assigned Date */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 lg:items-center">
           <div data-testid="ddlState" className="w-full sm:w-auto">
             <DropdownFilter
               items={Object.values(AssignmentState).map((s) => ({

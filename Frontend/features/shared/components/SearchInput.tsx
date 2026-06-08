@@ -1,5 +1,6 @@
 "use client";
 
+import { Search } from "lucide-react";
 import { ReactNode } from "react";
 
 interface SearchInputProps {
@@ -21,7 +22,7 @@ export default function SearchInput({
   width = "w-full sm:w-60",
   txtInputTestId = "txtSearch",
   btnSearchTestId = "btnSearch",
-  searchIcon = "🔍"
+  searchIcon = <Search size={16} />,
 }: SearchInputProps) {
   return (
     <div

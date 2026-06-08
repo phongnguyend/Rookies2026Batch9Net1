@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 interface DropdownFilterProps<T> {
@@ -65,10 +66,10 @@ export default function DropdownFilter<T>({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex h-9 items-center justify-between rounded border border-gray-400 px-3 ${width}`}
+        className={`hover:cursor-pointer flex h-9 items-center justify-between rounded border border-gray-400 px-3 ${width}`}
       >
         <span className="truncate">{selectedLabel}</span>
-        <span>{"\u25bc"}</span>
+        <span><ChevronDown size={16} className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}/></span>
       </button>
 
       {isOpen && (

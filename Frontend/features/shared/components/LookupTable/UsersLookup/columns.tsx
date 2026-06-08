@@ -20,6 +20,7 @@ export function createColumns(
             checked={pendingUser?.id === user.id}
             onChange={() => onSelect(user)}
             onClick={(e) => e.stopPropagation()}
+            tabIndex={-1} // ← ẩn radio khỏi Tab order
             className="w-4 h-4 appearance-auto accent-primary cursor-pointer"
           />
         );
