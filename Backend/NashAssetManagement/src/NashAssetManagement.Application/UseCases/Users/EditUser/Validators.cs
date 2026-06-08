@@ -17,7 +17,7 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
             RuleFor(x => x.DateOfBirth)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage("'Date Of Birth' must not be empty.")
+                .WithMessage("Date of Birth is required")
                 .Must(dob => dob.Date <= DateTime.Today)
                 .WithMessage("Date of birth cannot be in the future. Please select a different date")
                 .Must(dob => dob.Date <= DateTime.Today.AddYears(-18))
@@ -28,11 +28,11 @@ namespace NashAssetManagement.Application.UseCases.Users.EditUser
             RuleFor(x => x.JoinedDate)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage("'Joined Date' must not be empty.")
+                .WithMessage("Joined Date is required")
                 .Must((request, joinedDate) => joinedDate.Date > request.DateOfBirth.Date)
                 .WithMessage("Joined date is not later than Date of Birth. Please select a different date")
                 .Must((request, joinedDate) => joinedDate.Date >= request.DateOfBirth.Date.AddYears(18))
-                .WithMessage("User must be at least 18 years old on the joined date. Please select a different date")
+                .WithMessage("User must be at least 18 years old at the Joined Date")
                 .Must(joinedDate => 
                     joinedDate.DayOfWeek != DayOfWeek.Saturday &&
                     joinedDate.DayOfWeek != DayOfWeek.Sunday)
