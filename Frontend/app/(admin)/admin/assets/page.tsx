@@ -191,6 +191,7 @@ function AssetsContent() {
                 : row.state === AssetState.Assigned
             }
             data-testid="btnEdit"
+            onKeyDown={(e) => e.stopPropagation()}
             onClick={(e) => handleEdit(row, e)}
             className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
             title="Edit"
@@ -199,6 +200,7 @@ function AssetsContent() {
           </button>
           <button
             data-testid="btnIconDelete"
+            onKeyDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
 

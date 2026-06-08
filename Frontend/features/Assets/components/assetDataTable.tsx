@@ -119,8 +119,17 @@ export default function DataTable<T>({
                 onClick={() => {
                   onRowClick?.(row);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onRowClick?.(row);
+                  }
+                }}
+                tabIndex={onRowClick ? 0 : undefined}
                 className={`border-b border-gray-200 ${
-                  onRowClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""
+                  onRowClick
+                    ? "cursor-pointer hover:bg-gray-50 transition-colors focus:outline-black"
+                    : ""
                 }`}
               >
                 {columns.map((column) => (
