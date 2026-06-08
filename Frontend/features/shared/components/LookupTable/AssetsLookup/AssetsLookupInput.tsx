@@ -8,12 +8,14 @@ import { AssetsLookupTable } from "./AssetsLookupTable";
 export interface AssetsLookupInputProps {
   value?: LookupAssetsSummary | null;
   onChange?: (asset: LookupAssetsSummary | null) => void;
+  data_testid?: string;
   placeholder?: string;
 }
 
 const AssetsLookupInput = ({
   value,
   onChange,
+  data_testid = "txtAssetLookupInput",
   placeholder = "Select an asset",
 }: AssetsLookupInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +60,7 @@ const AssetsLookupInput = ({
         <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
           Asset
         </label>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" data-testid={data_testid}>
           <div
             role="button"
             tabIndex={0}

@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 export interface UsersLookupInputProps {
   value?: LookupUsers.LookupUsersSummary | null;
   onChange?: (user: LookupUsers.LookupUsersSummary | null) => void;
+  data_testid?: string;
   placeholder?: string;
 }
 
@@ -15,6 +16,7 @@ const UsersLookupInput = ({
   value,
   onChange,
   placeholder = "Select a user",
+  data_testid = "txtUserLookupInput",
 }: UsersLookupInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   // pendingUser: in-dialog selection only, never drives the input display
@@ -57,7 +59,7 @@ const UsersLookupInput = ({
         <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
           User
         </label>
-        <div className="flex-1">
+        <div className="flex-1" data-testid={data_testid}>
           <div
             role="button"
             tabIndex={0}

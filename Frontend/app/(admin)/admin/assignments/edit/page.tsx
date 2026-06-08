@@ -222,6 +222,7 @@ const EditAssignmentPage = () => {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="submit"
+              data-testid="btnSave"
               disabled={!isValid || isLoading || isEditLoading}
               className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
             >
@@ -229,6 +230,7 @@ const EditAssignmentPage = () => {
             </button>
             <button
               type="button"
+              data-testid="btnCancel"
               onClick={() => router.push("/admin/assignments")}
               className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
