@@ -5,6 +5,7 @@ import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import type { CategoryItem } from "../assets.types";
 import { useCreateCategoryMutation } from "../assets.api";
+import { Check, ChevronDown, X } from "lucide-react";
 
 const toTitleCase = (str: string): string =>
   str.trim().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -146,20 +147,17 @@ export default function CategoryDropdown({
         data-testid="ddlCategory"
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="
-          select
-          select-bordered
-          w-full
-          border-gray-400
-          focus:outline-none
-          focus:ring-0
-          focus:border-gray-500
-          active:border-gray-500
-        "
+        className="hover:cursor-pointer flex h-9 items-center justify-between rounded border border-gray-400 px-3 w-full"
       >
-        <span className="truncate">
-          {isLoading ? "Loading..." : value || "Select category"}
-        </span>
+        <div className="flex w-full items-center justify-between">
+          <span className="truncate">
+            {isLoading ? "Loading..." : value || "Select category"}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          />
+        </div>
       </button>
 
       {/* Dropdown */}
@@ -248,7 +246,7 @@ export default function CategoryDropdown({
                     onClick={handleConfirm}
                     className="btn btn-primary btn-sm"
                   >
-                    ✓
+                    <Check size={16}/>
                   </button>
 
                   <button
@@ -257,7 +255,7 @@ export default function CategoryDropdown({
                     onClick={resetAddForm}
                     className="btn btn-ghost btn-sm"
                   >
-                    ✕
+                    <X size={16}/>
                   </button>
                 </div>
               </div>

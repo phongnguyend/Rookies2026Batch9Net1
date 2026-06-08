@@ -63,7 +63,7 @@ export default function AssetDetailModal({
           <button
             data-testid="btnExit"
             onClick={handleClose}
-            className="flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
+            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
           >
             ✕
           </button>
@@ -120,7 +120,7 @@ function Row({
         {label}
       </span>
 
-      <span className="max-w-xl flex-1 break-words whitespace-pre-wrap text-gray-800">
+      <span className="max-w-xl flex-1 wrap-break-word whitespace-pre-wrap text-gray-800">
         {value}
       </span>
     </div>

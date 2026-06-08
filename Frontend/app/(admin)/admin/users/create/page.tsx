@@ -10,6 +10,7 @@ import { useCreateUserMutation } from "@/features/users/users.api";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useRouter, useSearchParams } from "next/navigation";
+import DropdownFilter from "@/features/shared/components/DropdownFilter";
 
 const genderItems = [Gender.Female, Gender.Male];
 const nameRegex = /^[a-zA-Z]+(?: [a-zA-Z]+)*$/;
@@ -89,7 +90,7 @@ const createUserSchema = z
     dateOfBirth: z
       .date()
       .nullable()
-      .refine((value): value is Date => value !== null, { 
+      .refine((value): value is Date => value !== null, {
         message: "Date of Birth is required.",
       })
       .refine((value) => !isFutureDate(value), {
@@ -151,8 +152,7 @@ const createUserSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["joinedDate"],
-        message:
-          "User must be at least 18 years old at the Joined Date",
+        message: "User must be at least 18 years old at the Joined Date",
       });
     }
   });
@@ -223,15 +223,15 @@ export default function CreateUserPage() {
         gender: data.gender,
         userType: data.userType,
       }).unwrap();
-      
+
       dispatch(
         enqueueToast({
           message: "User created successfully.",
           type: ToastType.Success,
           testId: "txtCreateUserSuccess",
         }),
-      );  
-      
+      );
+
       sessionStorage.setItem("usersTemporarySort", "createdDateDesc");
       router.push("/admin/users");
       reset();
@@ -253,11 +253,11 @@ export default function CreateUserPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-[420px] space-y-4">
-      <h1 className="text-xl font-bold text-primary">Create New User</h1>
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-lg space-y-4 px-4 sm:px-0">
+      <h1 className="mb-6 text-xl font-bold text-primary">Create New User</h1>
 
       {/* First Name */}
-      <div className="flex items-start gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>First Name</label>
 
         <div className="flex-1">
@@ -276,7 +276,7 @@ export default function CreateUserPage() {
       </div>
 
       {/* Last Name */}
-      <div className="flex items-start gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>Last Name</label>
 
         <div className="flex-1">
@@ -287,21 +287,19 @@ export default function CreateUserPage() {
           />
 
           {errors.lastName && (
-            <p className="mt-1 text-sm text-error">
-              {errors.lastName.message}
-            </p>
+            <p className="mt-1 text-sm text-error">{errors.lastName.message}</p>
           )}
         </div>
       </div>
 
       {/* Date of Birth */}
-      <div className="flex items-start gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>Date of Birth</label>
 
         <div className="flex-1">
           <DatePickerInput
             value={dateOfBirthValue}
-            onChange={(date) => { 
+            onChange={(date) => {
               setValue("dateOfBirth", date, {
                 shouldValidate: true,
                 shouldDirty: true,
@@ -322,7 +320,7 @@ export default function CreateUserPage() {
       </div>
 
       {/* Gender */}
-      <div className="flex items-center gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>Gender</label>
 
         <RadioGroup
@@ -348,9 +346,8 @@ export default function CreateUserPage() {
         )}
       </div>
 
-
       {/* Joined Date */}
-      <div className="flex items-start gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>Joined Date</label>
 
         <div className="flex-1">
@@ -377,54 +374,56 @@ export default function CreateUserPage() {
       </div>
 
       {/* User Type */}
-      <div className="flex items-start gap-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
         <label className={labelClass}>Type</label>
 
         <div className="flex-1">
-          <select
-            data-testid="ddlUserType"
-            value={userTypeValue}
-            onChange={(e) =>
-              setValue("userType", e.target.value as UserRoles, {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-              })
-            }
-            className="select select-bordered w-full bg-white"
-          >
-            <option value={UserRoles.Staff}>Staff</option>
-            <option value={UserRoles.Admin}>Admin</option>
-          </select>
+          <DropdownFilter
+            items={[
+              { value: UserRoles.Staff, label: "Staff" },
+              { value: UserRoles.Admin, label: "Admin" },
+            ]}
+            getKey={(item) => item.value}
+            getLabel={(item) => item.label}
+            values={userTypeValue ? [userTypeValue] : []} // single value → array
+            onChange={(vals) => {
+              // pick the newly added value (last in array), ignore deselects
+              const selected = vals.find((v) => v !== userTypeValue);
+              if (selected) {
+                setValue("userType", selected as UserRoles, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                  shouldTouch: true,
+                });
+              }
+            }}
+            placeholder="Select type"
+            width="w-full"
+            showAll={false}
+          />
 
           {errors.userType && (
-            <p className="mt-1 text-sm text-error">
-              {errors.userType.message}
-            </p>
+            <p className="mt-1 text-sm text-error">{errors.userType.message}</p>
           )}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pt-6">
+      <div className="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end">
         <button
           type="submit"
           data-testid="btnSaveUser"
           disabled={!isValid || isSubmitting}
-          className="btn btn-primary min-w-24 text-white"
+          className="btn btn-primary w-full text-white sm:w-auto sm:min-w-24"
         >
           Save
         </button>
-
         <button
           type="button"
           data-testid="btnCancelUser"
-          className="btn btn-outline btn-neutral min-w-24"
-          onClick={() => 
-            router.push(
-              searchParams.get("returnUrl") 
-              ?? "/admin/users"
-            )
+          className="btn btn-outline btn-neutral w-full sm:w-auto sm:min-w-24"
+          onClick={() =>
+            router.push(searchParams.get("returnUrl") ?? "/admin/users")
           }
         >
           Cancel
