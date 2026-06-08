@@ -215,7 +215,7 @@ export default function CreateAssignment({
             type="submit"
             data-testid="btnSave"
             disabled={!isValid || isLoading}
-            className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:cursor-pointer h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? "Saving..." : "Save"}
           </button>
@@ -224,7 +224,7 @@ export default function CreateAssignment({
             type="button"
             data-testid="btnCancel"
             onClick={() => router.push("/admin/assignments")}
-            className="h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </button>

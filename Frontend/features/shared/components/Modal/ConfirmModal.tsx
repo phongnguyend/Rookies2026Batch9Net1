@@ -103,6 +103,7 @@ export default function ConfirmModal({
               <h2 className="text-lg font-bold text-primary">{title}</h2>
               {showCloseIcon && (
                 <button
+                  type="button"
                   data-testid={closeBtnTestId}
                   onClick={onClose}
                   className="transition-colors duration-150 p-px rounded flex items-center justify-center border-primary bg-white hover:bg-primary hover:border-primary text-primary hover:text-white border-3"
@@ -126,10 +127,11 @@ export default function ConfirmModal({
             {yesButtonLabel && (
               <div className="px-6 pb-6 pt-0 bg-white flex items-center justify-start gap-3">
                 <button
+                  type="button"
                   data-testid={confirmBtnTestId}
                   onClick={onYes}
                   disabled={isLoading}
-                  className="px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="hover:cursor-pointer px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading && (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -147,7 +149,7 @@ export default function ConfirmModal({
                     onClose();
                   }}
                   disabled={isLoading}
-                  className="px-4 py-2 border border-gray-400 rounded text-[#6c757d] font-normal hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border border-gray-400 rounded text-[#6c757d] font-normal hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
                 >
                   {onNo && isLoading && (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

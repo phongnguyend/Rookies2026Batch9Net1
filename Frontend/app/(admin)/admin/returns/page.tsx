@@ -10,7 +10,6 @@ import SingleSortDataTable, {
 import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
-import DatePickerInput from "@/features/returns/components/DatePickerInput";
 import {
   returnsApi,
   useGetReturnRequestsQuery,
@@ -25,6 +24,7 @@ import { Check, X } from "lucide-react";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useDispatch } from "react-redux";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import DatePickerInput from "@/features/shared/components/DatePickerInput";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
@@ -415,7 +415,7 @@ export default function ReturnsPage() {
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
           <div className="mb-6 mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-5 sm:items-center">
               <div data-testid="ddlState">
                 <DropdownFilter
                   items={stateFilters}
@@ -435,7 +435,6 @@ export default function ReturnsPage() {
                   allLabel="All"
                 />
               </div>
-
               <DatePickerInput
                 value={returnedDate}
                 onChange={(date) => {
@@ -449,8 +448,7 @@ export default function ReturnsPage() {
                 }}
                 placeholder="Returned Date"
                 width="w-full sm:w-[220px]"
-                txtInputTestId="dpReturned"
-              />
+                txtInputTestId="dpReturned"/>
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">

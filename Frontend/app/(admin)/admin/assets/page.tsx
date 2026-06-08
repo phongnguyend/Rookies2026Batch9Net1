@@ -191,6 +191,7 @@ function AssetsContent() {
                 : row.state === AssetState.Assigned
             }
             data-testid="btnEdit"
+            onKeyDown={(e) => e.stopPropagation()}
             onClick={(e) => handleEdit(row, e)}
             className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
             title="Edit"
@@ -199,6 +200,7 @@ function AssetsContent() {
           </button>
           <button
             data-testid="btnIconDelete"
+            onKeyDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
 
@@ -250,7 +252,7 @@ function AssetsContent() {
           {/* Left filters */}
           {/* Left filters */}
           <div className="flex flex-wrap gap-3">
-            <div className="flex-1 min-w-[180px]">
+            <div className="flex-1 min-w-45">
               <DropdownStateFilter
                 items={state_options}
                 values={selectedStates}
@@ -262,7 +264,7 @@ function AssetsContent() {
               />
             </div>
 
-            <div data-testid="ddlCategory" className="flex-1 min-w-[180px]">
+            <div data-testid="ddlCategory" className="flex-1 min-w-45">
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
