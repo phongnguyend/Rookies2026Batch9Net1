@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
 {
@@ -29,7 +30,18 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
             if (currentUser.LocationId == null)            
                 return Errors.UserHasNoLocation();
 
-            var validationResults = await validator.ValidateAsync(request, cancellationToken);
+            // Cleaned request
+            var cleanedRequest = request with
+            {
+                SearchTerm = string.IsNullOrWhiteSpace(request.SearchTerm)
+                    ? request.SearchTerm
+                    : NormalizeSearchTerm(request.SearchTerm),
+                SortBy = request.SortBy?.Trim(),
+                PageNumber = request.PageNumber ?? 1,
+                PageSize = request.PageSize ?? 10,
+            };
+
+            var validationResults = await validator.ValidateAsync(cleanedRequest, cancellationToken);
             if (!validationResults.IsValid)
                 throw new ValidationException(validationResults.Errors);
         
@@ -38,24 +50,17 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
                 .Where(u => u.LocationId.ToString().Equals(currentUser.LocationId) && !u.IsDeleted)
                 ;
 
-            // Cleaned request
-            var cleanedRequest = request with
-            {
-                SortBy = request.SortBy?.Trim(),
-                PageNumber = request.PageNumber ?? 1,
-                PageSize = request.PageSize ?? 10,
-            };
-
             // Search
             if (!string.IsNullOrWhiteSpace(cleanedRequest.SearchTerm))
             {
-                var searchTerm = cleanedRequest.SearchTerm.Trim().ToLowerInvariant();
+                var searchTerm = cleanedRequest.SearchTerm.ToLowerInvariant();
                 var pattern = $"%{searchTerm}%";
 
                 usersQuery = usersQuery.Where(u =>
                     (u.StaffCode != null && EF.Functions.Like(u.StaffCode.ToLower(), pattern)) ||
                     (u.FirstName != null && EF.Functions.Like(u.FirstName.ToLower(), pattern)) ||
                     (u.LastName != null && EF.Functions.Like(u.LastName.ToLower(), pattern)) ||
+                    (u.UserName != null && EF.Functions.Like(u.UserName.ToLower(), pattern)) ||
                     EF.Functions.Like(((u.FirstName ?? "") + " " + (u.LastName ?? "")).ToLower(), pattern));
             }
 
@@ -118,6 +123,11 @@ namespace NashAssetManagement.Application.UseCases.Users.ViewUsers
             ))
             .ToListAsync(cancellationToken);
             return new PagedList<Response>(users, totalItems, cleanedRequest.PageNumber!.Value, cleanedRequest.PageSize!.Value);
+        }
+
+        private static string NormalizeSearchTerm(string searchTerm)
+        {
+            return Regex.Replace(searchTerm.Trim(), @"\s+", " ");
         }
     }
 }
