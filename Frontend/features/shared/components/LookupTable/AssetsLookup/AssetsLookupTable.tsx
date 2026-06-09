@@ -31,11 +31,11 @@ export const AssetsLookupTable = ({
   const { params, dispatch } = useAssetsLookupTableState();
   const sorts: SortItem[] = params.sortBy
     ? [
-        {
-          key: params.sortBy,
-          direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: params.sortBy,
+        direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [];
   const { data, isLoading } = useLookupAssetsQuery(params);
   const columns = useMemo(
@@ -74,7 +74,7 @@ export const AssetsLookupTable = ({
                     onSearch={(value) =>
                       dispatch({
                         type: "SET_SEARCH",
-                        payload: { searchTerm: value },
+                        payload: { searchTerm: value.trim().replace(/\s+/g, " ") },
                       })
                     }
                     txtInputTestId="txtSearchAsset"

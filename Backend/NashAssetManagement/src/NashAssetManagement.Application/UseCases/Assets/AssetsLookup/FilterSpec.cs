@@ -1,4 +1,5 @@
-﻿using Ardalis.Specification;
+﻿using System.Text.RegularExpressions;
+using Ardalis.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 
 namespace NashAssetManagement.Application.UseCases.Assets.AssetsLookup
@@ -13,7 +14,7 @@ namespace NashAssetManagement.Application.UseCases.Assets.AssetsLookup
                 && !x.IsDeleted);
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
-                var searchTerm = request.SearchTerm.Trim();
+                var searchTerm = Regex.Replace(request.SearchTerm.Trim(), @"\s+", " ");
                 Query.Search(x => x.AssetCode, "%" + searchTerm + "%")
                     .Search(x => x.Name, "%" + searchTerm + "%");
             }
