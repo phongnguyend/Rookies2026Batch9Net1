@@ -70,7 +70,7 @@ export default function DropdownFilter<T>({
 
       {isOpen && (
         <div
-          className={`absolute top-9 z-20 rounded border border-gray-300 bg-white py-1 shadow ${width}`}
+          className={`absolute top-9 z-20 rounded border border-gray-300 bg-white py-1 shadow ${width} max-h-60 overflow-y-auto`}
         >
           {showAll && (
             <label className="flex cursor-pointer items-center gap-2 px-2 py-1 text-sm hover:bg-gray-100">
