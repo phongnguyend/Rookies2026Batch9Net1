@@ -25,6 +25,7 @@ import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useDispatch } from "react-redux";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
+import SingleSelectDropdown from "@/features/shared/components/SingleSelectDropdown";
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
@@ -417,19 +418,18 @@ export default function ReturnsPage() {
           <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row sm:gap-5 sm:items-center">
               <div data-testid="ddlState">
-                <DropdownFilter
+                <SingleSelectDropdown
                   items={stateFilters}
-                  values={selectedStates}
+                  value={selectedStates[0]}
                   placeholder="State"
                   width="w-full sm:w-[200px]"
                   getKey={(state) => state.id}
                   getLabel={(state) => state.label}
-                  onChange={(values) => {
+                  onChange={(value) => {
                     // Filter changes always restart the list from page 1.
                     updateQueryParams({
                       page: 1,
-                      states:
-                        values.length === stateFilters.length ? [] : values,
+                      states: value ? [value] : [],
                     });
                   }}
                   allLabel="All"

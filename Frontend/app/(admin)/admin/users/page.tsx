@@ -25,7 +25,7 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { formatDate } from "@/utils/datetime.utils";
 import { CircleX, Pencil } from "lucide-react";
-import SingleSelectDropdown from "@/features/shared/components/SingleSelectedDropdown";
+import SingleSelectDropdown from "@/features/shared/components/SingleSelectDropdown";
 
 const typeFilters = [
   { id: UserRoles.Admin, label: "Admin" },
