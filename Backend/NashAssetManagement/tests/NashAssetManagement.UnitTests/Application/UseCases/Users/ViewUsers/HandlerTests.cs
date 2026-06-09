@@ -133,6 +133,38 @@ public class HandlerTests
     }
 
     [Fact]
+    public async Task Handle_ShouldValidateCleanedRequest_WhenSearchTermHasExtraSpaces()
+    {
+        // Arrange
+        var request = new Request(1, 10, "  Test     User  ", null, " staffCode ", null);
+        Request? validatedRequest = null;
+
+        _mockUser.Setup(u => u.UserId).Returns(Guid.NewGuid());
+        _mockUser.Setup(u => u.LocationId).Returns(LocationId);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()))
+            .Callback<Request, CancellationToken>((r, _) => validatedRequest = r)
+            .ReturnsAsync(new ValidationResult());
+        _mockUserManager
+            .Setup(x => x.Users)
+            .Returns(new List<User>().AsAsyncQueryable());
+
+        // Act
+        var result = await _handler.Handle(request, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsError);
+        Assert.NotNull(validatedRequest);
+        Assert.Equal("Test User", validatedRequest.SearchTerm);
+        Assert.Equal("staffCode", validatedRequest.SortBy);
+        Assert.Equal(1, validatedRequest.PageNumber);
+        Assert.Equal(10, validatedRequest.PageSize);
+        _mockValidator.Verify(
+            v => v.ValidateAsync(It.IsAny<Request>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
     public void Response_ShouldNotExposeCanBeDisabled()
     {
         // Assert
