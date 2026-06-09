@@ -4,6 +4,7 @@ import { useEffect, useRef, type MouseEvent } from "react";
 import { useGetUserByIdQuery } from "@/features/users/users.api";
 import { UserRoles, type UserDetail } from "@/features/users/users.types";
 import { formatDate } from "@/utils/datetime.utils";
+import { FocusTrap } from "focus-trap-react";
 
 interface UserDetailModalProps {
   userId: string | null;
@@ -96,59 +97,66 @@ export default function UserDetailModal({
   ];
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="user-detail-title"
+    <FocusTrap
+      focusTrapOptions={{
+        escapeDeactivates: false, // we handle Escape ourselves above
+        allowOutsideClick: true,  // lets the backdrop click still close it
+      }}
     >
       <div
-        ref={modalRef}
-        className="relative w-full max-w-xl overflow-hidden rounded-lg border bg-white shadow-lg"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        onClick={handleBackdropClick}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="user-detail-title"
       >
-        <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
-          <h2
-            id="user-detail-title"
-            className="text-lg font-semibold text-primary"
-          >
-            Detailed User Information
-          </h2>
+        <div
+          ref={modalRef}
+          className="relative w-full max-w-xl overflow-hidden rounded-lg border bg-white shadow-lg"
+        >
+          <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
+            <h2
+              id="user-detail-title"
+              className="text-lg font-semibold text-primary"
+            >
+              Detailed User Information
+            </h2>
 
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close detailed user information"
-            className="rounded border-3 border-primary px-2 py-0.5 text-sm font-semibold text-primary hover:cursor-pointer hover:font-bold"
-            data-testid="btnCloseUserDetail"
-          >
-            x
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close detailed user information"
+              className="rounded border-3 border-primary px-2 py-0.5 text-sm font-semibold text-primary hover:cursor-pointer hover:font-bold"
+              data-testid="btnCloseUserDetail"
+            >
+              x
+            </button>
+          </div>
 
-        <div className="max-h-[calc(100vh-8rem)] overflow-y-auto px-10 py-4">
-          {isFetching ? (
-            <div className="py-8 text-center text-gray-400">
-              Loading...
-            </div>
-          ) : isError ? (
-            <div className="py-8 text-center text-primary">
-              Cannot load user information.
-            </div>
-          ) : (
-            <div className="space-y-3 text-sm">
-              {details.map(([label, value, testId]) => (
-                <Field
-                  key={label}
-                  label={label}
-                  value={value}
-                  testId={testId}
-                />
-              ))}
-            </div>
-          )}
+          <div className="max-h-[calc(100vh-8rem)] overflow-y-auto px-10 py-4">
+            {isFetching ? (
+              <div className="py-8 text-center text-gray-400">
+                Loading...
+              </div>
+            ) : isError ? (
+              <div className="py-8 text-center text-primary">
+                Cannot load user information.
+              </div>
+            ) : (
+              <div className="space-y-3 text-sm">
+                {details.map(([label, value, testId]) => (
+                  <Field
+                    key={label}
+                    label={label}
+                    value={value}
+                    testId={testId}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </FocusTrap>
   );
 }

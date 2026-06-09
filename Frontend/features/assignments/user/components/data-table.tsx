@@ -31,11 +31,11 @@ export const UserAssignmentsDataTable = () => {
 
   const sorts: SortItem[] = params.sortBy
     ? [
-        {
-          key: params.sortBy,
-          direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: params.sortBy,
+        direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [];
   const { data, isLoading } =
     userAssignmentApi.useViewUserAssignmentsQuery(params);

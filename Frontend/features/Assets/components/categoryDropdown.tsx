@@ -6,6 +6,7 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import type { CategoryItem } from "../assets.types";
 import { useCreateCategoryMutation } from "../assets.api";
 import { Check, ChevronDown, X } from "lucide-react";
+import { FocusTrap } from "focus-trap-react";
 
 const toTitleCase = (str: string): string =>
   str.trim().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -141,69 +142,77 @@ export default function CategoryDropdown({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      {/* Trigger */}
-      <button
-        data-testid="ddlCategory"
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="hover:cursor-pointer flex h-9 items-center justify-between rounded border border-gray-400 px-3 w-full"
-      >
-        <div className="flex w-full items-center justify-between">
-          <span className="truncate">
-            {isLoading ? "Loading..." : value || "Select category"}
-          </span>
-          <ChevronDown
-            size={16}
-            className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          />
-        </div>
-      </button>
+    <FocusTrap
+      active={isOpen}
+      focusTrapOptions={{
+        escapeDeactivates: false,
+        allowOutsideClick: true,
+        returnFocusOnDeactivate: true,
+      }}
+    >
+      <div ref={containerRef} className="relative w-full">
+        {/* Trigger */}
+        <button
+          data-testid="ddlCategory"
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="hover:cursor-pointer flex h-9 items-center justify-between rounded border border-gray-400 px-3 w-full"
+        >
+          <div className="flex w-full items-center justify-between">
+            <span className="truncate">
+              {isLoading ? "Loading..." : value || "Select category"}
+            </span>
+            <ChevronDown
+              size={16}
+              className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            />
+          </div>
+        </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute left-0 top-12 z-30 max-h-60 w-full overflow-y-auto rounded-box border border-base-300 bg-base-100 shadow-lg">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              onClick={() => handleSelectCategory(cat)}
-              className={`cursor-pointer px-4 py-2 text-sm hover:bg-base-200 ${
-                value === cat.name ? "bg-base-200" : ""
-              }`}
-            >
-              {cat.name}
-            </div>
-          ))}
+        {/* Dropdown */}
+        {isOpen && (
+          <div className="absolute left-0 top-12 z-30 max-h-60 w-full overflow-y-auto rounded-box border border-base-300 bg-base-100 shadow-lg">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleSelectCategory(cat)}
+                className={`w-full text-left cursor-pointer px-4 py-2 text-sm hover:bg-base-200 ${value === cat.name ? "bg-base-200" : ""
+                  }`}
+              >
+                {cat.name}
+              </button>
+            ))}
 
-          <div className="divider my-0" />
+            <div className="divider my-0" />
 
-          {!showAddForm ? (
-            <div
-              data-testid="lnkAddNewCategory"
-              onClick={() => setShowAddForm(true)}
-              className="cursor-pointer px-4 py-2 text-sm italic text-primary hover:bg-base-200"
-            >
-              Add new category
-            </div>
-          ) : (
-            <div className="p-3">
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <input
-                  maxLength={20}
-                  data-testid="txtAddNewCategoryName"
-                  type="text"
-                  value={newName}
-                  onChange={(e) =>
-                    setNewName(
-                      e.target.value.replace(
-                        /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu,
-                        "",
-                      ),
-                    )
-                  }
-                  onBlur={(e) => setNewName(toTitleCase(e.target.value))}
-                  placeholder="Category name"
-                  className="
+            {!showAddForm ? (
+              <button
+                data-testid="lnkAddNewCategory"
+                onClick={() => setShowAddForm(true)}
+                className="cursor-pointer px-4 py-2 text-sm italic text-primary hover:bg-base-200"
+              >
+                Add new category
+              </button>
+            ) : (
+              <div className="p-3">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    maxLength={20}
+                    data-testid="txtAddNewCategoryName"
+                    type="text"
+                    value={newName}
+                    onChange={(e) =>
+                      setNewName(
+                        e.target.value.replace(
+                          /(\p{Extended_Pictographic}|\p{Emoji_Component})/gu,
+                          "",
+                        ),
+                      )
+                    }
+                    onBlur={(e) => setNewName(toTitleCase(e.target.value))}
+                    placeholder="Category name"
+                    className="
                     input
                     input-bordered
                     input-sm
@@ -212,21 +221,21 @@ export default function CategoryDropdown({
                     focus:ring-0
                     focus:border-gray-400
                   "
-                  autoFocus
-                />
+                    autoFocus
+                  />
 
-                <input
-                  data-testid="txtAddNewCategoryPrefix"
-                  maxLength={2}
-                  type="text"
-                  value={newPrefix}
-                  onChange={(e) =>
-                    setNewPrefix(
-                      e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase(),
-                    )
-                  }
-                  placeholder="Prefix"
-                  className="
+                  <input
+                    data-testid="txtAddNewCategoryPrefix"
+                    maxLength={2}
+                    type="text"
+                    value={newPrefix}
+                    onChange={(e) =>
+                      setNewPrefix(
+                        e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase(),
+                      )
+                    }
+                    placeholder="Prefix"
+                    className="
                     input
                     input-bordered
                     input-sm
@@ -237,34 +246,35 @@ export default function CategoryDropdown({
                     focus:ring-0
                     focus:border-gray-400
                   "
-                />
+                  />
 
-                <div className="flex gap-2 sm:self-center">
-                  <button
-                    data-testid="btnAcceptCategory"
-                    type="button"
-                    onClick={handleConfirm}
-                    className="btn btn-primary btn-sm"
-                  >
-                    <Check size={16}/>
-                  </button>
+                  <div className="flex gap-2 sm:self-center">
+                    <button
+                      data-testid="btnAcceptCategory"
+                      type="button"
+                      onClick={handleConfirm}
+                      className="btn btn-primary btn-sm"
+                    >
+                      <Check size={16} />
+                    </button>
 
-                  <button
-                    data-testid="btnCancelCategory"
-                    type="button"
-                    onClick={resetAddForm}
-                    className="btn btn-ghost btn-sm"
-                  >
-                    <X size={16}/>
-                  </button>
+                    <button
+                      data-testid="btnCancelCategory"
+                      type="button"
+                      onClick={resetAddForm}
+                      className="btn btn-ghost btn-sm"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
-      {error && <p className="mt-1 text-xs text-error">{error}</p>}
-    </div>
+        {error && <p className="mt-1 text-xs text-error">{error}</p>}
+      </div>
+    </FocusTrap>
   );
 }

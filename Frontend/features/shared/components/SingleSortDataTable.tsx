@@ -78,6 +78,13 @@ export default function SingleSortDataTable<T>({
                 <th
                   key={column.key}
                   data-testid={column.headerTestId}
+                  tabIndex={column.sortable ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if (column.sortable && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      handleSort(column.key);
+                    }
+                  }}
                   onClick={() => column.sortable && handleSort(column.key)}
                   className={`px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm
                     ${column.className ?? ""}
