@@ -5,6 +5,7 @@ using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Domain.Entities.Core;
 using ErrorOr;
 using NashAssetManagement.Application.Utilities;
+using System.Text.RegularExpressions;
 
 namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
 {
@@ -19,7 +20,9 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
         {
             var cleanedRequest = request with
             {
-              SearchTerm = request.SearchTerm?.Trim(),
+              SearchTerm = string.IsNullOrWhiteSpace(request.SearchTerm)
+                ? request.SearchTerm
+                : NormalizeSearchTerm(request.SearchTerm),
               SortBy = request.SortBy?.Trim(),
               PageNumber = request.PageNumber ?? 1,
               PageSize = request.PageSize ?? 20  
@@ -40,6 +43,11 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.ViewList
             var totalItems = await repository.CountAsync(filterSpec, cancellationToken);
             var items = await repository.ListAsync(spec, cancellationToken);
             return PagedList.Create(items, totalItems, cleanedRequest.PageNumber.Value, cleanedRequest.PageSize.Value);
+        }
+
+        private static string NormalizeSearchTerm(string searchTerm)
+        {
+            return Regex.Replace(searchTerm.Trim(), @"\s+", " ");
         }
     }
 }
