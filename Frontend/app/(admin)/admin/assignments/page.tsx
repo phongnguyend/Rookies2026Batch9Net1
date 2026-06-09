@@ -57,11 +57,11 @@ export default function AssignmentsPage() {
 
   const sorts: SortItem[] = sortBy
     ? [
-        {
-          key: sortBy,
-          direction: sortDesc ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: sortBy,
+        direction: sortDesc ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [];
 
   // Function update URL
@@ -87,12 +87,12 @@ export default function AssignmentsPage() {
     state: states.length > 0 ? states : undefined,
     assignedDate: assignedDate
       ? new Date(
-          Date.UTC(
-            assignedDate.getFullYear(),
-            assignedDate.getMonth(),
-            assignedDate.getDate(),
-          ),
-        ).toISOString()
+        Date.UTC(
+          assignedDate.getFullYear(),
+          assignedDate.getMonth(),
+          assignedDate.getDate(),
+        ),
+      ).toISOString()
       : undefined,
     sortBy: sortBy,
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
@@ -318,14 +318,14 @@ export default function AssignmentsPage() {
                 updateParams({
                   assignedDate: date
                     ? new Date(
-                        Date.UTC(
-                          date.getFullYear(),
-                          date.getMonth(),
-                          date.getDate(),
-                        ),
-                      )
-                        .toISOString()
-                        .split("T")[0]
+                      Date.UTC(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        date.getDate(),
+                      ),
+                    )
+                      .toISOString()
+                      .split("T")[0]
                     : undefined,
                   page: "1",
                 })
@@ -347,7 +347,7 @@ export default function AssignmentsPage() {
               }}
               onSearch={(value) => {
                 updateParams({
-                  search: value || undefined,
+                  search: value.trim().replace(/\s+/g, " ") || undefined,
                   page: "1",
                 });
               }}

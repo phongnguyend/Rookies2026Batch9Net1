@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using System.Text.RegularExpressions;
+using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -40,7 +41,7 @@ namespace NashAssetManagement.Application.UseCases.Users.UsersLookup
             query = query.Where(x => x.LocationId == userLocationId && !x.IsDeleted);
             if (!string.IsNullOrWhiteSpace(sanitizedRequest.SearchTerm))
             {
-                var searchTerm = sanitizedRequest.SearchTerm.Trim();
+                var searchTerm = Regex.Replace(sanitizedRequest.SearchTerm.Trim(), @"\s+", " ");
                 query = query.Where(x => x.StaffCode.Contains(searchTerm)
                     || x.FirstName.Contains(searchTerm)
                     || x.LastName.Contains(searchTerm)

@@ -1,4 +1,5 @@
-﻿using Ardalis.Specification;
+﻿using System.Text.RegularExpressions;
+using Ardalis.Specification;
 using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Enums;
 
@@ -7,7 +8,7 @@ namespace NashAssetManagement.Application.UseCases.Assignments.GetAll
     internal class FilterSpec : Specification<Assignment, Response>
     {
         public FilterSpec(Query query, Guid locationId) {
-            var searchTerm = query.SearchTerm?.Trim();
+            var searchTerm = Regex.Replace(query.SearchTerm ?? "", @"\s+", " ").Trim();
 
             Query.Where(x => x.Asset!.LocationId == locationId && x.IsDeleted == false)
                  .Include(x => x.Asset)
