@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UserRoles } from "@/features/users/users.types";
 
@@ -40,34 +41,45 @@ export default function UserTypeDropdown({
   }, []);
 
   return (
-    <div ref={ref} className={`relative ${width}`}>
+    <div ref={ref} className="relative">
       <button
         type="button"
         data-testid={testId}
         disabled={disabled}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex h-[33px] w-full items-center justify-between rounded border border-gray-400 bg-white px-3 text-left text-sm text-gray-700 outline-none transition hover:border-gray-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+        className={`hover:cursor-pointer flex h-9 items-center justify-between rounded border border-gray-400 bg-white px-3 text-left text-sm text-gray-700 outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 ${width}`}
       >
-        <span>{selectedLabel}</span>
-        <span className="ml-2 h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-gray-500" />
+        <span className="truncate">{selectedLabel}</span>
+        <span>
+          <ChevronDown
+            size={16}
+            className={`shrink-0 transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
+        </span>
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute left-0 top-[36px] z-30 w-full overflow-hidden rounded border border-gray-300 bg-white shadow">
+        <div
+          className={`absolute top-9 z-30 rounded border border-gray-300 bg-white py-1 shadow ${width}`}
+        >
           {roleOptions.map((option) => (
-            <button
+            <label
               key={option.value}
-              type="button"
-              onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
-              }}
-              className={`block w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                value === option.value ? "bg-gray-50 font-medium" : ""
-              }`}
+              className="flex cursor-pointer items-center gap-2 px-2 py-1 text-sm hover:bg-gray-100"
             >
+              <input
+                type="checkbox"
+                checked={value === option.value}
+                onChange={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                className="checkbox checkbox-xs"
+              />
               {option.label}
-            </button>
+            </label>
           ))}
         </div>
       )}

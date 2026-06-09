@@ -3,7 +3,6 @@
 import {
   type FormEvent,
   type ReactNode,
-  useEffect,
   useState,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -146,7 +145,7 @@ function FieldErrorMessage({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="mt-1 text-xs text-error">{message}</p>;
+  return <p className="mt-1 text-sm text-error">{message}</p>;
 }
 
 function FormFieldRow({
@@ -161,9 +160,9 @@ function FormFieldRow({
   children: ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-y-1 sm:grid-cols-[128px_minmax(0,1fr)] sm:gap-x-5">
-      <label className="text-sm text-gray-800 sm:pt-1.75">{label}</label>
-      <div>
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5">
+      <label className="w-28 text-sm text-gray-700">{label}</label>
+      <div className="flex-1">
         {children}
         {!hideError && <FieldErrorMessage message={error} />}
       </div>
@@ -265,7 +264,7 @@ export default function EditUserPage() {
     <div className="mb-10" data-testid="tabManagerUser">
       <div className="flex min-w-0">
         <div className="min-w-0 flex-1">
-          <h2 className="mb-6 text-xl font-bold text-primary">Edit User</h2>
+          <h1 className="mb-6 text-xl font-bold text-primary">Edit User</h1>
           {isLoading && <p className="text-sm text-gray-700">Loading...</p>}
           {!isLoading && user && <EditUserForm userId={userId} user={user} />}
         </div>
@@ -392,14 +391,17 @@ function EditUserForm({
   };
 
   return (
-    <form className="w-full max-w-140 space-y-3" onSubmit={handleSubmit}>
+    <form
+      className="mb-10 w-full max-w-lg space-y-4 px-4 sm:px-0"
+      onSubmit={handleSubmit}
+    >
       <FormFieldRow label="First Name">
         <input
           type="text"
           data-testid="txtEditFirstName"
           disabled
           value={user.firstName}
-          className="h-8.25 w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
+          className="input input-bordered w-full"
         />
       </FormFieldRow>
 
@@ -409,7 +411,7 @@ function EditUserForm({
           data-testid="txtEditLastName"
           disabled
           value={user.lastName}
-          className="h-8.25 w-full rounded border border-gray-400 bg-gray-100 px-3 text-sm text-gray-800 outline-none"
+          className="input input-bordered w-full"
         />
       </FormFieldRow>
 
@@ -481,12 +483,12 @@ function EditUserForm({
         />
       </FormFieldRow>
 
-      <div className="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end sm:gap-7">
+      <div className="flex flex-col-reverse gap-3 pt-6 sm:flex-row sm:justify-end">
         <button
           type="submit"
           data-testid="btnSaveEditUser"
           disabled={isSaveDisabled}
-          className="hover:cursor-pointer h-8.75 w-full rounded bg-primary px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="btn btn-primary w-full text-white sm:w-auto sm:min-w-24"
         >
           {isSaving ? "Saving..." : "Save"}
         </button>
@@ -495,7 +497,7 @@ function EditUserForm({
           type="button"
           data-testid="btnCancelEditUser"
           onClick={redirectToUsers}
-          className="hover:cursor-pointer h-8.75 w-full rounded border border-gray-400 bg-white px-4 text-sm text-gray-600 transition hover:bg-gray-50 sm:w-auto"
+          className="btn btn-outline btn-neutral w-full sm:w-auto sm:min-w-24"
         >
           Cancel
         </button>
