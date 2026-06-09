@@ -31,11 +31,11 @@ export const UsersLookupTable = ({
   const { params, dispatch } = useUsersLookupTableState();
   const sorts: SortItem[] = params.sortBy
     ? [
-        {
-          key: params.sortBy,
-          direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
-        },
-      ]
+      {
+        key: params.sortBy,
+        direction: params.sortDesc ? SortDirection.Desc : SortDirection.Asc,
+      },
+    ]
     : [];
   const { data, isLoading } = useLookupUsersQuery(params);
   const columns = useMemo(
@@ -75,7 +75,7 @@ export const UsersLookupTable = ({
                     onSearch={(value) => {
                       dispatch({
                         type: "SET_SEARCH",
-                        payload: { searchTerm: value },
+                        payload: { searchTerm: value.trim().replace(/\s+/g, " ") },
                       });
                     }}
                     txtInputTestId="txtSearchUser"
