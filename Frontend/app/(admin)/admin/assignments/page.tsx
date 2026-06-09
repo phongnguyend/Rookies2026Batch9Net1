@@ -29,6 +29,7 @@ import type { ApiErrorResponse } from "@/lib/api/base.types";
 import { returnsApi } from "@/features/returns/returns.api";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectPromotedAssignment } from "@/features/assignments/admin/edit/admin-assignment-list-ui.selectors";
+import SingleSelectDropdown from "@/features/shared/components/SingleSelectDropdown";
 
 const limit = 10;
 
@@ -291,18 +292,18 @@ export default function AssignmentsPage() {
         {/* Left group: State + Assigned Date */}
         <div className="flex flex-wrap gap-3 lg:items-center">
           <div data-testid="ddlState" className="w-full sm:w-auto">
-            <DropdownFilter
+            <SingleSelectDropdown
               items={Object.values(AssignmentState).map((s) => ({
                 key: s,
                 label: displayAssignmentState(s),
               }))}
-              values={states}
+              value={states[0]}
               placeholder="State"
               getKey={(item) => item.key}
               getLabel={(item) => item.label}
-              onChange={(values) =>
+              onChange={(value) =>
                 updateParams({
-                  state: values,
+                  state: value ? [value] : [],
                   page: "1",
                 })
               }
