@@ -200,8 +200,7 @@ export default function UsersPage() {
         : temporarySort === "updatedDateDesc"
           ? "updatedDate"
           : (sorts[0]?.key ?? defaultSort.key),
-    ...(temporarySort ||
-    sorts[0]?.direction === SortDirection.Desc
+    ...(temporarySort || sorts[0]?.direction === SortDirection.Desc
       ? { sortDesc: true }
       : {}),
   };
@@ -334,10 +333,7 @@ export default function UsersPage() {
   const currentUrl = `${pathname}?${searchParams.toString()}`;
 
   return (
-    <div
-      className="mb-10"
-      data-testid="tabManagerUser"
-    >
+    <div className="mb-10" data-testid="tabManagerUser">
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
