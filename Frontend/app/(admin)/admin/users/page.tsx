@@ -6,7 +6,6 @@ import SingleSortDataTable, {
   type ColumnDef,
   type SortItem,
 } from "@/features/shared/components/SingleSortDataTable";
-import DropdownFilter from "@/features/users/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import { SortDirection } from "@/lib/api/base.types";
@@ -26,6 +25,7 @@ import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { formatDate } from "@/utils/datetime.utils";
 import { CircleX, Pencil } from "lucide-react";
+import SingleSelectDropdown from "@/features/shared/components/SingleSelectedDropdown";
 
 const typeFilters = [
   { id: UserRoles.Admin, label: "Admin" },
@@ -345,26 +345,22 @@ export default function UsersPage() {
           <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex gap-5">
               <div data-testid="ddlFilterType">
-                <DropdownFilter
+                <SingleSelectDropdown
                   items={typeFilters}
-                  values={selectedTypes}
+                  value={selectedTypes[0]}
                   placeholder="Type"
                   width="w-40"
                   getKey={(item) => item.id}
                   getLabel={(item) => item.label}
-                  onChange={(values) => {
-                    // Empty values mean "All"; otherwise keep selected roles in
-                    // the URL so refresh/back navigation preserves the filter.
+                  onChange={(value) => {
                     updateQueryParams({
                       page: 1,
-                      type: values.length > 0 ? values.join(",") : null,
+                      type: value ?? null,
                     });
                   }}
-                  getTestIdAll={() => "ddlFilterAll"}
+                  getTestIdAll="ddlFilterAll"
                   getTestId={(item) =>
-                    item.id === UserRoles.Admin
-                      ? "ddlFilterAdmin"
-                      : "ddlFilterStaff"
+                    item.id === UserRoles.Admin ? "ddlFilterAdmin" : "ddlFilterStaff"
                   }
                 />
               </div>
