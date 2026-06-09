@@ -118,7 +118,7 @@ export default function LoginForm({
             {/* Eye toggle button */}
             <button
               type="button"
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content/75 focus:outline-none transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black transition-colors focus:outline-none"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
             >

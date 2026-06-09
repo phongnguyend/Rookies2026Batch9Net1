@@ -16,8 +16,8 @@
 @import "tailwindcss";
 @import "react-datepicker/dist/react-datepicker.css";
 @plugin "daisyui" {
-  themes: ["light"];
-};
+  themes: [ "light"];
+}
 
 @plugin "daisyui/theme" {
   name: "cmyk";
@@ -57,4 +57,10 @@
 /* General */
 body {
   font-family: "Geist", "Geist Mono", sans-serif;
+}
+
+/* Remove eye-icon behavior from microsoft */
+input::-ms-clear,
+input::-ms-reveal {
+  display: none;
 }
