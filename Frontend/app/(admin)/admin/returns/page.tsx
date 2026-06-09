@@ -29,10 +29,6 @@ import SingleSelectDropdown from "@/features/shared/components/SingleSelectDropd
 
 const pageSize = 10;
 const returnRequestTimeZone = "Asia/Bangkok";
-const defaultSort: SortItem = {
-  key: "assetCode",
-  direction: SortDirection.Asc,
-};
 
 const stateFilters = [
   { id: ReturnRequestState.Completed, label: "Completed" },
@@ -167,7 +163,7 @@ export default function ReturnsPage() {
             sortDescParam === "true" ? SortDirection.Desc : SortDirection.Asc,
         },
       ]
-    : [defaultSort];
+    : [];
 
   const [searchState, setSearchState] = useState({
     inputValue: querySearch,
@@ -254,8 +250,9 @@ export default function ReturnsPage() {
     ...(returnedDate
       ? { returnedDate: formatReturnedDateForQuery(returnedDate) }
       : {}),
-    sortBy: sorts[0]?.key ?? defaultSort.key,
-    sortDirection: sorts[0]?.direction ?? defaultSort.direction,
+    ...(sorts[0]
+      ? { sortBy: sorts[0].key, sortDirection: sorts[0].direction }
+      : {}),
   });
 
   const requests = data?.items ?? [];
