@@ -39,7 +39,7 @@ export default function SingleSortDataTable<T>({
   sorts = [],
   onSortChange,
   getRowKey,
-  rowTestId
+  rowTestId,
 }: DataTableProps<T>) {
   const handleSort = (key: string) => {
     const currentSort = sorts.find((s) => s.key === key);
@@ -81,9 +81,10 @@ export default function SingleSortDataTable<T>({
                   onClick={() => column.sortable && handleSort(column.key)}
                   className={`px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm
                     ${column.className ?? ""}
-                    ${column.sortable
-                      ? "cursor-pointer select-none hover:text-primary transition-colors"
-                      : ""
+                    ${
+                      column.sortable
+                        ? "cursor-pointer select-none hover:text-primary transition-colors"
+                        : ""
                     }`}
                 >
                   <div className="inline-flex items-center gap-1">
@@ -120,13 +121,10 @@ export default function SingleSortDataTable<T>({
           ) : (
             data.map((row, rowIndex) => (
               <tr
-                key={
-                  getRowKey
-                    ? getRowKey(row, rowIndex)
-                    : rowIndex
-                }
-                tabIndex={onRowClick ? 0 : undefined}  //tabIndex focus for lookup
-                onKeyDown={(e) => {                          // tabIndex focus for lookup
+                key={getRowKey ? getRowKey(row, rowIndex) : rowIndex}
+                tabIndex={0} //tabIndex focus for lookup
+                onKeyDown={(e) => {
+                  // tabIndex focus for lookup
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     onRowClick?.(row);
@@ -135,12 +133,13 @@ export default function SingleSortDataTable<T>({
                 onClick={() => onRowClick?.(row)}
                 className={`
                   border-b border-gray-200
-                  ${onRowClick
-                    ? "cursor-pointer hover:bg-gray-50 transition-colors"
-                    : ""
+                  ${
+                    onRowClick
+                      ? "cursor-pointer hover:bg-gray-50 transition-colors"
+                      : ""
                   }
                 `}
-                data-testid={rowTestId?.(row, rowIndex)}   //For assignment detail
+                data-testid={rowTestId?.(row, rowIndex)} //For assignment detail
               >
                 {columns.map((column) => (
                   <td
@@ -154,9 +153,7 @@ export default function SingleSortDataTable<T>({
                   >
                     {column.render
                       ? column.render(row, rowIndex)
-                      : (row as Record<string, ReactNode>)[
-                      String(column.key)
-                      ]}
+                      : (row as Record<string, ReactNode>)[String(column.key)]}
                   </td>
                 ))}
               </tr>
