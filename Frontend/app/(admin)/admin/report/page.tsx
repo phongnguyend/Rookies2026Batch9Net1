@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState, useEffect } from "react";
 import SingleSortDataTable, {
   ColumnDef,
   SortItem,
@@ -79,16 +80,23 @@ export default function ReportPage() {
     skip: !isAuthenticated, // if not authenticated, skip long polling the request
   });
 
+  const [pollInterval, setPollInterval] = useState(0);
   const { data: statusData, refetch: refetchStatus } = useGetExportStatusQuery(
     undefined,
     {
-      pollingInterval: 3000,
+      pollingInterval: pollInterval,
       refetchOnFocus: true,
       refetchOnReconnect: true,
       skipPollingIfUnfocused: true,
       skip: !isAuthenticated, // if not authenticated, skip long polling the request
     },
   );
+
+  useEffect(() => {
+    setPollInterval(
+      statusData?.status === ExportReportJobStatus.Processing ? 3000 : 0,
+    );
+  }, [statusData?.status]);
 
   const [startExport, { isLoading: isStartDownloading }] =
     useStartExportMutation();
@@ -130,7 +138,7 @@ export default function ReportPage() {
     } else {
       try {
         if (typeof window !== "undefined") {
-          localStorage.setItem("isAlreadyNotified", "false");
+          (window as any).__reportNotifiedReady = false;
         }
         dispatch(setHasNotifiedReady(false));
         await startExport({

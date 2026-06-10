@@ -86,7 +86,6 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   }, [profile, isAuthenticated, isError, dispatch, hasToken]);
 
   // Export Report
-  useAppSelector((state) => state.reportSlice);
   const { lastJobStatus } = useAppSelector((state) => state.reportSlice);
   const { data: exportStatus } = useGetExportStatusQuery(undefined, {
     pollingInterval: 2000,
@@ -103,17 +102,16 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAuthenticated || user?.role !== UserRoles.Admin) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("isAlreadyNotified");
+        (window as any).__reportNotifiedReady = false;
       }
-      dispatch(setHasNotifiedReady(false));
       return;
     }
 
-    // Only show once when the download finishes at any page
     const isAlreadyNotified =
       typeof window !== "undefined" &&
-      localStorage.getItem("isAlreadyNotified") === "true";
+      (window as any).__reportNotifiedReady === true;
 
+    // Only show once when the download finishes at any page
     const becameReady =
       lastJobStatus !== ExportReportJobStatus.ReadyToDownload &&
       exportStatus?.status === ExportReportJobStatus.ReadyToDownload &&
@@ -127,7 +125,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         }),
       );
       if (typeof window !== "undefined") {
-        localStorage.setItem("isAlreadyNotified", "true");
+        (window as any).__reportNotifiedReady = true;
       }
       dispatch(setHasNotifiedReady(true));
     }
