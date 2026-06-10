@@ -43,7 +43,9 @@ public class GetAssetsHandler : IRequestHandler<GetAssetsRequest, ErrorOr<PagedL
         }
 
         var location = Guid.Parse(_currentUser.LocationId!);
-        var normalizedSearch = request.Search?.Trim();
+        var normalizedSearch = string.IsNullOrWhiteSpace(request.Search)
+            ? null
+            : request.Search.Replace(" ", "").Trim();
 
         var categoryList = request.Categories?
                 .Split(",", StringSplitOptions.RemoveEmptyEntries);

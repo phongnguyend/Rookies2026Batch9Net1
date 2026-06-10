@@ -273,7 +273,7 @@ export default function ReportPage() {
             onClick={handleExport}
             disabled={isBtnDisabled}
             data-testid="btnExport"
-            className={`hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer h-9 ${isBtnDisabled ? "disabled:cursor-not-allowed disabled:opacity-50" : ""}`}
+            className={`flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer ${isBtnDisabled ? "disabled:cursor-not-allowed disabled:opacity-50" : ""}`}
           >
             {btnText}
           </button>
