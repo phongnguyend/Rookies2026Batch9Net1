@@ -17,13 +17,6 @@ import { loginSuccess, completeLoading } from "@/features/auth/auth.slice";
 import FirstChangePasswordModal from "@/features/auth/components/FirstChangePasswordModal";
 import { startUserSessionHub } from "@/features/auth/user-session.signalr";
 import { useGetExportStatusQuery } from "@/features/report/report.api";
-import { ExportReportJobStatus } from "@/features/report/report.types";
-import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
-import {
-  setHasNotifiedReady,
-  setLastJobStatus,
-} from "@/features/report/report.slice";
-import dayjs from "dayjs";
 
 export default function RootLayout({
   children,
@@ -85,60 +78,10 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     }
   }, [profile, isAuthenticated, isError, dispatch, hasToken]);
 
-  // Export Report
-  const { lastJobStatus } = useAppSelector((state) => state.reportSlice);
-  const { data: exportStatus } = useGetExportStatusQuery(undefined, {
-    pollingInterval: 2000,
+  // Export Report initial fetch (no polling)
+  useGetExportStatusQuery(undefined, {
     skip: !isAuthenticated || user?.role !== UserRoles.Admin,
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
-    skipPollingIfUnfocused: true,
   });
-
-  const formattedDate = exportStatus?.completedAtUtc
-    ? dayjs(exportStatus.completedAtUtc).format("MMM D, YYYY HH:mm:ss")
-    : "";
-
-  useEffect(() => {
-    if (!isAuthenticated || user?.role !== UserRoles.Admin) {
-      if (typeof window !== "undefined") {
-        (window as any).__reportNotifiedReady = false;
-      }
-      return;
-    }
-
-    const isAlreadyNotified =
-      typeof window !== "undefined" &&
-      (window as any).__reportNotifiedReady === true;
-
-    // Only show once when the download finishes at any page
-    const becameReady =
-      lastJobStatus !== ExportReportJobStatus.ReadyToDownload &&
-      exportStatus?.status === ExportReportJobStatus.ReadyToDownload &&
-      !isAlreadyNotified;
-
-    if (becameReady) {
-      dispatch(
-        enqueueToast({
-          message: `Report snapshot at ${formattedDate} is ready for downloading`,
-          type: ToastType.Success,
-        }),
-      );
-      if (typeof window !== "undefined") {
-        (window as any).__reportNotifiedReady = true;
-      }
-      dispatch(setHasNotifiedReady(true));
-    }
-
-    dispatch(setLastJobStatus(exportStatus?.status ?? null));
-  }, [
-    exportStatus?.status,
-    lastJobStatus,
-    isAuthenticated,
-    user?.role,
-    formattedDate,
-    dispatch,
-  ]);
 
   return (
     <RouteGuard>

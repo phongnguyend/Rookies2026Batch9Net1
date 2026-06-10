@@ -12,6 +12,8 @@ using NashAssetManagement.Domain.Entities.Core;
 using NashAssetManagement.Domain.Entities.Jobs.Report;
 using NashAssetManagement.Domain.Enums;
 
+using NashAssetManagement.Application.Abstractions.Realtime;
+
 namespace NashAssetManagement.Infrastructure.Report
 {
     public sealed class ReportExportJobService(
@@ -22,6 +24,7 @@ namespace NashAssetManagement.Infrastructure.Report
         IUnitOfWork uow,
         IReportFileNameService fileNameService,
         [FromKeyedServices(AppCts.Services.ReportExcel)] IExcelGenerator excelReportGenerator,
+        IUserSessionNotifier userSessionNotifier,
         ILogger<ReportExportJobService> logger) : IReportExportJobService
     {
         // if job failed, stop default retry from Hangfire 10 times
@@ -127,6 +130,13 @@ namespace NashAssetManagement.Infrastructure.Report
                 exportJob.CompletedAtUtc = dateTimeProvider.UtcNow;
 
                 await uow.SaveChangesAsync(cancellationToken);
+                
+                // Notify frontend when the excel file is ready
+                await userSessionNotifier.NotifyReportReadyAsync(
+                    exportJob.RequestedByAdminId,
+                    exportJob.CompletedAtUtc.Value.ToString("o"),
+                    $"/{exportJob.FilePath.Replace('\\', '/')}",
+                    cancellationToken);
             }
             catch (Exception ex)
             {

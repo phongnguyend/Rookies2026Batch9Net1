@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SingleSortDataTable, {
   ColumnDef,
   SortItem,
@@ -22,10 +22,7 @@ import {
 import { ENV_CONFIGS } from "@/lib/config/env";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import {
-  setDownloading,
-  setHasNotifiedReady,
-} from "@/features/report/report.slice";
+import { setDownloading } from "@/features/report/report.slice";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import dayjs from "dayjs";
 
@@ -80,23 +77,15 @@ export default function ReportPage() {
     skip: !isAuthenticated, // if not authenticated, skip long polling the request
   });
 
-  const [pollInterval, setPollInterval] = useState(0);
   const { data: statusData, refetch: refetchStatus } = useGetExportStatusQuery(
     undefined,
     {
-      pollingInterval: pollInterval,
       refetchOnFocus: true,
       refetchOnReconnect: true,
       skipPollingIfUnfocused: true,
-      skip: !isAuthenticated, // if not authenticated, skip long polling the request
+      skip: !isAuthenticated,
     },
   );
-
-  useEffect(() => {
-    setPollInterval(
-      statusData?.status === ExportReportJobStatus.Processing ? 3000 : 0,
-    );
-  }, [statusData?.status]);
 
   const [startExport, { isLoading: isStartDownloading }] =
     useStartExportMutation();
@@ -137,10 +126,6 @@ export default function ReportPage() {
       setIsModalOpen(true);
     } else {
       try {
-        if (typeof window !== "undefined") {
-          (window as any).__reportNotifiedReady = false;
-        }
-        dispatch(setHasNotifiedReady(false));
         await startExport({
           sortBy: queryParams.sortBy,
           sortDirection: queryParams.sortDirection,
