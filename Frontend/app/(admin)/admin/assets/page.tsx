@@ -282,7 +282,7 @@ function AssetsContent() {
             <button
               data-testid="btnCreateAsset"
               onClick={() => router.push("/admin/assets/create")}
-              className="hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer">
+              className="h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer">
               Create New Asset
             </button>
           </div>
