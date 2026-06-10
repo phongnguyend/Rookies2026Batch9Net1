@@ -327,7 +327,7 @@ export default function AssignmentsPage() {
                       .toISOString()
                       .split("T")[0]
                     : undefined,
-                  page: "1",
+                  page: date ? "1" : page.toString(),
                 })
               }
               placeholder="Assigned Date"
