@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SingleSortDataTable, {
   ColumnDef,
   SortItem,
@@ -26,6 +26,7 @@ import {
   setHasNotifiedReady,
 } from "@/features/report/report.slice";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import dayjs from "dayjs";
 
 const defaultSort: SortItem = {
   key: "categoryName",
@@ -91,6 +92,7 @@ export default function ReportPage() {
 
   const [startExport, { isLoading: isStartDownloading }] =
     useStartExportMutation();
+
   const [cancelExport, { isLoading: isCanceling }] = useCancelExportMutation();
 
   const reports = data?.items ?? [];
@@ -107,7 +109,7 @@ export default function ReportPage() {
     jobStatus === ExportReportJobStatus.Processing
       ? "Generating..."
       : jobStatus === ExportReportJobStatus.ReadyToDownload
-        ? "Ready to Download"
+        ? "Download"
         : "Export";
 
   const isBtnDisabled =
@@ -116,6 +118,11 @@ export default function ReportPage() {
     isStartDownloading ||
     isCanceling ||
     isDownloading;
+
+  // Formatted Date
+  const formattedDate = statusData?.completedAtUtc
+    ? dayjs(statusData.completedAtUtc).format("MMM D, YYYY HH:mm:ss")
+    : "";
 
   const handleExport = async () => {
     if (jobStatus === ExportReportJobStatus.ReadyToDownload) {
@@ -305,8 +312,8 @@ export default function ReportPage() {
         onClose={() => setIsModalOpen(false)}
         onYes={handleDownload}
         onNo={handleCancelReport}
-        title="Your report is ready for downloading"
-        body="Would you like to download the report or cancel it?"
+        title={`Your report is ready for downloading`}
+        body={`Would you like to download the report snapshot from ${formattedDate}?`}
         yesButtonLabel="Download File"
         noButtonLabel="Cancel Report"
         isLoading={isCanceling || isDownloading}
