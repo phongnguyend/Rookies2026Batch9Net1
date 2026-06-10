@@ -129,6 +129,9 @@ export default function ReportPage() {
       setIsModalOpen(true);
     } else {
       try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("isAlreadyNotified", "false");
+        }
         dispatch(setHasNotifiedReady(false));
         await startExport({
           sortBy: queryParams.sortBy,

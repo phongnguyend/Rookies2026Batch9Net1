@@ -19,7 +19,10 @@ import { startUserSessionHub } from "@/features/auth/user-session.signalr";
 import { useGetExportStatusQuery } from "@/features/report/report.api";
 import { ExportReportJobStatus } from "@/features/report/report.types";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
-import { setHasNotifiedReady } from "@/features/report/report.slice";
+import {
+  setHasNotifiedReady,
+  setLastJobStatus,
+} from "@/features/report/report.slice";
 import dayjs from "dayjs";
 
 export default function RootLayout({
@@ -83,7 +86,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   }, [profile, isAuthenticated, isError, dispatch, hasToken]);
 
   // Export Report
-  const { hasNotifiedReady } = useAppSelector((state) => state.reportSlice);
+  useAppSelector((state) => state.reportSlice);
   const { lastJobStatus } = useAppSelector((state) => state.reportSlice);
   const { data: exportStatus } = useGetExportStatusQuery(undefined, {
     pollingInterval: 2000,
@@ -99,14 +102,22 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== UserRoles.Admin) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("isAlreadyNotified");
+      }
+      dispatch(setHasNotifiedReady(false));
       return;
     }
 
     // Only show once when the download finishes at any page
+    const isAlreadyNotified =
+      typeof window !== "undefined" &&
+      localStorage.getItem("isAlreadyNotified") === "true";
+
     const becameReady =
       lastJobStatus !== ExportReportJobStatus.ReadyToDownload &&
       exportStatus?.status === ExportReportJobStatus.ReadyToDownload &&
-      !hasNotifiedReady;
+      !isAlreadyNotified;
 
     if (becameReady) {
       dispatch(
@@ -115,12 +126,16 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           type: ToastType.Success,
         }),
       );
+      if (typeof window !== "undefined") {
+        localStorage.setItem("isAlreadyNotified", "true");
+      }
       dispatch(setHasNotifiedReady(true));
     }
+
+    dispatch(setLastJobStatus(exportStatus?.status ?? null));
   }, [
     exportStatus?.status,
     lastJobStatus,
-    hasNotifiedReady,
     isAuthenticated,
     user?.role,
     formattedDate,
