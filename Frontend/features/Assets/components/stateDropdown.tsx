@@ -26,11 +26,12 @@ export default function DropdownStateFilter<T>({
   onChange,
   allLabel = "All",
   customLabel,
-  defaultValue,
 }: DropdownStateFilterProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const isAllSelected = values.length === items.length;
+  const isAllSelected =
+    values.length === items.length &&
+    items.every((item) => values.includes(getKey(item)));
 
   const selectedLabel =
     customLabel ??
@@ -42,8 +43,15 @@ export default function DropdownStateFilter<T>({
 
   const handleToggleItem = (itemKey: string) => {
     if (values.includes(itemKey)) {
-      const filteredValues = values.filter((value) => value !== itemKey);
-      onChange(filteredValues.length === 0 ? defaultValue ?? [] : filteredValues);
+      const filteredValues = values.filter(
+        (value) => value !== itemKey
+      );
+
+      if (filteredValues.length === 0) {
+        onChange(items.map((item) => getKey(item)));
+      } else {
+        onChange(filteredValues);
+      }
     } else {
       onChange([...values, itemKey]);
     }
@@ -51,7 +59,7 @@ export default function DropdownStateFilter<T>({
 
   const handleToggleAll = () => {
     if (isAllSelected) {
-      onChange(defaultValue!);
+      return;
     } else {
       onChange(items.map((item) => getKey(item)));
     }
