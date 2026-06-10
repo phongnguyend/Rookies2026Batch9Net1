@@ -163,8 +163,8 @@ const EditAssignmentPage = () => {
 
           {/* Assigned Date */}
           <div>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-              <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-5">
+              <label className="text-sm font-medium text-gray-700 md:w-28 md:shrink-0">
                 Assigned Date
               </label>
               <div className="flex-1" data-testid="dtpAssignedDate">
@@ -191,8 +191,8 @@ const EditAssignmentPage = () => {
 
           {/* Note */}
           <div>
-            <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-              <label className="pt-0 text-sm font-medium text-gray-700 md:w-32 md:shrink-0 md:pt-2">
+            <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-5">
+              <label className="pt-0 text-sm font-medium text-gray-700 md:w-28 md:shrink-0 md:pt-2">
                 Note
               </label>
               <Controller
@@ -224,7 +224,7 @@ const EditAssignmentPage = () => {
               type="submit"
               data-testid="btnSave"
               disabled={!isValid || isLoading || isEditLoading}
-              className="h-9 rounded-md bg-red-500 px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
+              className="h-9 rounded-md bg-primary px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
             >
               {isLoading ? "Saving..." : "Save"}
             </button>

@@ -19,7 +19,7 @@ export default function SearchInput({
   onChange,
   onSearch,
   placeholder = "Search...",
-  width = "w-full sm:w-60",
+  width = "w-full sm:w-64",
   txtInputTestId = "txtSearch",
   btnSearchTestId = "btnSearch",
   searchIcon = <Search size={16} />,

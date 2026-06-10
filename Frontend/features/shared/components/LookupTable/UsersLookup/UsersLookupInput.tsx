@@ -56,8 +56,8 @@ const UsersLookupInput = ({
 
   return (
     <div className="relative">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-        <label className="text-sm font-medium text-gray-700 md:w-32 md:shrink-0">
+      <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-5">
+        <label className="text-sm font-medium text-gray-700 md:w-28 md:shrink-0">
           User
         </label>
         <div className="flex-1" data-testid={data_testid}>

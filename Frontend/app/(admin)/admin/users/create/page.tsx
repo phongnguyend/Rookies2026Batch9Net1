@@ -253,7 +253,7 @@ export default function CreateUserPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-lg space-y-4 px-4 sm:px-0 mb-10">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xl mb-10 space-y-5">
       <h1 className="mb-6 text-xl font-bold text-primary">Create New User</h1>
 
       {/* First Name */}
@@ -414,14 +414,14 @@ export default function CreateUserPage() {
           type="submit"
           data-testid="btnSaveUser"
           disabled={!isValid || isSubmitting}
-          className="btn btn-primary w-full text-white sm:w-auto sm:min-w-24"
+          className="h-9 rounded-md bg-primary px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
         >
           Save
         </button>
         <button
           type="button"
           data-testid="btnCancelUser"
-          className="btn btn-outline btn-neutral w-full sm:w-auto sm:min-w-24"
+          className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
           onClick={() =>
             router.push(searchParams.get("returnUrl") ?? "/admin/users")
           }

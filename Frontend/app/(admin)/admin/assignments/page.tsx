@@ -14,7 +14,6 @@ import {
 import SearchInput from "@/features/shared/components/SearchInput";
 import Pagination from "@/features/shared/components/Pagination";
 import { SortDirection } from "@/lib/api/base.types";
-import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import DataTableButtonActions from "@/features/shared/components/DataTableButtonActions";
 import { useMemo, useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
@@ -290,7 +289,7 @@ export default function AssignmentsPage() {
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
         {/* Left group: State + Assigned Date */}
-        <div className="flex flex-wrap gap-3 lg:items-center">
+        <div className="flex flex-wrap flex-col gap-3 lg:flex-row lg:items-center">
           <div data-testid="ddlState" className="w-full sm:w-auto">
             <SingleSelectDropdown
               items={Object.values(AssignmentState).map((s) => ({
@@ -332,13 +331,12 @@ export default function AssignmentsPage() {
                 })
               }
               placeholder="Assigned Date"
-              width="w-full"
             />
           </div>
         </div>
 
         {/* Right group: Search + Create button */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:ml-auto">
+        <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
           <div className="w-full sm:w-auto">
             <SearchInput
               value={searchInput}
@@ -358,7 +356,7 @@ export default function AssignmentsPage() {
           </div>
 
           <button
-            className="w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
+            className="hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
             data-testid="btnCreateNewAssignment"
             onClick={() => router.push("/admin/assignments/create")}
           >

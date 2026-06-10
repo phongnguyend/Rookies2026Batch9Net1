@@ -5,6 +5,7 @@ import { useGetUserByIdQuery } from "@/features/users/users.api";
 import { UserRoles, type UserDetail } from "@/features/users/users.types";
 import { formatDate } from "@/utils/datetime.utils";
 import { FocusTrap } from "focus-trap-react";
+import { X } from "lucide-react";
 
 interface UserDetailModalProps {
   userId: string | null;
@@ -126,10 +127,10 @@ export default function UserDetailModal({
               type="button"
               onClick={onClose}
               aria-label="Close detailed user information"
-              className="rounded border-3 border-primary px-2 py-0.5 text-sm font-semibold text-primary hover:cursor-pointer hover:font-bold"
+              className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
               data-testid="btnCloseUserDetail"
             >
-              x
+              <X />
             </button>
           </div>
 

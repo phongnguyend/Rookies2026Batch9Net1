@@ -5,6 +5,7 @@ import { useDeleteAssetMutation } from "@/features/Assets/assets.api";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { useEffect, useRef } from "react";
+import { X } from "lucide-react";
 interface DeleteAssetModalProps {
   assetId: string | null;
   assetName: string;
@@ -56,36 +57,22 @@ export default function DeleteAssetModal({
           {hasHistory ? (
             <>
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-gray-300 bg-gray-100 px-10 py-4">
-                <h3 className="text-lg font-bold text-red-600">
+              <div className="bg-[#f1f3f5] border-b border-gray-500 px-6 py-3.5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-primary">
                   Cannot Delete Asset
                 </h3>
                 <button
                   data-testid="btnCloseDisablePopup"
                   onClick={onClose}
-                  className="text-red-600 hover:text-red-800"
+                  className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="m9 9 6 6" />
-                    <path d="m15 9-6 6" />
-                  </svg>
+                  <X />
                 </button>
               </div>
 
               {/* Body */}
-              <div className="px-10 py-5">
-                <p className="text-sm leading-6 text-gray-700">
+              <div className="px-6 py-6 text-neutral-800 text-base leading-relaxed pb-4">
+                <p className="">
                   Cannot delete the asset because it belongs to one or more
                   historical assignments.
                   <br />
@@ -97,7 +84,7 @@ export default function DeleteAssetModal({
                       onClose();
                       router.push(`/admin/assets/edit?id=${assetId}`);
                     }}
-                    className="text-sky-500 underline hover:text-sky-700"
+                    className="text-sky-500 underline hover:text-sky-700 hover:cursor-pointer"
                   >
                     Edit Asset page
                   </button>
@@ -107,34 +94,24 @@ export default function DeleteAssetModal({
           ) : (
             <>
               {/* Header */}
-              <div className="border-b border-gray-300 bg-gray-100 px-10 py-4">
-                <h3 className="text-lg font-bold text-red-600">
+              <div className="bg-[#f1f3f5] border-b border-gray-500 px-6 py-3.5 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-primary">
                   Are you sure?
                 </h3>
               </div>
               {/* Body */}
-              <div className="px-10 py-5">
-                <p className="text-sm text-gray-700">
+              <div className="px-6 pt-6 text-neutral-800 text-base leading-relaxed pb-4">
+                <p>
                   Do you want to delete this asset?
                 </p>
               </div>
               {/* Footer */}
-              <div className="px-10 pb-6 flex gap-4">
+              <div className="px-6 pb-6 pt-0 bg-white flex items-center justify-start gap-3">
                 <button
                   data-testid="btnDelete"
                   onClick={handleDelete}
                   disabled={isLoading}
-                  className="
-                rounded-md
-                bg-red-600
-                px-5
-                py-2
-                text-sm
-                font-medium
-                text-white
-                hover:bg-red-700
-                disabled:opacity-50
-              "
+                  className="hover:cursor-pointer px-4 py-2 bg-primary hover:bg-red-600 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </button>
@@ -142,16 +119,7 @@ export default function DeleteAssetModal({
                   data-testid="btnCancel"
                   onClick={onClose}
                   disabled={isLoading}
-                  className="
-                rounded-md
-                border
-                border-gray-400
-                px-5
-                py-2
-                text-sm
-                text-gray-600
-                hover:bg-gray-100
-              "
+                  className="px-4 py-2 border border-gray-400 rounded text-[#6c757d] font-normal hover:bg-gray-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
                 >
                   Cancel
                 </button>

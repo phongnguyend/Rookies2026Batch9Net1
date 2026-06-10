@@ -35,29 +35,8 @@ export function FormField({
   children: ReactNode;
 }) {
   return (
-    <div
-      className="
-        flex
-        flex-col
-        gap-2
-        sm:flex-row
-        sm:items-start
-        sm:gap-3
-        w-full
-      "
-    >
-      <label
-        className="
-          w-full
-          text-sm
-          font-medium
-          text-gray-700
-          sm:w-32
-          md:w-36
-          shrink-0
-          sm:pt-2
-        "
-      >
+    <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-5">
+      <label className="pt-0 text-sm font-medium text-gray-700 md:w-28 md:shrink-0 md:pt-2">
         {label}
       </label>
 
