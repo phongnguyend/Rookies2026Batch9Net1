@@ -199,7 +199,7 @@ export default function DatePickerInput({
   return (
     <div ref={ref} className={`relative ${width}`}>
       <div
-        className={`flex h-10 overflow-hidden rounded border bg-base-100 ${
+        className={`flex h-9 overflow-hidden rounded border bg-base-100 ${
           error || inputError ? "border-error" : "border-gray-400"
         }`}
       >
