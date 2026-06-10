@@ -70,9 +70,12 @@ export const AssetsWithAssignedLookupInput = ({
             onClick={handleOpen}
             data-testid={data_testid}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !isOpen) handleOpen();
+              if ((e.key === "Enter" || e.key === " ") && !isOpen) {
+                e.preventDefault();
+                handleOpen();
+              }
             }}
-            className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded cursor-pointer bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+            className="h-9 flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded cursor-pointer bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
           >
             {/* Input display is driven by value prop only, never pendingAsset */}
             {value ? (

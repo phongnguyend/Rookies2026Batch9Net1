@@ -8,6 +8,7 @@ using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.Assets.Specification;
 using NashAssetManagement.Application.UseCases.Categories.Specification;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.Assets.Create;
 
@@ -70,6 +71,12 @@ public class CreateAssetHandler
         if (category is null)
         {
             return CreateAssetErrors.CategoryNotFound;
+        }
+
+        if (request.InstalledDate > _dateTimeProvider.UtcNow.Date &&
+            request.State == AssetState.Available)
+        {
+            return CreateAssetErrors.AssetInstalledDateInvalidState;
         }
 
         var count = await _assetRepository.CountAsync(

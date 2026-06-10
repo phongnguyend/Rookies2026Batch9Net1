@@ -28,4 +28,9 @@ public static class EditAssetErrors
         code: "AssetEdit.AssetIsSoftDeleted",
         description: "Asset cannot be edited because some one has deleted it."
     );
+
+    public static readonly Error AssetInstalledDateInvalidState = Error.Conflict(
+        code: "AssetEdit.AssetInstalledDateInvalidState",
+        description: "Installed Date in the future can not be available."
+    );
 }

@@ -22,4 +22,9 @@ public static class CreateAssetErrors
         code: "AssetCreate.LocationNotFound",
         description: "Location not found. Please enter a valid location."
     );
+
+    public static readonly Error AssetInstalledDateInvalidState = Error.Conflict(
+        code: "AssetCreate.AssetInstalledDateInvalidState",
+        description: "Installed Date in the future can not be available."
+    );
 }

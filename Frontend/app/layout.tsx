@@ -20,6 +20,7 @@ import { useGetExportStatusQuery } from "@/features/report/report.api";
 import { ExportReportJobStatus } from "@/features/report/report.types";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
 import { setHasNotifiedReady } from "@/features/report/report.slice";
+import dayjs from "dayjs";
 
 export default function RootLayout({
   children,
@@ -83,6 +84,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   // Export Report
   const { hasNotifiedReady } = useAppSelector((state) => state.reportSlice);
+  const { lastJobStatus } = useAppSelector((state) => state.reportSlice);
   const { data: exportStatus } = useGetExportStatusQuery(undefined, {
     pollingInterval: 2000,
     skip: !isAuthenticated || user?.role !== UserRoles.Admin,
@@ -91,18 +93,25 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     skipPollingIfUnfocused: true,
   });
 
+  const formattedDate = exportStatus?.completedAtUtc
+    ? dayjs(exportStatus.completedAtUtc).format("MMM D, YYYY HH:mm:ss")
+    : "";
+
   useEffect(() => {
     if (!isAuthenticated || user?.role !== UserRoles.Admin) {
       return;
     }
 
-    if (
+    // Only show once when the download finishes at any page
+    const becameReady =
+      lastJobStatus !== ExportReportJobStatus.ReadyToDownload &&
       exportStatus?.status === ExportReportJobStatus.ReadyToDownload &&
-      !hasNotifiedReady
-    ) {
+      !hasNotifiedReady;
+
+    if (becameReady) {
       dispatch(
         enqueueToast({
-          message: "Report is ready to download",
+          message: `Report snapshot at ${formattedDate} is ready for downloading`,
           type: ToastType.Success,
         }),
       );
@@ -110,9 +119,11 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     }
   }, [
     exportStatus?.status,
+    lastJobStatus,
     hasNotifiedReady,
     isAuthenticated,
     user?.role,
+    formattedDate,
     dispatch,
   ]);
 

@@ -264,7 +264,7 @@ export default function CreateUserPage() {
           <input
             {...register("firstName")}
             data-testid="txtUserFirstName"
-            className="input input-bordered w-full"
+            className="h-9 input input-bordered w-full"
           />
 
           {errors.firstName && (
@@ -283,7 +283,7 @@ export default function CreateUserPage() {
           <input
             {...register("lastName")}
             data-testid="txtUserLastName"
-            className="input input-bordered w-full"
+            className="h-9 input input-bordered w-full"
           />
 
           {errors.lastName && (

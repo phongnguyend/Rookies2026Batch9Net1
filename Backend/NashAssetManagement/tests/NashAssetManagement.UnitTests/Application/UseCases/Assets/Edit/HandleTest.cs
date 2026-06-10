@@ -146,8 +146,13 @@ public class HandlerTests
     public async Task Handle_SaveChangesThrows_ShouldReturnAssetEditFailed()
     {
         // Arrange
+        var now = new DateTime(2026, 1, 1);
+
         _currentUser.Setup(x => x.LocationId)
             .Returns(Guid.NewGuid().ToString());
+
+        _dateTimeProvider.Setup(x => x.UtcNow)
+            .Returns(now);
 
         var asset = CreateAsset();
 
@@ -161,13 +166,20 @@ public class HandlerTests
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Database error"));
 
+        var request = CreateValidRequest() with
+        {
+            InstalledDate = now.AddDays(-1),
+            State = AssetState.Available
+        };
+
         // Act
         var result = await _handler.Handle(
-            CreateValidRequest(),
+            request,
             CancellationToken.None);
 
         // Assert
         Assert.True(result.IsError);
+
         Assert.Contains(result.Errors,
             e => e.Code == EditAssetErrors.AssetEditFailed.Code);
     }
@@ -228,7 +240,7 @@ public class HandlerTests
             AssetId: Guid.NewGuid().ToString(),
             AssetName: "Updated Laptop",
             Specification: "Updated Specification",
-            InstalledDate: DateTime.UtcNow.AddDays(-1),
+            InstalledDate: new DateTime(2025, 12, 31),
             State: AssetState.Available
         );
     }

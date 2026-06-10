@@ -327,7 +327,7 @@ export default function AssignmentsPage() {
                       .toISOString()
                       .split("T")[0]
                     : undefined,
-                  page: "1",
+                  page: date ? "1" : page.toString(),
                 })
               }
               placeholder="Assigned Date"
@@ -356,7 +356,7 @@ export default function AssignmentsPage() {
           </div>
 
           <button
-            className="hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
+            className="h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer flex items-center justify-center"
             data-testid="btnCreateNewAssignment"
             onClick={() => router.push("/admin/assignments/create")}
           >

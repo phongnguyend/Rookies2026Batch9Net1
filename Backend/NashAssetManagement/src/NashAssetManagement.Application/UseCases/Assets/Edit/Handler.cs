@@ -71,6 +71,12 @@ public class EditAssetHandler
         if(asset.IsDeleted == true)
             return EditAssetErrors.AssetIsSoftDeleted;
 
+        if (request.InstalledDate > _dateTimeProvider.UtcNow.Date &&
+            request.State == AssetState.Available)
+        {
+            return EditAssetErrors.AssetInstalledDateInvalidState;
+        }
+
         asset.Name = normalizedRequest.AssetName;
         asset.Specification = normalizedRequest.Specification;
         asset.InstalledAtUtc = normalizedRequest.InstalledDate;
