@@ -63,9 +63,13 @@ public sealed class AssetListSpec : Specification<Asset, GetAssetsResponse>
             Query.Where(a => states.Contains(a.State));
 
         if (search is not null)
+        {
+            var normalizedSearch = search.ToLower();
+
             Query.Where(a =>
-                a.AssetCode.Contains(search) ||
-                a.Name.Contains(search));
+                a.AssetCode.ToLower().Replace(" ", "").Contains(normalizedSearch) ||
+                a.Name.ToLower().Replace(" ", "").Contains(normalizedSearch));
+        }
 
         Query.Select(a => new GetAssetsResponse(
             a.Id,
