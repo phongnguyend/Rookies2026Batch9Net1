@@ -40,7 +40,8 @@ namespace NashAssetManagement.Application.UseCases.Report.CurrentDownload
 
             return new Response(
                 Status: reportJob.Status,
-                DownloadUrl: downloadUrl
+                DownloadUrl: downloadUrl,
+                CompletedAtUtc: reportJob.CompletedAtUtc
             );
         }
     }

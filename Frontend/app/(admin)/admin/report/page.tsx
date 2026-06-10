@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SingleSortDataTable, {
   ColumnDef,
   SortItem,
@@ -26,6 +26,7 @@ import {
   setHasNotifiedReady,
 } from "@/features/report/report.slice";
 import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import dayjs from "dayjs";
 
 const defaultSort: SortItem = {
   key: "categoryName",
@@ -91,6 +92,7 @@ export default function ReportPage() {
 
   const [startExport, { isLoading: isStartDownloading }] =
     useStartExportMutation();
+
   const [cancelExport, { isLoading: isCanceling }] = useCancelExportMutation();
 
   const reports = data?.items ?? [];
@@ -107,7 +109,7 @@ export default function ReportPage() {
     jobStatus === ExportReportJobStatus.Processing
       ? "Generating..."
       : jobStatus === ExportReportJobStatus.ReadyToDownload
-        ? "Ready to Download"
+        ? "Download"
         : "Export";
 
   const isBtnDisabled =
@@ -116,6 +118,11 @@ export default function ReportPage() {
     isStartDownloading ||
     isCanceling ||
     isDownloading;
+
+  // Formatted Date
+  const formattedDate = statusData?.completedAtUtc
+    ? dayjs(statusData.completedAtUtc).format("MMM D, YYYY HH:mm:ss")
+    : "";
 
   const handleExport = async () => {
     if (jobStatus === ExportReportJobStatus.ReadyToDownload) {
@@ -258,55 +265,55 @@ export default function ReportPage() {
     <div data-testid="tabReport" className="mb-10">
       <div className="mb-6 text-xl font-bold text-primary">Report</div>
 
-        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
-          {/* Right-aligned Export Button */}
-          <div className="w-full sm:w-auto sm:ml-auto flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={handleExport}
-              disabled={isBtnDisabled}
-              data-testid="btnExport"
-              className="flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
-            >
-              {btnText}
-            </button>
-          </div>
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+        {/* Right-aligned Export Button */}
+        <div className="w-full sm:w-auto sm:ml-auto flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={isBtnDisabled}
+            data-testid="btnExport"
+            className={`flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer ${isBtnDisabled ? "disabled:cursor-not-allowed disabled:opacity-50" : ""}`}
+          >
+            {btnText}
+          </button>
         </div>
+      </div>
 
-        <div className="overflow-x-auto" data-testid="dgdReportList">
-          <SingleSortDataTable<ViewReport.ReportRow>
-            data={reports}
-            columns={columns}
-            isLoading={isLoading}
-            emptyMessage="No reports found."
-            sorts={sorts}
-            onSortChange={handleSortChange}
+      <div className="overflow-x-auto" data-testid="dgdReportList">
+        <SingleSortDataTable<ViewReport.ReportRow>
+          data={reports}
+          columns={columns}
+          isLoading={isLoading}
+          emptyMessage="No reports found."
+          sorts={sorts}
+          onSortChange={handleSortChange}
+        />
+      </div>
+
+      {showPagination && (
+        <div data-testid="pagination">
+          <Pagination
+            pageNumber={pageNumber}
+            totalPages={data?.totalPages ?? 1}
+            pageSize={pageSize}
+            totalCount={totalCount}
+            hasPreviousPage={pageNumber > 1}
+            hasNextPage={pageNumber < (data?.totalPages ?? 1)}
+            onPageChange={(nextPage) => setPageNumber(nextPage)}
+            btnPreviousPageTestId="btnPrevPage"
+            btnNextPageTestId="btnNextPage"
           />
         </div>
-
-        {showPagination && (
-          <div data-testid="pagination">
-            <Pagination
-              pageNumber={pageNumber}
-              totalPages={data?.totalPages ?? 1}
-              pageSize={pageSize}
-              totalCount={totalCount}
-              hasPreviousPage={pageNumber > 1}
-              hasNextPage={pageNumber < (data?.totalPages ?? 1)}
-              onPageChange={(nextPage) => setPageNumber(nextPage)}
-              btnPreviousPageTestId="btnPrevPage"
-              btnNextPageTestId="btnNextPage"
-            />
-          </div>
-        )}
+      )}
 
       <ConfirmModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onYes={handleDownload}
         onNo={handleCancelReport}
-        title="Your report is ready for downloading"
-        body="Would you like to download the report or cancel it?"
+        title={`Your report is ready for downloading`}
+        body={`Would you like to download the report snapshot from ${formattedDate}?`}
         yesButtonLabel="Download File"
         noButtonLabel="Cancel Report"
         isLoading={isCanceling || isDownloading}

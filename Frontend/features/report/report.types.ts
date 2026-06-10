@@ -56,6 +56,7 @@ export namespace CurrentDownload {
   export interface Response {
     status: ExportReportJobStatus | null;
     downloadUrl: string | null;
+    completedAtUtc: string | null;
   }
 }
 
