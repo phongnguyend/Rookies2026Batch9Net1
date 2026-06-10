@@ -19,8 +19,14 @@ public sealed class AssetCountSpec : Specification<Asset>
             Query.Where(a => states.Contains(a.State));
 
         if (search is not null)
+        {
             Query.Where(a =>
-                a.AssetCode.Contains(search) ||
-                a.Name.Contains(search));
+                a.AssetCode.Replace(" ", "")
+                    .ToLower()
+                    .Contains(search) ||
+                a.Name.Replace(" ", "")
+                    .ToLower()
+                    .Contains(search));
+        }
     }
 }
