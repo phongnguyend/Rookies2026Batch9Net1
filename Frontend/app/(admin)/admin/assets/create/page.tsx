@@ -130,7 +130,7 @@ export default function CreateAssetPage() {
 
   // ─── Render ───────────────────────────────────────
   return (
-    <div className="max-w-lg mb-10">
+    <div className="w-full max-w-xl mb-10">
       <h1 className="text-primary font-bold text-xl mb-6">Create New Asset</h1>
 
       {serverError && (
@@ -139,7 +139,7 @@ export default function CreateAssetPage() {
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {/* Name */}
         <FormField label="Name">
           <input
@@ -209,8 +209,8 @@ export default function CreateAssetPage() {
           <FieldError message={fieldErrors.specification} />
         </FormField>
         {/* Installed Date */}
-        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
-          <label className="w-full md:w-36 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-5">
+          <label className="w-full md:w-28 md:shrink-0 pt-2 text-sm font-medium text-gray-700">
             Installed Date
           </label>
           <div className="flex-1">
@@ -263,13 +263,7 @@ export default function CreateAssetPage() {
           type="button"
           onClick={handleSave}
           disabled={!isFormValid || isCreating}
-          className="
-        btn
-        btn-primary
-        btn-sm
-        disabled:cursor-not-allowed
-        disabled:opacity-50
-      "
+          className="h-9 rounded-md bg-primary px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
         >
           {isCreating ? "Saving..." : "Save"}
         </button>
@@ -277,7 +271,7 @@ export default function CreateAssetPage() {
           data-testid="btnCancel"
           type="button"
           onClick={() => router.push("/admin/assets")}
-          className="btn btn-outline btn-sm"
+          className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Cancel
         </button>

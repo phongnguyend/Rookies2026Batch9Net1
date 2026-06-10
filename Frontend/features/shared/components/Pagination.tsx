@@ -167,7 +167,7 @@ export default function Pagination({
 
                           <button
                             type="button"
-                            className="btn btn-sm btn-primary"
+                            className="btn btn-sm btn-primary hover:bg-red-600"
                             onClick={handleGoToPage}
                             data-testid="btnGoToPage"
                           >
@@ -192,7 +192,7 @@ export default function Pagination({
                   type="button"
                   onClick={() => onPageChange(current)}
                   className={`join-item btn btn-sm shrink-0 ${
-                    pageNumber === current ? "btn-primary" : ""
+                    pageNumber === current ? "btn-primary hover:bg-red-600" : ""
                   }`}
                   data-testid={
                     pageNumber === current

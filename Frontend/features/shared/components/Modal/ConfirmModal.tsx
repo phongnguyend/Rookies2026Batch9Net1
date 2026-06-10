@@ -113,7 +113,7 @@ export default function ConfirmModal({
                     type="button"
                     data-testid={closeBtnTestId}
                     onClick={onClose}
-                    className="transition-colors duration-150 p-px rounded flex items-center justify-center border-primary bg-white hover:bg-primary hover:border-primary text-primary hover:text-white border-3"
+                    className="hover:cursor-pointer transition-colors duration-150 p-px rounded flex items-center justify-center border-primary bg-white hover:bg-primary hover:border-primary text-primary hover:text-white border-3"
                     aria-label="Close modal"
                   >
                     <div className="p-0.5 rounded-[3px] flex items-center justify-center font-bold">
@@ -138,7 +138,7 @@ export default function ConfirmModal({
                     data-testid={confirmBtnTestId}
                     onClick={onYes}
                     disabled={isLoading}
-                    className="hover:cursor-pointer px-4 py-2 bg-primary hover:bg-primary/90 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="hover:cursor-pointer px-4 py-2 bg-primary hover:bg-red-600 active:bg-primary/95 text-white font-semibold rounded flex items-center gap-2 shadow-sm transition-all duration-150 hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading && (
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -339,13 +339,11 @@ export default function UsersPage() {
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
           <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex gap-5">
-              <div data-testid="ddlFilterType">
-                <SingleSelectDropdown
+            <div className="relative" data-testid="ddlFilterType">
+              <SingleSelectDropdown
                   items={typeFilters}
                   value={selectedTypes[0]}
                   placeholder="Type"
-                  width="w-40"
                   getKey={(item) => item.id}
                   getLabel={(item) => item.label}
                   onChange={(value) => {
@@ -359,10 +357,10 @@ export default function UsersPage() {
                     item.id === UserRoles.Admin ? "ddlFilterAdmin" : "ddlFilterStaff"
                   }
                 />
-              </div>
             </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:gap-3">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
@@ -389,7 +387,7 @@ export default function UsersPage() {
                     `/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`,
                   )
                 }
-                className="hover:cursor-pointer rounded bg-primary px-5 py-2 font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
+                className="hover:bg-red-600 w-full sm:w-64 not-first:rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
               >
                 Create new user
               </button>

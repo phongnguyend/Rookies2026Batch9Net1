@@ -266,7 +266,7 @@ export default function ReportPage() {
               onClick={handleExport}
               disabled={isBtnDisabled}
               data-testid="btnExport"
-              className="hover:cursor-pointer w-full sm:w-auto rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.97] transition-all duration-150"
+              className="hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
             >
               {btnText}
             </button>

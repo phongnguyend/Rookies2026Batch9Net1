@@ -21,7 +21,7 @@ export default function SingleSelectDropdown<T>({
     items,
     value,
     placeholder = "Select",
-    width = "w-52",
+    width = "w-full sm:w-64",
     getKey,
     getLabel,
     onChange,

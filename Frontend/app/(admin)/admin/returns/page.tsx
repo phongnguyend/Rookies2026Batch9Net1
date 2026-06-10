@@ -412,14 +412,13 @@ export default function ReturnsPage() {
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
-          <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-col gap-4 sm:flex-row sm:gap-5 sm:items-center">
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="flex flex-wrap flex-col gap-3 lg:flex-row lg:items-center">
               <div data-testid="ddlState">
                 <SingleSelectDropdown
                   items={stateFilters}
                   value={selectedStates[0]}
                   placeholder="State"
-                  width="w-full sm:w-[200px]"
                   getKey={(state) => state.id}
                   getLabel={(state) => state.label}
                   onChange={(value) => {
@@ -444,15 +443,13 @@ export default function ReturnsPage() {
                   });
                 }}
                 placeholder="Returned Date"
-                width="w-full sm:w-[220px]"
                 txtInputTestId="dpReturned"/>
             </div>
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:gap-8">
+            <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
-                width="w-full sm:w-[242px]"
                 onChange={(value) =>
                   setSearchState({ inputValue: value, urlValue: querySearch })
                 }

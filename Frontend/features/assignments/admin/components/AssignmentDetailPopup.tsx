@@ -78,7 +78,7 @@ export default function AssignmentDetailPopup({
           data-testid="dlgAssignmentDetail"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 bg-gray-100 px-5 py-3">
+          <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
             <h2 className="text-lg font-bold text-[#cf2338]">
               Detailed Assignment Information
             </h2>
@@ -95,7 +95,7 @@ export default function AssignmentDetailPopup({
           </div>
 
           {/* Body */}
-          <div className="px-6 py-4" data-testid="dgdAssignmentRow">
+          <div className="px-10 py-4" data-testid="dgdAssignmentRow">
             {isLoading ? (
               <div className="py-8 text-center">
                 Loading...
