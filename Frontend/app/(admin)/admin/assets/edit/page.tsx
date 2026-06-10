@@ -40,13 +40,15 @@ export default function EditAssetPage() {
 
   const [editAsset, { isLoading: isEditing }] = useEditAssetMutation();
 
+
   const [form, setForm] = useState({
     assetName: "",
     specification: "",
     installedDate: null as Date | null,
     state: AssetState.Available,
   });
-
+  
+  const isFutureDate = form.installedDate !== null && form.installedDate > new Date();
   //-- Set data into Fields -----------------------------------------------
   useEffect(() => {
     if (!asset) return;
@@ -247,10 +249,13 @@ export default function EditAssetPage() {
             key={form.installedDate?.toISOString() ?? "empty"}
             value={form.installedDate}
             onChange={(date) => {
+              const validDate = date instanceof Date && !isNaN(date.getTime()) ? date : null;
               setForm((prev) => ({
                 ...prev,
-                installedDate:
-                  date instanceof Date && !isNaN(date.getTime()) ? date : null,
+                installedDate: validDate,
+                ...(validDate && validDate > new Date()
+                  ? { state: AssetState.NotAvailable }
+                  : {}),
               }));
             }}
             placeholder="Select date"
@@ -265,13 +270,18 @@ export default function EditAssetPage() {
             {EDITABLE_STATES.map((s) => (
               <label
                 key={s.value}
-                className="flex cursor-pointer items-center gap-2 text-sm"
+                className={`flex items-center gap-2 text-sm ${
+                  isFutureDate && s.value === AssetState.Available
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                }`}
               >
                 <input
                   data-testid={s.testId}
                   type="radio"
                   name="state"
                   checked={form.state === s.value}
+                  disabled={isFutureDate && s.value === AssetState.Available}
                   onChange={() =>
                     setForm((prev) => ({
                       ...prev,

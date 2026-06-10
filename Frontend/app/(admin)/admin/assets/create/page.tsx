@@ -35,7 +35,7 @@ export default function CreateAssetPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [categoryId, setCategoryId] = useState(""); // ← sent to API
   const [categoryName, setCategoryName] = useState(""); // ← shown in dropdown
-
+  const isFutureDate = installedDate !== null && installedDate > new Date();
   // ─── API ───────────────────────────────────────────
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetCategoriesQuery();
@@ -216,7 +216,12 @@ export default function CreateAssetPage() {
           <div className="flex-1">
             <DatePickerInput
               value={installedDate}
-              onChange={(date) => setInstalledDate(date)}
+              onChange={(date) => {
+                setInstalledDate(date);
+                if (date && date > new Date()) {
+                  setState(AssetState.NotAvailable);
+                }
+              }}
               placeholder="Select date"
               width="w-full"
             />
@@ -232,12 +237,15 @@ export default function CreateAssetPage() {
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:gap-4">
           <FormField label="State">
             <div className="flex flex-col gap-2 pt-2">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <label className={`flex items-center gap-2 text-sm ${
+                  isFutureDate ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                }`}>
                 <input
                   data-testid="rdoAvailable"
                   type="radio"
                   checked={state === AssetState.Available}
                   onChange={() => setState(AssetState.Available)}
+                  disabled={isFutureDate}
                   className="radio radio-primary radio-sm"
                 />
                 Available
