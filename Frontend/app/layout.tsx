@@ -136,7 +136,10 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
               {/* Drawer Sidebar */}
               <div className="drawer-side">
-                <label htmlFor="admin-drawer" className="drawer-overlay"></label>
+                <label
+                  htmlFor="admin-drawer"
+                  className="drawer-overlay"
+                ></label>
 
                 <Drawer role={user?.role as UserRoles} />
               </div>

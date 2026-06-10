@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setDrawerOpen } from "@/features/shared/drawer.slice";
 import {
-  APP_ROUTES,
   APP_SIDEBAR_ADMIN_ITEMS,
   APP_SIDEBAR_STAFF_ITEMS,
 } from "@/lib/api/routes";
@@ -52,12 +51,12 @@ export default function Drawer({ role }: DrawerProps) {
 
       {/* Navigation */}
       <nav
-        className="flex flex-col"
+        className="flex flex-col gap-y-0.5"
         data-testid={
           role == UserRoles.Admin ? "mnuAdminAssignment" : "mnuStaffAssignment"
         }
       >
-        {sideBarItems(role).map((item, index) => {
+        {sideBarItems(role).map((item) => {
           const normalizedPathname =
             pathname.endsWith("/") && pathname !== "/"
               ? pathname.slice(0, -1)
@@ -71,12 +70,24 @@ export default function Drawer({ role }: DrawerProps) {
             <Link
               key={item.href}
               href={item.href}
+              onKeyDown={(e) => {
+                if (
+                  e.key === "Enter" ||
+                  e.key === "Spacebar" ||
+                  e.key === " "
+                ) {
+                  if (e.target == e.currentTarget) {
+                    dispatch(setDrawerOpen(false));
+                    (e.currentTarget as HTMLAnchorElement).click();
+                  }
+                }
+              }}
+              tabIndex={0}
               onClick={() => dispatch(setDrawerOpen(false))}
               data-testid={item.dataTestId}
               className={`
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black
                 px-6 py-3.5 transition-all duration-150 font-bold text-base block
-                ${index === 0 ? "border-t border-white" : ""}
-                border-b border-white
                 ${isActive ? "bg-primary text-white" : "bg-[#eff1f5] hover:bg-base-300/80 text-neutral-800 hover:text-black"}
               `}
             >
