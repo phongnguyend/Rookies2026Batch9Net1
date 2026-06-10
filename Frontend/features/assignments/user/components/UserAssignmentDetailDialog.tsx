@@ -4,6 +4,7 @@ import { userAssignmentApi } from "../user-assignment.api";
 import { displayAssignmentState } from "@/utils/assignment.utils";
 import { AssignmentState } from "@/lib/api/base.types";
 import { X } from "lucide-react";
+import { FocusTrap } from "focus-trap-react";
 
 interface Props {
   assignment: ViewUserAssignments.UserAssignmentSummary | null;
@@ -43,60 +44,67 @@ export default function UserAssignmentDetailDialog({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={onClose} // click backdrop to close
+    <FocusTrap
+      focusTrapOptions={{
+        escapeDeactivates: false, // we handle Escape ourselves above
+        allowOutsideClick: true,  // lets the backdrop click still close it
+      }}
     >
       <div
-        data-testid={testId}
-        className="relative w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-lg border"
-        onClick={(e) => e.stopPropagation()} // prevent backdrop click from firing inside
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        onClick={onClose} // click backdrop to close
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
-          <h2 className="text-lg font-semibold text-primary">
-            Detailed Assignment Information
-          </h2>
-          <button
-            data-testid={"btnClose"}
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
-          >
-            <X />
-          </button>
-        </div>
+        <div
+          data-testid={testId}
+          className="relative w-full max-w-xl overflow-hidden rounded-lg bg-white shadow-lg border"
+          onClick={(e) => e.stopPropagation()} // prevent backdrop click from firing inside
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-gray-300 bg-gray-200 px-10 py-4">
+            <h2 className="text-lg font-semibold text-primary">
+              Detailed Assignment Information
+            </h2>
+            <button
+              data-testid={"btnClose"}
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
+            >
+              <X />
+            </button>
+          </div>
 
-        {/* Body */}
-        <div className="px-10 py-4">
-          {isFetching ? (
-            <div className="py-8 text-center text-gray-400">Loading...</div>
-          ) : (
-            <div className="space-y-3 text-sm">
-              <Field label="Asset Code" value={data?.assetCode} />
-              <Field label="Asset Name" value={data?.assetName} />
-              <Field label="Specification" value={data?.specification} />
-              <Field label="Assigned to" value={data?.assigneeName} />
-              <Field label="Assigned by" value={data?.assignerName} />
-              <Field
-                label="Assigned Date"
-                value={
-                  data?.assignedDate ? formatDate(data.assignedDate) : undefined
-                }
-              />
-              <Field
-                label="State"
-                value={displayAssignmentState(data?.state!)}
-              />
-              <Field label="Note" value={data?.note} />
-              {isAcceptedAndReturning(assignment) && <div className="text-center my-2 text-gray-500">
-                Assignment is currently in returning process
-              </div>}
-            </div>
-          )}
+          {/* Body */}
+          <div className="px-10 py-4">
+            {isFetching ? (
+              <div className="py-8 text-center text-gray-400">Loading...</div>
+            ) : (
+              <div className="space-y-3 text-sm">
+                <Field label="Asset Code" value={data?.assetCode} />
+                <Field label="Asset Name" value={data?.assetName} />
+                <Field label="Specification" value={data?.specification} />
+                <Field label="Assigned to" value={data?.assigneeName} />
+                <Field label="Assigned by" value={data?.assignerName} />
+                <Field
+                  label="Assigned Date"
+                  value={
+                    data?.assignedDate ? formatDate(data.assignedDate) : undefined
+                  }
+                />
+                <Field
+                  label="State"
+                  value={displayAssignmentState(data?.state!)}
+                />
+                <Field label="Note" value={data?.note} />
+                {isAcceptedAndReturning(assignment) && <div className="text-center my-2 text-gray-500">
+                  Assignment is currently in returning process
+                </div>}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </FocusTrap>
   );
 }

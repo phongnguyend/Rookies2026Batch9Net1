@@ -115,7 +115,7 @@ export default function AssignmentsPage() {
       promotedAssignment,
       ...data.items.filter((x) => x.id !== promotedAssignment.id),
     ];
-  }, [data?.items, promotedAssignment, page]);
+  }, [data, promotedAssignment, page]);
 
   // const assignments = data?.items ?? [];
   const assignments = displayAssignments;

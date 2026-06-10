@@ -236,7 +236,6 @@ export default function CreateAssetPage() {
                 <input
                   data-testid="rdoAvailable"
                   type="radio"
-                  name="state"
                   checked={state === AssetState.Available}
                   onChange={() => setState(AssetState.Available)}
                   className="radio radio-primary radio-sm"
@@ -248,7 +247,6 @@ export default function CreateAssetPage() {
                 <input
                   data-testid="rdoNotAvailable"
                   type="radio"
-                  name="state"
                   checked={state === AssetState.NotAvailable}
                   onChange={() => setState(AssetState.NotAvailable)}
                   className="radio radio-primary radio-sm"
