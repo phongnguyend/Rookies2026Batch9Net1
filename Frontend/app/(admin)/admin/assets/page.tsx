@@ -240,19 +240,10 @@ function AssetsContent() {
       />
       <div>
         {/* Filters */}
-        <div
-          className="
-          mb-4
-          flex
-          flex-col
-          gap-3
-          xl:flex-row
-          xl:items-center
-        "
-        >
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
           {/* Left filters */}
-          <div className="flex flex-wrap gap-3">
-            <div className="flex-1 min-w-45">
+          <div className="flex flex-wrap flex-col gap-3 lg:flex-row lg:items-center">
+            <div className="w-full sm:w-auto">
               <DropdownStateFilter
                 items={state_options}
                 values={selectedStates}
@@ -264,7 +255,7 @@ function AssetsContent() {
               />
             </div>
 
-            <div data-testid="ddlCategory" className="flex-1 min-w-45">
+            <div data-testid="ddlCategory" className="w-full sm:w-auto">
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
@@ -278,42 +269,20 @@ function AssetsContent() {
           </div>
 
           {/* Search + button */}
-          <div
-            className="
-              flex
-              flex-col
-              gap-3
-              sm:flex-row
-              sm:items-center
-              xl:ml-auto
-            "
-          >
-            <div data-testid="txtSearch" className="w-full sm:w-60">
+          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+            <div data-testid="txtSearch" className="w-full sm:w-auto">
               <SearchInput
                 value={searchInput}
                 onChange={setSearchInput}
                 onSearch={handleSearch}
                 placeholder="Search..."
-                width="w-full"
               />
             </div>
 
             <button
               data-testid="btnCreateAsset"
               onClick={() => router.push("/admin/assets/create")}
-              className="
-                w-full
-                sm:w-auto
-                whitespace-nowrap
-                rounded
-                bg-primary
-                px-5
-                py-2
-                font-semibold
-                text-white
-                cursor-pointer
-              "
-            >
+              className="hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer">
               Create New Asset
             </button>
           </div>

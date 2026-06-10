@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useGetAssetByIdQuery } from "@/features/Assets/assets.api";
 import AssetHistoryTable from "./assetHistoryTable";
+import { X } from "lucide-react";
 
 interface AssetDetailModalProps {
   assetId: string | null;
@@ -55,7 +56,7 @@ export default function AssetDetailModal({
     <dialog ref={dialogRef} className="modal" onClose={onClose}>
       <div className="modal-box max-w-3xl" data-testid="dlgDetailedAssetInfo">
         {/* Header */}
-        <div className="bg-gray-100 text-red-500 -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
+        <div className="border-b border-gray-300 bg-gray-200 text-primary -mx-6 -mt-6 px-6 py-4 mb-6 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-bold text-lg">
             Detailed Asset Information
           </h3>
@@ -63,9 +64,9 @@ export default function AssetDetailModal({
           <button
             data-testid="btnExit"
             onClick={handleClose}
-            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-[#cf2338] text-[#cf2338] transition hover:bg-[#cf2338] hover:text-white"
+            className="hover:cursor-pointer flex h-7 w-7 items-center justify-center rounded border-2 border-primary text-primary transition hover:bg-primary hover:text-white"
           >
-            ✕
+            <X />
           </button>
         </div>
 

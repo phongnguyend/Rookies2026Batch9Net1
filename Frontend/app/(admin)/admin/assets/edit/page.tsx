@@ -182,7 +182,7 @@ export default function EditAssetPage() {
 
   //-- Render -----------------------------------------------
   return (
-    <div className="w-full max-w-lg px-4 sm:px-0 mb-10">
+    <div className="w-full max-w-xl mb-10">
       <h1 className="mb-6 text-xl font-bold text-primary">Edit Asset</h1>
 
       {serverError && (
@@ -191,7 +191,7 @@ export default function EditAssetPage() {
         </div>
       )}
       {/* Name */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <FormField label="Name">
           <input
             data-testid="txtName"
@@ -294,7 +294,7 @@ export default function EditAssetPage() {
           type="button"
           onClick={handleSave}
           disabled={!canSave}
-          className="btn btn-primary btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-9 rounded-md bg-primary px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
         >
           {isEditing ? "Saving..." : "Save"}
         </button>
@@ -302,7 +302,7 @@ export default function EditAssetPage() {
           data-testid="btnCancel"
           type="button"
           onClick={() => router.push("/admin/assets")}
-          className="btn btn-outline btn-sm"
+          className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Cancel
         </button>

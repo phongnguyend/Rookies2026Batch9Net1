@@ -261,7 +261,7 @@ export default function EditUserPage() {
   }
 
   return (
-    <div className="mb-10" data-testid="tabManagerUser">
+    <div className="w-full max-w-xl mb-10" data-testid="tabManagerUser">
       <div className="flex min-w-0">
         <div className="min-w-0 flex-1">
           <h1 className="mb-6 text-xl font-bold text-primary">Edit User</h1>
@@ -392,7 +392,7 @@ function EditUserForm({
 
   return (
     <form
-      className="mb-10 w-full max-w-lg space-y-4 px-4 sm:px-0"
+      className="mb-10 w-full max-w-xl space-y-5"
       onSubmit={handleSubmit}
     >
       <FormFieldRow label="First Name">
@@ -488,7 +488,7 @@ function EditUserForm({
           type="submit"
           data-testid="btnSaveEditUser"
           disabled={isSaveDisabled}
-          className="btn btn-primary w-full text-white sm:w-auto sm:min-w-24"
+          className="h-9 rounded-md bg-primary px-6 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50 hover:cursor-pointer"
         >
           {isSaving ? "Saving..." : "Save"}
         </button>
@@ -497,7 +497,7 @@ function EditUserForm({
           type="button"
           data-testid="btnCancelEditUser"
           onClick={redirectToUsers}
-          className="btn btn-outline btn-neutral w-full sm:w-auto sm:min-w-24"
+          className="hover:cursor-pointer h-9 rounded-md border border-gray-300 bg-white px-6 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Cancel
         </button>

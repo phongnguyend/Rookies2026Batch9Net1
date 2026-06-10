@@ -21,7 +21,7 @@ export default function DropdownFilter<T>({
   items,
   values,
   placeholder = "Select",
-  width = "w-52",
+  width = "w-full sm:w-64",
   getKey,
   getLabel,
   onChange,
