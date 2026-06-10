@@ -387,7 +387,7 @@ export default function UsersPage() {
                     `/admin/users/create?returnUrl=${encodeURIComponent(currentUrl)}`,
                   )
                 }
-                className="h-9 hover:bg-red-600 w-full sm:w-64 not-first:rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
+                className="flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 not-first:rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
               >
                 Create new user
               </button>
