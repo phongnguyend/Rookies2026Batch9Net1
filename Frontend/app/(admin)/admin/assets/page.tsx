@@ -20,10 +20,11 @@ import DataTable, {
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
 import { clearPinnedEditedAsset, getPinnedEditedAsset } from "@/features/Assets/editAssetStore";
 import { CircleX, Pencil } from "lucide-react";
+import {displayAssetState}from "@/utils/asset.utils";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
-  label: s,
+  label: displayAssetState(s),
 }));
 
 const default_states = [
