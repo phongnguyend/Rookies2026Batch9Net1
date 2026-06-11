@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface PaginationProps {
   pageNumber: number;
@@ -33,6 +33,7 @@ export default function Pagination({
 
   const [openDotsIndex, setOpenDotsIndex] = useState<number | null>(null);
   const [goToPage, setGoToPage] = useState(String(pageNumber));
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
   const getPaginationItems = (
     currentPage: number,
@@ -93,6 +94,30 @@ export default function Pagination({
     setOpenDotsIndex(null);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node)
+      ) {
+        setOpenDotsIndex(null);
+      }
+    };
+
+    if (openDotsIndex !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDotsIndex]);
+
+  useEffect(() => {
+    setGoToPage(String(pageNumber));
+    setOpenDotsIndex(null);
+  }, [pageNumber]);
+
   return (
     <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {typeof totalCount === "number" && typeof pageSize === "number" && (
@@ -116,7 +141,10 @@ export default function Pagination({
               type="button"
               className="join-item btn btn-sm shrink-0"
               disabled={!hasPreviousPage}
-              onClick={() => onPageChange(pageNumber - 1)}
+              onClick={() => {
+                setOpenDotsIndex(null);
+                onPageChange(pageNumber - 1);
+              }}
               data-testid={btnPreviousPageTestId}
             >
               <ChevronLeft className="h-4 w-4 sm:hidden" />
@@ -148,38 +176,54 @@ export default function Pagination({
 
                     {/* GoToPage Modal */}
                     {openDotsIndex === index && (
-                      <div className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded-lg border bg-white p-4 shadow-lg">
-                        <p className="mb-3 text-lg font-medium">Go to page</p>
+                    <div
+                      ref={popupRef}
+                      className="absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded-lg border bg-white p-4 shadow-lg"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="text-lg font-medium">Go to page</p>
 
-                        <div className="flex gap-2">
-                          <input
-                            type="number"
-                            min={1}
-                            max={totalPages}
-                            value={goToPage}
-                            onChange={(e) => setGoToPage(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") handleGoToPage();
-                            }}
-                            className="input input-bordered input-sm w-full"
-                            data-testid="txtGoToPage"
-                          />
-
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-primary hover:bg-red-600"
-                            onClick={handleGoToPage}
-                            data-testid="btnGoToPage"
-                          >
-                            Go
-                          </button>
-                        </div>
-
-                        <p className="mt-3 text-sm text-gray-500">
-                          Page 1 - {totalPages}
-                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs"
+                          onClick={() => setOpenDotsIndex(null)}
+                          data-testid="btnCloseGoToPage"
+                          aria-label="Close go to page popup"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
                       </div>
-                    )}
+
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={totalPages}
+                          value={goToPage}
+                          onChange={(e) => setGoToPage(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleGoToPage();
+                            if (e.key === "Escape") setOpenDotsIndex(null);
+                          }}
+                          className="input input-bordered input-sm w-full"
+                          data-testid="txtGoToPage"
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-primary hover:bg-red-600"
+                          onClick={handleGoToPage}
+                          data-testid="btnGoToPage"
+                        >
+                          Go
+                        </button>
+                      </div>
+
+                      <p className="mt-3 text-sm text-gray-500">
+                        Page 1 - {totalPages}
+                      </p>
+                    </div>
+                  )}
                   </div>
                 );
               }
@@ -190,7 +234,10 @@ export default function Pagination({
                 <button
                   key={current}
                   type="button"
-                  onClick={() => onPageChange(current)}
+                  onClick={() => {
+                    setOpenDotsIndex(null);
+                    onPageChange(current);
+                  }}
                   className={`join-item btn btn-sm shrink-0 ${
                     pageNumber === current ? "btn-primary hover:bg-red-600" : ""
                   }`}
@@ -210,7 +257,10 @@ export default function Pagination({
               type="button"
               className="join-item btn btn-sm shrink-0"
               disabled={!hasNextPage}
-              onClick={() => onPageChange(pageNumber + 1)}
+              onClick={() => {
+                setOpenDotsIndex(null);
+                onPageChange(pageNumber + 1);
+              }}
               data-testid={btnNextPageTestId}
             >
               <span className="hidden sm:inline">Next</span>
