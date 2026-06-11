@@ -5,13 +5,23 @@ import { logoutAccount } from "@/features/auth/auth.slice";
 import { authApi } from "./auth.api";
 import { ENV_CONFIGS } from "@/lib/config/env";
 import type { AppDispatch } from "@/lib/redux/store";
+import { enqueueToast, ToastType } from "@/features/shared/toast.slice";
+import { reportApi } from "@/features/report/report.api";
+import dayjs from "dayjs";
 
 const forceLogoutToastStorageKey = "forceLogoutToastMessage";
 const defaultForceLogoutMessage =
   "Your account privilege has changed. Please login again.";
 
+// Message for forcing logout
 type ForceLogoutMessage = {
   reason?: string;
+};
+
+// Message for Report
+type ReportReadyMessage = {
+  completedAtUtc: string;
+  downloadUrl: string;
 };
 
 let connection: signalR.HubConnection | null = null;
@@ -57,6 +67,31 @@ export const startUserSessionHub = async (dispatch: AppDispatch) => {
 
     // disconnect the signalr hub
     await stopUserSessionHub();
+  });
+
+  connection.on("reportReady", (message?: ReportReadyMessage) => {
+    if (!message) {
+      return;
+    }
+
+    const formattedDate = message.completedAtUtc
+      ? dayjs(message.completedAtUtc).format("MMM D, YYYY HH:mm:ss")
+      : "";
+
+    dispatch(
+      enqueueToast({
+        message: `Report snapshot at ${formattedDate} is ready for downloading`,
+        type: ToastType.Success,
+      })
+    );
+
+    // Trigger manually to get the current State of the Report when reciving signal from Backend
+    dispatch(
+      reportApi.endpoints.getExportStatus.initiate(undefined, {
+        subscribe: false,
+        forceRefetch: true,
+      })
+    );
   });
 
   try {

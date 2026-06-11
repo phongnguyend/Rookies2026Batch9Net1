@@ -17,5 +17,15 @@ namespace NashAssetManagement.WebAPI.Realtime
                     new ForceLogoutMessage(reason, DateTime.UtcNow),
                     cancellationToken);
         }
+
+        public Task NotifyReportReadyAsync(Guid userId, string completedAtUtc, string downloadUrl, CancellationToken cancellationToken)
+        {
+            return hubContext.Clients
+                .User(userId.ToString())
+                .SendAsync(
+                    UserSessionHubEvents.ReportReady,
+                    new ReportReadyMessage(completedAtUtc, downloadUrl),
+                    cancellationToken);
+        }
     }
 }

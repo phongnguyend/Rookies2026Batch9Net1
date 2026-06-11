@@ -100,7 +100,7 @@ const UsersLookupInput = ({
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => {
                   e.stopPropagation();
-                  if (e.key === "Enter" || e.key === " ") e.preventDefault(); // ← ngăn form submit
+                  if (e.key === "Enter") e.preventDefault(); // ← ngăn form submit
                 }}
               >
                 <UsersLookupTable

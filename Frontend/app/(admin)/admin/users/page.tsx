@@ -286,7 +286,7 @@ export default function UsersPage() {
             </UserActionButton>
 
             <div
-              className={isSelf ? "tooltip tooltip-left" : ""}
+              className={isSelf ? "tooltip tooltip-left flex" : "flex"}
               data-tip={isSelf ? "You cannot disable your self" : undefined}
             >
               <UserActionButton

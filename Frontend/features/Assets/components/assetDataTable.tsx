@@ -82,7 +82,7 @@ export default function DataTable<T>({
                 onClick={() => column.sortable && handleSort(column.key)}
                 className={`px-3 py-2 sm:px-4 sm:py-3 font-semibold text-xs sm:text-sm ${column.className ?? ""} ${
                   column.sortable
-                    ? "cursor-pointer select-none hover:text-primary"
+                    ? "cursor-pointer select-none hover:text-primary transition-colors"
                     : ""
                 }`}
               >
@@ -107,7 +107,7 @@ export default function DataTable<T>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="py-8 text-center text-sm text-gray-500"
+                className="py-8 text-center text-gray-500"
               >
                 {emptyMessage}
               </td>
@@ -128,14 +128,14 @@ export default function DataTable<T>({
                 tabIndex={onRowClick ? 0 : undefined}
                 className={`border-b border-gray-200 ${
                   onRowClick
-                    ? "cursor-pointer hover:bg-gray-50 transition-colors focus:outline-black"
+                    ? "cursor-pointer hover:bg-gray-50 transition-colors"
                     : ""
                 }`}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${column.className ?? ""}`}
+                    className={`px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm truncate ${column.className ?? ""}`}
                   >
                     {column.render
                       ? column.render(row, rowIndex)
