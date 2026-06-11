@@ -34,6 +34,7 @@ import { returnsApi } from "@/features/returns/returns.api";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectPromotedAssignment } from "@/features/assignments/admin/edit/admin-assignment-list-ui.selectors";
 import SingleSelectDropdown from "@/features/shared/components/SingleSelectDropdown";
+import { clearPromotedAssignment } from "@/features/assignments/admin/edit/admin-assignment-list-ui.slice";
 
 const limit = 10;
 
@@ -126,7 +127,6 @@ export default function AssignmentsPage() {
     ];
   }, [data, promotedAssignment, page]);
 
-  // const assignments = data?.items ?? [];
   const assignments = displayAssignments;
 
   const handleConfirmDeleteAssignment = async () => {
@@ -138,6 +138,11 @@ export default function AssignmentsPage() {
       }).unwrap();
 
       setDeletingAssignment(null);
+
+      if (promotedAssignment?.id === deletingAssignment.id) {
+        dispatchAction(clearPromotedAssignment());
+      }
+
       updateParams({ page: "1" });
       dispatchAction(
         enqueueToast({
