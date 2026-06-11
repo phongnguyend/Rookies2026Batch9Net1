@@ -242,6 +242,7 @@ function AssetsContent() {
         assetName={deleteTarget?.name ?? ""}
         hasHistory={deleteTarget?.hasHistory ?? false}
         onClose={() => setDeleteTarget(null)}
+        onDeleted={() => setPageNumber(1)}
       />
       <div>
         {/* Filters */}
