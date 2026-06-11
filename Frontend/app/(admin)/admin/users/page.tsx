@@ -450,6 +450,7 @@ export default function UsersPage() {
                       type: ToastType.Success,
                     }),
                   );
+                  updateQueryParams({ page: 1 });
                 } catch (err) {
                   console.error("Failed to disable user:", err);
                   dispatch(

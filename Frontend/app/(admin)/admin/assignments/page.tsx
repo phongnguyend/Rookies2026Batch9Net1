@@ -138,6 +138,7 @@ export default function AssignmentsPage() {
       }).unwrap();
 
       setDeletingAssignment(null);
+      updateParams({ page: "1" });
       dispatchAction(
         enqueueToast({
           message: "Assignment deleted successfully.",

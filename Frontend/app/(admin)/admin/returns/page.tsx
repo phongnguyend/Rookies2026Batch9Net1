@@ -382,6 +382,7 @@ export default function ReturnsPage() {
         returnRequestId: cancelingRequest.id,
       }).unwrap();
       setCancelingRequest(null);
+      updateQueryParams({ page: 1 });
 
       dispatchAction(
         enqueueToast({

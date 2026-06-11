@@ -11,12 +11,14 @@ interface DeleteAssetModalProps {
   assetName: string;
   hasHistory: boolean;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
 export default function DeleteAssetModal({
   assetId,
   hasHistory,
   onClose,
+  onDeleted,
 }: DeleteAssetModalProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -37,6 +39,7 @@ export default function DeleteAssetModal({
       await deleteAsset({
         id: assetId,
       }).unwrap();
+      onDeleted?.();
       onClose();
     } catch {
       dispatch(
