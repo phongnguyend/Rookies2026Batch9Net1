@@ -87,15 +87,16 @@ function AssetsContent() {
 
   // ─── Display Item ───────────────────────────────────────
   // ─── Read pinned edited asset on mount ─────────
-  const [pinnedEditedAsset] = useState<AssetListItem | null>(() =>
-    getPinnedEditedAsset(),
-  );
+  const [pinnedEditedAsset, setPinnedEditedAssetState] = useState<AssetListItem | null>(null);
 
-  // ─── Clear when user leaves assets page ────────
   useEffect(() => {
     if (!data) return;
-    clearPinnedEditedAsset();
-  });
+    const pinned = getPinnedEditedAsset();
+    if (pinned) {
+      setPinnedEditedAssetState(pinned);
+      clearPinnedEditedAsset();
+    }
+  }, [data]);
 
   const displayItems = (() => {
     const items = data?.items ?? [];
@@ -244,8 +245,11 @@ function AssetsContent() {
         assetId={deleteTarget?.id ?? null}
         assetName={deleteTarget?.name ?? ""}
         hasHistory={deleteTarget?.hasHistory ?? false}
-        onClose={() => setDeleteTarget(null)}
-        onDeleted={() => setPageNumber(1)}
+        onClose={() => {
+          setDeleteTarget(null);
+          clearPinnedEditedAsset();
+          setPinnedEditedAssetState(null);
+        }}
       />
       <div>
         {/* Filters */}
