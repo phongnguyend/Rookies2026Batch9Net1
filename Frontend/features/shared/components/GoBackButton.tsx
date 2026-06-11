@@ -8,7 +8,7 @@ type GoBackButtonProps = {
 export default function GoBackButton({ href, title }: GoBackButtonProps) {
   return (
     <div className="flex items-center gap-2">
-      <Link href={href} className="btn btn-primary btn-circle btn-ghost">
+      <Link prefetch={false} href={href} className="btn btn-primary btn-circle btn-ghost">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

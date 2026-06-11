@@ -68,6 +68,7 @@ export default function Drawer({ role }: DrawerProps) {
 
           return (
             <Link
+              prefetch={false}  
               key={item.href}
               href={item.href}
               onKeyDown={(e) => {
