@@ -188,7 +188,10 @@ function AssetsContent() {
       className: "w-28",
       render: (row) => {
         return (
-          <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-3"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               disabled={
                 EditDisabledStates
@@ -264,7 +267,7 @@ function AssetsContent() {
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-                placeholder={categoriesLoading ? "Loading..." : "Category"}
+              placeholder={categoriesLoading ? "Loading..." : "Category"}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
@@ -274,7 +277,7 @@ function AssetsContent() {
           </div>
 
           {/* Search + button */}
-          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row lg:justify-end">
             <div data-testid="txtSearch" className="w-full sm:w-auto">
               <SearchInput
                 value={searchInput}

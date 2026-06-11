@@ -73,6 +73,7 @@ export default function NavBar() {
                   <span className="text-white">{crumb.label}</span>
                 ) : (
                   <Link
+                    prefetch={false}
                     href={href}
                     className="text-white/80 hover:text-white transition-colors"
                   >

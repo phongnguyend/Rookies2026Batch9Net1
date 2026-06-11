@@ -110,6 +110,7 @@ function GlobalErrorContent({ error, reset }: GlobalErrorProps) {
 
             {/* return to home path */}
             <Link
+              prefetch={false}
               href={homePath}
               className="w-full py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold rounded-lg shadow-sm transition-all duration-150 flex items-center justify-center gap-2 text-sm"
             >
