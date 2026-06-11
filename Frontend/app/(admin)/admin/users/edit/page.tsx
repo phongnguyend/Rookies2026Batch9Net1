@@ -401,7 +401,7 @@ function EditUserForm({
           data-testid="txtEditFirstName"
           disabled
           value={user.firstName}
-          className="h-9 input input-bordered w-full"
+          className="h-9 w-full cursor-not-allowed rounded border border-gray-200 bg-gray-100 px-3 text-sm text-gray-500"
         />
       </FormFieldRow>
 
@@ -411,7 +411,7 @@ function EditUserForm({
           data-testid="txtEditLastName"
           disabled
           value={user.lastName}
-          className="h-9 input input-bordered w-full"
+          className="h-9 w-full cursor-not-allowed rounded border border-gray-200 bg-gray-100 px-3 text-sm text-gray-500"
         />
       </FormFieldRow>
 

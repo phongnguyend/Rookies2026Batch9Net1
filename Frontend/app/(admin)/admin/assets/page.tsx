@@ -18,9 +18,12 @@ import DataTable, {
   SortItem,
 } from "@/features/Assets/components/assetDataTable";
 import DropdownStateFilter from "@/features/Assets/components/stateDropdown";
-import { clearPinnedEditedAsset, getPinnedEditedAsset } from "@/features/Assets/editAssetStore";
+import {
+  clearPinnedEditedAsset,
+  getPinnedEditedAsset,
+} from "@/features/Assets/editAssetStore";
 import { CircleX, Pencil } from "lucide-react";
-import {displayAssetState}from "@/utils/asset.utils";
+import { displayAssetState } from "@/utils/asset.utils";
 
 const state_options = Object.values(AssetState).map((s) => ({
   key: s,
@@ -165,7 +168,6 @@ function AssetsContent() {
       sortable: true,
       testId: "btnSortAssetName",
       className: "w-64",
-      render: (row) => <div className="truncate">{row.name}</div>,
     },
     {
       key: "category",
@@ -182,49 +184,54 @@ function AssetsContent() {
       className: "w-32",
     },
     {
-      key: "",
-      header: "Actions",
+      key: "actions",
+      header: "",
       className: "w-28",
-      render: (row) => (
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-          <button
-            disabled={
-              EditDisabledStates
-                ? EditDisabledStates
-                : row.state === AssetState.Assigned
-            }
-            data-testid="btnEdit"
-            onKeyDown={(e) => e.stopPropagation()}
-            onClick={(e) => handleEdit(row, e)}
-            className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
-            title="Edit"
+      render: (row) => {
+        return (
+          <div
+            className="flex items-center gap-3"
+            onClick={(e) => e.stopPropagation()}
           >
-            <Pencil size={22} />
-          </button>
-          <button
-            data-testid="btnIconDelete"
-            onKeyDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
+            <button
+              disabled={
+                EditDisabledStates
+                  ? EditDisabledStates
+                  : row.state === AssetState.Assigned
+              }
+              data-testid="btnEdit"
+              onKeyDown={(e) => e.stopPropagation()}
+              onClick={(e) => handleEdit(row, e)}
+              className="disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer lucide lucide-pencil text-gray-500"
+              title="Edit"
+            >
+              <Pencil size={20} />
+            </button>
+            <button
+              data-testid="btnIconDelete"
+              onKeyDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
 
-              setDeleteTarget({
-                id: row.id,
-                name: row.name,
-                hasHistory: row.hasHistory,
-              });
-            }}
-            className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
-            disabled={
-              DeleteDisabledStates
-                ? DeleteDisabledStates
-                : row.state === AssetState.Assigned
-            }
-            title="Delete"
-          >
-            <CircleX size={22} />
-          </button>
-        </div>
-      ),
+                setDeleteTarget({
+                  id: row.id,
+                  name: row.name,
+                  hasHistory: row.hasHistory,
+                });
+              }}
+              className="text-red-400 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
+              disabled={
+                DeleteDisabledStates
+                  ? DeleteDisabledStates
+                  : row.state === AssetState.Assigned
+              }
+              title="Delete"
+            >
+              <CircleX size={20} />
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -265,7 +272,7 @@ function AssetsContent() {
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-                placeholder={categoriesLoading ? "Loading..." : "Category"}
+              placeholder={categoriesLoading ? "Loading..." : "Category"}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
@@ -275,7 +282,7 @@ function AssetsContent() {
           </div>
 
           {/* Search + button */}
-          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row lg:justify-end">
             <div data-testid="txtSearch" className="w-full sm:w-auto">
               <SearchInput
                 value={searchInput}
@@ -288,7 +295,8 @@ function AssetsContent() {
             <button
               data-testid="btnCreateAsset"
               onClick={() => router.push("/admin/assets/create")}
-              className="flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer">
+              className="flex items-center justify-center h-9 hover:bg-red-600 w-full sm:w-64 rounded bg-primary px-5 py-2 font-semibold text-white whitespace-nowrap text-sm sm:text-base cursor-pointer"
+            >
               Create new asset
             </button>
           </div>

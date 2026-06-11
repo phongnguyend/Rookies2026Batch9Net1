@@ -6,7 +6,10 @@ import {
   useParams,
 } from "next/navigation";
 import { SortItem } from "@/features/shared/components/DataTable";
-import { useGetAllAssignmentsQuery, useDeleteAssignmentMutation } from "@/features/assignments/admin/assignments.api";
+import {
+  useGetAllAssignmentsQuery,
+  useDeleteAssignmentMutation,
+} from "@/features/assignments/admin/assignments.api";
 import {
   Assignment,
   AssignmentState,
@@ -19,7 +22,9 @@ import { useMemo, useState } from "react";
 import AssignmentDetailPopup from "../../../../features/assignments/admin/components/AssignmentDetailPopup";
 import DatePickerInput from "@/features/shared/components/DatePickerInput";
 import { displayAssignmentState } from "@/utils/assignment.utils";
-import SingleSortDataTable, { ColumnDef } from "@/features/shared/components/SingleSortDataTable";
+import SingleSortDataTable, {
+  ColumnDef,
+} from "@/features/shared/components/SingleSortDataTable";
 import { Pencil, RotateCcw, Trash2, CircleX } from "lucide-react";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useDispatch } from "react-redux";
@@ -43,25 +48,30 @@ export default function AssignmentsPage() {
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
   const [searchInput, setSearchInput] = useState(search);
-  const allowedStates = [AssignmentState.Accepted, AssignmentState.WaitingForAcceptance];
-  const states = searchParams.getAll("state").filter((s) =>
-    allowedStates.includes(s as AssignmentState)
-  );
+  const allowedStates = [
+    AssignmentState.Accepted,
+    AssignmentState.WaitingForAcceptance,
+  ];
+  const states = searchParams
+    .getAll("state")
+    .filter((s) => allowedStates.includes(s as AssignmentState));
   const assignedDateParam = searchParams.get("assignedDate");
   const assignedDate = assignedDateParam ? new Date(assignedDateParam) : null;
   const sortBy = searchParams.get("sortBy") || undefined;
   const sortDesc = searchParams.get("sortDesc") === "true";
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<
+    string | null
+  >(null);
   const [deletingAssignment, setDeletingAssignment] =
     useState<Assignment | null>(null);
 
   const sorts: SortItem[] = sortBy
     ? [
-      {
-        key: sortBy,
-        direction: sortDesc ? SortDirection.Desc : SortDirection.Asc,
-      },
-    ]
+        {
+          key: sortBy,
+          direction: sortDesc ? SortDirection.Desc : SortDirection.Asc,
+        },
+      ]
     : [];
 
   // Function update URL
@@ -87,12 +97,12 @@ export default function AssignmentsPage() {
     state: states.length > 0 ? states : undefined,
     assignedDate: assignedDate
       ? new Date(
-        Date.UTC(
-          assignedDate.getFullYear(),
-          assignedDate.getMonth(),
-          assignedDate.getDate(),
-        ),
-      ).toISOString()
+          Date.UTC(
+            assignedDate.getFullYear(),
+            assignedDate.getMonth(),
+            assignedDate.getDate(),
+          ),
+        ).toISOString()
       : undefined,
     sortBy: sortBy,
     sortDirection: sortDesc ? SortDirection.Desc : SortDirection.Asc,
@@ -128,12 +138,13 @@ export default function AssignmentsPage() {
       }).unwrap();
 
       setDeletingAssignment(null);
+      updateParams({ page: "1" });
       dispatchAction(
         enqueueToast({
           message: "Assignment deleted successfully.",
           type: ToastType.Success,
           testId: "toastSuccess",
-        })
+        }),
       );
     } catch (error) {
       setDeletingAssignment(null);
@@ -149,7 +160,7 @@ export default function AssignmentsPage() {
           message,
           type: ToastType.Error,
           testId: "toastError",
-        })
+        }),
       );
     }
   };
@@ -239,7 +250,9 @@ export default function AssignmentsPage() {
             acceptBtnTestId="btnAcceptAssignment"
             declineBtnTestId="btnDeleteAssignment"
             returnBtnTestId="btnReturnAssignment"
-            acceptIcon={<Pencil className="text-gray-500" size={20} strokeWidth={3} />}
+            acceptIcon={
+              <Pencil className="text-gray-500" size={20} strokeWidth={3} />
+            }
             declineIcon={<Trash2 size={20} strokeWidth={3} />}
             returnIcon={<RotateCcw size={20} strokeWidth={3} />}
           />
@@ -318,14 +331,14 @@ export default function AssignmentsPage() {
                 updateParams({
                   assignedDate: date
                     ? new Date(
-                      Date.UTC(
-                        date.getFullYear(),
-                        date.getMonth(),
-                        date.getDate(),
-                      ),
-                    )
-                      .toISOString()
-                      .split("T")[0]
+                        Date.UTC(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate(),
+                        ),
+                      )
+                        .toISOString()
+                        .split("T")[0]
                     : undefined,
                   page: date ? "1" : page.toString(),
                 })
@@ -336,7 +349,7 @@ export default function AssignmentsPage() {
         </div>
 
         {/* Right group: Search + Create button */}
-        <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+        <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row lg:justify-end">
           <div className="w-full sm:w-auto">
             <SearchInput
               value={searchInput}

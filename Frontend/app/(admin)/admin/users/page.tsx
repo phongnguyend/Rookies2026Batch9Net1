@@ -286,7 +286,7 @@ export default function UsersPage() {
             </UserActionButton>
 
             <div
-              className={isSelf ? "tooltip tooltip-left" : ""}
+              className={isSelf ? "tooltip tooltip-left flex" : "flex"}
               data-tip={isSelf ? "You cannot disable your self" : undefined}
             >
               <UserActionButton
@@ -338,29 +338,30 @@ export default function UsersPage() {
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">User List</h2>
 
-          <div className="my-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="my-4 flex flex-col gap-4 lg:flex-row lg:justify-between">
             <div className="relative" data-testid="ddlFilterType">
               <SingleSelectDropdown
-                  items={typeFilters}
-                  value={selectedTypes[0]}
-                  placeholder="Type"
-                  getKey={(item) => item.id}
-                  getLabel={(item) => item.label}
-                  onChange={(value) => {
-                    updateQueryParams({
-                      page: 1,
-                      type: value ?? null,
-                    });
-                  }}
-                  getTestIdAll="ddlFilterAll"
-                  getTestId={(item) =>
-                    item.id === UserRoles.Admin ? "ddlFilterAdmin" : "ddlFilterStaff"
-                  }
-                />
+                items={typeFilters}
+                value={selectedTypes[0]}
+                placeholder="Type"
+                getKey={(item) => item.id}
+                getLabel={(item) => item.label}
+                onChange={(value) => {
+                  updateQueryParams({
+                    page: 1,
+                    type: value ?? null,
+                  });
+                }}
+                getTestIdAll="ddlFilterAll"
+                getTestId={(item) =>
+                  item.id === UserRoles.Admin
+                    ? "ddlFilterAdmin"
+                    : "ddlFilterStaff"
+                }
+              />
             </div>
 
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:gap-3">
+            <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row lg:justify-end">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."
@@ -449,6 +450,7 @@ export default function UsersPage() {
                       type: ToastType.Success,
                     }),
                   );
+                  updateQueryParams({ page: 1 });
                 } catch (err) {
                   console.error("Failed to disable user:", err);
                   dispatch(
