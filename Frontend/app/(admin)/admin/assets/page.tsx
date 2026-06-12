@@ -183,6 +183,7 @@ function AssetsContent() {
       sortable: true,
       testId: "btnSortState",
       className: "w-32",
+      render: (row) => displayAssetState(row.state),
     },
     {
       key: "actions",
