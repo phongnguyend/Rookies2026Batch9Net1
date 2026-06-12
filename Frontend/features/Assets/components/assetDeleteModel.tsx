@@ -40,7 +40,6 @@ export default function DeleteAssetModal({
         id: assetId,
       }).unwrap();
       onDeleted?.();
-      onClose();
     } catch {
       dispatch(
         enqueueToast({

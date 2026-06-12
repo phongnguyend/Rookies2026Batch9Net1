@@ -87,7 +87,8 @@ function AssetsContent() {
 
   // ─── Display Item ───────────────────────────────────────
   // ─── Read pinned edited asset on mount ─────────
-  const [pinnedEditedAsset, setPinnedEditedAssetState] = useState<AssetListItem | null>(null);
+  const [pinnedEditedAsset, setPinnedEditedAssetState] =
+    useState<AssetListItem | null>(null);
 
   useEffect(() => {
     if (!data) return;
@@ -245,10 +246,12 @@ function AssetsContent() {
         assetId={deleteTarget?.id ?? null}
         assetName={deleteTarget?.name ?? ""}
         hasHistory={deleteTarget?.hasHistory ?? false}
+        onDeleted={() => {
+          setDeleteTarget(null);
+          setPinnedEditedAssetState(null);
+        }}
         onClose={() => {
           setDeleteTarget(null);
-          clearPinnedEditedAsset();
-          setPinnedEditedAssetState(null);
         }}
       />
       <div>
@@ -272,7 +275,7 @@ function AssetsContent() {
               <DropdownFilter
                 items={categoryOptions}
                 values={selectedCategories}
-              placeholder={categoriesLoading ? "Loading..." : "Category"}
+                placeholder={categoriesLoading ? "Loading..." : "Category"}
                 getKey={(item) => item.key}
                 getLabel={(item) => item.label}
                 onChange={handleCategoryChange}
