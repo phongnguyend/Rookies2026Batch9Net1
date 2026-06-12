@@ -18,7 +18,7 @@ import {
   type ReturnRequestRow,
 } from "@/features/returns/returns.types";
 import { SortDirection } from "@/lib/api/base.types";
-import { formatDate } from "@/utils/datetime.utils";
+import { formatDate, localDateToUtcIso } from "@/utils/datetime.utils";
 import { Check, X } from "lucide-react";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useDispatch } from "react-redux";
@@ -435,7 +435,7 @@ export default function ReturnsPage() {
                   updateQueryParams({
                     page: 1,
                     returnedDate: date
-                      ? formatReturnedDateForQuery(date)!
+                      ? localDateToUtcIso(date)!
                       : null,
                   });
                 }}
