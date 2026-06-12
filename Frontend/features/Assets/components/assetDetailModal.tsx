@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useGetAssetByIdQuery } from "@/features/Assets/assets.api";
 import AssetHistoryTable from "./assetHistoryTable";
 import { X } from "lucide-react";
-
+import { displayAssetState } from "@/utils/asset.utils";
 interface AssetDetailModalProps {
   assetId: string | null;
   onClose: () => void;
@@ -82,7 +82,7 @@ export default function AssetDetailModal({
               <Row label="Name" value={data.name} />
               <Row label="Category" value={data.category} />
               <Row label="Location" value={data.location} />
-              <Row label="State" value={data.state} />
+              <Row label="State" value={displayAssetState(data.state)} />
               <Row label="Specification" value={data.specification} />
               <Row
                 label="Installed Date"
