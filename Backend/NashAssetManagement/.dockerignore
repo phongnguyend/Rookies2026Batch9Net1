@@ -1,0 +1,5 @@
+# Avoid copy local build
+**/bin
+**/obj
+**/.vs
+**/.vscode

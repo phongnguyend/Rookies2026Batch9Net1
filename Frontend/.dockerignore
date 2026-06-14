@@ -1,0 +1,13 @@
+node_modules
+.next
+.vscode
+.vs
+*.DS_Store
+.gitignore
+README.md
+.dockerignore
+LICENSE
+.docker
+.gitlab
+.git
+out
