@@ -7,7 +7,6 @@ import SingleSortDataTable, {
   type ColumnDef,
   type SortItem,
 } from "@/features/shared/components/SingleSortDataTable";
-import DropdownFilter from "@/features/shared/components/DropdownFilter";
 import Pagination from "@/features/shared/components/Pagination";
 import SearchInput from "@/features/shared/components/SearchInput";
 import {
@@ -19,7 +18,7 @@ import {
   type ReturnRequestRow,
 } from "@/features/returns/returns.types";
 import { SortDirection } from "@/lib/api/base.types";
-import { formatDate } from "@/utils/datetime.utils";
+import { formatDate, localDateToUtcIso } from "@/utils/datetime.utils";
 import { Check, X } from "lucide-react";
 import ConfirmModal from "@/features/shared/components/Modal/ConfirmModal";
 import { useDispatch } from "react-redux";
@@ -383,6 +382,7 @@ export default function ReturnsPage() {
         returnRequestId: cancelingRequest.id,
       }).unwrap();
       setCancelingRequest(null);
+      updateQueryParams({ page: 1 });
 
       dispatchAction(
         enqueueToast({
@@ -404,15 +404,12 @@ export default function ReturnsPage() {
   };
 
   return (
-    <div
-      className="mb-10"
-      data-testid="mnuReturning"
-    >
+    <div className="mb-10" data-testid="mnuReturning">
       <div className="flex min-w-0">
         <main className="min-w-0 flex-1">
           <h2 className="mb-6 text-xl font-bold text-primary">Request List</h2>
 
-          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row">
             <div className="flex flex-wrap flex-col gap-3 lg:flex-row lg:items-center">
               <div data-testid="ddlState">
                 <SingleSelectDropdown
@@ -438,15 +435,16 @@ export default function ReturnsPage() {
                   updateQueryParams({
                     page: 1,
                     returnedDate: date
-                      ? formatReturnedDateForQuery(date)!
+                      ? localDateToUtcIso(date)!
                       : null,
                   });
                 }}
                 placeholder="Returned Date"
-                txtInputTestId="dpReturned"/>
+                txtInputTestId="dpReturned"
+              />
             </div>
 
-            <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+            <div className="flex flex-wrap gap-3 lg:ml-auto flex-col lg:flex-row">
               <SearchInput
                 value={searchInput}
                 placeholder="Search..."

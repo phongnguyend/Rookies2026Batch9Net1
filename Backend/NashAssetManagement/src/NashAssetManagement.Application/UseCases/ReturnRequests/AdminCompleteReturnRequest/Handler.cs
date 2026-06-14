@@ -1,11 +1,13 @@
 using ErrorOr;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
 using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 
 namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteReturnRequest
@@ -16,6 +18,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
         ILogger<Handler> logger,
         ICurrentUser currentUser,
         IValidator<Request> validator,
+        UserManager<User> userManager,
         IDateTimeProvider dateTimeProvider)
         : IRequestHandler<Request, ErrorOr<Updated>>
     {
@@ -33,7 +36,11 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
             var returnRequestId = Guid.Parse(orgRequest.ReturnRequestId!);
 
             // check current user
-            if(currentUser is null || currentUser.UserId is null)
+            var userId = currentUser.UserId.ToString();
+
+            var user = await userManager.FindByIdAsync(userId!);
+
+            if (user is null)
             {
                 return Errors.UserNotFound;
             }
@@ -87,6 +94,7 @@ namespace NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteR
                 // update return request [Completed]
                 returnRequest.State = ReturnRequestState.Completed;
                 returnRequest.ReturnedAtUtc = dateTimeProvider.UtcNow.Date;
+                returnRequest.AcceptedByUser = user;
 
                 // update assignment [Returned]
                 returnRequest.Assignment.State = AssignmentState.Returned;

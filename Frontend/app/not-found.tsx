@@ -61,6 +61,7 @@ export default function NotFoundPage() {
         {/* Buttons */}
         <div className="flex flex-col gap-3 mt-8">
           <Link
+            prefetch={false}  
             href={homePath}
             className="w-full py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-sm transition-all duration-150 flex items-center justify-center gap-2 text-sm"
           >

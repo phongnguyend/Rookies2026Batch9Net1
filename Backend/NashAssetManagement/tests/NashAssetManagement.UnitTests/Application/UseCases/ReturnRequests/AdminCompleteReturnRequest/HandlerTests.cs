@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NashAssetManagement.Application.Abstractions.AppIdentity;
@@ -6,6 +7,7 @@ using NashAssetManagement.Application.Abstractions.DataAccess;
 using NashAssetManagement.Application.Abstractions.DateTimes;
 using NashAssetManagement.Application.UseCases.ReturnRequests.AdminCompleteReturnRequest;
 using NashAssetManagement.Domain.Entities.Core;
+using NashAssetManagement.Domain.Entities.Identity;
 using NashAssetManagement.Domain.Enums;
 using Xunit;
 
@@ -18,6 +20,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
         private readonly Mock<ILogger<Handler>> _loggerMock;
         private readonly Mock<ICurrentUser> _currentUserMock;
         private readonly Mock<IDateTimeProvider> _dateTimeProviderMock;
+        private readonly Mock<UserManager<User>> _userManagerMock;
         private readonly Handler _handler;
 
         public HandlerTests()
@@ -27,6 +30,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             _loggerMock = new Mock<ILogger<Handler>>();
             _currentUserMock = new Mock<ICurrentUser>();
             _dateTimeProviderMock = new Mock<IDateTimeProvider>();
+            _userManagerMock = MockUserManager();
 
             _handler = new Handler(
                 _repositoryMock.Object,
@@ -34,6 +38,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
                 _loggerMock.Object,
                 _currentUserMock.Object,
                 new Validator(),
+                _userManagerMock.Object,
                 _dateTimeProviderMock.Object);
         }
 
@@ -61,6 +66,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Arrange
             var request = new Request("invalid-guid");
 
+            SetupCurrentAdmin(Guid.NewGuid());
+
             // Act
             await Assert.ThrowsAsync<ValidationException>(() =>
                 _handler.Handle(request, CancellationToken.None));
@@ -73,10 +80,9 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
         public async Task AdminCompleteReturnRequest_ReturnRequestNotFound_ShouldReturnReturnRequestNotFound()
         {
             // Arrange
-            var adminId = Guid.NewGuid();
             var request = new Request(Guid.NewGuid().ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(adminId);
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -90,6 +96,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.ReturnRequestNotFound.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -99,7 +107,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             var returnRequest = CreateReturnRequest(ReturnRequestState.Completed);
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -113,6 +121,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.RequestAlreadyCompleted.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -122,7 +132,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             var returnRequest = CreateReturnRequest(ReturnRequestState.Cancelled);
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -136,6 +146,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.RequestCancelled.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -151,7 +163,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
 
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -165,6 +177,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.AssignmentNotFound.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -177,7 +191,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
 
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -191,6 +205,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.InvalidAssignmentState.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -213,7 +229,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
 
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -227,6 +243,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.AssetNotFound.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -236,7 +254,7 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             var returnRequest = CreateReturnRequest();
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            SetupCurrentAdmin(Guid.NewGuid());
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -254,6 +272,8 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             // Assert
             Assert.True(result.IsError);
             Assert.Equal(Errors.UnexpectedError.Code, result.FirstError.Code);
+
+            _uowMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -264,8 +284,11 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             var returnRequest = CreateReturnRequest();
             var request = new Request(returnRequest.Id.ToString());
 
-            _currentUserMock.Setup(x => x.UserId).Returns(Guid.NewGuid());
-            _dateTimeProviderMock.Setup(x => x.UtcNow).Returns(completedDate);
+            SetupCurrentAdmin(Guid.NewGuid());
+
+            _dateTimeProviderMock
+                .Setup(x => x.UtcNow)
+                .Returns(completedDate);
 
             _repositoryMock
                 .Setup(x => x.FirstOrDefaultAsync(
@@ -292,6 +315,33 @@ namespace NashAssetManagement.UnitTests.Application.UseCases.ReturnRequests.Admi
             _uowMock.Verify(
                 x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
                 Times.Once);
+        }
+
+        private void SetupCurrentAdmin(Guid adminId)
+        {
+            _currentUserMock
+                .Setup(x => x.UserId)
+                .Returns(adminId);
+
+            _userManagerMock
+                .Setup(x => x.FindByIdAsync(adminId.ToString()))
+                .ReturnsAsync(new User { Id = adminId });
+        }
+
+        private static Mock<UserManager<User>> MockUserManager()
+        {
+            var store = new Mock<IUserStore<User>>();
+
+            return new Mock<UserManager<User>>(
+                store.Object,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!,
+                null!);
         }
 
         private static ReturnRequest CreateReturnRequest(

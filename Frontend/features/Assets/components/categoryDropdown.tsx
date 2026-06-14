@@ -122,7 +122,7 @@ export default function CategoryDropdown({
       }).unwrap();
 
       onChange(result.id, result.name); // ← pass id + name from API response
-
+      setIsOpen(false);
       dispatch(
         enqueueToast({
           message: `Category "${result.name}" created successfully.`,

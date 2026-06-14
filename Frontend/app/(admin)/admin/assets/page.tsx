@@ -87,15 +87,17 @@ function AssetsContent() {
 
   // ─── Display Item ───────────────────────────────────────
   // ─── Read pinned edited asset on mount ─────────
-  const [pinnedEditedAsset] = useState<AssetListItem | null>(() =>
-    getPinnedEditedAsset(),
-  );
+  const [pinnedEditedAsset, setPinnedEditedAssetState] =
+    useState<AssetListItem | null>(null);
 
-  // ─── Clear when user leaves assets page ────────
   useEffect(() => {
     if (!data) return;
-    clearPinnedEditedAsset();
-  });
+    const pinned = getPinnedEditedAsset();
+    if (pinned) {
+      setPinnedEditedAssetState(pinned);
+      clearPinnedEditedAsset();
+    }
+  }, [data]);
 
   const displayItems = (() => {
     const items = data?.items ?? [];
@@ -181,6 +183,7 @@ function AssetsContent() {
       sortable: true,
       testId: "btnSortState",
       className: "w-32",
+      render: (row) => displayAssetState(row.state),
     },
     {
       key: "actions",
@@ -188,7 +191,10 @@ function AssetsContent() {
       className: "w-28",
       render: (row) => {
         return (
-          <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-3"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               disabled={
                 EditDisabledStates
@@ -241,7 +247,13 @@ function AssetsContent() {
         assetId={deleteTarget?.id ?? null}
         assetName={deleteTarget?.name ?? ""}
         hasHistory={deleteTarget?.hasHistory ?? false}
-        onClose={() => setDeleteTarget(null)}
+        onDeleted={() => {
+          setDeleteTarget(null);
+          setPinnedEditedAssetState(null);
+        }}
+        onClose={() => {
+          setDeleteTarget(null);
+        }}
       />
       <div>
         {/* Filters */}
@@ -274,7 +286,7 @@ function AssetsContent() {
           </div>
 
           {/* Search + button */}
-          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row">
+          <div className="flex flex-wrap gap-3 lg:items-center lg:ml-auto flex-col lg:flex-row lg:justify-end">
             <div data-testid="txtSearch" className="w-full sm:w-auto">
               <SearchInput
                 value={searchInput}

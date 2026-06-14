@@ -135,6 +135,13 @@ export const UserAssignmentsDataTable = () => {
       }).unwrap();
 
       setDecliningAssignment(null);
+      dispatch({
+        type: "SET_PAGINATION",
+        payload: {
+          pageNumber: 1,
+          pageSize: params.pageSize!,
+        },
+      });
       dispatchAction(
         enqueueToast({
           message: "Assignment declined successfully.",
