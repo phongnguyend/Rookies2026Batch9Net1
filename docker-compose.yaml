@@ -25,7 +25,7 @@ services:
   # API
   nam-api:
     container_name: nam-api
-    image: nashassetmanagement/api:latest
+    image: anonyfriday/api:latest
     restart: always
     depends_on:
       nam-db:
@@ -41,7 +41,7 @@ services:
   # Web Frontend
   nam-web:
     container_name: nam-web
-    image: nashassetmanagement/web:latest
+    image: anonyfriday/web:latest
     restart: always
     depends_on:
       nam-db:
@@ -49,7 +49,7 @@ services:
       nam-api:
         condition: service_started
     ports:
-      - 5001:3000
+      - 5001:80
     env_file:
       - path: secrets/nam-web.env
         required: true
