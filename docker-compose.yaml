@@ -1,5 +1,5 @@
 services:
-  # Nash Asset Management Database
+  # Database
   nam-db:
     container_name: nam-db
     image: mcr.microsoft.com/mssql/server:2025-latest
@@ -21,6 +21,37 @@ services:
       timeout: 5s
       retries: 10
       start_period: 20s
+
+  # API
+  nam-api:
+    container_name: nam-api
+    image: anonyfriday/api:latest
+    restart: always
+    depends_on:
+      nam-db:
+        condition: service_healthy
+    ports:
+      - 5000:8080
+    env_file:
+      - path: secrets/nam-api.env
+        required: true
+    networks:
+      - nam-network
+
+  # Web Frontend
+  nam-web:
+    container_name: nam-web
+    image: anonyfriday/web:latest
+    restart: always
+    depends_on:
+      nam-db:
+        condition: service_healthy
+      nam-api:
+        condition: service_started
+    ports:
+      - 5001:80
+    networks:
+      - nam-network
 
 volumes:
   nam-db-data:
