@@ -18,7 +18,7 @@ jobs:
         env:
             DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
             DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-            IMAGE_NAME: nashassetmanagement/api
+            IMAGE_NAME: anonyfriday/api
 
         steps:
             - name: Checkout
@@ -47,7 +47,7 @@ jobs:
         env:
             DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
             DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-            IMAGE_NAME: nashassetmanagement/web
+            IMAGE_NAME: anonyfriday/web
 
         steps:
             - name: Checkout
