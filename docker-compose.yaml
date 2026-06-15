@@ -50,9 +50,6 @@ services:
         condition: service_started
     ports:
       - 5001:80
-    env_file:
-      - path: secrets/nam-web.env
-        required: true
     networks:
       - nam-network
 
