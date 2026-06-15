@@ -9,7 +9,7 @@ on:
             - completed
     push:
         branches:
-            - deploy/dockerhub
+            - main
 
 jobs:
     api:
