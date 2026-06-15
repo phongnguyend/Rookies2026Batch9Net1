@@ -21,6 +21,9 @@ jobs:
             IMAGE_NAME: nashassetmanagement/api
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
             - name: Login to Docker Hub
               uses: docker/login-action@v4
               with:
@@ -47,6 +50,9 @@ jobs:
             IMAGE_NAME: nashassetmanagement/web
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
             - name: Login to Docker Hub
               uses: docker/login-action@v4
               with:
