@@ -6,7 +6,12 @@
 
 A project **Asset Management System** built for managing organizational assets, assignments, and returns. This project demonstrates enterprise-grade full-stack development with modern architecture patterns and best practices.
 
----
+### 👥 Team
+
+**Developers**: Vu Kim Duy, Nguyen Thai Hoa, Nguyen Do Dang Khoa, Nguyen Xuan Dung, Truong Quang Huy, Nguyen Vu Truong Huy
+
+**Mentors**: Phong Nguyen, Nam Nguyen
+
 
 ## 🛠️ Tech Stack
 
@@ -17,31 +22,31 @@ A project **Asset Management System** built for managing organizational assets, 
 - **Infrastructure**: Azure, Docker, Bicep, Azure Pipelines
 - **Architecture**: Clean Architecture, CQRS, Feature-based structure
 
----
 
 ## 📋 Project Scope & Features
 
 ### **Staff Portal**
 
-- Dashboard, Asset browsing, My assignments, Return requests, Profile management
+- My assignments
+- Login, Logout
 
 ### **Admin Portal**
 
 - Asset management (CRUD), Category management, Assignments, Return approvals, User management, Reports
+- Login, Logout
+- Asset-based Location on Admin account only
 
 ### **Enhancements**
 
-- Real-time notifications via SignalR
+- Real-time notifications
 - Role-based access control
-- Responsive design
-- Multi-environment support (DEV, QC)
+- Responsive design (Mobile, width < 320px ) & (Laptop & Tablet, width >= 320px)
 
 ### **Browser Support**
 
 - Chrome, Firefox, Edge, Safari, Opera, Vivaldi
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
----
 
 ## 📡 Current Supporting APIs
 
@@ -79,7 +84,6 @@ A project **Asset Management System** built for managing organizational assets, 
 | **Identity API** | `/api/v1/auth/me`                    | GET      | Get current user info                  | ✅ Completed |
 | **SignalR Hub**  | `/hubs/user-session`                 | WS       | Real-time user session notifications   | ✅ Completed |
 
----
 
 ## 🖼️ Current Supporting Pages
 
@@ -112,7 +116,6 @@ A project **Asset Management System** built for managing organizational assets, 
 | **Auth**       | `/logout`             | GET    | Logout action                | ✅ Completed |
 | **Global**     | `[...slug]`           | ALL    | 404 Error page               | ✅ Completed |
 
----
 
 ## 🏗️ Architecture
 
@@ -124,7 +127,6 @@ A project **Asset Management System** built for managing organizational assets, 
 
 ![Entity Relationship Diagram](./docs/images/erd.png)
 
----
 
 ## 📂 Project Structure
 
@@ -201,7 +203,6 @@ A project **Asset Management System** built for managing organizational assets, 
 └── README.md
 ```
 
----
 
 ## 🚀 Running the Project
 
@@ -292,7 +293,6 @@ dotnet ef database drop
 dotnet ef database update
 ```
 
----
 
 ## 🧪 Testing
 
@@ -312,7 +312,6 @@ dotnet test \
   "/p:Include=\"[NashAssetManagement.Application]*,[NashAssetManagement.Domain]*\""
 ```
 
----
 
 ## 🏛️ Architecture Patterns & Design Decisions
 
@@ -342,7 +341,6 @@ dotnet test \
 - **React Hook Form** - Efficient form handling
 - **Zod** - Runtime type safety & validation
 
----
 
 ## 📊 CI/CD Pipeline
 
@@ -365,7 +363,6 @@ dotnet test \
    - Deploy Web to App Service
    - Database migrations
 
----
 
 ## 📚 Reference Links
 
@@ -416,7 +413,6 @@ dotnet test \
 - [SQL Server Docker Image](https://hub.docker.com/r/microsoft/mssql-server)
 - [Swagger/OpenAPI](https://swagger.io/)
 
----
 
 ## 🤝 Contribution Guidelines
 
@@ -448,39 +444,12 @@ dotnet test \
    - Ensure CI/CD passes
    - Request review from team members
 
----
 
-## 👥 Team Members
+## Copyright
 
-### **Developers**
+© 2026 Nashtech. All rights reserved.
 
-- Vu Kim Duy
-- Nguyen Thai Hoa
-- Nguyen Do Dang Khoa
-- Nguyen Xuan Dung
-- Truong Quang Huy
-- Nguyen Vu Truong Huy
-
-### **Mentors**
-
-- Phong Nguyen
-- Nam Nguyen
-
----
-
-## 📋 Code of Conduct
-
-See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) for our community guidelines and expectations.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](./LICENSE) file for details.
-
----
-
-![NashTech Logo](./docs/images/nashtech_logo.png)
+![Nashtech Logo](./docs/images/nashtech_logo.png)
 
 **Last Updated**: June 2026  
 **Version**: 1.0.0
